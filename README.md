@@ -1,5 +1,7 @@
 # FGPE Gamification Service
 
+This is a Gamification Service for educational contexts. It consumes a JSON object adhering to GEdIL schema and uses it to provide the student with a gamified experience leveraging on the activities of the course.
+
 ## Getting Started
 
 Docker + Make + Node.js + TypeScript + NestJS + TypeORM + TypeGraphQL + Jest + TSLint + EasyGraphQL Tester

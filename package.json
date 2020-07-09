@@ -1,7 +1,7 @@
 {
   "name": "fgpe-gamification-service",
   "version": "1.0.0",
-  "description": "FGPE Gamification Service",
+  "description": "This is a Gamification Service for educational contexts. It consumes a JSON object adhering to GEdIL schema and uses it to provide the student with a gamified experience leveraging on the activities of the course.",
   "license": "GPL-3.0",
   "scripts": {
     "prebuild": "rimraf dist",
