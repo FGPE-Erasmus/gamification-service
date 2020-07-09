@@ -2,7 +2,7 @@
 
 ## Getting Started
 
-Docker + Make + Node.js + TypeScript + NestJS + TypeORM + TypeGraphQL + Jest + TSLint + EasyGraphQL Tester = :heart:
+Docker + Make + Node.js + TypeScript + NestJS + TypeORM + TypeGraphQL + Jest + TSLint + EasyGraphQL Tester
 
 ### Requirements
 
@@ -20,7 +20,7 @@ $ Make --version
 >= v4.2.1
 
 $ node --version
->= v12.13.1
+>= v14
 
 $ NPM --version
 >= v6.4.5
@@ -79,6 +79,11 @@ $ cd gamification-service
 $ npm run test:cov
 ```
 
+### Admin Login
+
+ - username: `admin`
+ - password: `4dm1nS.`
+
 ## Built With
 
 * [Docker](https://docker.com/)
@@ -86,7 +91,7 @@ $ npm run test:cov
 * [Node.js](https://nodejs.org/)
 * [TypeScript](https://sass-lang.com/)
 * [NestJS](https://nestjs.com/)
-* [Fastify](https://fastify.io/)
+* [Express](https://expressjs.com)
 * [TypeORM](https://typeorm.io/)
 * [TypeGraphQL](https://typegraphql.ml/)
 * [Jest](https://jestjs.io/)

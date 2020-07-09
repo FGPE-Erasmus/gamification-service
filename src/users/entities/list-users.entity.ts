@@ -1,12 +1,13 @@
-import { Field, ObjectType, Int } from 'type-graphql';
+import { ObjectType, Field, Int } from '@nestjs/graphql';
+
 import { IListItems } from '../../common/interfaces/list-items.interface';
 import { UserEntity as User } from './user.entity';
 
 @ObjectType('ListUsers')
 export class ListUsersEntity implements IListItems {
-  @Field(type => [User])
+  @Field(() => [User])
   items: User[];
 
-  @Field(type => Int)
+  @Field(() => Int)
   total: number;
 }

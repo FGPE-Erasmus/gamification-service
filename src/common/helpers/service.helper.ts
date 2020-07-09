@@ -1,6 +1,7 @@
 import { ObjectId } from 'mongodb';
 import { Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
+
 import { IWhereName } from '../interfaces/where-name.interface';
 import { IWhereIds } from '../interfaces/where-ids.interface';
 import { findOrder } from '../types/find-order.type';
@@ -8,7 +9,7 @@ import { FindNameDto } from '../dto/find-name.dto';
 
 @Injectable()
 export class ServiceHelper {
-  async getUpsertData(id: string | undefined, fields: any, repository: Repository<any>): Promise<any> {
+  async getUpsertData(id: string | undefined, fields: { [k: string]: any }, repository: Repository<any>): Promise<any> {
     if (id) {
       return {
         ...(await repository.findOne(id)),

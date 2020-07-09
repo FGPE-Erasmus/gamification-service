@@ -1,10 +1,13 @@
 import { ObjectID } from 'mongodb';
 import { Test, TestingModule } from '@nestjs/testing';
+import * as bcrypt from 'bcryptjs';
+
+import { ServiceHelper } from '../common/helpers/service.helper';
 import { UsersService } from './users.service';
 import { UserRepository } from './repositories/user.repository';
-import { ServiceHelper } from '../common/helpers/service.helper';
 import { UserEntity } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
+import { Role } from './entities/role.enum';
 
 describe('UsersService', () => {
   let service: UsersService;
@@ -24,8 +27,9 @@ describe('UsersService', () => {
   it('should return one new User', async () => {
     const mockCreateUserDto: CreateUserDto = {
       name: 'John Doe',
+      username: 'johndoe',
       email: 'johndoe@johndoe.com',
-      telephone: '+55 21 2233-4455',
+      telephone: '+351 21 2233-4455',
       birthDate: new Date('1980-05-10'),
     };
 
@@ -33,6 +37,8 @@ describe('UsersService', () => {
       id: new ObjectID(),
       createdAt: new Date(),
       active: true,
+      roles: [Role.USER],
+      password: await bcrypt.hash('password', 10),
       ...mockCreateUserDto,
     };
 

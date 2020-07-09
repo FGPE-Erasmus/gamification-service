@@ -13,12 +13,14 @@ describe('UsersModule (Queries and Mutations)', () => {
 
   it('Should pass if the mutation is valid', done => {
     const name: string = fakeName.findName();
+    const username: string = fakeInternet.userName();
     const email: string = fakeInternet.email();
 
     const mutation = `
       mutation saveUser($user: CreateUserInput!) {
         saveUser(userInput: $user) {
           name
+          username
           email
         }
       }
@@ -26,6 +28,7 @@ describe('UsersModule (Queries and Mutations)', () => {
     tester.test(true, mutation, {
       user: {
         name,
+        username,
         email,
       },
     });
@@ -38,8 +41,10 @@ describe('UsersModule (Queries and Mutations)', () => {
         users {
           items {
             id
-            name
+            username
             email
+            name
+            roles
           }
           total
         }

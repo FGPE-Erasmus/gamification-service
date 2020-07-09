@@ -1,4 +1,5 @@
-import { ArgsType } from 'type-graphql';
+import { ArgsType } from '@nestjs/graphql';
+
 import { FindNameDto } from '../../common/dto/find-name.dto';
 
 @ArgsType()

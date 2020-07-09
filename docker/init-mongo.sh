@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 echo "Creating mongo users..."
 
-mongo -- "${MONGO_INITDB_DATABASE}" <<EOF
+mongo -- "${DB_INITDB_DATABASE}" <<EOF
   db.createUser(
     {
-      "user": "${MONGO_INITDB_ROOT_USERNAME}",
-      "pwd": "${MONGO_INITDB_ROOT_PASSWORD}",
+      "user": "${DB_INITDB_ROOT_USERNAME}",
+      "pwd": "${DB_INITDB_ROOT_PASSWORD}",
       "roles": [
         {
           "role": "readWrite",
-          "db": "${MONGO_INITDB_DATABASE}"
+          "db": "${DB_INITDB_DATABASE}"
         },
       ]
     }

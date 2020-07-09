@@ -1,13 +1,13 @@
 import { Column, Entity, ObjectID, ObjectIdColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
-import { Field, ID } from 'type-graphql';
-import { ObjectType } from '@nestjs/graphql';
+import { ObjectType, Field, ID } from '@nestjs/graphql';
 
 import { EmailScalar as Email } from '../../common/scalars/email.scalar';
+import { Role } from './role.enum';
 
 @Entity('User')
 @ObjectType('User')
 export class UserEntity {
-  @Field(type => ID)
+  @Field(() => ID)
   @ObjectIdColumn()
   readonly id: ObjectID;
 
@@ -15,9 +15,20 @@ export class UserEntity {
   @Column()
   name: string;
 
-  @Field(type => Email)
+  @Field()
+  @Column()
+  username: string;
+
+  @Field(() => Email)
   @Column()
   email: string;
+
+  @Column({ select: false })
+  password?: string;
+
+  @Field(() => [Role])
+  @Column({ default: [Role.USER] })
+  roles: Role[];
 
   @Field({ nullable: true })
   @Column()

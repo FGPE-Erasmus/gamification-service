@@ -3,27 +3,34 @@ import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 
 import { AppModule } from '../../src/app.module';
-
+import { GqlAdminGuard } from '../../src/common/guards/gql-admin.guard';
+import { GqlJwtAuthGuard } from '../../src/common/guards/gql-jwt-auth.guard';
 
 describe('UsersResolver (e2e)', () => {
   let app: INestApplication;
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
-    }).compile();
+    })
+      .overrideGuard(GqlJwtAuthGuard)
+      .useValue({ canActivate: () => true })
+      .overrideGuard(GqlAdminGuard)
+      .useValue({ canActivate: () => true })
+      .compile();
 
     app = moduleFixture.createNestApplication();
     await app.init();
   });
 
-  it('Query Users', done => {
+  it('Query Users', () => {
     const query = {
       query: `{
         users {
           items {
             id
             name
+            username
             email
           }
           total
@@ -34,21 +41,15 @@ describe('UsersResolver (e2e)', () => {
     request(app.getHttpServer())
       .post('/graphql')
       .send(query)
-      .end((error, response) => {
-        expect(response.status).toBe(200);
-        expect(response.body.data).toEqual(
-          expect.objectContaining({
-            users: {
-              items: [],
-              total: 0,
-            },
-          }),
-        );
-        done();
+      .expect(200, {
+        users: {
+          items: [],
+          total: 0,
+        },
       });
   });
 
-  afterAll(async () => {
+  afterEach(async () => {
     await app.close();
   });
 });

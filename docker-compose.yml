@@ -7,7 +7,7 @@ services:
       context: .
       dockerfile: ./docker/Dockerfile
       args:
-        - PORT=${PORT}
+        - PORT=${APP_PORT}
         - NODE_ENV=${NODE_ENV}
     user: node
     working_dir: /home/node/app
@@ -16,7 +16,7 @@ services:
     volumes:
       - ./src:/home/node/app/src
     ports:
-      - ${PORT}:${PORT}
+      - ${APP_PORT}:${APP_PORT}
     depends_on:
       - mongodb
     networks:
@@ -24,14 +24,14 @@ services:
     command: "npm run start:dev"
 
   mongodb:
-    container_name: ${MONGO_HOST}
+    container_name: ${DB_HOST}
     image: mongo:latest
     environment:
-      - MONGO_INITDB_DATABASE=${MONGO_DATABASE_NAME}
-      - MONGO_INITDB_ROOT_USERNAME=${MONGO_USERNAME}
-      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
+      - DB_INITDB_DATABASE=${DB_NAME}
+      - DB_INITDB_ROOT_USERNAME=${DB_USERNAME}
+      - DB_INITDB_ROOT_PASSWORD=${DB_PASSWORD}
     ports:
-      - ${MONGO_PORT}:${MONGO_PORT}
+      - ${DB_PORT}:${DB_PORT}
     volumes:
       - ./docker/init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh
       - fgpe-gs-db:/data/db
