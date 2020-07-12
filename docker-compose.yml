@@ -27,13 +27,13 @@ services:
     container_name: ${DB_HOST}
     image: mongo:latest
     environment:
-      - DB_INITDB_DATABASE=${DB_NAME}
-      - DB_INITDB_ROOT_USERNAME=${DB_USERNAME}
-      - DB_INITDB_ROOT_PASSWORD=${DB_PASSWORD}
+      - MONGO_INITDB_DATABASE=${DB_NAME}
+      - MONGO_INITDB_ROOT_USERNAME=${DB_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${DB_PASSWORD}
     ports:
       - ${DB_PORT}:${DB_PORT}
     volumes:
-      - ./docker/init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh
+      #- ./docker/init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh
       - fgpe-gs-db:/data/db
     networks:
       - fgpe-gs-nw
