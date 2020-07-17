@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { RestHealthcheckController } from './rest.healthcheck.controller';
-import { GraphqlHealthResolver } from './graphl.healthcheck.resolver';
+import { HealthcheckController } from './healthcheck.controller';
+import { HealthcheckResolver } from './healthcheck.resolver';
 
 @Module({
-    controllers: [RestHealthcheckController],
-    providers: [GraphqlHealthResolver],
+    controllers: [HealthcheckController],
+    providers: [HealthcheckResolver],
 })
 export class HealthModule { }

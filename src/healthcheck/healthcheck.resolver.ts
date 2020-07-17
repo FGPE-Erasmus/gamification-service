@@ -1,7 +1,7 @@
 import { Query, Resolver, Mutation } from '@nestjs/graphql';
 
 @Resolver(() => String)
-export class GraphqlHealthResolver {
+export class HealthcheckResolver {
     constructor() { }
 
     @Query(returns => String)

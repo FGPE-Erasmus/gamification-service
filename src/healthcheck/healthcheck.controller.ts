@@ -1,9 +1,9 @@
-import { Controller, Get, Res, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Res } from '@nestjs/common';
 import { Response } from 'express';
 import { appConfig } from 'src/app.config';
 
 @Controller('healthcheck')
-export class RestHealthcheckController {
+export class HealthcheckController {
     @Get()
     async checkStatus(@Res() res: Response) {
         try {
