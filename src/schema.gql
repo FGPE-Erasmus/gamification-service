@@ -33,6 +33,7 @@ type ListUsers {
 type Query {
   user(id: String!): User!
   users(skip: Int = 0, take: Int = 50, ids: [ID!], name: String, order: String = "DESC", fieldSort: String = "updatedAt"): ListUsers!
+  queryCheck: String!
 }
 
 type Mutation {
@@ -40,6 +41,7 @@ type Mutation {
   deleteUser(id: ID!): Boolean!
   login(login: String!, password: String!): User!
   signup(name: String!, username: String!, email: Email!, password: String!): User!
+  mutationCheck: String!
 }
 
 input CreateUserInput {

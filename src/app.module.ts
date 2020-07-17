@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { DateScalar } from './common/scalars/date.scalar';
 import { EmailScalar } from './common/scalars/email.scalar';
+import { HealthModule } from './healthcheck/healthcheck.module';
 
 @Module({
   imports: [
@@ -19,9 +20,10 @@ import { EmailScalar } from './common/scalars/email.scalar';
       playground: appConfig.isDevelopment,
       installSubscriptionHandlers: true,
     }),
+    HealthModule,
     AuthModule,
     UsersModule,
   ],
   providers: [DateScalar, EmailScalar],
 })
-export class AppModule {}
+export class AppModule { }
