@@ -9,6 +9,7 @@ import { UsersModule } from './users/users.module';
 import { DateScalar } from './common/scalars/date.scalar';
 import { EmailScalar } from './common/scalars/email.scalar';
 import { HealthModule } from './healthcheck/healthcheck.module';
+import { GameModule } from './game/game.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { HealthModule } from './healthcheck/healthcheck.module';
     HealthModule,
     AuthModule,
     UsersModule,
+    GameModule,
   ],
   providers: [DateScalar, EmailScalar],
 })
