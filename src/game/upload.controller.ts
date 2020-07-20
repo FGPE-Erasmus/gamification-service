@@ -9,7 +9,7 @@ import { GameAdminGuard } from './game-admin.guard';
 export class GameUploadController {
     @Post()
     @UseInterceptors(FileInterceptor('zip'))
-    createGame(@UploadedFile() file) {
+    uploadZip(@UploadedFile() file) {
         return { file };
     }
 }
