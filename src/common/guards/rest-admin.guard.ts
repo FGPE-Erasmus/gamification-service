@@ -1,12 +1,12 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
-import { UserEntity as User } from '../users/entities/user.entity';
+import { UserEntity as User } from '../../users/entities/user.entity';
 
 /**
  * Check if the user performing the request has admin role.
  */
 @Injectable()
-export class GameAdminGuard implements CanActivate {
+export class RestAdminGuard implements CanActivate {
     constructor(private usersService: UsersService) { }
 
     canActivate(context: ExecutionContext): boolean {

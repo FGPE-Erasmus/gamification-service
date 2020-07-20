@@ -1,15 +1,16 @@
 import { FileInterceptor } from '@nestjs/platform-express';
-import { Controller, Post, UseInterceptors, UploadedFile, UseGuards } from '@nestjs/common';
-import { GameJwtAuthGuard } from './game-jwt-auth';
-import { GameAdminGuard } from './game-admin.guard';
+import { Controller, Post, UseInterceptors, UploadedFile, UseGuards, Body } from '@nestjs/common';
+import { RestJwtGuard } from '../common/guards/rest-jwt-auth.guard';
+import { RestAdminGuard } from '../common/guards/rest-admin.guard';
+import GameDto from './game.dto';
 
 
 @Controller('upload')
-@UseGuards(GameJwtAuthGuard, GameAdminGuard)
+@UseGuards(RestJwtGuard, RestAdminGuard)
 export class GameUploadController {
     @Post()
     @UseInterceptors(FileInterceptor('zip'))
-    uploadZip(@UploadedFile() file) {
+    uploadZip(@Body() gameDto: GameDto, @UploadedFile() file) {
         return { file };
     }
 }

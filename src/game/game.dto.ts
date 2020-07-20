@@ -15,6 +15,4 @@ export default class GameDto {
     @Field()
     userIds: string;
 
-    @Field()
-    zipGEdIL: string; //for now
 }
