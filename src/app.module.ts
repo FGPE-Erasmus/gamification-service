@@ -28,4 +28,4 @@ import { GameModule } from './game/game.module';
   ],
   providers: [DateScalar, EmailScalar],
 })
-export class AppModule { }
+export class AppModule {}

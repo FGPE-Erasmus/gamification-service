@@ -38,8 +38,8 @@
     "@nestjs/passport": "^7.1.0",
     "@nestjs/platform-express": "^7.3.2",
     "@nestjs/typeorm": "^7.0.0",
-    "apollo-server": "^2.15.1",
-    "apollo-server-express": "^2.15.1",
+    "apollo-server": "^2.16.0",
+    "apollo-server-express": "^2.16.0",
     "bcryptjs": "^2.4.3",
     "class-transformer": "^0.2.3",
     "class-validator": "^0.12.2",
@@ -56,7 +56,8 @@
     "rimraf": "^3.0.2",
     "rxjs": "^6.6.0",
     "type-graphql": "^0.17.6",
-    "typeorm": "^0.2.25"
+    "typeorm": "^0.2.25",
+    "unzipper": "^0.10.11"
   },
   "devDependencies": {
     "@nestjs/cli": "^7.0.0",
@@ -68,6 +69,7 @@
     "@types/node": "^14.0.14",
     "@types/passport-jwt": "^3.0.3",
     "@types/supertest": "^2.0.10",
+    "@types/unzipper": "^0.10.3",
     "@typescript-eslint/eslint-plugin": "^3.5.0",
     "@typescript-eslint/parser": "^3.5.0",
     "easygraphql-tester": "^5.1.6",
@@ -85,6 +87,10 @@
     "ts-node": "^8.10.2",
     "tsconfig-paths": "^3.9.0",
     "typescript": "^3.9.6"
+  },
+  "resolutions": {
+    "**/**/fs-capacitor": "^6.2.0",
+    "**/graphql-upload": "^11.0.0"
   },
   "repository": {
     "type": "git",

@@ -1,17 +1,28 @@
-import { Query, Resolver, Mutation, Args } from '@nestjs/graphql';
-import GameDto from './game.dto';
+import { Resolver, Mutation, Args } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
-import { GqlJwtAuthGuard } from 'src/common/guards/gql-jwt-auth.guard';
-import { GqlAdminGuard } from 'src/common/guards/gql-admin.guard';
 
-@Resolver(() => String)
+import { GqlJwtAuthGuard } from '../common/guards/gql-jwt-auth.guard';
+import { GqlAdminGuard } from '../common/guards/gql-admin.guard';
+import ImportGameDto from './import-game.dto';
+import { GameService } from './game.service';
+
+@Resolver()
 export class GameResolver {
-    constructor() { }
+  constructor(private gameService: GameService) {}
 
-    @Mutation(returns => String)
-    @UseGuards(GqlJwtAuthGuard, GqlAdminGuard)
-    async createGame(@Args() input: GameDto): Promise<string> {
-        return 'Creating a game...';
-    }
-
+  @Mutation(() => String)
+  @UseGuards(GqlJwtAuthGuard, GqlAdminGuard)
+  async createGame(@Args() input: ImportGameDto): Promise<string> {
+    const { createReadStream } = await input.file;
+    await this.gameService.create(
+      {
+        name: input.name,
+        startDate: input.startDate,
+        endDate: input.endDate,
+        userIds: input.userIds,
+      },
+      createReadStream(),
+    );
+    return 'Creating a game...';
+  }
 }
