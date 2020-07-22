@@ -1,16 +1,21 @@
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Controller, Post, UseInterceptors, UploadedFile, UseGuards, Body } from '@nestjs/common';
+import { Readable } from 'stream';
+
 import { RestJwtGuard } from '../common/guards/rest-jwt-auth.guard';
 import { RestAdminGuard } from '../common/guards/rest-admin.guard';
 import GameDto from './game.dto';
-
+import { GameService } from './game.service';
 
 @Controller('upload')
-@UseGuards(RestJwtGuard, RestAdminGuard)
 export class GameUploadController {
-    @Post()
-    @UseInterceptors(FileInterceptor('zip'))
-    uploadZip(@Body() gameDto: GameDto, @UploadedFile() file) {
-        return { file };
-    }
+  constructor(private gameService: GameService) {}
+
+  @Post()
+  @UseInterceptors(FileInterceptor('file'))
+  @UseGuards(RestJwtGuard, RestAdminGuard)
+  async uploadZip(@Body() gameDto: GameDto, @UploadedFile() file): Promise<string> {
+    await this.gameService.create(gameDto, Readable.from(file.buffer));
+    return 'Creating a game...';
+  }
 }

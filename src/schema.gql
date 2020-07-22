@@ -42,6 +42,7 @@ type Mutation {
   login(login: String!, password: String!): User!
   signup(name: String!, username: String!, email: Email!, password: String!): User!
   mutationCheck: String!
+  createGame(name: String!, startDate: Date!, endDate: Date!, userIds: String!, file: Upload!): String!
 }
 
 input CreateUserInput {
@@ -53,3 +54,6 @@ input CreateUserInput {
   roles: [Role!] = [USER]
   password: String
 }
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
