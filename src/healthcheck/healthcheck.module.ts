@@ -3,7 +3,7 @@ import { HealthcheckController } from './healthcheck.controller';
 import { HealthcheckResolver } from './healthcheck.resolver';
 
 @Module({
-    controllers: [HealthcheckController],
-    providers: [HealthcheckResolver],
+  controllers: [HealthcheckController],
+  providers: [HealthcheckResolver],
 })
-export class HealthModule { }
+export class HealthModule {}

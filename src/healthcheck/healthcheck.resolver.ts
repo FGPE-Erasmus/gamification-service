@@ -2,16 +2,13 @@ import { Query, Resolver, Mutation } from '@nestjs/graphql';
 
 @Resolver(() => String)
 export class HealthcheckResolver {
-    constructor() { }
+  @Query(() => String)
+  async queryCheck(): Promise<string> {
+    return 'Healthy';
+  }
 
-    @Query(returns => String)
-    async queryCheck() {
-        return 'Healthy';
-    }
-
-    @Mutation(returns => String)
-    async mutationCheck() {
-        return 'Healthy';
-    }
-
+  @Mutation(() => String)
+  async mutationCheck(): Promise<string> {
+    return 'Healthy';
+  }
 }
