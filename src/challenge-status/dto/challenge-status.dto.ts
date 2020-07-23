@@ -1,8 +1,8 @@
-import { ObjectType, Field, ArgsType, InputType } from '@nestjs/graphql';
-import { State } from './state.enum';
+import { Field, ArgsType, InputType } from '@nestjs/graphql';
+import { State } from '../entities/state.enum';
 
-@ObjectType('ChallengeStatus')
-export default class ChallengeStatus {
+@ArgsType()
+export default class ChallengeStatusDto {
   @Field()
   startedAt: Date;
 
@@ -10,7 +10,7 @@ export default class ChallengeStatus {
   endedAt?: Date;
 
   @Field(() => [State])
-  state: [State];
+  state: State[];
 
   @Field({ nullable: true })
   openedAt?: Date;

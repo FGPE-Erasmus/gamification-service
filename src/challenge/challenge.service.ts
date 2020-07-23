@@ -14,9 +14,10 @@ export class ChallengeService {
   /**
    * Create a challenge with a set of providesd fields.
    *
-   * @param id of the challenge to update (if any)
+   * @param id of the challenge to create
    * @param data for creation
    */
+
   async createChallenge(id: string | undefined, data: CreateChallengeDto): Promise<Challenge> {
     const fields: { [k: string]: any } = { ...data };
     console.log(fields);

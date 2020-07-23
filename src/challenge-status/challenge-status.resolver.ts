@@ -1,18 +1,40 @@
-import { Resolver, Mutation, Args } from '@nestjs/graphql';
+import { Resolver, Mutation, Args, Query } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 
 import { GqlJwtAuthGuard } from '../common/guards/gql-jwt-auth.guard';
 import { ChallengeStatusService } from './challenge-status.service';
-import CreateStatusDto from './dto/create-challenge-status.dto';
-import ChallengeStatus from './dto/challenge-status.dto';
+import { ChallengeStatusEntity } from './entities/challenge-status.entity';
+import { ChallengeEntity as Challenge } from 'src/challenge/entities/challenge.entity';
+import { ChallengeStatusEntity as ChallengeStatus } from './entities/challenge-status.entity';
+import { State } from './entities/state.enum';
 
 @Resolver()
 export class ChallengeStatusResolver {
   constructor(private challengeStatusService: ChallengeStatusService) {}
 
-  @Mutation(() => String)
+  @Query()
   @UseGuards(GqlJwtAuthGuard)
-  async createStatus(@Args() input: CreateStatusDto): Promise<ChallengeStatus> {
-    return this.challengeStatusService.createStatus(input);
+  async create(@Args() input: Challenge, studentId: string): Promise<ChallengeStatusEntity> {
+    return this.challengeStatusService.createStatus(studentId, input);
+  }
+
+  @Query()
+  @UseGuards(GqlJwtAuthGuard)
+  async update(
+    @Args() input: ChallengeStatus,
+    studentId: string,
+    status: State,
+    date: Date,
+  ): Promise<ChallengeStatusEntity> {
+    switch (status) {
+      case State.OPENED:
+        return this.challengeStatusService.markAsOpen(studentId, input, date);
+      case State.FAILED:
+        return this.challengeStatusService.markAsFailed(studentId, input);
+      case State.COMPLETED:
+        return this.challengeStatusService.markAsCompleted(studentId, input, date);
+      case State.REJECTED:
+        return this.challengeStatusService.markAsRejected(studentId, input);
+    }
   }
 }
