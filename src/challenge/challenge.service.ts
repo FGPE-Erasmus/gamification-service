@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { ServiceHelper } from 'src/common/helpers/service.helper';
-import { CreateChallengeDto } from './dto/create-challenge.dto';
+import { ServiceHelper } from '../common/helpers/service.helper';
+import { UpsertChallengeDto } from './dto/upsert-challenge.dto';
 import { ChallengeRepository } from './repositories/challenge.repository';
 import { ChallengeEntity as Challenge } from './entities/challenge.entity';
 
@@ -18,7 +18,7 @@ export class ChallengeService {
    * @param data for creation
    */
 
-  async createChallenge(id: string | undefined, data: CreateChallengeDto): Promise<Challenge> {
+  async createChallenge(id: string | undefined, data: UpsertChallengeDto): Promise<Challenge> {
     const fields: { [k: string]: any } = { ...data };
     console.log(fields);
     const newChallenge: Challenge = await this.serviceHelper.getUpsertData(id, fields, this.challengeRepository);

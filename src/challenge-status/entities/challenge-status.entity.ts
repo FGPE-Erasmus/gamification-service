@@ -1,23 +1,31 @@
-import { Entity, Column, Timestamp } from 'typeorm';
-import { InputType, Field, ObjectType, ArgsType } from '@nestjs/graphql';
+import { Entity, Column, PrimaryColumn } from 'typeorm';
+import { Field, ObjectType } from '@nestjs/graphql';
 import { State } from './state.enum';
 
 @Entity('ChallengeStatus')
 @ObjectType('ChallengeStatus')
 export class ChallengeStatusEntity {
-  @Field()
-  @Column()
-  startedAt: Date;
+  @Field(() => String)
+  @PrimaryColumn()
+  readonly studentId: string;
 
-  @Field()
+  @Field(() => String)
+  @PrimaryColumn()
+  readonly challengeId: string;
+
+  @Field({ nullable: true })
   @Column()
-  endedAt: Date;
+  startedAt?: Date;
+
+  @Field({ nullable: true })
+  @Column()
+  endedAt?: Date;
 
   @Field(() => [State])
   @Column()
   state: State[];
 
-  @Field()
+  @Field({ nullable: true })
   @Column()
-  openedAt: Date;
+  openedAt?: Date;
 }

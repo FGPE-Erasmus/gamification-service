@@ -25,11 +25,10 @@ export class UpsertChallengeDto {
 
   @Field({ nullable: true })
   @IsArray()
-  modeParameters: string[]; //switch-case depending on mode?
+  modeParameters: string[];
 
   @Field({ nullable: true })
   exerciseIds: string[];
-  startedAt: Date;
 
   @Field()
   locked: boolean;

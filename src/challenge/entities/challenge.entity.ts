@@ -26,11 +26,11 @@ export class ChallengeEntity {
   @Column()
   mode: Mode[];
 
-  @Field()
+  @Field(() => [String])
   @Column()
   modeParameters: string[];
 
-  @Field()
+  @Field(() => [String])
   @Column()
   exerciseIds: string[];
 

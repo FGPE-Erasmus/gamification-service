@@ -1,4 +1,4 @@
-import { Field, ArgsType, InputType } from '@nestjs/graphql';
+import { Field, ArgsType } from '@nestjs/graphql';
 import { State } from '../entities/state.enum';
 
 @ArgsType()
