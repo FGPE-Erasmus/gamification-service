@@ -13,15 +13,13 @@ export class UpsertChallengeDto {
   @Field()
   description: string;
 
-  @Field(() => [Difficulty])
-  @IsArray()
+  @Field(() => Difficulty)
   @IsEnum(Difficulty, { each: true })
-  difficulty: Difficulty[];
+  difficulty: Difficulty;
 
-  @Field(() => [Mode])
-  @IsArray()
+  @Field(() => Mode)
   @IsEnum(Mode, { each: true })
-  mode: Mode[];
+  mode: Mode;
 
   @Field({ nullable: true })
   @IsArray()

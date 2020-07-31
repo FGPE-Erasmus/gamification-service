@@ -18,13 +18,13 @@ export class ChallengeEntity {
   @Column()
   description: string;
 
-  @Field(() => [Difficulty])
+  @Field(() => Difficulty)
   @Column()
-  difficulty: Difficulty[];
+  difficulty: Difficulty;
 
-  @Field(() => [Mode])
+  @Field(() => Mode)
   @Column()
-  mode: Mode[];
+  mode: Mode;
 
   @Field(() => [String])
   @Column()

@@ -31,41 +31,35 @@ export class ChallengeStatusService {
     return this.challengeStatusRepository.save(newStatus);
   }
 
+  async getStatus(studentId: string, challengeId: string): Promise<ChallengeStatus> {
+    return await this.challengeStatusRepository.findStatus(studentId, challengeId);
+  }
+
   async markAsOpen(studentId: string, challengeId: string, date: Date): Promise<ChallengeStatus> {
-    const temp = await this.findOne(studentId, challengeId);
+    const temp = await this.challengeStatusRepository.findStatus(studentId, challengeId);
     temp.state = [State.OPENED];
     temp.openedAt = date;
     return this.challengeStatusRepository.save(temp);
   }
 
   async markAsFailed(studentId: string, challengeId: string, date: Date): Promise<ChallengeStatus> {
-    const temp = await this.findOne(studentId, challengeId);
+    const temp = await this.challengeStatusRepository.findStatus(studentId, challengeId);
     temp.state = [State.FAILED];
     temp.endedAt = date;
     return this.challengeStatusRepository.save(temp);
   }
 
   async markAsCompleted(studentId: string, challengeId: string, date: Date): Promise<ChallengeStatus> {
-    const temp = await this.findOne(studentId, challengeId);
+    const temp = await this.challengeStatusRepository.findStatus(studentId, challengeId);
     temp.state = [State.COMPLETED];
     temp.endedAt = date;
     return this.challengeStatusRepository.save(temp);
   }
 
   async markAsRejected(studentId: string, challengeId: string, date: Date): Promise<ChallengeStatus> {
-    const temp = await this.findOne(studentId, challengeId);
+    const temp = await this.challengeStatusRepository.findStatus(studentId, challengeId);
     temp.state = [State.REJECTED];
     temp.endedAt = date;
     return this.challengeStatusRepository.save(temp);
-  }
-
-  //helper
-  async findOne(studentId: string, challengeId: string): Promise<ChallengeStatus> {
-    return this.challengeStatusRepository.findOne({
-      where: {
-        studentId,
-        challengeId,
-      },
-    });
   }
 }
