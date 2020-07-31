@@ -4,6 +4,7 @@ import { ChallengeStatusEntity as ChallengeStatus } from './entities/challenge-s
 import { GqlJwtAuthGuard } from '../common/guards/gql-jwt-auth.guard';
 import { ChallengeStatusService } from './challenge-status.service';
 import { State } from './entities/state.enum';
+import UpdateChallengeStatus from './dto/update-challenge-status.dto';
 
 @Resolver()
 export class ChallengeStatusResolver {
@@ -11,31 +12,25 @@ export class ChallengeStatusResolver {
 
   @Query(() => ChallengeStatus)
   @UseGuards(GqlJwtAuthGuard)
-  async create(@Args() studentId: string, challengeId: string): Promise<ChallengeStatus> {
-    return this.challengeStatusService.createStatus(studentId, challengeId).catch(e => {
-      console.log(e);
-      throw e;
-    });
+  async create(
+    @Args('studentId') studentId: string,
+    @Args('challengeId') challengeId: string,
+  ): Promise<ChallengeStatus> {
+    return this.challengeStatusService.createStatus(studentId, challengeId);
   }
 
   @Query(() => ChallengeStatus)
   @UseGuards(GqlJwtAuthGuard)
-  async update(
-    @Args()
-    studentId: string,
-    challengeId: string,
-    status: State,
-    date: Date,
-  ): Promise<ChallengeStatus> {
+  async update(@Args() update: UpdateChallengeStatus): Promise<ChallengeStatus> {
     switch (status) {
       case State.OPENED:
-        return this.challengeStatusService.markAsOpen(studentId, challengeId, date);
+        return this.challengeStatusService.markAsOpen(update.studentId, update.challengeId, update.date);
       case State.FAILED:
-        return this.challengeStatusService.markAsFailed(studentId, challengeId, date);
+        return this.challengeStatusService.markAsFailed(update.studentId, update.challengeId, update.date);
       case State.COMPLETED:
-        return this.challengeStatusService.markAsCompleted(studentId, challengeId, date);
+        return this.challengeStatusService.markAsCompleted(update.studentId, update.challengeId, update.date);
       case State.REJECTED:
-        return this.challengeStatusService.markAsRejected(studentId, challengeId, date);
+        return this.challengeStatusService.markAsRejected(update.studentId, update.challengeId, update.date);
     }
   }
 }

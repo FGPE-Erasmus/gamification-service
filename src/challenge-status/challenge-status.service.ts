@@ -23,12 +23,11 @@ export class ChallengeStatusService {
       state: [State.LOCKED], //the default one?
     };
 
-    const newStatus: ChallengeStatus = await this.serviceHelper
-      .getUpsertData(undefined, { ...status }, this.challengeStatusRepository)
-      .catch(e => {
-        console.log(e);
-        throw e;
-      });
+    const newStatus: ChallengeStatus = await this.serviceHelper.getUpsertData(
+      undefined,
+      { ...status },
+      this.challengeStatusRepository,
+    );
     return this.challengeStatusRepository.save(newStatus);
   }
 
