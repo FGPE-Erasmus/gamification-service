@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { ServiceHelper } from 'src/common/helpers/service.helper';
-import { LeaderboardRepository } from './leaderboard.repository';
-import { LeaderboardDto } from './leaderboard.dto';
+import { LeaderboardRepository } from './repository/leaderboard.repository';
+import { LeaderboardDto } from './dto/leaderboard.dto';
 import { LeaderboardEntity as Leaderboard } from './entities/leaderboard.entity';
 import { PlayerLeaderboardRepository } from 'src/player-leaderboard/repository/player-leaderboard.repository';
-import { SortedResult } from './entities/sorted-result.dto';
+import { SortedResult } from './dto/sorted-result.dto';
 import { SortingOrders } from './entities/sorting.enum';
+import { PlayerLeaderboardEntity as PlayerLeaderboard } from 'src/player-leaderboard/entity/player-leaderboard.entity';
 
 @Injectable()
 export class LeaderboardService {
@@ -27,32 +28,35 @@ export class LeaderboardService {
     metrics: string[],
     sortingOrder: SortingOrders[],
     index: number,
+    list: PlayerLeaderboard[] | undefined,
   ): Promise<SortedResult> {
-    const tempList = await this.playerLeaderboardRepository.find({
-      where: {
-        leaderboardId: leaderboardId,
-      },
-    });
+    if (list === undefined) {
+      const list = await this.playerLeaderboardRepository.find({
+        where: {
+          leaderboardId: leaderboardId,
+        },
+      });
+    }
 
     if (sortingOrder[index].includes(SortingOrders.ASC)) {
-      tempList.sort((x, y) => (x.score[metrics[index]] > y.score[metrics[index]] ? -1 : 1));
+      list.sort((x, y) => (x.score[metrics[index]] > y.score[metrics[index]] ? -1 : 1));
     }
     if (sortingOrder[index].includes(SortingOrders.DESC)) {
-      tempList.sort((x, y) => (x.score[metrics[index]] > y.score[metrics[index]] ? 1 : -1));
+      list.sort((x, y) => (x.score[metrics[index]] > y.score[metrics[index]] ? 1 : -1));
     }
 
     const tempScores = [];
 
-    for (const player of tempList) {
+    for (const player of list) {
       tempScores.push(player.score[metrics[index]]);
     }
 
     if (this.hasDuplicates(tempScores)) {
-      return this.sortLeaderboard(leaderboardId, leaderboardName, metrics, sortingOrder, index + 1);
+      return this.sortLeaderboard(leaderboardId, leaderboardName, metrics, sortingOrder, index + 1, list);
     } else {
       const result: SortedResult = {
         name: leaderboardName,
-        entries: tempList,
+        entries: list,
       };
       return result;
     }
