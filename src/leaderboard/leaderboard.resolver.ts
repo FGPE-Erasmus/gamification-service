@@ -18,6 +18,7 @@ export class LeaderboardResolver {
       leaderboard.name,
       leaderboard.metrics,
       leaderboard.sortingOrders,
+      0,
     );
   }
 }
