@@ -6,7 +6,7 @@ import { PrimaryColumn, Entity, Column } from 'typeorm';
 export class PlayerLeaderboardEntity {
   @Field()
   @PrimaryColumn()
-  studentId: string;
+  playerId: string;
 
   @Field()
   @PrimaryColumn()
