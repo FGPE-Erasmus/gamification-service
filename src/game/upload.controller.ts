@@ -14,6 +14,7 @@ export class GameUploadController {
   @Post()
   @UseInterceptors(FileInterceptor('file'))
   @UseGuards(RestJwtGuard, RestAdminGuard)
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   async uploadZip(@Body() gameDto: GameDto, @UploadedFile() file): Promise<string> {
     await this.gameService.create(gameDto, Readable.from(file.buffer));
     return 'Creating a game...';
