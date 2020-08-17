@@ -1,11 +1,10 @@
-import { ArgsType, Field, ID } from '@nestjs/graphql';
-import { IsOptional } from 'class-validator';
+import { ArgsType, Field } from '@nestjs/graphql';
+import { Result } from '../entity/result.enum';
 
 @ArgsType()
 export class SubmissionDto {
-  @Field(() => ID, { nullable: true })
-  @IsOptional()
-  id?: string;
+  @Field()
+  id: string;
 
   @Field()
   exerciseId: string;
@@ -14,5 +13,20 @@ export class SubmissionDto {
   playerId: string;
 
   @Field()
+  metrics: { [key: string]: number };
+
+  @Field(() => Result, { nullable: true })
+  result?: Result;
+
+  @Field({ nullable: true })
+  grade?: number;
+
+  @Field({ nullable: true })
+  feedback?: string;
+
+  @Field()
   submittedAt: Date;
+
+  @Field({ nullable: true })
+  evaluatedAt?: Date;
 }

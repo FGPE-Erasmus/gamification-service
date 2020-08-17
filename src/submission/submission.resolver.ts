@@ -5,20 +5,30 @@ import { SubmissionEntity as Submission } from './entity/submission.entity';
 import { SubmissionDto } from './dto/submission.dto';
 import { GqlJwtAuthGuard } from 'src/common/guards/gql-jwt-auth.guard';
 import { GqlUser } from 'src/common/decorators/gql-user.decorator';
-import { GqlSubmissionAuthGuard } from 'src/common/guards/gql-submission-auth.guard';
+import { Role } from 'src/users/entities/role.enum';
 
 @Resolver(() => Submission)
 export class SubmissionResolver {
   constructor(private readonly submissionService: SubmissionService) {}
 
   @Query(() => Submission)
-  @UseGuards(GqlJwtAuthGuard, GqlSubmissionAuthGuard)
-  async submission(@Args({ name: 'id', type: () => ID }) id: string): Promise<Submission> {
+  @UseGuards(GqlJwtAuthGuard)
+  async submission(
+    @Args({ name: 'id', type: () => ID })
+    id: string,
+    @GqlUser('id') playerId: string,
+    @GqlUser('roles') roles: Role[],
+  ): Promise<Submission> {
     const submission = await this.submissionService.getSubmission(id);
-    if (!submission) {
-      throw new NotFoundException(id);
+
+    if (playerId !== submission.playerId && !roles.includes(Role.ADMIN)) {
+      throw new Error('User does not have permissions');
+    } else {
+      if (!submission) {
+        throw new NotFoundException(id);
+      }
+      return submission;
     }
-    return submission;
   }
 
   @Query(() => [Submission])

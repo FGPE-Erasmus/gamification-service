@@ -6,10 +6,9 @@ import { SubmissionRepository } from './submission.repository';
 import { Result } from './entity/result.enum';
 import { EvaluationEvent } from './dto/evaluation-event.dto';
 import { response } from 'express';
-import { UserEntity as User } from 'src/users/entities/user.entity';
-import { Role } from 'src/users/entities/role.enum';
 
 import got from 'got';
+import { appConfig } from 'src/app.config';
 
 @Injectable()
 export class SubmissionService {
@@ -43,7 +42,7 @@ export class SubmissionService {
     // included in the submission object itself so I thought I would skip it, lemme know if I'm missing a point there
     this.saveSubmission(submission.id, submission);
     try {
-      const response = await got('https://evaluation-engine.temp.com', {
+      const response = await got(appConfig.evaluationEngine, {
         json: submission,
       }).json();
     } catch (e) {
@@ -70,9 +69,5 @@ export class SubmissionService {
     return (await data.result) === Result.ACCEPTED
       ? this.onSubmissionAccepted(submission)
       : this.onSubmissionRejected(submission);
-  }
-
-  isAuthorized(user: User, submissionPlayerId: string): boolean {
-    return user.roles.includes(Role.ADMIN) || user.id.toString() === submissionPlayerId;
   }
 }
