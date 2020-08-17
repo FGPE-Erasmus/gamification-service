@@ -1,15 +1,24 @@
 import { Result } from '../entity/result.enum';
-import { Field, ArgsType } from '@nestjs/graphql';
+import { Field, ArgsType, ID } from '@nestjs/graphql';
+import { ObjectID } from 'typeorm';
 
 @ArgsType()
 export class EvaluationEvent {
-  @Field()
-  id: string;
+  @Field(() => ID)
+  id: ObjectID;
 
   @Field()
   result: Result;
 
   @Field()
-  //why do we need metrics here?
   metrics: { [key: string]: number };
+
+  @Field()
+  feedback: string;
+
+  @Field()
+  grade: number;
+
+  @Field()
+  evaluatedAt: Date;
 }

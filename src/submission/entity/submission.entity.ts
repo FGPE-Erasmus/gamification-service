@@ -1,11 +1,10 @@
-import { ObjectIdColumn, Entity, ObjectID, Column, Timestamp, UpdateDateColumn } from 'typeorm';
+import { ObjectIdColumn, Entity, ObjectID, Column, UpdateDateColumn } from 'typeorm';
 import { Field, ObjectType, ID } from '@nestjs/graphql';
 import { Result } from './result.enum';
 
 @Entity('Submission')
 @ObjectType('Submission')
 export class SubmissionEntity {
-  [x: string]: any;
   @ObjectIdColumn()
   @Field(() => ID)
   id: ObjectID;

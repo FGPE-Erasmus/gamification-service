@@ -14,8 +14,5 @@ export class SubmissionDto {
   playerId: string;
 
   @Field()
-  metrics: { [key: string]: number };
-
-  @Field()
   submittedAt: Date;
 }

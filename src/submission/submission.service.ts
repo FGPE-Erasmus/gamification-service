@@ -6,6 +6,9 @@ import { SubmissionRepository } from './submission.repository';
 import { Result } from './entity/result.enum';
 import { EvaluationEvent } from './dto/evaluation-event.dto';
 import { response } from 'express';
+import { UserEntity as User } from 'src/users/entities/user.entity';
+import { Role } from 'src/users/entities/role.enum';
+
 import got from 'got';
 
 @Injectable()
@@ -62,9 +65,14 @@ export class SubmissionService {
   }
 
   async onSubmissionEvaluated(data: EvaluationEvent): Promise<Submission> {
-    const submission: Submission = await this.getSubmission(data.id);
+    let submission: Submission = await this.getSubmission(data.id.toString());
+    submission = { ...submission, ...data };
     return (await data.result) === Result.ACCEPTED
       ? this.onSubmissionAccepted(submission)
       : this.onSubmissionRejected(submission);
+  }
+
+  isAuthorized(user: User, submissionPlayerId: string): boolean {
+    return user.roles.includes(Role.ADMIN) || user.id.toString() === submissionPlayerId;
   }
 }
