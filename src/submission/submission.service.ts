@@ -6,9 +6,9 @@ import { SubmissionRepository } from './submission.repository';
 import { Result } from './entity/result.enum';
 import { EvaluationEvent } from './dto/evaluation-event.dto';
 import { response } from 'express';
+import { appConfig } from 'src/app.config';
 
 import got from 'got';
-import { appConfig } from 'src/app.config';
 
 @Injectable()
 export class SubmissionService {
@@ -18,7 +18,7 @@ export class SubmissionService {
   ) {}
 
   async saveSubmission(id: string | undefined, data: SubmissionDto): Promise<Submission> {
-    const fields: { [k: string]: any } = { ...data };
+    const fields: { [k: string]: any } = { ...data, submittedAt: new Date() };
     const newSubmission = await this.serviceHelper.getUpsertData(id, fields, this.submissionRepository);
     return await this.submissionRepository.save(newSubmission);
   }
@@ -37,13 +37,16 @@ export class SubmissionService {
     return submission;
   }
 
-  async sendSubmission(submission: SubmissionDto): Promise<any> {
+  async sendSubmission(submission: SubmissionDto, codeFile: string): Promise<any> {
     // I know that in doc we have parameters (exerciseid, playerId, submission), but two first ones are suppossed to be
     // included in the submission object itself so I thought I would skip it, lemme know if I'm missing a point there
     this.saveSubmission(submission.id, submission);
     try {
       const response = await got(appConfig.evaluationEngine, {
-        json: submission,
+        json: {
+          exerciseId: submission.exerciseId,
+          file: codeFile,
+        },
       }).json();
     } catch (e) {
       console.error(e);

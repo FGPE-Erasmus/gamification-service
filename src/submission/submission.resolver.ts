@@ -42,7 +42,7 @@ export class SubmissionResolver {
 
   @Mutation(() => Submission)
   @UseGuards(GqlJwtAuthGuard)
-  async createSubmission(@Args() mutationArgs: SubmissionDto): Promise<Submission> {
-    return await this.submissionService.sendSubmission(mutationArgs);
+  async createSubmission(@Args() mutationArgs: SubmissionDto, @Args() codeFile: string): Promise<Submission> {
+    return await this.submissionService.sendSubmission(mutationArgs, codeFile);
   }
 }
