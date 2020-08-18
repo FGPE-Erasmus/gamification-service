@@ -9,6 +9,7 @@ interface IAppConfig {
   isTesting: boolean;
   assetsPath: string;
   database: ConnectionOptions;
+  evaluationEngine: string;
   port: number;
   host: string;
   jwt: {
@@ -29,6 +30,7 @@ export const appConfig: IAppConfig = {
   isDevelopment: process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'dev',
   isTesting: process.env.NODE_ENV === 'test',
   assetsPath: `${__dirname}/../assets`,
+  evaluationEngine: process.env.EVALUATION_ENGINE,
   database: {
     type: 'mongodb',
     host: process.env.DB_HOST,
