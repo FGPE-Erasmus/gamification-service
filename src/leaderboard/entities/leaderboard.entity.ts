@@ -13,7 +13,7 @@ export class LeaderboardEntity {
   @Column()
   name: string;
 
-  @Field()
+  @Field(() => [String])
   @Column()
   metrics: string[];
 

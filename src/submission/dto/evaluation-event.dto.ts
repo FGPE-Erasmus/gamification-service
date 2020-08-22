@@ -1,4 +1,4 @@
-import { Result } from '../entity/result.enum';
+import { Result } from '../entities/result.enum';
 import { Field, ArgsType, ID } from '@nestjs/graphql';
 import { ObjectID } from 'typeorm';
 

@@ -1,5 +1,5 @@
 import { ArgsType, Field } from '@nestjs/graphql';
-import { SortingOrders } from './entities/sorting.enum';
+import { SortingOrders } from '../entities/sorting.enum';
 
 @ArgsType()
 export class LeaderboardDto {

@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { SubmissionDto } from './dto/submission.dto';
-import { SubmissionEntity as Submission } from './entity/submission.entity';
+import { SubmissionEntity as Submission } from './entities/submission.entity';
 import { ServiceHelper } from 'src/common/helpers/service.helper';
 import { SubmissionRepository } from './submission.repository';
-import { Result } from './entity/result.enum';
+import { Result } from './entities/result.enum';
 import { EvaluationEvent } from './dto/evaluation-event.dto';
 import { response } from 'express';
 import { appConfig } from 'src/app.config';

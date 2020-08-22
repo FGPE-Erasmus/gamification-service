@@ -1,5 +1,5 @@
 import { ObjectType, Field } from '@nestjs/graphql';
-import { PlayerLeaderboardEntity as PlayerLeaderboard } from 'src/player-leaderboard/entity/player-leaderboard.entity';
+import { PlayerLeaderboardEntity as PlayerLeaderboard } from 'src/player-leaderboard/entities/player-leaderboard.entity';
 
 @ObjectType('SortedResult')
 export class SortedResult {

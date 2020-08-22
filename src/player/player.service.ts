@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ServiceHelper } from 'src/common/helpers/service.helper';
 import { PlayerRepository } from './player.repository';
-import { PlayerEntity as Player } from './player.entity';
+import { PlayerEntity as Player } from './entities/player.entity';
 import { PlayerDto } from './player.dto';
 
 @Injectable()
