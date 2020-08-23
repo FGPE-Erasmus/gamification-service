@@ -1,4 +1,5 @@
 import { ArgsType, Field } from '@nestjs/graphql';
+import graphqlTypeJson from 'graphql-type-json';
 
 @ArgsType()
 export default class PlayerLeaderboardDto {
@@ -8,6 +9,6 @@ export default class PlayerLeaderboardDto {
   @Field()
   leaderboardId: string;
 
-  @Field({ nullable: true })
+  @Field(() => graphqlTypeJson, { nullable: true })
   score: { [key: string]: number };
 }

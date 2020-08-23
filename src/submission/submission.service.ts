@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { SubmissionDto } from './dto/submission.dto';
-import { SubmissionEntity as Submission } from './entity/submission.entity';
+import { SubmissionEntity as Submission } from './entities/submission.entity';
 import { ServiceHelper } from 'src/common/helpers/service.helper';
-import { SubmissionRepository } from './submission.repository';
-import { Result } from './entity/result.enum';
+import { SubmissionRepository } from './repository/submission.repository';
+import { Result } from './entities/result.enum';
 import { EvaluationEvent } from './dto/evaluation-event.dto';
 import { response } from 'express';
 import { appConfig } from 'src/app.config';
@@ -37,9 +37,11 @@ export class SubmissionService {
     return submission;
   }
 
-  async sendSubmission(submission: SubmissionDto, codeFile: string): Promise<any> {
+  async sendSubmission(submission: SubmissionDto): Promise<any> {
     // I know that in doc we have parameters (exerciseid, playerId, submission), but two first ones are suppossed to be
     // included in the submission object itself so I thought I would skip it, lemme know if I'm missing a point there
+    const codeFile = submission.codeFile;
+    delete submission.codeFile;
     this.saveSubmission(submission.id, submission);
     try {
       const response = await got(appConfig.evaluationEngine, {

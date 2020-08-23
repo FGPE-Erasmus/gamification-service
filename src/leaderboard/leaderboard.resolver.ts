@@ -11,7 +11,7 @@ export class LeaderboardResolver {
 
   @Query(() => Leaderboard)
   @UseGuards(GqlJwtAuthGuard)
-  async getSorted(@Args('LeaderboardId') leaderboardId: string): Promise<SortedResult> {
+  async getSorted(@Args() leaderboardId: string): Promise<SortedResult> {
     return this.leaderboardService.sortLeaderboard(leaderboardId);
   }
 }

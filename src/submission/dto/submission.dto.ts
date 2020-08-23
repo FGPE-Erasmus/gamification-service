@@ -10,4 +10,7 @@ export class SubmissionDto {
 
   @Field()
   playerId: string;
+
+  @Field()
+  codeFile: string;
 }

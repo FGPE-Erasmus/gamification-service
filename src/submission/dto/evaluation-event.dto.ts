@@ -1,6 +1,7 @@
-import { Result } from '../entity/result.enum';
+import { Result } from '../entities/result.enum';
 import { Field, ArgsType, ID } from '@nestjs/graphql';
 import { ObjectID } from 'typeorm';
+import graphqlTypeJson from 'graphql-type-json';
 
 @ArgsType()
 export class EvaluationEvent {
@@ -10,7 +11,7 @@ export class EvaluationEvent {
   @Field()
   result: Result;
 
-  @Field()
+  @Field(() => graphqlTypeJson, { nullable: true })
   metrics: { [key: string]: number };
 
   @Field()

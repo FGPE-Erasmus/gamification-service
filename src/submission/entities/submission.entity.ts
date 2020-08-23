@@ -1,43 +1,44 @@
 import { ObjectIdColumn, Entity, ObjectID, Column, UpdateDateColumn } from 'typeorm';
 import { Field, ObjectType, ID } from '@nestjs/graphql';
 import { Result } from './result.enum';
+import graphqlTypeJson from 'graphql-type-json';
 
 @Entity('Submission')
 @ObjectType('Submission')
 export class SubmissionEntity {
-  @ObjectIdColumn()
   @Field(() => ID)
+  @ObjectIdColumn()
   id: ObjectID;
 
-  @Column()
   @Field()
+  @Column()
   exerciseId: string;
 
-  @Column()
   @Field()
+  @Column()
   playerId: string;
 
+  @Field(() => graphqlTypeJson, { nullable: true })
   @Column()
-  @Field()
   metrics: { [key: string]: number };
 
-  @Column({ nullable: true })
-  @Field(() => Result)
+  @Field(() => Result, { nullable: true })
+  @Column()
   result?: Result;
 
-  @Column({ nullable: true })
-  @Field()
+  @Field({ nullable: true })
+  @Column()
   grade?: number;
 
-  @Column({ nullable: true })
-  @Field()
+  @Field({ nullable: true })
+  @Column()
   feedback?: string;
 
-  @UpdateDateColumn({ type: 'timestamp' })
   @Field()
+  @Column({ type: 'timestamp' })
   submittedAt: Date;
 
-  @UpdateDateColumn({ type: 'timestamp', nullable: true })
-  @Field()
+  @Field({ nullable: true })
+  @Column({ type: 'timestamp' })
   evaluatedAt?: Date;
 }
