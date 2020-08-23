@@ -1,5 +1,5 @@
 import { ObjectType, Field } from '@nestjs/graphql';
-import { PlayerLeaderboardEntity as PlayerLeaderboard } from 'src/player-leaderboard/entities/player-leaderboard.entity';
+import PlayerLeaderboardDto from 'src/player-leaderboard/dto/player-leaderboard.dto';
 
 @ObjectType('SortedResult')
 export class SortedResult {
@@ -7,5 +7,5 @@ export class SortedResult {
   name: string;
 
   @Field()
-  entries: PlayerLeaderboard[];
+  entries: PlayerLeaderboardDto[];
 }

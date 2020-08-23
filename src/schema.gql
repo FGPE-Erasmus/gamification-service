@@ -74,7 +74,7 @@ type Query {
   user(id: String!): User!
   users(skip: Int = 0, take: Int = 50, ids: [ID!], name: String, order: String = "DESC", fieldSort: String = "updatedAt"): ListUsers!
   queryCheck: String!
-  get(challngeId: String!, studentId: String!): ChallengeStatus!
+  get(challengeId: String!, studentId: String!): ChallengeStatus!
   submission(submissionId: String!): Submission!
   submissions(exerciseId: String!): [Submission!]!
 }
