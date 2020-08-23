@@ -1,7 +1,7 @@
 import { ObjectIdColumn, Entity, ObjectID, Column, UpdateDateColumn } from 'typeorm';
 import { Field, ObjectType, ID } from '@nestjs/graphql';
 import { Result } from './result.enum';
-import { json } from 'express';
+import graphqlTypeJson from 'graphql-type-json';
 
 @Entity('Submission')
 @ObjectType('Submission')
@@ -18,7 +18,7 @@ export class SubmissionEntity {
   @Column()
   playerId: string;
 
-  @Field(() => json)
+  @Field(() => graphqlTypeJson, { nullable: true })
   @Column()
   metrics: { [key: string]: number };
 

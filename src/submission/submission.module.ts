@@ -3,7 +3,7 @@ import { SubmissionService } from './submission.service';
 import { ServiceHelper } from 'src/common/helpers/service.helper';
 import { SubmissionResolver } from './submission.resolver';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { SubmissionRepository } from './submission.repository';
+import { SubmissionRepository } from './repository/submission.repository';
 
 @Module({
   imports: [TypeOrmModule.forFeature([SubmissionRepository])],

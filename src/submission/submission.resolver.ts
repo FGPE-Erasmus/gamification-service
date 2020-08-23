@@ -14,7 +14,7 @@ export class SubmissionResolver {
   @Query(() => Submission)
   @UseGuards(GqlJwtAuthGuard)
   async submission(
-    @Args() id: string,
+    @Args('submissionId') id: string,
     @GqlUser('id') playerId: string,
     @GqlUser('roles') roles: Role[],
   ): Promise<Submission> {
@@ -32,13 +32,13 @@ export class SubmissionResolver {
 
   @Query(() => [Submission])
   @UseGuards(GqlJwtAuthGuard)
-  async submissions(@Args() exerciseId: string, @GqlUser('id') playerId: string): Promise<Submission[]> {
+  async submissions(@Args('exerciseId') exerciseId: string, @GqlUser('id') playerId: string): Promise<Submission[]> {
     return await this.submissionService.getAllSubmissions(exerciseId, playerId);
   }
 
   @Mutation(() => Submission)
   @UseGuards(GqlJwtAuthGuard)
-  async createSubmission(@Args() mutationArgs: SubmissionDto, @Args() codeFile: string): Promise<Submission> {
-    return await this.submissionService.sendSubmission(mutationArgs, codeFile);
+  async createSubmission(@Args() mutationArgs: SubmissionDto): Promise<Submission> {
+    return await this.submissionService.sendSubmission(mutationArgs);
   }
 }

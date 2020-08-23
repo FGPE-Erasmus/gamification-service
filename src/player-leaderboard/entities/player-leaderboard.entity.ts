@@ -1,6 +1,6 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { PrimaryColumn, Entity, Column } from 'typeorm';
-import { json } from 'express';
+import graphqlTypeJson from 'graphql-type-json';
 
 @Entity('PlayerLeaderboard')
 @ObjectType('PlayerLeaderboard')
@@ -13,7 +13,7 @@ export class PlayerLeaderboardEntity {
   @PrimaryColumn()
   leaderboardId: string;
 
-  @Field(() => json, { nullable: true })
+  @Field(() => graphqlTypeJson, { nullable: true })
   @Column()
   score: { [key: string]: number };
 }

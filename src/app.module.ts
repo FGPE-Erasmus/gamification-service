@@ -12,6 +12,11 @@ import { HealthModule } from './healthcheck/healthcheck.module';
 import { GameModule } from './game/game.module';
 import { ChallengeModule } from './challenge/challenge.module';
 import { ChallengeStatusModule } from './challenge-status/challenge-status.module';
+import { GraphQLJSON } from 'graphql-type-json';
+import { SubmissionModule } from './submission/submission.module';
+import { LeaderboardModule } from './leaderboard/leaderboard.module';
+import { PlayerLeaderboardModule } from './player-leaderboard/player-leaderboard.module';
+import { PlayerModule } from './player/player.module';
 
 @Module({
   imports: [
@@ -22,6 +27,7 @@ import { ChallengeStatusModule } from './challenge-status/challenge-status.modul
       debug: appConfig.isDevelopment,
       playground: appConfig.isDevelopment,
       installSubscriptionHandlers: true,
+      resolvers: { JSON: GraphQLJSON },
     }),
     HealthModule,
     AuthModule,
@@ -29,6 +35,10 @@ import { ChallengeStatusModule } from './challenge-status/challenge-status.modul
     GameModule,
     ChallengeModule,
     ChallengeStatusModule,
+    LeaderboardModule,
+    PlayerLeaderboardModule,
+    PlayerModule,
+    SubmissionModule,
   ],
   providers: [DateScalar, EmailScalar],
 })
