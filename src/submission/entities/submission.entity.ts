@@ -35,10 +35,10 @@ export class SubmissionEntity {
   feedback?: string;
 
   @Field()
-  @UpdateDateColumn({ type: 'timestamp' })
+  @Column({ type: 'timestamp' })
   submittedAt: Date;
 
   @Field({ nullable: true })
-  @UpdateDateColumn({ type: 'timestamp' })
+  @Column({ type: 'timestamp' })
   evaluatedAt?: Date;
 }
