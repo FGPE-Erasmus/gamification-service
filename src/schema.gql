@@ -121,6 +121,7 @@ type Query {
   coupons: [Coupon!]!
   coupon(rewardId: String!): [Coupon!]!
   hint(exerciseId: String!): [Hint!]!
+  playersWithVirtualItem(id: String!): [Player!]!
   virtualItem(rewardId: String!): [VirtualItem!]!
   virtualItems: [VirtualItem!]!
   playersWithBadge(rewardId: String!): [Player!]!
