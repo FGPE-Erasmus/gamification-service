@@ -70,6 +70,46 @@ enum Result {
   REJECTED
 }
 
+type Player {
+  id: ID!
+  userId: String!
+  points: Float!
+}
+
+type Coupon {
+  id: ID!
+  playerId: String!
+  name: String!
+  description: String!
+  recurrenceLimit: Float!
+}
+
+type Badge {
+  id: ID!
+  playerId: String!
+  name: String!
+  description: String!
+  recurrenceLimit: Float!
+}
+
+type Hint {
+  id: ID!
+  playerId: String!
+  exerciseId: String!
+  name: String!
+  description: String!
+  recurrenceLimit: Float!
+  message: String!
+}
+
+type VirtualItem {
+  id: ID!
+  playerId: String!
+  name: String!
+  description: String!
+  recurrenceLimit: Float!
+}
+
 type Query {
   user(id: String!): User!
   users(skip: Int = 0, take: Int = 50, ids: [ID!], name: String, order: String = "DESC", fieldSort: String = "updatedAt"): ListUsers!
@@ -77,6 +117,15 @@ type Query {
   get(challengeId: String!, studentId: String!): ChallengeStatus!
   submission(submissionId: String!): Submission!
   submissions(exerciseId: String!): [Submission!]!
+  playersWithCoupon(rewardId: String!): [Player!]!
+  coupons: [Coupon!]!
+  coupon(rewardId: String!): [Coupon!]!
+  hint(exerciseId: String!): [Hint!]!
+  virtualItem(rewardId: String!): [VirtualItem!]!
+  virtualItems: [VirtualItem!]!
+  playersWithBadge(rewardId: String!): [Player!]!
+  badges: [Badge!]!
+  badge(rewardId: String!): [Badge!]!
 }
 
 type Mutation {
