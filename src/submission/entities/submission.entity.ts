@@ -18,6 +18,10 @@ export class SubmissionEntity {
   @Column()
   playerId: string;
 
+  @Field()
+  @Column()
+  gameId: string;
+
   @Field(() => graphqlTypeJson, { nullable: true })
   @Column()
   metrics: { [key: string]: number };

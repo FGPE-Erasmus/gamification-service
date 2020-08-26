@@ -33,6 +33,7 @@ type ListUsers {
 type ChallengeStatus {
   studentId: String!
   challengeId: String!
+  gameId: String!
   startedAt: Date
   endedAt: Date
   state: [State!]!
@@ -52,6 +53,7 @@ type Submission {
   id: ID!
   exerciseId: String!
   playerId: String!
+  gameId: String!
   metrics: JSON
   result: Result
   grade: Float
@@ -73,20 +75,14 @@ enum Result {
 type Player {
   id: ID!
   userId: String!
+  gameId: String!
   points: Float!
 }
 
 type Coupon {
   id: ID!
   playerId: String!
-  name: String!
-  description: String!
-  recurrenceLimit: Float!
-}
-
-type Badge {
-  id: ID!
-  playerId: String!
+  gameId: String!
   name: String!
   description: String!
   recurrenceLimit: Float!
@@ -94,6 +90,7 @@ type Badge {
 
 type Hint {
   id: ID!
+  gameId: String!
   playerId: String!
   exerciseId: String!
   name: String!
@@ -105,6 +102,16 @@ type Hint {
 type VirtualItem {
   id: ID!
   playerId: String!
+  gameId: String!
+  name: String!
+  description: String!
+  recurrenceLimit: Float!
+}
+
+type Badge {
+  id: ID!
+  playerId: String!
+  gameId: String!
   name: String!
   description: String!
   recurrenceLimit: Float!
@@ -117,16 +124,17 @@ type Query {
   get(challengeId: String!, studentId: String!): ChallengeStatus!
   submission(submissionId: String!): Submission!
   submissions(exerciseId: String!): [Submission!]!
-  playersWithCoupon(rewardId: String!): [Player!]!
+  playersWithCoupon(couponId: String!): [Player!]!
   coupons: [Coupon!]!
-  coupon(rewardId: String!): [Coupon!]!
-  hint(exerciseId: String!): [Hint!]!
-  playersWithVirtualItem(id: String!): [Player!]!
-  virtualItem(rewardId: String!): [VirtualItem!]!
+  coupon(couponId: String!): [Coupon!]!
+  playerHints(exerciseId: String!, id: String!): [Hint!]!
+  exerciseHints(exerciseId: String!): [Hint!]!
+  playersWithVirtualItem(virtualItemId: String!): [Player!]!
   virtualItems: [VirtualItem!]!
-  playersWithBadge(rewardId: String!): [Player!]!
+  virtualItem(virtualItemId: String!): [VirtualItem!]!
+  playersWithBadge(badgeId: String!): [Player!]!
   badges: [Badge!]!
-  badge(rewardId: String!): [Badge!]!
+  badge(badgeId: String!): [Badge!]!
 }
 
 type Mutation {
@@ -136,7 +144,7 @@ type Mutation {
   signup(name: String!, username: String!, email: Email!, password: String!): User!
   mutationCheck: String!
   createGame(name: String!, startDate: Date!, endDate: Date!, userIds: String!, file: Upload!): String!
-  createSubmission(id: String!, exerciseId: String!, playerId: String!, codeFile: String!): Submission!
+  createSubmission(id: String!, gameId: String!, exerciseId: String!, playerId: String!, codeFile: String!): Submission!
 }
 
 input CreateUserInput {

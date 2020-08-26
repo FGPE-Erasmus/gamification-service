@@ -9,6 +9,9 @@ export default class PlayerLeaderboardDto {
   @Field()
   leaderboardId: string;
 
+  @Field()
+  gameId: string;
+
   @Field(() => graphqlTypeJson, { nullable: true })
   score: { [key: string]: number };
 }

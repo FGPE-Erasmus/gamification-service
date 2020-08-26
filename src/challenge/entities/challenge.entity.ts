@@ -16,6 +16,10 @@ export class ChallengeEntity {
 
   @Field()
   @Column()
+  gameId: string;
+
+  @Field()
+  @Column()
   description: string;
 
   @Field(() => Difficulty)

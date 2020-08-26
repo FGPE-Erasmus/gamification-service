@@ -15,6 +15,10 @@ export class VirtualItemEntity implements IReward {
 
   @Field()
   @Column()
+  gameId: string;
+
+  @Field()
+  @Column()
   name: string;
 
   @Field()

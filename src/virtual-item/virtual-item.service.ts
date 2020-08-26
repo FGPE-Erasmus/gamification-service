@@ -8,13 +8,13 @@ export class VirtualItemService {
 
   async getVirtualItem(id: string, playerId: string): Promise<VirtualItem[]> {
     const wrap: VirtualItem[] = [];
-    const virtualItem = await this.virtualItemRespository.findOne({
+    const virtualItem = await this.virtualItemRespository.find({
       where: {
         id: id,
         playerId: playerId,
       },
     });
-    if (virtualItem) wrap.push(virtualItem);
+    if (virtualItem) wrap.concat(virtualItem);
     return wrap;
   }
 
@@ -30,7 +30,7 @@ export class VirtualItemService {
     return await getRepository(PlayerRepository)
       .createQueryBuilder('player')
       .leftJoin(VirtualItemRepository, 'virtual_item', 'virtual_item.playerId = player.id')
-      .where('virtual_item.id = :rewardId', { rewardId: id })
+      .where('virtual_item.id = :virtualItemId', { virtualItemId: id })
       .getMany();
   }
 }

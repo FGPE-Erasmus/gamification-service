@@ -10,13 +10,13 @@ export class BadgeService {
 
   async getBadge(id: string, playerId: string): Promise<Badge[]> {
     const wrap: Badge[] = [];
-    const badge = await this.badgeRepository.findOne({
+    const badge = await this.badgeRepository.find({
       where: {
         id: id,
         playerId: playerId,
       },
     });
-    if (badge) wrap.push(badge);
+    if (badge) wrap.concat(badge);
     return wrap;
   }
 
@@ -32,7 +32,7 @@ export class BadgeService {
     return await getRepository(PlayerRepository)
       .createQueryBuilder('player')
       .leftJoin(BadgeRepository, 'badge', 'badge.playerId = player.id')
-      .where('badge.id = :rewardId', { rewardId: id })
+      .where('badge.id = :badgeId', { badgeId: id })
       .getMany();
   }
 }

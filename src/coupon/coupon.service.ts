@@ -1,23 +1,20 @@
 import { CouponRepository } from './repository/coupon.repository';
 import { CouponEntity as Coupon } from './entities/coupon.entity';
 import { PlayerRepository } from 'src/player/repository/player.repository';
-import { PlayerEntity as Player } from 'src/player/entities/player.entity';
 import { getRepository } from 'typeorm';
-import { BadgeRepository } from 'src/badge/repository/badge.repository';
-import { CouponResolver } from './coupon.resolver';
 
 export class CouponService {
   constructor(readonly couponRespository: CouponRepository) {}
 
   async getCoupon(id: string, playerId: string): Promise<Coupon[]> {
     const wrap: Coupon[] = [];
-    const coupon = await this.couponRespository.findOne({
+    const coupon = await this.couponRespository.find({
       where: {
         id: id,
         playerId: playerId,
       },
     });
-    if (coupon) wrap.push(coupon);
+    if (coupon) wrap.concat(coupon);
     return wrap;
   }
 
@@ -33,7 +30,7 @@ export class CouponService {
     return await getRepository(PlayerRepository)
       .createQueryBuilder('player')
       .leftJoin(CouponRepository, 'coupon', 'coupon.playerId = player.id')
-      .where('coupon.id = :rewardId', { rewardId: id })
+      .where('coupon.id = :couponId', { couponId: id })
       .getMany();
   }
 }

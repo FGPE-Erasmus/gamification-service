@@ -13,6 +13,10 @@ export class PlayerLeaderboardEntity {
   @PrimaryColumn()
   leaderboardId: string;
 
+  @Field()
+  @Column()
+  gameId: string;
+
   @Field(() => graphqlTypeJson, { nullable: true })
   @Column()
   score: { [key: string]: number };

@@ -15,7 +15,7 @@ export class LeaderboardService {
   ) {}
 
   async createLeaderboard(id: string | undefined, data: LeaderboardDto): Promise<Leaderboard> {
-    const fields: { [l: string]: any } = { ...data };
+    const fields: { [key: string]: any } = { ...data };
     const newLeaderboard: Leaderboard = await this.serviceHelper.getUpsertData(id, fields, this.leaderboardRepository);
     return this.leaderboardRepository.save(newLeaderboard);
   }

@@ -11,6 +11,10 @@ export class HintEntity implements IReward {
 
   @Field()
   @Column()
+  gameId: string;
+
+  @Field()
+  @Column()
   playerId: string;
 
   @Field()
