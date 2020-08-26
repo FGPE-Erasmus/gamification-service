@@ -17,6 +17,10 @@ import { SubmissionModule } from './submission/submission.module';
 import { LeaderboardModule } from './leaderboard/leaderboard.module';
 import { PlayerLeaderboardModule } from './player-leaderboard/player-leaderboard.module';
 import { PlayerModule } from './player/player.module';
+import { CouponModule } from './coupon/coupon.module';
+import { HintModule } from './hint/hint.module';
+import { VirtualItemModule } from './virtual-item/virtual-item.module';
+import { BadgeModule } from './badge/badge.module';
 
 @Module({
   imports: [
@@ -39,6 +43,10 @@ import { PlayerModule } from './player/player.module';
     PlayerLeaderboardModule,
     PlayerModule,
     SubmissionModule,
+    BadgeModule,
+    CouponModule,
+    HintModule,
+    VirtualItemModule,
   ],
   providers: [DateScalar, EmailScalar],
 })

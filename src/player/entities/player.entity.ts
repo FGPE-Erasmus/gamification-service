@@ -14,5 +14,9 @@ export class PlayerEntity {
 
   @Field()
   @Column()
+  gameId: string;
+
+  @Field()
+  @Column()
   points: number;
 }

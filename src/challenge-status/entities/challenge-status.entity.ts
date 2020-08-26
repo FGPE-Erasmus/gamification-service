@@ -13,6 +13,10 @@ export class ChallengeStatusEntity {
   @PrimaryColumn()
   readonly challengeId: string;
 
+  @Field()
+  @Column()
+  gameId: string;
+
   @Field({ nullable: true })
   @Column()
   startedAt?: Date;

@@ -13,6 +13,10 @@ export class LeaderboardEntity {
   @Column()
   name: string;
 
+  @Field()
+  @Column()
+  gameId: string;
+
   @Field(() => [String])
   @Column()
   metrics: string[];

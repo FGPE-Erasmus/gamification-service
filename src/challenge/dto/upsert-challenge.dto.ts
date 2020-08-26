@@ -13,6 +13,9 @@ export class UpsertChallengeDto {
   @Field()
   description: string;
 
+  @Field()
+  gameId: string;
+
   @Field(() => Difficulty)
   @IsEnum(Difficulty, { each: true })
   difficulty: Difficulty;

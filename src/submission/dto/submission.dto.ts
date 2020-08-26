@@ -6,6 +6,9 @@ export class SubmissionDto {
   id: string;
 
   @Field()
+  gameId: string;
+
+  @Field()
   exerciseId: string;
 
   @Field()
