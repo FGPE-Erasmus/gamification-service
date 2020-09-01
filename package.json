@@ -31,6 +31,7 @@
     ]
   },
   "dependencies": {
+    "@nestjs/bull": "^0.1.2",
     "@nestjs/common": "^7.0.0",
     "@nestjs/core": "^7.0.0",
     "@nestjs/graphql": "^7.0.0",
@@ -38,6 +39,7 @@
     "@nestjs/passport": "^7.1.0",
     "@nestjs/platform-express": "^7.3.2",
     "@nestjs/typeorm": "^7.0.0",
+    "@types/bull": "^3.14.2",
     "apollo-server": "^2.16.0",
     "apollo-server-express": "^2.16.0",
     "bcryptjs": "^2.4.3",
@@ -54,6 +56,7 @@
     "mongodb": "^3.5.9",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
+    "redis": "^3.0.2",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^6.6.0",

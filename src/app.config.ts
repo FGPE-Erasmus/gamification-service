@@ -10,6 +10,8 @@ interface IAppConfig {
   assetsPath: string;
   database: ConnectionOptions;
   evaluationEngine: string;
+  queueHost: string;
+  queuePort: number;
   port: number;
   host: string;
   jwt: {
@@ -31,6 +33,8 @@ export const appConfig: IAppConfig = {
   isTesting: process.env.NODE_ENV === 'test',
   assetsPath: `${__dirname}/../assets`,
   evaluationEngine: process.env.EVALUATION_ENGINE,
+  queueHost: process.env.QUEQUE_HOST,
+  queuePort: parseInt(process.env.QUEQUE_PORT, 10),
   database: {
     type: 'mongodb',
     host: process.env.DB_HOST,

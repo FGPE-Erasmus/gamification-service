@@ -3,10 +3,16 @@ import { BadgeEntity as Badge } from './entities/badge.entity';
 import { Injectable } from '@nestjs/common';
 import { PlayerRepository } from 'src/player/repository/player.repository';
 import { getRepository } from 'typeorm';
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
+import { Trigger } from 'src/hook/enums/trigger.enum';
 
 @Injectable()
 export class BadgeService {
-  constructor(readonly badgeRepository: BadgeRepository) {}
+  constructor(
+    @InjectQueue('hooksQueue') private hooksQueue: Queue,
+    private readonly badgeRepository: BadgeRepository,
+  ) {}
 
   async getBadge(id: string, playerId: string): Promise<Badge[]> {
     const wrap: Badge[] = [];
@@ -34,5 +40,12 @@ export class BadgeService {
       .leftJoin(BadgeRepository, 'badge', 'badge.playerId = player.id')
       .where('badge.id = :badgeId', { badgeId: id })
       .getMany();
+  }
+
+  async grantBadgeJob(badgeId: string, playerId: string): Promise<any> {
+    const job = await this.hooksQueue.add(Trigger.REWARD_GRANTED, {
+      rewardId: badgeId,
+      playerId: playerId,
+    });
   }
 }

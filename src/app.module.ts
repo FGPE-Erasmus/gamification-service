@@ -21,6 +21,8 @@ import { CouponModule } from './coupon/coupon.module';
 import { HintModule } from './hint/hint.module';
 import { VirtualItemModule } from './virtual-item/virtual-item.module';
 import { BadgeModule } from './badge/badge.module';
+import { BullModule } from '@nestjs/bull';
+import { ProcessorModule } from './consumers/processor.module';
 
 @Module({
   imports: [
@@ -33,6 +35,18 @@ import { BadgeModule } from './badge/badge.module';
       installSubscriptionHandlers: true,
       resolvers: { JSON: GraphQLJSON },
     }),
+    BullModule.registerQueue({
+      name: 'hooksQueue',
+      // limiter:,
+      // prefix,
+      // defaultJobOptions,
+      // settings:,
+      redis: {
+        host: appConfig.queueHost,
+        port: appConfig.queuePort,
+      },
+    }),
+    ProcessorModule,
     HealthModule,
     AuthModule,
     UsersModule,
