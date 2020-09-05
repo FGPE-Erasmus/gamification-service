@@ -4,10 +4,9 @@ import { Job } from 'bull';
 @Processor('hooksQueue')
 export class QueueListener {
   @OnQueueCompleted()
-  async performAction(job: Job, result: any): Promise<any> {
-    console.log('Performing the action...');
+  async showResult(job: Job, result: any): Promise<any> {
+    console.log('Sucessful completion with the result: ');
     console.log(result);
-    return true;
   }
 
   @OnQueueError()

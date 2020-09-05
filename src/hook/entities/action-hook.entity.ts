@@ -1,14 +1,14 @@
 import { IsEnum, IsArray } from 'class-validator';
 import { ObjectType, Field, ID } from '@nestjs/graphql';
 import { Trigger } from '../enums/trigger.enum';
+import { Entity, ObjectIdColumn, Column, ObjectID } from 'typeorm';
+import { HookEntity } from 'src/hook/entities/hook.entity';
 import { Criteria } from '../other-dto/criteria.dto';
 import { Action } from '../other-dto/action.dto';
-import { Entity, ObjectIdColumn, Column, ObjectID } from 'typeorm';
-import { Hook } from 'src/hook/entities/hook.entity';
 
 @Entity('ActionHook')
 @ObjectType('ActionHook')
-export class ActionHookEntity extends Hook {
+export class ActionHookEntity extends HookEntity {
   @ObjectIdColumn()
   @Field(() => ID)
   id: ObjectID;
@@ -25,4 +25,22 @@ export class ActionHookEntity extends Hook {
   @Column()
   @Field()
   lastRun: Date;
+
+  @Column()
+  @Field()
+  gameId: string;
+
+  @Column()
+  @Field()
+  @IsArray()
+  actions: Action[];
+
+  @Column()
+  @Field()
+  @IsArray()
+  criteria: Criteria[];
+
+  @Column()
+  @Field()
+  active: boolean;
 }

@@ -29,10 +29,4 @@ export class BadgeResolver {
   async badge(@Args('badgeId') id: string, @GqlUser('id') playerId: string): Promise<Badge[]> {
     return await this.badgeService.getBadge(id, playerId);
   }
-
-  @Query()
-  @UseGuards(GqlJwtAuthGuard, GqlEnrolledInGame)
-  async grantBadge(@Args('badgeId') id: string, @GqlUser('id') playerId: string): Promise<Badge[]> {
-    return await this.badgeService.grantBadgeJob(id, playerId);
-  }
 }

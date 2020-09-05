@@ -3,10 +3,15 @@ import { State } from './entities/state.enum';
 import { ChallengeStatusEntity as ChallengeStatus } from './entities/challenge-status.entity';
 import { ServiceHelper } from '../common/helpers/service.helper';
 import { ChallengeStatusRepository } from './repositories/challenge-status.repository';
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
+import { Trigger } from 'src/hook/enums/trigger.enum';
+import { PlayerEntity as Player } from 'src/player/entities/player.entity';
 
 @Injectable()
 export class ChallengeStatusService {
   constructor(
+    @InjectQueue('hooksQueue') private hooksQueue: Queue,
     private readonly serviceHelper: ServiceHelper,
     private readonly challengeStatusRepository: ChallengeStatusRepository,
   ) {}
@@ -49,8 +54,14 @@ export class ChallengeStatusService {
     return this.challengeStatusRepository.save(temp);
   }
 
-  async markAsCompleted(studentId: string, challengeId: string, date: Date): Promise<ChallengeStatus> {
-    const temp = await this.challengeStatusRepository.findStatus(studentId, challengeId);
+  async markAsCompleted(gameId: string, player: Player, challengeId: string, date: Date): Promise<ChallengeStatus> {
+    const job = await this.hooksQueue.add(Trigger.CHALLENGE_COMPLETED, {
+      gameId: gameId,
+      challengeId: challengeId,
+      player: player,
+    });
+
+    const temp = await this.challengeStatusRepository.findStatus(player.id.toString(), challengeId);
     temp.state = [State.COMPLETED];
     temp.endedAt = date;
     return this.challengeStatusRepository.save(temp);

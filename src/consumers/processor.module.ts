@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
-import { RewardProcessor } from './reward.processor';
 import { BullModule } from '@nestjs/bull';
+import { JobProcessor } from './processors/job.processor';
+import { QueueListener } from './queue.listener';
 
 @Module({
   imports: [
@@ -8,6 +9,6 @@ import { BullModule } from '@nestjs/bull';
       name: 'hooksQueue',
     }),
   ],
-  providers: [RewardProcessor],
+  providers: [JobProcessor, QueueListener],
 })
 export class ProcessorModule {}

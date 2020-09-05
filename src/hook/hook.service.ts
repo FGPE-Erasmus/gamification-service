@@ -1,4 +1,3 @@
-import { HookRepository } from './repository/hook.repository';
 import { ScheduledHookEntity as ScheduledHook } from './entities/scheduled-hook.entity';
 import { ScheduledHookRepository } from './repository/scheduled-hook.repository';
 import { ActionHookRepository } from './repository/action-hook.repository';
@@ -10,16 +9,11 @@ import { Trigger } from './enums/trigger.enum';
 @Injectable()
 export class HookService {
   constructor(
-    private readonly hookRepository: HookRepository,
     private readonly scheduledHookRepository: ScheduledHookRepository,
     private readonly actionHookRepository: ActionHookRepository,
   ) {}
 
-  async uploadHook(hook: Hook): Promise<Hook> {
-    return await this.hookRepository.save(hook);
-  }
-
-  async uploadScheduledHook(
+  async registerScheduledHook(
     hook: Hook,
     recurrent: boolean,
     trigger: string,
@@ -33,16 +27,18 @@ export class HookService {
       nextRun: nextRun,
       lastRun: lastRun,
     } as ScheduledHook;
+    delete scheduledHook['id'];
     return await this.scheduledHookRepository.save(scheduledHook);
   }
 
-  async uploadActionHook(hook: Hook, trigger: Trigger, sourceId: string, lastRun: Date): Promise<ActionHook> {
+  async registerActionHook(hook: Hook, trigger: Trigger, sourceId: string, lastRun: Date): Promise<ActionHook> {
     const actionHook = {
       ...hook,
       trigger: trigger,
       sourceId: sourceId,
       lastRun: lastRun,
     } as ActionHook;
+    delete actionHook['id'];
     return await this.actionHookRepository.save(actionHook);
   }
 }

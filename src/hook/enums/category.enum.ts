@@ -2,8 +2,8 @@ import { registerEnumType } from '@nestjs/graphql';
 
 export enum Category {
   GIVE = 'give',
-  TAKE_OUT = 'take out',
-  SET = 'set',
+  TAKE = 'take',
+  UPDATE = 'update',
 }
 
 registerEnumType(Category, { name: 'Category' });
