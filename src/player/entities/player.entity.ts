@@ -24,19 +24,19 @@ export class PlayerEntity {
   @Column()
   points: number;
 
-  @Field()
+  @Field(() => [PlayerBadge])
   @ManyToMany(() => PlayerBadge)
   badges: PlayerBadge[];
 
-  @Field()
+  @Field(() => [PlayerCoupon])
   @ManyToMany(() => PlayerCoupon)
   coupons: PlayerCoupon[];
 
-  @Field()
+  @Field(() => [PlayerHint])
   @ManyToMany(() => PlayerHint)
   hints: PlayerHint[];
 
-  @Field()
+  @Field(() => [PlayerVirtualItem])
   @ManyToMany(() => PlayerVirtualItem)
   virtualItems: PlayerVirtualItem[];
 }

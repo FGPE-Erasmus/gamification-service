@@ -33,8 +33,8 @@ export const appConfig: IAppConfig = {
   isTesting: process.env.NODE_ENV === 'test',
   assetsPath: `${__dirname}/../assets`,
   evaluationEngine: process.env.EVALUATION_ENGINE,
-  queueHost: process.env.QUEQUE_HOST,
-  queuePort: parseInt(process.env.QUEQUE_PORT, 10),
+  queueHost: process.env.REDIS_HOST,
+  queuePort: parseInt(process.env.REDIS_PORT, 10),
   database: {
     type: 'mongodb',
     host: process.env.DB_HOST,

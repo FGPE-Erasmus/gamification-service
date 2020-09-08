@@ -30,6 +30,21 @@ type ListUsers {
   total: Int!
 }
 
+type Criteria {
+  conditions: [String!]!
+  junctors: [Junctor!]!
+}
+
+enum Junctor {
+  AND
+  OR
+}
+
+type Action {
+  type: String!
+  parameters: [String!]!
+}
+
 type ChallengeStatus {
   studentId: String!
   challengeId: String!
@@ -47,6 +62,94 @@ enum State {
   FAILED
   COMPLETED
   REJECTED
+}
+
+type Badge {
+  id: ID!
+  type: RewardType!
+  players: [PlayerBadge!]!
+  gameId: String!
+  name: String!
+  description: String!
+  recurrenceLimit: Float!
+}
+
+enum RewardType {
+  BADGE
+  COUPON
+  HINT
+  VIRTUAL_ITEM
+}
+
+type PlayerBadge {
+  id: ID!
+  player: Player!
+  badge: Badge!
+  count: Float!
+}
+
+type Coupon {
+  id: ID!
+  players: [PlayerCoupon!]!
+  type: RewardType!
+  gameId: String!
+  name: String!
+  description: String!
+  recurrenceLimit: Float!
+}
+
+type PlayerCoupon {
+  id: ID!
+  player: Player!
+  coupon: Coupon!
+  count: Float!
+}
+
+type Hint {
+  id: ID!
+  type: RewardType!
+  gameId: String!
+  players: [PlayerHint!]!
+  exerciseId: String!
+  name: String!
+  description: String!
+  recurrenceLimit: Float!
+  message: String!
+}
+
+type PlayerHint {
+  id: ID!
+  player: Player!
+  hint: Hint!
+  count: Float!
+}
+
+type VirtualItem {
+  id: ID!
+  players: [PlayerVirtualItem!]!
+  type: RewardType!
+  gameId: String!
+  name: String!
+  description: String!
+  recurrenceLimit: Float!
+}
+
+type PlayerVirtualItem {
+  id: ID!
+  player: Player!
+  virtualItem: VirtualItem!
+  count: Float!
+}
+
+type Player {
+  id: ID!
+  userId: String!
+  gameId: String!
+  points: Float!
+  badges: [PlayerBadge!]!
+  coupons: [PlayerCoupon!]!
+  hints: [PlayerHint!]!
+  virtualItems: [PlayerVirtualItem!]!
 }
 
 type Submission {
@@ -70,51 +173,6 @@ scalar JSON @specifiedBy(url: "http://www.ecma-international.org/publications/fi
 enum Result {
   ACCEPTED
   REJECTED
-}
-
-type Player {
-  id: ID!
-  userId: String!
-  gameId: String!
-  points: Float!
-}
-
-type Coupon {
-  id: ID!
-  playerId: String!
-  gameId: String!
-  name: String!
-  description: String!
-  recurrenceLimit: Float!
-}
-
-type Hint {
-  id: ID!
-  gameId: String!
-  playerId: String!
-  exerciseId: String!
-  name: String!
-  description: String!
-  recurrenceLimit: Float!
-  message: String!
-}
-
-type VirtualItem {
-  id: ID!
-  playerId: String!
-  gameId: String!
-  name: String!
-  description: String!
-  recurrenceLimit: Float!
-}
-
-type Badge {
-  id: ID!
-  playerId: String!
-  gameId: String!
-  name: String!
-  description: String!
-  recurrenceLimit: Float!
 }
 
 type Query {

@@ -4,11 +4,11 @@ import { IsArray } from 'class-validator';
 
 @ObjectType('Criteria')
 export class Criteria {
-  @Field()
+  @Field(() => [String])
   @IsArray()
   conditions: string[];
 
-  @Field()
+  @Field(() => [Junctor])
   @IsArray()
   junctors: Junctor[];
 }

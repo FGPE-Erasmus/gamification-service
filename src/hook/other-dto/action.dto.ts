@@ -8,7 +8,7 @@ export class Action {
   @IsEnum(Category, { each: true })
   type: Category;
 
-  @Field()
+  @Field(() => [String])
   @IsArray()
   parameters: string[];
 }

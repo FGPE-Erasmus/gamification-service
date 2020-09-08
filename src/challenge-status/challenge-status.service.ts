@@ -47,8 +47,14 @@ export class ChallengeStatusService {
     return this.challengeStatusRepository.save(temp);
   }
 
-  async markAsFailed(studentId: string, challengeId: string, date: Date): Promise<ChallengeStatus> {
-    const temp = await this.challengeStatusRepository.findStatus(studentId, challengeId);
+  async markAsFailed(gameId: string, player: Player, challengeId: string, date: Date): Promise<ChallengeStatus> {
+    const job = await this.hooksQueue.add(Trigger.CHALLENGE_FAILED, {
+      gameId: gameId,
+      challengeId: challengeId,
+      player: player,
+    });
+
+    const temp = await this.challengeStatusRepository.findStatus(player.id.toString(), challengeId);
     temp.state = [State.FAILED];
     temp.endedAt = date;
     return this.challengeStatusRepository.save(temp);

@@ -5,8 +5,6 @@ import { PlayerRepository } from 'src/player/repository/player.repository';
 import { getRepository } from 'typeorm';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
-import { Trigger } from 'src/hook/enums/trigger.enum';
-import { BadgeDto } from './dto/badge.dto';
 import { ServiceHelper } from 'src/common/helpers/service.helper';
 
 @Injectable()
@@ -43,16 +41,5 @@ export class BadgeService {
       .leftJoin(BadgeRepository, 'badge', 'badge.playerId = player.id')
       .where('badge.id = :badgeId', { badgeId: id })
       .getMany();
-  }
-
-  async grantBadge(badgeDto: BadgeDto, playerId: string): Promise<any> {
-    badgeDto.playerId = playerId;
-    const badge: Badge = await this.serviceHelper.getUpsertData(undefined, { ...badgeDto }, this.badgeRepository);
-    await this.badgeRepository.save(badge);
-
-    const job = await this.hooksQueue.add(Trigger.REWARD_GRANTED, {
-      rewardId: badge.id,
-      playerId: playerId,
-    });
   }
 }

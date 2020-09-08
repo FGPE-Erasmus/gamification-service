@@ -1,7 +1,8 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
-import { Column, Entity, ObjectIdColumn, ObjectID } from 'typeorm';
+import { Column, Entity, ObjectIdColumn, ObjectID, ManyToMany } from 'typeorm';
 import { IReward } from 'src/common/interfaces/reward.interface';
 import { RewardType } from 'src/common/enum/reward-type.enum';
+import { PlayerVirtualItemEntity as PlayerVirtualItem } from './virtual-item-player.entity';
 
 @Entity('VirtualItem')
 @ObjectType('VirtualItem')
@@ -10,9 +11,9 @@ export class VirtualItemEntity implements IReward {
   @ObjectIdColumn()
   readonly id: ObjectID;
 
-  @Field()
-  @Column()
-  playerId: string;
+  @Field(() => [PlayerVirtualItem])
+  @ManyToMany(() => PlayerVirtualItem)
+  players: PlayerVirtualItem[];
 
   @Field(() => RewardType)
   @Column()

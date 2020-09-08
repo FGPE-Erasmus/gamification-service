@@ -19,6 +19,7 @@ services:
       - ${APP_PORT}:${APP_PORT}
     depends_on:
       - mongodb
+      - redis
     networks:
       - fgpe-gs-nw
     command: "npm run start:dev"
@@ -38,8 +39,22 @@ services:
     networks:
       - fgpe-gs-nw
 
+  redis:
+    container_name: ${REDIS_HOST}
+    image: redis:latest
+    environment: 
+      - ALLOW_EMPTY_PASSWORD=${ALLOW_EMPTY_PASSWORD}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    ports:
+      - ${REDIS_PORT}:${REDIS_PORT}
+    volumes:
+      - fgpe-gs-redis:/data/redis
+    networks:
+      - fgpe-gs-nw
+
 volumes:
   fgpe-gs-db: {}
+  fgpe-gs-redis: {}
 
 networks:
   fgpe-gs-nw:

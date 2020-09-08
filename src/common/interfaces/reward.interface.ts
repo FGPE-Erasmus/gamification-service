@@ -7,11 +7,3 @@ export interface IReward {
   description: string;
   recurrenceLimit: number;
 }
-
-export class Reward {
-  id: any;
-  name: string;
-  type: RewardType;
-  description: string;
-  recurrenceLimit: number;
-}

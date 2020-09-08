@@ -31,12 +31,12 @@ export class ActionHookEntity extends HookEntity {
   gameId: string;
 
   @Column()
-  @Field()
+  @Field(() => [Action])
   @IsArray()
   actions: Action[];
 
   @Column()
-  @Field()
+  @Field(() => [Criteria])
   @IsArray()
   criteria: Criteria[];
 

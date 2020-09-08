@@ -24,7 +24,7 @@ export class GameResolver {
       },
       createReadStream(),
     );
-    await this.hookService.uploadHook(undefined); //temp for now
+    //implement hooks uploading
     return 'Creating a game...';
   }
 }
