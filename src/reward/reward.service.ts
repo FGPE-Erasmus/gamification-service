@@ -85,7 +85,7 @@ export class RewardService {
           break;
         }
     }
-    const job = await this.hooksQueue.add(Trigger.CHALLENGE_COMPLETED, {
+    const job = await this.hooksQueue.add(Trigger.REWARD_GRANTED, {
       rewardId: reward.id,
       playerId: player.id,
     });
@@ -108,14 +108,13 @@ export class RewardService {
 
   async substractPoints(amount: string[], player: Player) {
     //substract points from the player, adding a field 'point' to Player entity?
-    //change string to a number
     const job = await this.hooksQueue.add(Trigger.POINTS_UPDATED, {
       playerId: player.id,
     });
   }
 
-  async update(params: string[], player: Player) {
-    //updating user's properties (updated points?)
+  async updatePlayer(params: string[], player: Player) {
+    //updating user's properties (updated points? does this trigger concern update regarding all other rewards or smth more/else?)
     const job = await this.hooksQueue.add(Trigger.PLAYER_UPDATED, {
       playerId: player.id,
     });
@@ -129,6 +128,7 @@ export class RewardService {
   }
 
   async ifEnoughForGranting(amount: string[]) {
+    //after REWARD_GRANNTED trigger
     //to be implemented...
   }
 }

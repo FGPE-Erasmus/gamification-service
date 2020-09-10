@@ -47,15 +47,17 @@ export class JobProcessor {
 
   async runActions(actions: Action[], player: Player): Promise<any> {
     actions.forEach(action => {
+      // TODO: get a reward obj from its id located in action.parameters and pass it as the first argument in methods below
       switch (action.type) {
         case Category.GIVE:
           this.rewardService.grantReward(action.parameters, player);
           break;
         case Category.TAKE:
+          //what other 'things' we can substract/take from the player? apart from points ofc
           this.rewardService.substractPoints(action.parameters, player);
           break;
         case Category.UPDATE:
-          this.rewardService.update(action.parameters, player);
+          this.rewardService.updatePlayer(action.parameters, player);
           break;
       }
     });
