@@ -5,10 +5,11 @@ import { GqlJwtAuthGuard } from '../common/guards/gql-jwt-auth.guard';
 import { GqlAdminGuard } from '../common/guards/gql-admin.guard';
 import ImportGameDto from './import-game.dto';
 import { GameService } from './game.service';
+import { HookService } from 'src/hook/hook.service';
 
 @Resolver()
 export class GameResolver {
-  constructor(private gameService: GameService) {}
+  constructor(private gameService: GameService, private hookService: HookService) {}
 
   @Mutation(() => String)
   @UseGuards(GqlJwtAuthGuard, GqlAdminGuard)
@@ -23,6 +24,7 @@ export class GameResolver {
       },
       createReadStream(),
     );
+    //implement hooks uploading
     return 'Creating a game...';
   }
 }

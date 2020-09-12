@@ -1,0 +1,16 @@
+export enum Trigger {
+  SUBMISSION_EVALUATED = 'submission evaluated',
+  SUBMISSION_RECEIVED = 'submission received',
+  SUBMISSION_ACCEPTED = 'submission accepted',
+  SUBMISSION_REJECTED = 'submission rejected',
+  CHALLENGE_COMPLETED = 'challenge completed',
+  CHALLENGE_FAILED = 'challenge failed',
+  REWARD_GRANTED = 'reward granted',
+  PLAYER_UPDATED = 'player updated',
+  POINTS_UPDATED = 'points updated',
+  DUEL_INVITATION_RECEIVED = 'duel invitation received',
+  DUEL_INITIATED = 'duel initiated',
+  DUEL_ACCEPTED = 'duel accepted',
+  DUEL_REJECTED = 'duel rejected',
+  DUEL_COMPLETED = 'duel completed',
+}

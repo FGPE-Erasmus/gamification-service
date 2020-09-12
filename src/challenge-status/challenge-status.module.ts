@@ -4,9 +4,17 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ChallengeStatusRepository } from './repositories/challenge-status.repository';
 import { ChallengeStatusResolver } from './challenge-status.resolver';
 import { ServiceHelper } from '../common/helpers/service.helper';
+import { BullModule } from '@nestjs/bull';
+import { QueueConfigService } from 'src/queue.config';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ChallengeStatusRepository])],
+  imports: [
+    TypeOrmModule.forFeature([ChallengeStatusRepository]),
+    BullModule.registerQueueAsync({
+      name: 'hooksQueue',
+      useClass: QueueConfigService,
+    }),
+  ],
   providers: [ChallengeStatusService, ServiceHelper, ChallengeStatusResolver],
   exports: [ChallengeStatusService],
 })

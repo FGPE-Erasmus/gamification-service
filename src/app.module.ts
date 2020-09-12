@@ -21,6 +21,11 @@ import { CouponModule } from './coupon/coupon.module';
 import { HintModule } from './hint/hint.module';
 import { VirtualItemModule } from './virtual-item/virtual-item.module';
 import { BadgeModule } from './badge/badge.module';
+import { BullModule } from '@nestjs/bull';
+import { ProcessorModule } from './consumers/processor.module';
+import { HookModule } from './hook/hook.module';
+import { RewardModule } from './reward/reward.module';
+import { QueueConfigService } from './queue.config';
 
 @Module({
   imports: [
@@ -33,6 +38,12 @@ import { BadgeModule } from './badge/badge.module';
       installSubscriptionHandlers: true,
       resolvers: { JSON: GraphQLJSON },
     }),
+    BullModule.registerQueueAsync({
+      name: 'hooksQueue',
+      useClass: QueueConfigService,
+    }),
+    RewardModule,
+    ProcessorModule,
     HealthModule,
     AuthModule,
     UsersModule,
@@ -47,6 +58,7 @@ import { BadgeModule } from './badge/badge.module';
     CouponModule,
     HintModule,
     VirtualItemModule,
+    HookModule,
   ],
   providers: [DateScalar, EmailScalar],
 })
