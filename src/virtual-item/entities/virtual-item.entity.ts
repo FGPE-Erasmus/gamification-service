@@ -17,7 +17,7 @@ export class VirtualItemEntity implements IReward {
 
   @Field(() => RewardType)
   @Column()
-  type: RewardType.VIRTUAL_ITEM;
+  kind: RewardType.VIRTUAL_ITEM;
 
   @Field()
   @Column()

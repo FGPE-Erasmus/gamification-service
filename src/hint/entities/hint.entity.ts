@@ -13,7 +13,7 @@ export class HintEntity implements IReward {
 
   @Field(() => RewardType)
   @Column()
-  type: RewardType.HINT;
+  kind: RewardType.HINT;
 
   @Field()
   @Column()

@@ -13,7 +13,7 @@ export class BadgeEntity implements IReward {
 
   @Field(() => RewardType)
   @Column()
-  type: RewardType.BADGE;
+  kind: RewardType.BADGE;
 
   @Field(() => [PlayerBadge])
   @ManyToMany(() => PlayerBadge)

@@ -30,6 +30,38 @@ type ListUsers {
   total: Int!
 }
 
+type Challenge {
+  id: ID!
+  name: String!
+  parentChallenge: Challenge!
+  gameId: String!
+  description: String!
+  difficulty: Difficulty!
+  mode: Mode!
+  modeParameters: [String!]!
+  refs: [String!]!
+  locked: Boolean!
+  hidden: Boolean!
+}
+
+enum Difficulty {
+  BEGINNER
+  EASY
+  AVERAGE
+  HARD
+  MASTER
+}
+
+enum Mode {
+  NORMAL
+  SHAPESHIFTER
+  SHORTENING
+  SPEEDUP
+  HACK_IT
+  TIME_BOMB
+  DUEL
+}
+
 type Criteria {
   conditions: [String!]!
   junctors: [Junctor!]!
@@ -66,7 +98,7 @@ enum State {
 
 type Badge {
   id: ID!
-  type: RewardType!
+  kind: RewardType!
   players: [PlayerBadge!]!
   gameId: String!
   name: String!
@@ -91,7 +123,7 @@ type PlayerBadge {
 type Coupon {
   id: ID!
   players: [PlayerCoupon!]!
-  type: RewardType!
+  kind: RewardType!
   gameId: String!
   name: String!
   description: String!
@@ -107,7 +139,7 @@ type PlayerCoupon {
 
 type Hint {
   id: ID!
-  type: RewardType!
+  kind: RewardType!
   gameId: String!
   players: [PlayerHint!]!
   exerciseId: String!
@@ -127,7 +159,7 @@ type PlayerHint {
 type VirtualItem {
   id: ID!
   players: [PlayerVirtualItem!]!
-  type: RewardType!
+  kind: RewardType!
   gameId: String!
   name: String!
   description: String!

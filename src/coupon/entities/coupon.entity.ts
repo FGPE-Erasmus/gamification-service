@@ -17,7 +17,7 @@ export class CouponEntity implements IReward {
 
   @Field(() => RewardType)
   @Column()
-  type: RewardType.COUPON;
+  kind: RewardType.COUPON;
 
   @Field()
   @Column()

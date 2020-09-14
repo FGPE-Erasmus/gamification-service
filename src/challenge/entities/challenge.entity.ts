@@ -1,4 +1,4 @@
-import { Entity, ObjectIdColumn, ObjectID, Column } from 'typeorm';
+import { Entity, ObjectIdColumn, ObjectID, Column, ManyToOne, OneToMany, ManyToMany } from 'typeorm';
 import { ObjectType, Field, ID } from '@nestjs/graphql';
 import { Difficulty } from './difficulty.enum';
 import { Mode } from './mode.enum';
@@ -13,6 +13,10 @@ export class ChallengeEntity {
   @Field()
   @Column()
   name: string;
+
+  @Field(() => ChallengeEntity)
+  @ManyToOne(() => ChallengeEntity)
+  parentChallenge: ChallengeEntity;
 
   @Field()
   @Column()
@@ -36,7 +40,7 @@ export class ChallengeEntity {
 
   @Field(() => [String])
   @Column()
-  exerciseIds: string[];
+  refs: string[];
 
   @Field()
   @Column()

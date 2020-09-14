@@ -2,9 +2,13 @@ import { Field, ArgsType } from '@nestjs/graphql';
 import { MinLength, MaxLength, IsArray, IsEnum } from 'class-validator';
 import { Difficulty } from '../entities/difficulty.enum';
 import { Mode } from '../entities/mode.enum';
+import { ChallengeEntity as Challenge } from '../entities/challenge.entity';
 
 @ArgsType()
 export class UpsertChallengeDto {
+  @Field()
+  id: string;
+
   @Field()
   @MinLength(4)
   @MaxLength(200)
@@ -24,16 +28,21 @@ export class UpsertChallengeDto {
   @IsEnum(Mode, { each: true })
   mode: Mode;
 
-  @Field({ nullable: true })
+  @Field(() => [String])
   @IsArray()
   modeParameters: string[];
 
-  @Field({ nullable: true })
-  exerciseIds: string[];
+  @Field(() => [String])
+  @IsArray()
+  refs: string[];
 
   @Field()
   locked: boolean;
 
   @Field()
   hidden: boolean;
+
+  @Field(() => [Challenge])
+  @IsArray()
+  children: Challenge[];
 }

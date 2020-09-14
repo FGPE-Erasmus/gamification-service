@@ -18,10 +18,22 @@ export class ChallengeService {
    * @param data for creation
    */
 
-  async createChallenge(id: string | undefined, data: UpsertChallengeDto): Promise<Challenge> {
+  async createChallenge(data: UpsertChallengeDto): Promise<Challenge> {
     const fields: { [k: string]: any } = { ...data };
-    console.log(fields);
-    const newChallenge: Challenge = await this.serviceHelper.getUpsertData(id, fields, this.challengeRepository);
+    delete fields.children;
+    fields.parentChallenge = '';
+    const newChallenge: Challenge = await this.serviceHelper.getUpsertData(
+      'aaaaaaaaaaaa',
+      fields,
+      this.challengeRepository,
+    );
+    if (data.children.length !== 0) {
+      const childrenList: Challenge[] = data.children;
+      childrenList.forEach(async child => {
+        child.parentChallenge = newChallenge;
+        this.challengeRepository.save(child);
+      });
+    }
     return this.challengeRepository.save(newChallenge);
   }
 }
