@@ -1,4 +1,4 @@
-import { Entity, ObjectIdColumn, ObjectID, Column, ManyToOne, OneToMany, ManyToMany } from 'typeorm';
+import { Entity, ObjectIdColumn, ObjectID, Column, ManyToOne } from 'typeorm';
 import { ObjectType, Field, ID } from '@nestjs/graphql';
 import { Difficulty } from './difficulty.enum';
 import { Mode } from './mode.enum';
