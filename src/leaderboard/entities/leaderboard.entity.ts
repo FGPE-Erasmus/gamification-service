@@ -1,6 +1,7 @@
-import { Entity, ObjectIdColumn, ObjectID, Column } from 'typeorm';
+import { Entity, ObjectIdColumn, ObjectID, Column, ManyToOne } from 'typeorm';
 import { ObjectType, ID, Field } from '@nestjs/graphql';
 import { SortingOrders } from './sorting.enum';
+import { ChallengeEntity } from 'src/challenge/entities/challenge.entity';
 
 @Entity('Leaderboard')
 @ObjectType('Leaderboard')
@@ -12,6 +13,10 @@ export class LeaderboardEntity {
   @Field()
   @Column()
   name: string;
+
+  @Field(() => ChallengeEntity, { nullable: true })
+  @ManyToOne(() => ChallengeEntity)
+  challenge: ChallengeEntity;
 
   @Field()
   @Column()

@@ -9,7 +9,7 @@ export class LeaderboardDto {
   @Field()
   name: string;
 
-  @Field()
+  @Field(() => [String])
   metrics: string[];
 
   @Field(() => [SortingOrders])

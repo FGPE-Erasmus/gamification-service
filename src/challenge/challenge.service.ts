@@ -22,11 +22,7 @@ export class ChallengeService {
     const fields: { [k: string]: any } = { ...data };
     delete fields.children;
     fields.parentChallenge = '';
-    const newChallenge: Challenge = await this.serviceHelper.getUpsertData(
-      'aaaaaaaaaaaa',
-      fields,
-      this.challengeRepository,
-    );
+    const newChallenge: Challenge = await this.serviceHelper.getUpsertData(fields.id, fields, this.challengeRepository);
     if (data.children.length !== 0) {
       const childrenList: Challenge[] = data.children;
       childrenList.forEach(async child => {

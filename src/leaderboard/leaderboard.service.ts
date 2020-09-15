@@ -5,6 +5,7 @@ import { LeaderboardDto } from './dto/leaderboard.dto';
 import { LeaderboardEntity as Leaderboard } from './entities/leaderboard.entity';
 import { PlayerLeaderboardRepository } from 'src/player-leaderboard/repository/player-leaderboard.repository';
 import { SortingOrders } from './entities/sorting.enum';
+import { ChallengeRepository } from 'src/challenge/repositories/challenge.repository';
 
 @Injectable()
 export class LeaderboardService {
@@ -12,12 +13,24 @@ export class LeaderboardService {
     private readonly serviceHelper: ServiceHelper,
     private readonly leaderboardRepository: LeaderboardRepository,
     private readonly playerLeaderboardRepository: PlayerLeaderboardRepository,
+    private readonly challengeRepository: ChallengeRepository,
   ) {}
 
-  async createLeaderboard(id: string | undefined, data: LeaderboardDto): Promise<Leaderboard> {
+  async createLeaderboard(gameId: string, data: LeaderboardDto, challengeId?: string): Promise<Leaderboard> {
     const fields: { [key: string]: any } = { ...data };
-    const newLeaderboard: Leaderboard = await this.serviceHelper.getUpsertData(id, fields, this.leaderboardRepository);
-    return this.leaderboardRepository.save(newLeaderboard);
+    fields.gameId = gameId;
+    fields.sortingOrders = fields.sorting_orders as [SortingOrders];
+    delete fields.sorting_orders;
+    if (challengeId) {
+      const challenge = this.challengeRepository.findOne(challengeId);
+      fields.challenge = challenge;
+    }
+    const newLeaderboard: Leaderboard = await this.serviceHelper.getUpsertData(
+      fields.id,
+      fields,
+      this.leaderboardRepository,
+    );
+    return await this.leaderboardRepository.save(newLeaderboard);
   }
 
   async sortLeaderboard(leaderboardId: string): Promise<any> {
