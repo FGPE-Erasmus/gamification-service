@@ -33,9 +33,9 @@ type ListUsers {
 type Challenge {
   id: ID!
   name: String!
-  parentChallenge: Challenge!
   gameId: String!
-  description: String!
+  parentChallenge: Challenge
+  description: String
   difficulty: Difficulty!
   mode: Mode!
   modeParameters: [String!]!
@@ -60,6 +60,16 @@ enum Mode {
   HACK_IT
   TIME_BOMB
   DUEL
+}
+
+type Game {
+  id: ID!
+  name: String!
+  description: String
+  gedilLayerId: String
+  gedilLayerDescription: String
+  startDate: Date
+  endDate: Date
 }
 
 type Criteria {
@@ -211,6 +221,8 @@ type Query {
   user(id: String!): User!
   users(skip: Int = 0, take: Int = 50, ids: [ID!], name: String, order: String = "DESC", fieldSort: String = "updatedAt"): ListUsers!
   queryCheck: String!
+  game(id: String!): Game!
+  challenges: [Challenge!]!
   get(challengeId: String!, studentId: String!): ChallengeStatus!
   submission(submissionId: String!): Submission!
   submissions(exerciseId: String!): [Submission!]!
@@ -233,7 +245,7 @@ type Mutation {
   login(login: String!, password: String!): User!
   signup(name: String!, username: String!, email: Email!, password: String!): User!
   mutationCheck: String!
-  createGame(name: String!, startDate: Date!, endDate: Date!, userIds: String!, file: Upload!): String!
+  importGEdILArchive(name: String!, description: String, startDate: Date, endDate: Date, users: [String!], file: Upload!): Game!
   createSubmission(id: String!, gameId: String!, exerciseId: String!, playerId: String!, codeFile: String!): Submission!
 }
 

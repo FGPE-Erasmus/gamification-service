@@ -1,11 +1,13 @@
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Controller, Post, UseInterceptors, UploadedFile, UseGuards, Body } from '@nestjs/common';
 import { Readable } from 'stream';
+import 'multer';
 
 import { RestJwtGuard } from '../common/guards/rest-jwt-auth.guard';
 import { RestAdminGuard } from '../common/guards/rest-admin.guard';
-import GameDto from './game.dto';
+import GameDto from './dto/game.dto';
 import { GameService } from './game.service';
+import { GameEntity as Game } from './entities/game.entity';
 
 @Controller('upload')
 export class GameUploadController {
@@ -14,9 +16,8 @@ export class GameUploadController {
   @Post()
   @UseInterceptors(FileInterceptor('file'))
   @UseGuards(RestJwtGuard, RestAdminGuard)
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  async uploadZip(@Body() gameDto: GameDto, @UploadedFile() file): Promise<string> {
-    await this.gameService.create(gameDto, Readable.from(file.buffer));
-    return 'Creating a game...';
+  async importGEdILArchive(@Body() gameDto: GameDto, @UploadedFile() file: Express.Multer.File): Promise<Game> {
+    const game: Game = await this.gameService.importGEdILArchive(gameDto, Readable.from(file.buffer));
+    return game;
   }
 }

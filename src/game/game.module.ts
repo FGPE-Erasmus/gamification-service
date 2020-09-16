@@ -1,25 +1,27 @@
 import { Module } from '@nestjs/common';
-import { GameUploadController } from './upload.controller';
 import { MulterModule } from '@nestjs/platform-express';
+import { TypeOrmModule } from '@nestjs/typeorm';
+
+import { GameUploadController } from './upload.controller';
 import { UsersModule } from 'src/users/users.module';
 import { GameResolver } from './game.resolver';
 import { GameService } from './game.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { ExtractionHelper } from 'src/common/helpers/extraction.helper';
 import { ScheduledHookRepository } from 'src/hook/repository/scheduled-hook.repository';
 import { ActionHookRepository } from 'src/hook/repository/action-hook.repository';
 import { HookService } from 'src/hook/hook.service';
 import { ChallengeModule } from 'src/challenge/challenge.module';
+import { GameRepository } from './repositories/game.repository';
+import { DateScalar } from '../common/scalars/date.scalar';
 
 @Module({
   imports: [
     MulterModule,
     UsersModule,
     ChallengeModule,
-    TypeOrmModule.forFeature([ScheduledHookRepository, ActionHookRepository]),
+    TypeOrmModule.forFeature([GameRepository, ScheduledHookRepository, ActionHookRepository]),
   ],
   controllers: [GameUploadController],
-  providers: [GameService, GameResolver, HookService, ExtractionHelper],
+  providers: [DateScalar, GameService, GameResolver, HookService],
   exports: [GameService],
 })
 export class GameModule {}

@@ -1,37 +1,32 @@
 import { Injectable } from '@nestjs/common';
+import { ObjectId } from 'mongodb';
 import { Readable } from 'stream';
-import { Parse, Entry } from 'unzipper';
+import { Parse } from 'unzipper';
 
-import GameDto from './game.dto';
-import { ExtractionHelper } from 'src/common/helpers/extraction.helper';
-import { ChallengeEntity as Challenge } from 'src/challenge/entities/challenge.entity';
-import { ChallengeService } from 'src/challenge/challenge.service';
-import { UpsertChallengeDto } from 'src/challenge/dto/upsert-challenge.dto';
-import { RewardType } from 'src/common/enum/reward-type.enum';
+import { extractToJson } from '../common/utils/extraction.utils';
+import { ChallengeService } from '../challenge/challenge.service';
+import GameDto from './dto/game.dto';
+import { GameEntity as Game } from './entities/game.entity';
+import { GameRepository } from './repositories/game.repository';
 
 @Injectable()
 export class GameService {
-  constructor(private extractionHelper: ExtractionHelper, private challengeService: ChallengeService) {}
+  constructor(private challengeService: ChallengeService, private gameRepository: GameRepository) {}
+
   /**
-   * Create a game from a GEdIL specification.
+   * Import a game from a GEdIL layer archive.
    *
-   * @param game the game properties
-   * @param gedilStream a read stream to the GEdIL specification package.
+   * @param game {Game} the game properties
+   * @param gedilStream {Readable} a read stream to the GEdIL specification package.
    */
-  async create(game: GameDto, gedilStream: Readable): Promise<boolean | undefined> {
-    console.log(game);
+  async importGEdILArchive(gameDto: GameDto, gedilStream: Readable): Promise<Game | undefined> {
+    let game: Game;
+    const entries = { challenges: {}, leaderboards: {}, rewards: {}, rules: {} };
 
-    const regexChallenge = /\b(\w*challenges\w*)\b/g;
-    const regexRewards = /\b(\w*rewards\w*)\b/g;
-    const regexLeaderboards = /\b(\w*leaderboards\w*)\b/g;
-    const regexRules = /\b(\w*rules\w*)\b/g;
-
-    gedilStream.pipe(Parse()).on('entry', async (entry: Entry) => {
+    const zip = gedilStream.pipe(Parse({ forceStream: true }));
+    for await (const entry of zip) {
       const fileName = entry.path;
-      const type = entry.type;
-      const size = entry.vars.compressedSize;
-      const content = await entry.buffer();
-      const encodedContent = this.extractionHelper.extractToJson(content);
+      const buffer = await entry.buffer();
 
       // if (regexChallenge.test(fileName) && regexRewards.test(fileName)) {
       //   switch (encodedContent.kind) {
@@ -42,12 +37,78 @@ export class GameService {
       //   }
       // }
 
-      if (regexChallenge.test(fileName) && !regexRewards.test(fileName)) {
-        const challenge: UpsertChallengeDto = encodedContent as UpsertChallengeDto;
-        await this.challengeService.createChallenge(challenge);
+      if (fileName === 'metadata.json') {
+        game = await this.create(gameDto, extractToJson(buffer));
+      } else {
+        const result = /^(challenges|leaderboards|rewards|rules)\/([^/]+)\//.exec(fileName);
+        if (result) {
+          const subpath = fileName.substring(result[0].length);
+          if (!entries[result[1]][result[2]]) {
+            entries[result[1]][result[2]] = {};
+          }
+          entries[result[1]][result[2]][subpath] = buffer;
+        } else {
+          console.error('Unrecognized entry "%s".', fileName);
+          entry.autodrain();
+        }
       }
-      entry.autodrain();
+    }
+
+    const subObjects = { challenges: {}, leaderboards: {}, rewards: {}, rules: {} };
+
+    // challenges
+    for (const gedilId of Object.keys(entries.challenges)) {
+      subObjects.challenges[gedilId] = await this.challengeService.importGEdIL(
+        game,
+        gedilId,
+        entries.challenges[gedilId],
+      );
+    }
+
+    // leaderboards
+    /* for (const gedilId of Object.keys(entries.challenges)) {
+      // TODO
+    } */
+
+    // rewards
+    /* for (const gedilId of Object.keys(entries.rewards)) {
+      // TODO
+    } */
+
+    // rules
+    /* for (const gedilId of Object.keys(entries.rules)) {
+      // TODO
+    } */
+
+    return game;
+  }
+
+  /**
+   * Create a game.
+   *
+   * @param game {Game} the game properties
+   * @param gedilLayer {any} data about the GEdIL layer.
+   */
+  async create(gameDto: GameDto, gedilLayer: { id: string; name: string; description: string }): Promise<Game> {
+    return this.gameRepository.save({
+      ...gameDto,
+      gedilLayerId: gedilLayer.id,
+      gedilLayerDescription: `[${gedilLayer.name}] ${gedilLayer.description}`,
     });
-    return true;
+  }
+
+  /**
+   * Returns a game by their ID
+   *
+   * @param {string} id of game
+   * @returns {(Promise<Game | undefined>)}
+   * @memberof UsersService
+   */
+  async findGameById(id: string): Promise<Game> {
+    return await this.gameRepository.findOne({
+      where: {
+        _id: ObjectId(id),
+      },
+    });
   }
 }

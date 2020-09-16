@@ -1,5 +1,5 @@
 import { ArgsType, Field, Int, ID } from '@nestjs/graphql';
-import { Max, Min, MinLength, IsArray, IsMongoId } from 'class-validator';
+import { Max, Min, MinLength, IsArray, IsMongoId, Allow } from 'class-validator';
 
 import { order } from '../types/order.type';
 
@@ -24,8 +24,10 @@ export class FindNameDto {
   name?: string;
 
   @Field(() => String, { nullable: true })
+  @Allow()
   order?: order = 'DESC';
 
   @Field({ nullable: true })
+  @Allow()
   fieldSort?: string = 'updatedAt';
 }

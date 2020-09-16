@@ -17,7 +17,9 @@ COPY package*.json ./
 RUN npm install
 RUN chown -R node:node /home/node/.npm-global
 
-COPY . .
+COPY tsconfig*.json ./
+COPY nest-cli.json ./
+
 RUN chown -R node:node /home/node/app
 
 USER node

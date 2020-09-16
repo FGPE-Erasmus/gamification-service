@@ -1,5 +1,5 @@
 import { ID, Field, ArgsType } from '@nestjs/graphql';
-import { IsOptional, IsMongoId } from 'class-validator';
+import { IsOptional, IsMongoId, Allow } from 'class-validator';
 
 import { CreateUserDto } from './create-user.dto';
 
@@ -11,5 +11,6 @@ export class UpsertUserDto {
   id?: string;
 
   @Field()
+  @Allow()
   userInput: CreateUserDto;
 }
