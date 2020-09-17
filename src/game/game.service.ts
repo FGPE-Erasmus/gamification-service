@@ -8,10 +8,15 @@ import { ChallengeService } from '../challenge/challenge.service';
 import GameDto from './dto/game.dto';
 import { GameEntity as Game } from './entities/game.entity';
 import { GameRepository } from './repositories/game.repository';
+import { LeaderboardService } from 'src/leaderboard/leaderboard.service';
 
 @Injectable()
 export class GameService {
-  constructor(private challengeService: ChallengeService, private gameRepository: GameRepository) {}
+  constructor(
+    private challengeService: ChallengeService,
+    private gameRepository: GameRepository,
+    private leaderboardService: LeaderboardService,
+  ) {}
 
   /**
    * Import a game from a GEdIL layer archive.
@@ -41,8 +46,10 @@ export class GameService {
         game = await this.create(gameDto, extractToJson(buffer));
       } else {
         const result = /^(challenges|leaderboards|rewards|rules)\/([^/]+)\//.exec(fileName);
+        console.log(result);
         if (result) {
           const subpath = fileName.substring(result[0].length);
+          console.log(subpath);
           if (!entries[result[1]][result[2]]) {
             entries[result[1]][result[2]] = {};
           }
@@ -66,9 +73,13 @@ export class GameService {
     }
 
     // leaderboards
-    /* for (const gedilId of Object.keys(entries.challenges)) {
-      // TODO
-    } */
+    for (const gedilId of Object.keys(entries.leaderboards)) {
+      subObjects.leaderboards[gedilId] = await this.leaderboardService.importGEdIL(
+        game,
+        gedilId,
+        entries.leaderboards[gedilId],
+      );
+    }
 
     // rewards
     /* for (const gedilId of Object.keys(entries.rewards)) {

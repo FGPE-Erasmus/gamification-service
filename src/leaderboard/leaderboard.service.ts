@@ -1,11 +1,14 @@
 import { Injectable } from '@nestjs/common';
+
 import { ServiceHelper } from 'src/common/helpers/service.helper';
+import { extractToJson } from 'src/common/utils/extraction.utils';
+import { SortingOrders } from './entities/sorting.enum';
+import { GameEntity as Game } from '../game/entities/game.entity';
+import { ChallengeEntity as Challenge } from '../challenge/entities/challenge.entity';
+import { LeaderboardEntity as Leaderboard } from './entities/leaderboard.entity';
 import { LeaderboardRepository } from './repository/leaderboard.repository';
 import { LeaderboardDto } from './dto/leaderboard.dto';
-import { LeaderboardEntity as Leaderboard } from './entities/leaderboard.entity';
 import { PlayerLeaderboardRepository } from 'src/player-leaderboard/repository/player-leaderboard.repository';
-import { SortingOrders } from './entities/sorting.enum';
-import { ChallengeRepository } from 'src/challenge/repositories/challenge.repository';
 
 @Injectable()
 export class LeaderboardService {
@@ -13,20 +16,47 @@ export class LeaderboardService {
     private readonly serviceHelper: ServiceHelper,
     private readonly leaderboardRepository: LeaderboardRepository,
     private readonly playerLeaderboardRepository: PlayerLeaderboardRepository,
-    private readonly challengeRepository: ChallengeRepository,
   ) {}
 
-  async createLeaderboard(gameId: string, data: LeaderboardDto, challengeId?: string): Promise<Leaderboard> {
+  async importGEdIL(
+    game: Game,
+    gedilId: string,
+    entries: { [path: string]: Buffer },
+    challenge?: Challenge,
+  ): Promise<Leaderboard | undefined> {
+    let leaderboard: Leaderboard;
+
+    const subEntries = { challenges: {}, leaderboards: {}, rewards: {}, rules: {} };
+    for (const path of Object.keys(entries)) {
+      if (path === 'metadata.json') {
+        const encodedContent = extractToJson(entries[path]);
+        leaderboard = await this.createLeaderboard({
+          ...encodedContent,
+          gameId: game.id,
+          challenge,
+        });
+      } else {
+        const result = /^(challenges|leaderboards|rewards|rules)\/([^/]+)\//.exec(path);
+        if (result) {
+          const subpath = path.substring(result[0].length);
+          if (!subEntries[result[1]][result[2]]) {
+            subEntries[result[1]][result[2]] = {};
+          }
+          subEntries[result[1]][result[2]][subpath] = entries[path];
+        } else {
+          console.error('Unrecognized entry "leaderboards/%s/%s".', gedilId, path);
+        }
+      }
+    }
+    return leaderboard;
+  }
+
+  async createLeaderboard(data: LeaderboardDto): Promise<Leaderboard> {
     const fields: { [key: string]: any } = { ...data };
-    fields.gameId = gameId;
     fields.sortingOrders = fields.sorting_orders as [SortingOrders];
     delete fields.sorting_orders;
-    if (challengeId) {
-      const challenge = this.challengeRepository.findOne(challengeId);
-      fields.challenge = challenge;
-    }
     const newLeaderboard: Leaderboard = await this.serviceHelper.getUpsertData(
-      fields.id,
+      null,
       fields,
       this.leaderboardRepository,
     );
