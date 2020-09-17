@@ -20,33 +20,18 @@ export class LeaderboardService {
 
   async importGEdIL(
     game: Game,
-    gedilId: string,
     entries: { [path: string]: Buffer },
     challenge?: Challenge,
   ): Promise<Leaderboard | undefined> {
     let leaderboard: Leaderboard;
 
-    const subEntries = { challenges: {}, leaderboards: {}, rewards: {}, rules: {} };
     for (const path of Object.keys(entries)) {
-      if (path === 'metadata.json') {
-        const encodedContent = extractToJson(entries[path]);
-        leaderboard = await this.createLeaderboard({
-          ...encodedContent,
-          gameId: game.id,
-          challenge,
-        });
-      } else {
-        const result = /^(challenges|leaderboards|rewards|rules)\/([^/]+)\//.exec(path);
-        if (result) {
-          const subpath = path.substring(result[0].length);
-          if (!subEntries[result[1]][result[2]]) {
-            subEntries[result[1]][result[2]] = {};
-          }
-          subEntries[result[1]][result[2]][subpath] = entries[path];
-        } else {
-          console.error('Unrecognized entry "leaderboards/%s/%s".', gedilId, path);
-        }
-      }
+      const encodedContent = extractToJson(entries[path]);
+      leaderboard = await this.createLeaderboard({
+        ...encodedContent,
+        gameId: game.id,
+        challenge,
+      });
     }
     return leaderboard;
   }

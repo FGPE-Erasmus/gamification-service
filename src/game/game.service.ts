@@ -74,11 +74,7 @@ export class GameService {
 
     // leaderboards
     for (const gedilId of Object.keys(entries.leaderboards)) {
-      subObjects.leaderboards[gedilId] = await this.leaderboardService.importGEdIL(
-        game,
-        gedilId,
-        entries.leaderboards[gedilId],
-      );
+      subObjects.leaderboards[gedilId] = await this.leaderboardService.importGEdIL(game, entries.leaderboards[gedilId]);
     }
 
     // rewards
