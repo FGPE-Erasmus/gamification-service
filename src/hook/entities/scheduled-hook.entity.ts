@@ -1,24 +1,47 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
 import { Entity, ObjectIdColumn, ObjectID, Column } from 'typeorm';
-import { HookEntity } from './hook.entity';
 import { IsArray } from 'class-validator';
+
 import { Criteria } from '../other-dto/criteria.dto';
 import { Action } from '../other-dto/action.dto';
+import { Trigger } from '../other-dto/trigger.dto';
 
 @Entity('ScheduledHook')
 @ObjectType('ScheduledHook')
-export class ScheduledHookEntity extends HookEntity {
+export class ScheduledHookEntity {
   @ObjectIdColumn()
   @Field(() => ID)
   id: ObjectID;
 
   @Column()
   @Field()
-  recurrent: boolean;
+  name: string;
 
   @Column()
   @Field()
-  trigger: string;
+  gameId: string;
+
+  @Column()
+  @Field()
+  trigger: Trigger;
+
+  @Column()
+  @Field(() => [Criteria])
+  @IsArray()
+  criteria: Criteria[];
+
+  @Column()
+  @Field(() => [Action])
+  @IsArray()
+  actions: Action[];
+
+  @Column()
+  @Field()
+  active: boolean;
+
+  @Column()
+  @Field()
+  recurrent: boolean;
 
   @Column()
   @Field()
@@ -27,22 +50,4 @@ export class ScheduledHookEntity extends HookEntity {
   @Column()
   @Field()
   lastRun: Date;
-
-  @Column()
-  @Field()
-  gameId: string;
-
-  @Column()
-  @Field(() => [Action])
-  @IsArray()
-  actions: Action[];
-
-  @Column()
-  @Field(() => [Criteria])
-  @IsArray()
-  criteria: Criteria[];
-
-  @Column()
-  @Field()
-  active: boolean;
 }

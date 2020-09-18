@@ -32,16 +32,16 @@ export class JobProcessor {
 
   //to be changed
   checkCriteria(criterias: Criteria[]): boolean {
-    criterias.some(criteria => {
-      const conditional = '';
-      const junctorsLength = criteria.junctors.length;
-      for (let i = 0; i < junctorsLength; i++) {
-        const junctor = criteria.junctors[i] === Junctor.AND ? '&&' : '||';
-        conditional.concat(criteria.conditions[i] + ' ' + junctor + ' ');
-      }
-      conditional.concat(criteria.conditions[junctorsLength]);
-      if (!eval(conditional)) return false;
-    });
+    // criterias.some(criteria => {
+    //   const conditional = '';
+    //   const junctorsLength = criteria.junctors.length;
+    //   for (let i = 0; i < junctorsLength; i++) {
+    //     const junctor = criteria.junctors[i] === Junctor.AND ? '&&' : '||';
+    //     conditional.concat(criteria.conditions[i] + ' ' + junctor + ' ');
+    //   }
+    //   conditional.concat(criteria.conditions[junctorsLength]);
+    // if (!eval(conditional)) return false;
+    // });
     return true;
   }
 

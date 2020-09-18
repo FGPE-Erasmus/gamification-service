@@ -1,22 +1,45 @@
 import { IsEnum, IsArray } from 'class-validator';
 import { ObjectType, Field, ID } from '@nestjs/graphql';
-import { Trigger } from '../enums/trigger.enum';
 import { Entity, ObjectIdColumn, Column, ObjectID } from 'typeorm';
-import { HookEntity } from 'src/hook/entities/hook.entity';
+
 import { Criteria } from '../other-dto/criteria.dto';
 import { Action } from '../other-dto/action.dto';
+import { Trigger } from '../other-dto/trigger.dto';
 
 @Entity('ActionHook')
 @ObjectType('ActionHook')
-export class ActionHookEntity extends HookEntity {
+export class ActionHookEntity {
   @ObjectIdColumn()
   @Field(() => ID)
   id: ObjectID;
 
   @Column()
   @Field()
-  @IsEnum(Trigger, { each: true })
+  name: string;
+
+  @Column()
+  @Field()
+  gameId: string;
+
+  @Column()
+  @Field()
   trigger: Trigger;
+
+  @Column()
+  @Field(() => [Criteria])
+  @IsArray()
+  @IsEnum([Criteria], { each: true })
+  criteria: Criteria[];
+
+  @Column()
+  @Field(() => [Action])
+  @IsArray()
+  @IsEnum([Action], { each: true })
+  actions: Action[];
+
+  @Column()
+  @Field()
+  active: boolean;
 
   @Column()
   @Field()
@@ -25,22 +48,4 @@ export class ActionHookEntity extends HookEntity {
   @Column()
   @Field()
   lastRun: Date;
-
-  @Column()
-  @Field()
-  gameId: string;
-
-  @Column()
-  @Field(() => [Action])
-  @IsArray()
-  actions: Action[];
-
-  @Column()
-  @Field(() => [Criteria])
-  @IsArray()
-  criteria: Criteria[];
-
-  @Column()
-  @Field()
-  active: boolean;
 }

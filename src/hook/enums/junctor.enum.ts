@@ -1,8 +1,8 @@
 import { registerEnumType } from '@nestjs/graphql';
 
 export enum Junctor {
-  AND = 'and',
-  OR = 'or',
+  AND = 'AND',
+  OR = 'OR',
 }
 
 registerEnumType(Junctor, { name: 'Junctor' });

@@ -12,12 +12,14 @@ import { HookService } from 'src/hook/hook.service';
 import { ChallengeModule } from 'src/challenge/challenge.module';
 import { GameRepository } from './repositories/game.repository';
 import { DateScalar } from '../common/scalars/date.scalar';
+import { LeaderboardModule } from 'src/leaderboard/leaderboard.module';
 
 @Module({
   imports: [
     MulterModule,
     UsersModule,
     ChallengeModule,
+    LeaderboardModule,
     TypeOrmModule.forFeature([GameRepository, ScheduledHookRepository, ActionHookRepository]),
   ],
   controllers: [GameUploadController],

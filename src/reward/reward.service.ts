@@ -1,4 +1,8 @@
 import { Injectable } from '@nestjs/common';
+import { Repository } from 'typeorm';
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
+
 import { RewardType } from 'src/common/enum/reward-type.enum';
 import { BadgeRepository } from 'src/badge/repository/badge.repository';
 import { CouponRepository } from 'src/coupon/repository/coupon.repository';
@@ -14,10 +18,7 @@ import { PlayerRepository } from 'src/player/repository/player.repository';
 import { PlayerCouponEntity } from 'src/coupon/entities/coupon-player.entity';
 import { PlayerHintEntity } from 'src/hint/entities/hint-player.entity';
 import { PlayerVirtualItemEntity } from 'src/virtual-item/entities/virtual-item-player.entity';
-import { Repository } from 'typeorm';
-import { InjectQueue } from '@nestjs/bull';
-import { Queue } from 'bull';
-import { Trigger } from 'src/hook/enums/trigger.enum';
+import { TriggerEvent } from 'src/hook/enums/trigger-event.enum';
 
 @Injectable()
 export class RewardService {
@@ -85,7 +86,7 @@ export class RewardService {
           break;
         }
     }
-    const job = await this.hooksQueue.add(Trigger.REWARD_GRANTED, {
+    const job = await this.hooksQueue.add(TriggerEvent.REWARD_GRANTED, {
       rewardId: reward.id,
       playerId: player.id,
     });
@@ -108,14 +109,14 @@ export class RewardService {
 
   async substractPoints(amount: string[], player: Player) {
     //substract points from the player, adding a field 'point' to Player entity?
-    const job = await this.hooksQueue.add(Trigger.POINTS_UPDATED, {
+    const job = await this.hooksQueue.add(TriggerEvent.POINTS_UPDATED, {
       playerId: player.id,
     });
   }
 
   async updatePlayer(params: string[], player: Player) {
     //updating user's properties (updated points? does this trigger concern update regarding all other rewards or smth more/else?)
-    const job = await this.hooksQueue.add(Trigger.PLAYER_UPDATED, {
+    const job = await this.hooksQueue.add(TriggerEvent.PLAYER_UPDATED, {
       playerId: player.id,
     });
   }

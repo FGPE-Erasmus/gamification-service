@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { State } from './entities/state.enum';
+import { Queue } from 'bull';
+import { InjectQueue } from '@nestjs/bull';
+
 import { ChallengeStatusEntity as ChallengeStatus } from './entities/challenge-status.entity';
+import { PlayerEntity as Player } from 'src/player/entities/player.entity';
+import { State } from './entities/state.enum';
 import { ServiceHelper } from '../common/helpers/service.helper';
 import { ChallengeStatusRepository } from './repositories/challenge-status.repository';
-import { InjectQueue } from '@nestjs/bull';
-import { Queue } from 'bull';
-import { Trigger } from 'src/hook/enums/trigger.enum';
-import { PlayerEntity as Player } from 'src/player/entities/player.entity';
+import { TriggerEvent } from 'src/hook/enums/trigger-event.enum';
 
 @Injectable()
 export class ChallengeStatusService {
@@ -48,7 +49,7 @@ export class ChallengeStatusService {
   }
 
   async markAsFailed(gameId: string, player: Player, challengeId: string, date: Date): Promise<ChallengeStatus> {
-    const job = await this.hooksQueue.add(Trigger.CHALLENGE_FAILED, {
+    const job = await this.hooksQueue.add(TriggerEvent.CHALLENGE_FAILED, {
       gameId: gameId,
       challengeId: challengeId,
       player: player,
@@ -61,7 +62,7 @@ export class ChallengeStatusService {
   }
 
   async markAsCompleted(gameId: string, player: Player, challengeId: string, date: Date): Promise<ChallengeStatus> {
-    const job = await this.hooksQueue.add(Trigger.CHALLENGE_COMPLETED, {
+    const job = await this.hooksQueue.add(TriggerEvent.CHALLENGE_COMPLETED, {
       gameId: gameId,
       challengeId: challengeId,
       player: player,

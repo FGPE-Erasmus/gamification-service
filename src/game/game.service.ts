@@ -9,6 +9,7 @@ import GameDto from './dto/game.dto';
 import { GameEntity as Game } from './entities/game.entity';
 import { GameRepository } from './repositories/game.repository';
 import { LeaderboardService } from 'src/leaderboard/leaderboard.service';
+import { HookService } from 'src/hook/hook.service';
 
 @Injectable()
 export class GameService {
@@ -16,6 +17,7 @@ export class GameService {
     private challengeService: ChallengeService,
     private gameRepository: GameRepository,
     private leaderboardService: LeaderboardService,
+    private hookService: HookService,
   ) {}
 
   /**
@@ -83,9 +85,9 @@ export class GameService {
     } */
 
     // rules
-    /* for (const gedilId of Object.keys(entries.rules)) {
-      // TODO
-    } */
+    for (const gedilId of Object.keys(entries.rules)) {
+      subObjects.rules[gedilId] = await this.hookService.importGEdIL(game, entries.rules[gedilId]);
+    }
 
     return game;
   }

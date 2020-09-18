@@ -72,8 +72,17 @@ type Game {
   endDate: Date
 }
 
+type Condition {
+  order: Float!
+  leftEntity: String!
+  leftProperty: String!
+  comparingFunction: String!
+  rightEntity: String!
+  rightProperty: String!
+}
+
 type Criteria {
-  conditions: [String!]!
+  conditions: [Condition!]!
   junctors: [Junctor!]!
 }
 
@@ -85,25 +94,6 @@ enum Junctor {
 type Action {
   type: String!
   parameters: [String!]!
-}
-
-type ChallengeStatus {
-  studentId: String!
-  challengeId: String!
-  gameId: String!
-  startedAt: Date
-  endedAt: Date
-  state: [State!]!
-  openedAt: Date
-}
-
-enum State {
-  LOCKED
-  HIDDEN
-  OPENED
-  FAILED
-  COMPLETED
-  REJECTED
 }
 
 type Badge {
@@ -192,6 +182,25 @@ type Player {
   coupons: [PlayerCoupon!]!
   hints: [PlayerHint!]!
   virtualItems: [PlayerVirtualItem!]!
+}
+
+type ChallengeStatus {
+  studentId: String!
+  challengeId: String!
+  gameId: String!
+  startedAt: Date
+  endedAt: Date
+  state: [State!]!
+  openedAt: Date
+}
+
+enum State {
+  LOCKED
+  HIDDEN
+  OPENED
+  FAILED
+  COMPLETED
+  REJECTED
 }
 
 type Submission {
