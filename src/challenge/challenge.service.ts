@@ -1,8 +1,12 @@
 import { Injectable } from '@nestjs/common';
+import { ObjectId } from 'mongodb';
 
 import { ServiceHelper } from '../common/helpers/service.helper';
 import { extractToJson } from '../common/utils/extraction.utils';
 import { GameEntity as Game } from '../game/entities/game.entity';
+import { HookService } from '../hook/hook.service';
+import { LeaderboardService } from '../leaderboard/leaderboard.service';
+import { RewardService } from '../reward/reward.service';
 import { UpsertChallengeDto } from './dto/upsert-challenge.dto';
 import { ChallengeRepository } from './repositories/challenge.repository';
 import { ChallengeEntity as Challenge } from './entities/challenge.entity';
@@ -12,6 +16,9 @@ export class ChallengeService {
   constructor(
     private readonly serviceHelper: ServiceHelper,
     private readonly challengeRepository: ChallengeRepository,
+    private readonly leaderboardService: LeaderboardService,
+    private readonly rewardService: RewardService,
+    private readonly hookService: HookService,
   ) {}
 
   async importGEdIL(
@@ -28,8 +35,8 @@ export class ChallengeService {
         const encodedContent = extractToJson(entries[path]);
         challenge = await this.create({
           ...encodedContent,
-          gameId: game.id,
-          parentChallenge,
+          game: game.id,
+          parentChallenge: parentChallenge?.id,
         });
       } else {
         const result = /^(challenges|leaderboards|rewards|rules)\/([^/]+)\//.exec(path);
@@ -45,6 +52,32 @@ export class ChallengeService {
       }
     }
 
+    const subObjects = { challenges: {}, leaderboards: {}, rewards: {}, rules: {} };
+
+    // inner challenges
+    for (const gedilId of Object.keys(subEntries.challenges)) {
+      subObjects.challenges[gedilId] = await this.importGEdIL(game, gedilId, subEntries.challenges[gedilId], challenge);
+    }
+
+    // inner leaderboards
+    for (const gedilId of Object.keys(subEntries.leaderboards)) {
+      subObjects.leaderboards[gedilId] = await this.leaderboardService.importGEdIL(
+        game,
+        subEntries.leaderboards[gedilId],
+        challenge,
+      );
+    }
+
+    // inner rewards
+    for (const gedilId of Object.keys(subEntries.rewards)) {
+      subObjects.rewards[gedilId] = await this.rewardService.importGEdIL(game, subEntries.rewards[gedilId], challenge);
+    }
+
+    // inner rules
+    for (const gedilId of Object.keys(subEntries.rules)) {
+      subObjects.rules[gedilId] = await this.hookService.importGEdIL(game, subEntries.rules[gedilId], challenge);
+    }
+
     return challenge;
   }
 
@@ -55,17 +88,7 @@ export class ChallengeService {
    * @param data for creation
    */
   async create(data: UpsertChallengeDto): Promise<Challenge> {
-    const fields: { [k: string]: any } = { ...data };
-    const newChallenge: Challenge = await this.serviceHelper.getUpsertData(null, fields, this.challengeRepository);
-    /* delete fields.children;
-    fields.parentChallenge = '';
-    if (data.children.length !== 0) {
-      const childrenList: Challenge[] = data.children;
-      childrenList.forEach(async child => {
-        child.parentChallenge = newChallenge;
-        this.challengeRepository.save(child);
-      });
-    } */
+    const newChallenge: Challenge = await this.serviceHelper.getUpsertData(null, { ...data }, this.challengeRepository);
     return this.challengeRepository.save(newChallenge);
   }
 
@@ -76,5 +99,20 @@ export class ChallengeService {
    */
   async findAll(): Promise<Challenge[]> {
     return await this.challengeRepository.find();
+  }
+
+  /**
+   * Finds a challenge by its ID.
+   *
+   * @param {string} id of challenge
+   * @returns {(Promise<Challenge | undefined>)}
+   * @memberof ChallengeService
+   */
+  async findOne(id: string): Promise<Challenge> {
+    return await this.challengeRepository.findOne({
+      where: {
+        _id: ObjectId(id),
+      },
+    });
   }
 }

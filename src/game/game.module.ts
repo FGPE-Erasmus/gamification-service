@@ -2,28 +2,29 @@ import { Module } from '@nestjs/common';
 import { MulterModule } from '@nestjs/platform-express';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+import { DateScalar } from '../common/scalars/date.scalar';
+import { ChallengeModule } from '../challenge/challenge.module';
+import { HookModule } from '../hook/hook.module';
+import { LeaderboardModule } from '../leaderboard/leaderboard.module';
+import { RewardModule } from '../reward/reward.module';
+import { UsersModule } from '../users/users.module';
 import { GameUploadController } from './upload.controller';
-import { UsersModule } from 'src/users/users.module';
 import { GameResolver } from './game.resolver';
 import { GameService } from './game.service';
-import { ScheduledHookRepository } from 'src/hook/repository/scheduled-hook.repository';
-import { ActionHookRepository } from 'src/hook/repository/action-hook.repository';
-import { HookService } from 'src/hook/hook.service';
-import { ChallengeModule } from 'src/challenge/challenge.module';
 import { GameRepository } from './repositories/game.repository';
-import { DateScalar } from '../common/scalars/date.scalar';
-import { LeaderboardModule } from 'src/leaderboard/leaderboard.module';
 
 @Module({
   imports: [
+    TypeOrmModule.forFeature([GameRepository]),
     MulterModule,
     UsersModule,
     ChallengeModule,
+    HookModule,
     LeaderboardModule,
-    TypeOrmModule.forFeature([GameRepository, ScheduledHookRepository, ActionHookRepository]),
+    RewardModule,
   ],
   controllers: [GameUploadController],
-  providers: [DateScalar, GameService, GameResolver, HookService],
+  providers: [DateScalar, GameService, GameResolver],
   exports: [GameService],
 })
 export class GameModule {}

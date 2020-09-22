@@ -2,39 +2,32 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type User {
+type Player {
   id: ID!
-  name: String!
-  username: String!
-  email: Email!
-  roles: [Role!]!
-  telephone: String
-  birthDate: Date
-  createdAt: Date!
-  updatedAt: Date!
+  userId: String!
+  gameId: String!
+  points: Float!
+  rewards: [PlayerReward!]!
 }
 
-"""Email custom scalar type"""
-scalar Email
-
-enum Role {
-  USER
-  ADMIN
+type Game {
+  id: ID!
+  name: String!
+  description: String
+  gedilLayerId: String
+  gedilLayerDescription: String
+  startDate: Date
+  endDate: Date
 }
 
 """Date custom scalar type"""
 scalar Date
 
-type ListUsers {
-  items: [User!]!
-  total: Int!
-}
-
 type Challenge {
   id: ID!
-  name: String!
-  gameId: String!
+  game: Game!
   parentChallenge: Challenge
+  name: String!
   description: String
   difficulty: Difficulty!
   mode: Mode!
@@ -62,14 +55,76 @@ enum Mode {
   DUEL
 }
 
-type Game {
+type Reward {
   id: ID!
+  game: Game
+  parentChallenge: Challenge
+  kind: RewardType!
   name: String!
   description: String
-  gedilLayerId: String
-  gedilLayerDescription: String
-  startDate: Date
-  endDate: Date
+  image: String
+  recurrent: Boolean!
+  cost: Float!
+  amount: Float!
+  challenges: [Challenge!]!
+  message: String!
+  players: [PlayerReward!]!
+}
+
+enum RewardType {
+  POINT
+  BADGE
+  VIRTUAL_ITEM
+  COUPON
+  REVEAL
+  UNLOCK
+  HINT
+  MESSAGE
+}
+
+type PlayerReward {
+  id: ID!
+  players: Player!
+  rewards: Reward!
+  count: Float!
+}
+
+type User {
+  id: ID!
+  name: String!
+  username: String!
+  email: Email!
+  roles: [Role!]!
+  photo: String
+  telephone: String
+  birthDate: Date
+  createdAt: Date!
+  updatedAt: Date!
+  players: [PlayerReward!]!
+}
+
+"""Email custom scalar type"""
+scalar Email
+
+enum Role {
+  USER
+  ADMIN
+}
+
+type ListUsers {
+  items: [User!]!
+  total: Int!
+}
+
+type Action {
+  type: Category!
+  parameters: [String!]!
+}
+
+enum Category {
+  GIVE
+  TAKE
+  UPDATE
 }
 
 type Condition {
@@ -91,33 +146,89 @@ enum Junctor {
   OR
 }
 
-type Action {
-  type: String!
-  parameters: [String!]!
+type ScheduledHook {
+  id: ID
+  game: Game
+  parentChallenge: Challenge
+  criteria: Criteria
+  actions: [Action!]
+  recurrent: Boolean
+  cron: String
+  interval: Float
+  active: Boolean
+  lastRun: Date
 }
 
-type Badge {
-  id: ID!
-  kind: RewardType!
-  players: [PlayerBadge!]!
+type ActionHook {
+  id: ID
+  game: Game
+  parentChallenge: Challenge
+  trigger: TriggerEvent
+  sourceId: String
+  criteria: Criteria
+  actions: [Action!]
+  recurrent: Boolean
+  active: Boolean
+  lastRun: Date
+}
+
+enum TriggerEvent {
+  SUBMISSION_EVALUATED
+  SUBMISSION_RECEIVED
+  SUBMISSION_ACCEPTED
+  SUBMISSION_REJECTED
+  CHALLENGE_COMPLETED
+  CHALLENGE_FAILED
+  REWARD_GRANTED
+  PLAYER_UPDATED
+  POINTS_UPDATED
+  DUEL_INVITATION_RECEIVED
+  DUEL_INITIATED
+  DUEL_ACCEPTED
+  DUEL_REJECTED
+  DUEL_COMPLETED
+}
+
+type ChallengeStatus {
+  studentId: String!
+  challengeId: String!
   gameId: String!
-  name: String!
-  description: String!
-  recurrenceLimit: Float!
+  startedAt: Date
+  endedAt: Date
+  state: [State!]!
+  openedAt: Date
 }
 
-enum RewardType {
-  BADGE
-  COUPON
-  HINT
-  VIRTUAL_ITEM
+enum State {
+  LOCKED
+  HIDDEN
+  OPENED
+  FAILED
+  COMPLETED
+  REJECTED
 }
 
-type PlayerBadge {
+type Submission {
   id: ID!
-  player: Player!
-  badge: Badge!
-  count: Float!
+  exerciseId: String!
+  playerId: String!
+  gameId: String!
+  metrics: JSON
+  result: Result
+  grade: Float
+  feedback: String
+  submittedAt: Date!
+  evaluatedAt: Date
+}
+
+"""
+The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON @specifiedBy(url: "http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf")
+
+enum Result {
+  ACCEPTED
+  REJECTED
 }
 
 type Coupon {
@@ -173,79 +284,18 @@ type PlayerVirtualItem {
   count: Float!
 }
 
-type Player {
-  id: ID!
-  userId: String!
-  gameId: String!
-  points: Float!
-  badges: [PlayerBadge!]!
-  coupons: [PlayerCoupon!]!
-  hints: [PlayerHint!]!
-  virtualItems: [PlayerVirtualItem!]!
-}
-
-type ChallengeStatus {
-  studentId: String!
-  challengeId: String!
-  gameId: String!
-  startedAt: Date
-  endedAt: Date
-  state: [State!]!
-  openedAt: Date
-}
-
-enum State {
-  LOCKED
-  HIDDEN
-  OPENED
-  FAILED
-  COMPLETED
-  REJECTED
-}
-
-type Submission {
-  id: ID!
-  exerciseId: String!
-  playerId: String!
-  gameId: String!
-  metrics: JSON
-  result: Result
-  grade: Float
-  feedback: String
-  submittedAt: Date!
-  evaluatedAt: Date
-}
-
-"""
-The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
-"""
-scalar JSON @specifiedBy(url: "http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf")
-
-enum Result {
-  ACCEPTED
-  REJECTED
-}
-
 type Query {
   user(id: String!): User!
   users(skip: Int = 0, take: Int = 50, ids: [ID!], name: String, order: String = "DESC", fieldSort: String = "updatedAt"): ListUsers!
   queryCheck: String!
-  game(id: String!): Game!
+  scheduledHooks: [ScheduledHook!]!
+  actionHooks: [ActionHook!]!
+  rewards: [Reward!]!
   challenges: [Challenge!]!
+  game(id: String!): Game!
   get(challengeId: String!, studentId: String!): ChallengeStatus!
   submission(submissionId: String!): Submission!
   submissions(exerciseId: String!): [Submission!]!
-  playersWithCoupon(couponId: String!): [Player!]!
-  coupons: [Coupon!]!
-  coupon(couponId: String!): [Coupon!]!
-  playerHints(exerciseId: String!, id: String!): [Hint!]!
-  exerciseHints(exerciseId: String!): [Hint!]!
-  playersWithVirtualItem(virtualItemId: String!): [Player!]!
-  virtualItems: [VirtualItem!]!
-  virtualItem(virtualItemId: String!): [VirtualItem!]!
-  playersWithBadge(badgeId: String!): [Player!]!
-  badges: [Badge!]!
-  badge(badgeId: String!): [Badge!]!
 }
 
 type Mutation {

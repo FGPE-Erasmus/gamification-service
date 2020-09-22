@@ -10,14 +10,16 @@ import { GameEntity as Game } from './entities/game.entity';
 import { GameRepository } from './repositories/game.repository';
 import { LeaderboardService } from 'src/leaderboard/leaderboard.service';
 import { HookService } from 'src/hook/hook.service';
+import { RewardService } from 'src/reward/reward.service';
 
 @Injectable()
 export class GameService {
   constructor(
-    private challengeService: ChallengeService,
     private gameRepository: GameRepository,
-    private leaderboardService: LeaderboardService,
-    private hookService: HookService,
+    private readonly challengeService: ChallengeService,
+    private readonly rewardService: RewardService,
+    private readonly leaderboardService: LeaderboardService,
+    private readonly hookService: HookService,
   ) {}
 
   /**
@@ -48,10 +50,8 @@ export class GameService {
         game = await this.create(gameDto, extractToJson(buffer));
       } else {
         const result = /^(challenges|leaderboards|rewards|rules)\/([^/]+)\//.exec(fileName);
-        console.log(result);
         if (result) {
           const subpath = fileName.substring(result[0].length);
-          console.log(subpath);
           if (!entries[result[1]][result[2]]) {
             entries[result[1]][result[2]] = {};
           }
@@ -80,9 +80,9 @@ export class GameService {
     }
 
     // rewards
-    /* for (const gedilId of Object.keys(entries.rewards)) {
-      // TODO
-    } */
+    for (const gedilId of Object.keys(entries.rewards)) {
+      subObjects.rewards[gedilId] = await this.rewardService.importGEdIL(game, entries.rewards[gedilId]);
+    }
 
     // rules
     for (const gedilId of Object.keys(entries.rules)) {
@@ -107,13 +107,13 @@ export class GameService {
   }
 
   /**
-   * Returns a game by their ID
+   * Returns a game by its ID.
    *
    * @param {string} id of game
    * @returns {(Promise<Game | undefined>)}
-   * @memberof UsersService
+   * @memberof GameService
    */
-  async findGameById(id: string): Promise<Game> {
+  async findOne(id: string): Promise<Game> {
     return await this.gameRepository.findOne({
       where: {
         _id: ObjectId(id),

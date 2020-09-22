@@ -1,10 +1,10 @@
 import { ObjectType, Field, Int } from '@nestjs/graphql';
 
-import { IListItems } from '../../common/interfaces/list-items.interface';
+import { IPagination } from '../../common/interfaces/pagination.interface';
 import { UserEntity as User } from './user.entity';
 
 @ObjectType('ListUsers')
-export class ListUsersEntity implements IListItems {
+export class ListUsersEntity implements IPagination<User> {
   @Field(() => [User])
   items: User[];
 

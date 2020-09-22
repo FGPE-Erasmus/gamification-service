@@ -1,53 +1,51 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
 import { Entity, ObjectIdColumn, ObjectID, Column } from 'typeorm';
-import { IsArray } from 'class-validator';
 
-import { Criteria } from '../other-dto/criteria.dto';
-import { Action } from '../other-dto/action.dto';
-import { Trigger } from '../other-dto/trigger.dto';
+import { GameEntity as Game } from '../../game/entities/game.entity';
+import { ChallengeEntity as Challenge } from '../../challenge/entities/challenge.entity';
+import { ActionEmbed as Action } from './embedded/action.embed';
+import { CriteriaEmbed as Criteria } from './embedded/criteria.embed';
 
 @Entity('ScheduledHook')
 @ObjectType('ScheduledHook')
 export class ScheduledHookEntity {
-  @ObjectIdColumn()
   @Field(() => ID)
+  @ObjectIdColumn()
   id: ObjectID;
 
+  @Field(() => Game)
   @Column()
-  @Field()
-  name: string;
+  game: string;
 
-  @Column()
-  @Field()
-  gameId: string;
+  @Field(() => Challenge, { nullable: true })
+  @Column({ nullable: true })
+  parentChallenge?: string;
 
-  @Column()
-  @Field()
-  trigger: Trigger;
+  @Field(() => Criteria, { nullable: true })
+  @Column({ nullable: true })
+  criteria?: Criteria;
 
-  @Column()
-  @Field(() => [Criteria])
-  @IsArray()
-  criteria: Criteria[];
-
-  @Column()
   @Field(() => [Action])
-  @IsArray()
+  @Column({ default: [] })
   actions: Action[];
 
-  @Column()
   @Field()
-  active: boolean;
-
   @Column()
-  @Field()
   recurrent: boolean;
 
-  @Column()
-  @Field()
-  nextRun: Date;
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  cron?: string;
 
-  @Column()
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  interval?: number;
+
   @Field()
-  lastRun: Date;
+  @Column({ default: true })
+  active: boolean;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  lastRun?: Date;
 }

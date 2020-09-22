@@ -1,10 +1,11 @@
-import { IsEnum, IsArray } from 'class-validator';
 import { ObjectType, Field, ID } from '@nestjs/graphql';
 import { Entity, ObjectIdColumn, Column, ObjectID } from 'typeorm';
 
-import { Criteria } from '../other-dto/criteria.dto';
-import { Action } from '../other-dto/action.dto';
-import { Trigger } from '../other-dto/trigger.dto';
+import { ChallengeEntity as Challenge } from '../../challenge/entities/challenge.entity';
+import { GameEntity as Game } from '../../game/entities/game.entity';
+import { TriggerEventEnum as TriggerEvent } from '../enum/trigger-event.enum';
+import { ActionEmbed as Action } from './embedded/action.embed';
+import { CriteriaEmbed as Criteria } from './embedded/criteria.embed';
 
 @Entity('ActionHook')
 @ObjectType('ActionHook')
@@ -13,39 +14,39 @@ export class ActionHookEntity {
   @Field(() => ID)
   id: ObjectID;
 
+  @Field(() => Game)
   @Column()
-  @Field()
-  name: string;
+  game: string;
 
-  @Column()
-  @Field()
-  gameId: string;
+  @Field(() => Challenge, { nullable: true })
+  @Column({ nullable: true })
+  parentChallenge?: string;
 
+  @Field(() => TriggerEvent)
   @Column()
-  @Field()
-  trigger: Trigger;
+  trigger: TriggerEvent;
 
-  @Column()
-  @Field(() => [Criteria])
-  @IsArray()
-  @IsEnum([Criteria], { each: true })
-  criteria: Criteria[];
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  sourceId?: string;
 
-  @Column()
+  @Field(() => Criteria, { nullable: true })
+  @Column({ nullable: true })
+  criteria?: Criteria;
+
   @Field(() => [Action])
-  @IsArray()
-  @IsEnum([Action], { each: true })
+  @Column({ default: [] })
   actions: Action[];
 
-  @Column()
   @Field()
+  @Column()
+  recurrent: boolean;
+
+  @Field()
+  @Column({ default: true })
   active: boolean;
 
-  @Column()
-  @Field()
-  sourceId: string;
-
-  @Column()
-  @Field()
-  lastRun: Date;
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  lastRun?: Date;
 }

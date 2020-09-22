@@ -1,4 +1,4 @@
-import { RewardType } from '../enum/reward-type.enum';
+import { RewardType } from '../../reward/entities/reward-type.enum';
 
 export interface IReward {
   id: any;

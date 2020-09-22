@@ -1,17 +1,14 @@
 import { Module } from '@nestjs/common';
-import { ServiceHelper } from 'src/common/helpers/service.helper';
-import { LeaderboardService } from './leaderboard.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
+
+import { ServiceHelper } from '../common/helpers/service.helper';
+import { PlayerLeaderboardRepository } from '../player-leaderboard/repository/player-leaderboard.repository';
+
+import { LeaderboardService } from './leaderboard.service';
 import { LeaderboardRepository } from './repository/leaderboard.repository';
-import { PlayerLeaderboardRepository } from 'src/player-leaderboard/repository/player-leaderboard.repository';
-import { ChallengeModule } from 'src/challenge/challenge.module';
-import { ChallengeRepository } from 'src/challenge/repositories/challenge.repository';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([LeaderboardRepository, PlayerLeaderboardRepository, ChallengeRepository]),
-    ChallengeModule,
-  ],
+  imports: [TypeOrmModule.forFeature([LeaderboardRepository, PlayerLeaderboardRepository])],
   providers: [ServiceHelper, LeaderboardService],
   exports: [LeaderboardService],
 })

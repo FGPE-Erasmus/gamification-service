@@ -1,7 +1,8 @@
-import { Column, Entity, ObjectID, ObjectIdColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Column, Entity, ObjectID, ObjectIdColumn, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
 import { ObjectType, Field, ID } from '@nestjs/graphql';
 
 import { EmailScalar as Email } from '../../common/scalars/email.scalar';
+import { PlayerRewardEntity as PlayerReward } from '../../reward/entities/player-reward.entity';
 import { Role } from './role.enum';
 
 @Entity('User')
@@ -32,11 +33,18 @@ export class UserEntity {
 
   @Field({ nullable: true })
   @Column()
+  photo?: string;
+
+  @Field({ nullable: true })
+  @Column()
   telephone?: string;
 
   @Field({ nullable: true })
   @Column()
   birthDate?: Date;
+
+  @Column()
+  active: boolean;
 
   @Field()
   @CreateDateColumn({ type: 'timestamp' })
@@ -46,6 +54,10 @@ export class UserEntity {
   @UpdateDateColumn({ type: 'timestamp', nullable: true })
   updatedAt?: Date;
 
-  @Column()
-  active: boolean;
+  @Field(() => [PlayerReward])
+  @OneToMany(
+    () => PlayerReward,
+    playerReward => playerReward.rewards,
+  )
+  players: PlayerReward[];
 }

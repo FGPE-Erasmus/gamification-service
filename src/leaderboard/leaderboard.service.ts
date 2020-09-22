@@ -29,8 +29,8 @@ export class LeaderboardService {
       const encodedContent = extractToJson(entries[path]);
       leaderboard = await this.createLeaderboard({
         ...encodedContent,
-        gameId: game.id,
-        challenge,
+        game: game.id,
+        parentChallenge: challenge?.id,
       });
     }
     return leaderboard;

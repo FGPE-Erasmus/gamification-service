@@ -31,7 +31,7 @@ export class GameResolver {
   @Query(() => Game)
   @UseGuards(GqlJwtAuthGuard)
   async game(@Args('id') id: string): Promise<Game> {
-    const game: Game = await this.gameService.findGameById(id);
+    const game: Game = await this.gameService.findOne(id);
     if (!game) {
       throw new NotFoundException(id);
     }

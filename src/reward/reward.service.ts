@@ -3,40 +3,83 @@ import { Repository } from 'typeorm';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 
-import { RewardType } from 'src/common/enum/reward-type.enum';
-import { BadgeRepository } from 'src/badge/repository/badge.repository';
-import { CouponRepository } from 'src/coupon/repository/coupon.repository';
-import { HintRepository } from 'src/hint/repository/hint.repository';
-import { VirtualItemRepository } from 'src/virtual-item/repository/virtual-item.repository';
-import { BadgeEntity as Badge } from 'src/badge/entities/badge.entity';
-import { CouponEntity as Coupon } from 'src/coupon/entities/coupon.entity';
-import { HintEntity as Hint } from 'src/hint/entities/hint.entity';
-import { VirtualItemEntity as VirtualItem } from 'src/virtual-item/entities/virtual-item.entity';
-import { PlayerEntity as Player } from 'src/player/entities/player.entity';
-import { PlayerBadgeEntity } from 'src/badge/entities/badge-player.entity';
-import { PlayerRepository } from 'src/player/repository/player.repository';
-import { PlayerCouponEntity } from 'src/coupon/entities/coupon-player.entity';
-import { PlayerHintEntity } from 'src/hint/entities/hint-player.entity';
-import { PlayerVirtualItemEntity } from 'src/virtual-item/entities/virtual-item-player.entity';
-import { TriggerEvent } from 'src/hook/enums/trigger-event.enum';
+import { ServiceHelper } from '../common/helpers/service.helper';
+import { RewardType } from './entities/reward-type.enum';
+import { HookService } from '../hook/hook.service';
+import { TriggerEventEnum as TriggerEvent } from '../hook/enum/trigger-event.enum';
+import { PlayerEntity as Player } from '../player/entities/player.entity';
+import { extractToJson } from '../common/utils/extraction.utils';
+import { GameEntity as Game } from '../game/entities/game.entity';
+import { ChallengeEntity as Challenge } from '../challenge/entities/challenge.entity';
+import { RewardEntity as Reward } from './entities/reward.entity';
+import { RewardDto } from './dto/reward.dto';
+import { RewardRepository } from './repository/reward.repository';
+import { PlayerService } from 'src/player/player.service';
+import { ActionHookService } from 'src/hook/action-hook.service';
+import { CategoryEnum } from 'src/hook/enum/category.enum';
 
 @Injectable()
 export class RewardService {
   constructor(
+    private readonly serviceHelper: ServiceHelper,
     @InjectQueue('hooksQueue') private hooksQueue: Queue,
-    private badgeRepository: BadgeRepository,
-    private couponRepository: CouponRepository,
-    private hintRepository: HintRepository,
-    private virtualItemRepository: VirtualItemRepository,
-    private playerRepository: PlayerRepository,
+    private playerService: PlayerService,
+    private rewardRepository: RewardRepository,
+    private actionHookService: ActionHookService,
   ) {}
+
+  async importGEdIL(
+    game: Game,
+    entries: { [path: string]: Buffer },
+    challenge?: Challenge,
+  ): Promise<Reward | undefined> {
+    let reward: Reward;
+    for (const path of Object.keys(entries)) {
+      const encodedContent = extractToJson(entries[path]);
+      reward = await this.createReward({
+        ...encodedContent,
+        game: game.id,
+        parentChallenge: challenge?.id,
+      });
+      if (challenge) {
+        this.actionHookService.create({
+          game: game.id.toString(),
+          parentChallenge: challenge?.id?.toString(),
+          trigger: TriggerEvent.CHALLENGE_COMPLETED,
+          sourceId: challenge?.id?.toString(),
+          actions: [
+            {
+              type: CategoryEnum.GIVE,
+              parameters: [reward.id.toString()],
+            },
+          ],
+          recurrent: false,
+          active: true,
+        });
+      }
+    }
+    return reward;
+  }
+
+  async createReward<T extends RewardDto>(data: T): Promise<Reward> {
+    const newReward: Reward = await this.serviceHelper.getUpsertData(null, { ...data }, this.rewardRepository);
+    return await this.rewardRepository.save(newReward);
+  }
+
+  /**
+   * Find all rewards.
+   *
+   * @returns {Promise<Reward[]>} the rewards.
+   */
+  async findAll(): Promise<Reward[]> {
+    return await this.rewardRepository.find();
+  }
 
   async grantReward(reward: any, player: Player): Promise<any> {
     let playerReward;
     switch (reward['type']) {
       case RewardType.BADGE || 'badge':
-        if (this.checkIfExists(reward, 'badge', player, this.badgeRepository)) break;
-        else {
+        /* if (!this.checkIfExists(reward, 'badge', player, this.badgeRepository)) {
           reward = reward as Badge;
           playerReward = {
             player: player,
@@ -44,12 +87,11 @@ export class RewardService {
             count: 1,
           } as PlayerBadgeEntity;
           await this.addNewReward(reward, 'badges', player, playerReward, this.badgeRepository);
-          break;
-        }
+        } */
+        break;
 
       case RewardType.COUPON || 'coupon':
-        if (this.checkIfExists(reward, 'coupon', player, this.couponRepository)) break;
-        else {
+        /* if (!this.checkIfExists(reward, 'coupon', player, this.couponRepository)) {
           reward = reward as Coupon;
           playerReward = {
             player: player,
@@ -57,12 +99,11 @@ export class RewardService {
             count: 1,
           } as PlayerCouponEntity;
           await this.addNewReward(reward, 'coupons', player, playerReward, this.couponRepository);
-          break;
-        }
+        } */
+        break;
 
       case RewardType.HINT || 'hint':
-        if (this.checkIfExists(reward, 'hint', player, this.hintRepository)) break;
-        else {
+        /* if (!this.checkIfExists(reward, 'hint', player, this.hintRepository)) {
           reward = reward as Hint;
           playerReward = {
             player: player,
@@ -70,12 +111,11 @@ export class RewardService {
             count: 1,
           } as PlayerHintEntity;
           await this.addNewReward(reward, 'hints', player, playerReward, this.hintRepository);
-          break;
-        }
+        } */
+        break;
 
       case RewardType.VIRTUAL_ITEM || 'virtual item':
-        if (this.checkIfExists(reward, 'virtualItem', player, this.virtualItemRepository)) break;
-        else {
+        /* if (!this.checkIfExists(reward, 'virtualItem', player, this.virtualItemRepository)) {
           reward = reward as VirtualItem;
           playerReward = {
             player: player,
@@ -83,8 +123,8 @@ export class RewardService {
             count: 1,
           } as PlayerVirtualItemEntity;
           await this.addNewReward(reward, 'virtualItems', player, playerReward, this.virtualItemRepository);
-          break;
-        }
+        } */
+        break;
     }
     const job = await this.hooksQueue.add(TriggerEvent.REWARD_GRANTED, {
       rewardId: reward.id,
@@ -99,7 +139,7 @@ export class RewardService {
       if (entity[rewardType]['id'] === reward['id']) {
         entity['count'] += 1;
         reward[rewardType] = player[playerRewards];
-        await this.playerRepository.save(player);
+        await this.playerService.createPlayer(player.id?.toString(), player);
         await repo.save(reward);
         return (ifExists = true);
       }
@@ -124,7 +164,7 @@ export class RewardService {
   async addNewReward<T>(reward: any, rewardType: string, player: Player, playerReward: any, repo: Repository<T>) {
     player[rewardType].push(playerReward);
     reward.players.push(playerReward);
-    await this.playerRepository.save(player);
+    await this.playerService.createPlayer(player.id?.toString(), player);
     await repo.save(reward);
   }
 

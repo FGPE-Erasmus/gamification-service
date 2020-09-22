@@ -1,6 +1,8 @@
-import { Entity, ObjectIdColumn, ObjectID, Column, ManyToOne } from 'typeorm';
+import { Entity, ObjectIdColumn, ObjectID, Column } from 'typeorm';
 import { ObjectType, Field, ID } from '@nestjs/graphql';
 
+import { ChallengeEntity as Challenge } from '../../challenge/entities/challenge.entity';
+import { GameEntity as Game } from '../../game/entities/game.entity';
 import { Difficulty } from './difficulty.enum';
 import { Mode } from './mode.enum';
 
@@ -11,17 +13,17 @@ export class ChallengeEntity {
   @ObjectIdColumn()
   readonly id: ObjectID;
 
+  @Field(() => Game)
+  @Column()
+  game: string;
+
+  @Field(() => Challenge, { nullable: true })
+  @Column()
+  parentChallenge: string;
+
   @Field()
   @Column()
   name: string;
-
-  @Field()
-  @Column()
-  gameId: string;
-
-  @Field(() => ChallengeEntity, { nullable: true })
-  @ManyToOne(() => ChallengeEntity)
-  parentChallenge: ChallengeEntity;
 
   @Field({ nullable: true })
   @Column()

@@ -7,7 +7,7 @@ import { PlayerEntity as Player } from 'src/player/entities/player.entity';
 import { State } from './entities/state.enum';
 import { ServiceHelper } from '../common/helpers/service.helper';
 import { ChallengeStatusRepository } from './repositories/challenge-status.repository';
-import { TriggerEvent } from 'src/hook/enums/trigger-event.enum';
+import { TriggerEventEnum as TriggerEvent } from '../hook/enum/trigger-event.enum';
 
 @Injectable()
 export class ChallengeStatusService {
