@@ -1,4 +1,4 @@
-FROM node:14-alpine
+FROM node:lts-alpine
 
 RUN apk update && apk add bash
 
@@ -17,7 +17,9 @@ COPY package*.json ./
 RUN npm install
 RUN chown -R node:node /home/node/.npm-global
 
-COPY . .
+COPY tsconfig*.json ./
+COPY nest-cli.json ./
+
 RUN chown -R node:node /home/node/app
 
 USER node

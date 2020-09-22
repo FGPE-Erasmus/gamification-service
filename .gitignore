@@ -1,6 +1,8 @@
 /dist
 /node_modules
 
+/src/.old_code
+
 .env
 *.log
 yarn.lock

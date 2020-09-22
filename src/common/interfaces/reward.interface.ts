@@ -1,9 +1,9 @@
-import { RewardType } from '../enum/reward-type.enum';
+import { RewardType } from '../../reward/entities/reward-type.enum';
 
 export interface IReward {
   id: any;
   name: string;
-  type: RewardType;
+  kind: RewardType;
   description: string;
   recurrenceLimit: number;
 }

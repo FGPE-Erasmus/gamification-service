@@ -1,10 +1,14 @@
 import { Injectable } from '@nestjs/common';
+
 import { ServiceHelper } from 'src/common/helpers/service.helper';
+import { extractToJson } from 'src/common/utils/extraction.utils';
+import { SortingOrders } from './entities/sorting.enum';
+import { GameEntity as Game } from '../game/entities/game.entity';
+import { ChallengeEntity as Challenge } from '../challenge/entities/challenge.entity';
+import { LeaderboardEntity as Leaderboard } from './entities/leaderboard.entity';
 import { LeaderboardRepository } from './repository/leaderboard.repository';
 import { LeaderboardDto } from './dto/leaderboard.dto';
-import { LeaderboardEntity as Leaderboard } from './entities/leaderboard.entity';
 import { PlayerLeaderboardRepository } from 'src/player-leaderboard/repository/player-leaderboard.repository';
-import { SortingOrders } from './entities/sorting.enum';
 
 @Injectable()
 export class LeaderboardService {
@@ -14,10 +18,34 @@ export class LeaderboardService {
     private readonly playerLeaderboardRepository: PlayerLeaderboardRepository,
   ) {}
 
-  async createLeaderboard(id: string | undefined, data: LeaderboardDto): Promise<Leaderboard> {
+  async importGEdIL(
+    game: Game,
+    entries: { [path: string]: Buffer },
+    challenge?: Challenge,
+  ): Promise<Leaderboard | undefined> {
+    let leaderboard: Leaderboard;
+
+    for (const path of Object.keys(entries)) {
+      const encodedContent = extractToJson(entries[path]);
+      leaderboard = await this.createLeaderboard({
+        ...encodedContent,
+        game: game.id,
+        parentChallenge: challenge?.id,
+      });
+    }
+    return leaderboard;
+  }
+
+  async createLeaderboard(data: LeaderboardDto): Promise<Leaderboard> {
     const fields: { [key: string]: any } = { ...data };
-    const newLeaderboard: Leaderboard = await this.serviceHelper.getUpsertData(id, fields, this.leaderboardRepository);
-    return this.leaderboardRepository.save(newLeaderboard);
+    fields.sortingOrders = fields.sorting_orders as [SortingOrders];
+    delete fields.sorting_orders;
+    const newLeaderboard: Leaderboard = await this.serviceHelper.getUpsertData(
+      null,
+      fields,
+      this.leaderboardRepository,
+    );
+    return await this.leaderboardRepository.save(newLeaderboard);
   }
 
   async sortLeaderboard(leaderboardId: string): Promise<any> {

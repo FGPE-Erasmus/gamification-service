@@ -1,9 +1,7 @@
 import { Entity, ObjectIdColumn, ObjectID, Column, ManyToMany } from 'typeorm';
 import { ObjectType, Field, ID } from '@nestjs/graphql';
-import { PlayerBadgeEntity as PlayerBadge } from 'src/badge/entities/badge-player.entity';
-import { PlayerCouponEntity as PlayerCoupon } from 'src/coupon/entities/coupon-player.entity';
-import { PlayerHintEntity as PlayerHint } from 'src/hint/entities/hint-player.entity';
-import { PlayerVirtualItemEntity as PlayerVirtualItem } from 'src/virtual-item/entities/virtual-item-player.entity';
+
+import { PlayerRewardEntity as PlayerReward } from '../../reward/entities/player-reward.entity';
 
 @Entity('Player')
 @ObjectType('Player')
@@ -24,19 +22,7 @@ export class PlayerEntity {
   @Column()
   points: number;
 
-  @Field(() => [PlayerBadge])
-  @ManyToMany(() => PlayerBadge)
-  badges: PlayerBadge[];
-
-  @Field(() => [PlayerCoupon])
-  @ManyToMany(() => PlayerCoupon)
-  coupons: PlayerCoupon[];
-
-  @Field(() => [PlayerHint])
-  @ManyToMany(() => PlayerHint)
-  hints: PlayerHint[];
-
-  @Field(() => [PlayerVirtualItem])
-  @ManyToMany(() => PlayerVirtualItem)
-  virtualItems: PlayerVirtualItem[];
+  @Field(() => [PlayerReward])
+  @ManyToMany(() => PlayerReward)
+  rewards: PlayerReward[];
 }

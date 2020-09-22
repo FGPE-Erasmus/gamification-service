@@ -1,23 +1,20 @@
 import { Processor, Process } from '@nestjs/bull';
-import { ActionHookRepository } from 'src/hook/repository/action-hook.repository';
-import { Category } from 'src/hook/enums/category.enum';
 import { Job } from 'bull';
-import { Criteria } from 'src/hook/other-dto/criteria.dto';
-import { Junctor } from 'src/hook/enums/junctor.enum';
-import { Action } from 'src/hook/other-dto/action.dto';
-import { PlayerEntity as Player } from 'src/player/entities/player.entity';
-import { RewardService } from 'src/reward/reward.service';
+
+import { CategoryEnum as Category } from '../../hook/enum/category.enum';
+import { HookService } from '../../hook/hook.service';
+import { Criteria } from '../../hook/dto/criteria.dto';
+import { Action } from '../../hook/dto/action.dto';
+import { PlayerEntity as Player } from '../../player/entities/player.entity';
+import { RewardService } from '../../reward/reward.service';
 
 @Processor('hooksQueue')
 export class JobProcessor {
-  constructor(
-    private readonly actionHookRepository: ActionHookRepository,
-    private readonly rewardService: RewardService,
-  ) {}
+  constructor(private readonly hookService: HookService, private readonly rewardService: RewardService) {}
 
   @Process()
   async performActionOnCompleted(job: Job<unknown>): Promise<any> {
-    const hooks = await this.actionHookRepository.find({
+    /* const hooks = await this.hookService.find({
       where: {
         gameId: job.data['gameId'],
         trigger: job.name,
@@ -27,21 +24,21 @@ export class JobProcessor {
       if (this.checkCriteria(hook.criteria)) {
         this.runActions(hook.actions, job.data['player'] as Player);
       }
-    });
+    }); */
   }
 
   //to be changed
   checkCriteria(criterias: Criteria[]): boolean {
-    criterias.some(criteria => {
-      const conditional = '';
-      const junctorsLength = criteria.junctors.length;
-      for (let i = 0; i < junctorsLength; i++) {
-        const junctor = criteria.junctors[i] === Junctor.AND ? '&&' : '||';
-        conditional.concat(criteria.conditions[i] + ' ' + junctor + ' ');
-      }
-      conditional.concat(criteria.conditions[junctorsLength]);
-      if (!eval(conditional)) return false;
-    });
+    // criterias.some(criteria => {
+    //   const conditional = '';
+    //   const junctorsLength = criteria.junctors.length;
+    //   for (let i = 0; i < junctorsLength; i++) {
+    //     const junctor = criteria.junctors[i] === Junctor.AND ? '&&' : '||';
+    //     conditional.concat(criteria.conditions[i] + ' ' + junctor + ' ');
+    //   }
+    //   conditional.concat(criteria.conditions[junctorsLength]);
+    // if (!eval(conditional)) return false;
+    // });
     return true;
   }
 

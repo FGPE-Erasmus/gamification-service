@@ -2,16 +2,105 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Player {
+  id: ID!
+  userId: String!
+  gameId: String!
+  points: Float!
+  rewards: [PlayerReward!]!
+}
+
+type Game {
+  id: ID!
+  name: String!
+  description: String
+  gedilLayerId: String
+  gedilLayerDescription: String
+  startDate: Date
+  endDate: Date
+}
+
+"""Date custom scalar type"""
+scalar Date
+
+type Challenge {
+  id: ID!
+  game: Game!
+  parentChallenge: Challenge
+  name: String!
+  description: String
+  difficulty: Difficulty!
+  mode: Mode!
+  modeParameters: [String!]!
+  refs: [String!]!
+  locked: Boolean!
+  hidden: Boolean!
+}
+
+enum Difficulty {
+  BEGINNER
+  EASY
+  AVERAGE
+  HARD
+  MASTER
+}
+
+enum Mode {
+  NORMAL
+  SHAPESHIFTER
+  SHORTENING
+  SPEEDUP
+  HACK_IT
+  TIME_BOMB
+  DUEL
+}
+
+type Reward {
+  id: ID!
+  game: Game
+  parentChallenge: Challenge
+  kind: RewardType!
+  name: String!
+  description: String
+  image: String
+  recurrent: Boolean!
+  cost: Float!
+  amount: Float!
+  challenges: [Challenge!]!
+  message: String!
+  players: [PlayerReward!]!
+}
+
+enum RewardType {
+  POINT
+  BADGE
+  VIRTUAL_ITEM
+  COUPON
+  REVEAL
+  UNLOCK
+  HINT
+  MESSAGE
+}
+
+type PlayerReward {
+  id: ID!
+  players: Player!
+  rewards: Reward!
+  count: Float!
+}
+
 type User {
   id: ID!
   name: String!
   username: String!
   email: Email!
   roles: [Role!]!
+  photo: String
   telephone: String
   birthDate: Date
   createdAt: Date!
   updatedAt: Date!
+  players: [PlayerReward!]!
 }
 
 """Email custom scalar type"""
@@ -22,16 +111,33 @@ enum Role {
   ADMIN
 }
 
-"""Date custom scalar type"""
-scalar Date
-
 type ListUsers {
   items: [User!]!
   total: Int!
 }
 
+type Action {
+  type: Category!
+  parameters: [String!]!
+}
+
+enum Category {
+  GIVE
+  TAKE
+  UPDATE
+}
+
+type Condition {
+  order: Float!
+  leftEntity: String!
+  leftProperty: String!
+  comparingFunction: String!
+  rightEntity: String!
+  rightProperty: String!
+}
+
 type Criteria {
-  conditions: [String!]!
+  conditions: [Condition!]!
   junctors: [Junctor!]!
 }
 
@@ -40,9 +146,47 @@ enum Junctor {
   OR
 }
 
-type Action {
-  type: String!
-  parameters: [String!]!
+type ScheduledHook {
+  id: ID
+  game: Game
+  parentChallenge: Challenge
+  criteria: Criteria
+  actions: [Action!]
+  recurrent: Boolean
+  cron: String
+  interval: Float
+  active: Boolean
+  lastRun: Date
+}
+
+type ActionHook {
+  id: ID
+  game: Game
+  parentChallenge: Challenge
+  trigger: TriggerEvent
+  sourceId: String
+  criteria: Criteria
+  actions: [Action!]
+  recurrent: Boolean
+  active: Boolean
+  lastRun: Date
+}
+
+enum TriggerEvent {
+  SUBMISSION_EVALUATED
+  SUBMISSION_RECEIVED
+  SUBMISSION_ACCEPTED
+  SUBMISSION_REJECTED
+  CHALLENGE_COMPLETED
+  CHALLENGE_FAILED
+  REWARD_GRANTED
+  PLAYER_UPDATED
+  POINTS_UPDATED
+  DUEL_INVITATION_RECEIVED
+  DUEL_INITIATED
+  DUEL_ACCEPTED
+  DUEL_REJECTED
+  DUEL_COMPLETED
 }
 
 type ChallengeStatus {
@@ -62,94 +206,6 @@ enum State {
   FAILED
   COMPLETED
   REJECTED
-}
-
-type Badge {
-  id: ID!
-  type: RewardType!
-  players: [PlayerBadge!]!
-  gameId: String!
-  name: String!
-  description: String!
-  recurrenceLimit: Float!
-}
-
-enum RewardType {
-  BADGE
-  COUPON
-  HINT
-  VIRTUAL_ITEM
-}
-
-type PlayerBadge {
-  id: ID!
-  player: Player!
-  badge: Badge!
-  count: Float!
-}
-
-type Coupon {
-  id: ID!
-  players: [PlayerCoupon!]!
-  type: RewardType!
-  gameId: String!
-  name: String!
-  description: String!
-  recurrenceLimit: Float!
-}
-
-type PlayerCoupon {
-  id: ID!
-  player: Player!
-  coupon: Coupon!
-  count: Float!
-}
-
-type Hint {
-  id: ID!
-  type: RewardType!
-  gameId: String!
-  players: [PlayerHint!]!
-  exerciseId: String!
-  name: String!
-  description: String!
-  recurrenceLimit: Float!
-  message: String!
-}
-
-type PlayerHint {
-  id: ID!
-  player: Player!
-  hint: Hint!
-  count: Float!
-}
-
-type VirtualItem {
-  id: ID!
-  players: [PlayerVirtualItem!]!
-  type: RewardType!
-  gameId: String!
-  name: String!
-  description: String!
-  recurrenceLimit: Float!
-}
-
-type PlayerVirtualItem {
-  id: ID!
-  player: Player!
-  virtualItem: VirtualItem!
-  count: Float!
-}
-
-type Player {
-  id: ID!
-  userId: String!
-  gameId: String!
-  points: Float!
-  badges: [PlayerBadge!]!
-  coupons: [PlayerCoupon!]!
-  hints: [PlayerHint!]!
-  virtualItems: [PlayerVirtualItem!]!
 }
 
 type Submission {
@@ -175,24 +231,71 @@ enum Result {
   REJECTED
 }
 
+type Coupon {
+  id: ID!
+  players: [PlayerCoupon!]!
+  kind: RewardType!
+  gameId: String!
+  name: String!
+  description: String!
+  recurrenceLimit: Float!
+}
+
+type PlayerCoupon {
+  id: ID!
+  player: Player!
+  coupon: Coupon!
+  count: Float!
+}
+
+type Hint {
+  id: ID!
+  kind: RewardType!
+  gameId: String!
+  players: [PlayerHint!]!
+  exerciseId: String!
+  name: String!
+  description: String!
+  recurrenceLimit: Float!
+  message: String!
+}
+
+type PlayerHint {
+  id: ID!
+  player: Player!
+  hint: Hint!
+  count: Float!
+}
+
+type VirtualItem {
+  id: ID!
+  players: [PlayerVirtualItem!]!
+  kind: RewardType!
+  gameId: String!
+  name: String!
+  description: String!
+  recurrenceLimit: Float!
+}
+
+type PlayerVirtualItem {
+  id: ID!
+  player: Player!
+  virtualItem: VirtualItem!
+  count: Float!
+}
+
 type Query {
   user(id: String!): User!
   users(skip: Int = 0, take: Int = 50, ids: [ID!], name: String, order: String = "DESC", fieldSort: String = "updatedAt"): ListUsers!
   queryCheck: String!
+  scheduledHooks: [ScheduledHook!]!
+  actionHooks: [ActionHook!]!
+  rewards: [Reward!]!
+  challenges: [Challenge!]!
+  game(id: String!): Game!
   get(challengeId: String!, studentId: String!): ChallengeStatus!
   submission(submissionId: String!): Submission!
   submissions(exerciseId: String!): [Submission!]!
-  playersWithCoupon(couponId: String!): [Player!]!
-  coupons: [Coupon!]!
-  coupon(couponId: String!): [Coupon!]!
-  playerHints(exerciseId: String!, id: String!): [Hint!]!
-  exerciseHints(exerciseId: String!): [Hint!]!
-  playersWithVirtualItem(virtualItemId: String!): [Player!]!
-  virtualItems: [VirtualItem!]!
-  virtualItem(virtualItemId: String!): [VirtualItem!]!
-  playersWithBadge(badgeId: String!): [Player!]!
-  badges: [Badge!]!
-  badge(badgeId: String!): [Badge!]!
 }
 
 type Mutation {
@@ -201,7 +304,7 @@ type Mutation {
   login(login: String!, password: String!): User!
   signup(name: String!, username: String!, email: Email!, password: String!): User!
   mutationCheck: String!
-  createGame(name: String!, startDate: Date!, endDate: Date!, userIds: String!, file: Upload!): String!
+  importGEdILArchive(name: String!, description: String, startDate: Date, endDate: Date, users: [String!], file: Upload!): Game!
   createSubmission(id: String!, gameId: String!, exerciseId: String!, playerId: String!, codeFile: String!): Submission!
 }
 

@@ -13,6 +13,10 @@ async function bootstrap() {
     credentials: true,
     origin: true,
   });
+  /* app.useGlobalPipes(new ValidationPipe({
+    transform: false,
+    whitelist: true,
+  })); */
   await app.listen(appConfig.port, appConfig.host);
 }
 bootstrap();
