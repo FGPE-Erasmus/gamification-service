@@ -1,4 +1,4 @@
-import { Entity, Column, ObjectIdColumn, ObjectID, ManyToOne } from 'typeorm';
+import { Entity, Column, ObjectIdColumn, ObjectID } from 'typeorm';
 import { ObjectType, Field, ID } from '@nestjs/graphql';
 
 import { PlayerEntity as Player } from '../../player/entities/player.entity';
@@ -12,12 +12,12 @@ export class PlayerRewardEntity {
   id: ObjectID;
 
   @Field(() => Player)
-  @ManyToOne(() => Player, { primary: true })
-  players: Player[];
+  @Column()
+  players: string[];
 
   @Field(() => Reward)
-  @ManyToOne(() => Reward, { primary: true })
-  rewards: Reward[];
+  @Column()
+  rewards: string[];
 
   @Field()
   @Column()

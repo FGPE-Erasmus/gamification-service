@@ -95,10 +95,11 @@ export class ChallengeService {
   /**
    * Find all challenges.
    *
+   * @param {any} query the query to filter items
    * @returns {Promise<Challenge[]>} the challenges.
    */
-  async findAll(): Promise<Challenge[]> {
-    return await this.challengeRepository.find();
+  async findAll(query?: any): Promise<Challenge[]> {
+    return await this.challengeRepository.find(query);
   }
 
   /**

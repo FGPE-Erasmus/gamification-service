@@ -1,9 +1,6 @@
-import { Field, ObjectType } from '@nestjs/graphql';
+import { ObjectType, OmitType } from '@nestjs/graphql';
 
 import { RewardDto } from './reward.dto';
 
 @ObjectType('Badge')
-export class BadgeDto extends RewardDto {
-  @Field()
-  image?: string;
-}
+export class BadgeDto extends OmitType(RewardDto, ['kind', 'amount', 'message', 'challenges']) {}

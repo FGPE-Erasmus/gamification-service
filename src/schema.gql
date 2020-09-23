@@ -55,7 +55,7 @@ enum Mode {
   DUEL
 }
 
-type Reward {
+type RewardEntity {
   id: ID!
   game: Game
   parentChallenge: Challenge
@@ -64,10 +64,10 @@ type Reward {
   description: String
   image: String
   recurrent: Boolean!
-  cost: Float!
-  amount: Float!
-  challenges: [Challenge!]!
-  message: String!
+  cost: Float
+  amount: Float
+  message: String
+  challenges: [Challenge!]
   players: [PlayerReward!]!
 }
 
@@ -85,7 +85,7 @@ enum RewardType {
 type PlayerReward {
   id: ID!
   players: Player!
-  rewards: Reward!
+  rewards: RewardEntity!
   count: Float!
 }
 
@@ -189,6 +189,107 @@ enum TriggerEvent {
   DUEL_COMPLETED
 }
 
+type Badge {
+  id: ID!
+  game: Game
+  parentChallenge: Challenge
+  name: String!
+  description: String
+  image: String
+  recurrent: Boolean!
+  cost: Float
+  players: [PlayerReward!]!
+}
+
+type Coupon {
+  id: ID!
+  game: Game
+  parentChallenge: Challenge
+  name: String!
+  description: String
+  image: String
+  recurrent: Boolean!
+  cost: Float
+  amount: Float
+  players: [PlayerReward!]!
+}
+
+type Hint {
+  id: ID!
+  game: Game
+  parentChallenge: Challenge
+  name: String!
+  description: String
+  image: String
+  recurrent: Boolean!
+  cost: Float
+  message: String
+  challenges: [Challenge!]
+  players: [PlayerReward!]!
+}
+
+type Message {
+  id: ID!
+  game: Game
+  parentChallenge: Challenge
+  name: String!
+  description: String
+  image: String
+  recurrent: Boolean!
+  cost: Float
+  message: String
+  challenges: [Challenge!]
+  players: [PlayerReward!]!
+}
+
+type Point {
+  id: ID!
+  game: Game
+  parentChallenge: Challenge
+  name: String!
+  description: String
+  recurrent: Boolean!
+  amount: Float
+  players: [PlayerReward!]!
+}
+
+type VirtualItem {
+  id: ID!
+  game: Game
+  parentChallenge: Challenge
+  name: String!
+  description: String
+  image: String
+  recurrent: Boolean!
+  cost: Float
+  amount: Float
+  players: [PlayerReward!]!
+}
+
+type Unlock {
+  id: ID!
+  game: Game
+  parentChallenge: Challenge
+  name: String!
+  description: String
+  recurrent: Boolean!
+  cost: Float
+  challenges: [Challenge!]!
+  players: [PlayerReward!]!
+}
+
+type Reveal {
+  id: ID!
+  game: Game
+  parentChallenge: Challenge
+  name: String!
+  description: String
+  recurrent: Boolean!
+  cost: Float
+  challenges: [Challenge!]!
+  players: [PlayerReward!]!
+}
+
 type ChallengeStatus {
   studentId: String!
   challengeId: String!
@@ -231,66 +332,20 @@ enum Result {
   REJECTED
 }
 
-type Coupon {
-  id: ID!
-  players: [PlayerCoupon!]!
-  kind: RewardType!
-  gameId: String!
-  name: String!
-  description: String!
-  recurrenceLimit: Float!
-}
-
-type PlayerCoupon {
-  id: ID!
-  player: Player!
-  coupon: Coupon!
-  count: Float!
-}
-
-type Hint {
-  id: ID!
-  kind: RewardType!
-  gameId: String!
-  players: [PlayerHint!]!
-  exerciseId: String!
-  name: String!
-  description: String!
-  recurrenceLimit: Float!
-  message: String!
-}
-
-type PlayerHint {
-  id: ID!
-  player: Player!
-  hint: Hint!
-  count: Float!
-}
-
-type VirtualItem {
-  id: ID!
-  players: [PlayerVirtualItem!]!
-  kind: RewardType!
-  gameId: String!
-  name: String!
-  description: String!
-  recurrenceLimit: Float!
-}
-
-type PlayerVirtualItem {
-  id: ID!
-  player: Player!
-  virtualItem: VirtualItem!
-  count: Float!
-}
-
 type Query {
   user(id: String!): User!
   users(skip: Int = 0, take: Int = 50, ids: [ID!], name: String, order: String = "DESC", fieldSort: String = "updatedAt"): ListUsers!
   queryCheck: String!
   scheduledHooks: [ScheduledHook!]!
   actionHooks: [ActionHook!]!
-  rewards: [Reward!]!
+  badges: [Badge!]!
+  coupons: [Coupon!]!
+  hints: [Hint!]!
+  messages: [Message!]!
+  points: [Point!]!
+  virtualItems: [VirtualItem!]!
+  unlocks: [Unlock!]!
+  reveals: [Reveal!]!
   challenges: [Challenge!]!
   game(id: String!): Game!
   get(challengeId: String!, studentId: String!): ChallengeStatus!
