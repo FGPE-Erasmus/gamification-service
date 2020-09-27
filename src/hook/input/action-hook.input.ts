@@ -7,7 +7,7 @@ import { CriteriaInput as Criteria } from './criteria.input';
 
 @InputType()
 export class ActionHookInput {
-  @Field(() => ID, { nullable: true })
+  @Field(() => ID)
   @IsOptional()
   @IsString()
   id?: string;

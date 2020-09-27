@@ -1,7 +1,5 @@
-import { UseGuards } from '@nestjs/common';
-import { Parent, Query, ResolveProperty, Resolver } from '@nestjs/graphql';
+import { Parent, ResolveField, Resolver } from '@nestjs/graphql';
 
-import { GqlJwtAuthGuard } from '../common/guards/gql-jwt-auth.guard';
 import { ChallengeEntity as Challenge } from '../challenge/entities/challenge.entity';
 import { GameEntity as Game } from '../game/entities/game.entity';
 import { ChallengeService } from '../challenge/challenge.service';
@@ -9,27 +7,33 @@ import { GameService } from '../game/game.service';
 import { RewardEntity as Reward } from './entities/reward.entity';
 import { RewardService } from './reward.service';
 
-@Resolver(() => Reward)
+@Resolver(() => Reward, { isAbstract: true })
 export class RewardResolver {
   constructor(
-    private readonly rewardService: RewardService,
-    private readonly gameService: GameService,
-    private readonly challengeService: ChallengeService,
+    protected readonly rewardService: RewardService,
+    protected readonly gameService: GameService,
+    protected readonly challengeService: ChallengeService,
   ) {}
 
-  @Query(() => [Reward])
+  /* @Query(() => [RewardDto])
   @UseGuards(GqlJwtAuthGuard)
-  async rewards(): Promise<Reward[]> {
+  async rewards(): Promise<RewardDto[]> {
     return this.rewardService.findAll();
   }
 
-  @ResolveProperty()
+  @Query(() => [BadgeDto])
+  @UseGuards(GqlJwtAuthGuard)
+  async badges(): Promise<BadgeDto[]> {
+    return this.rewardService.findAll(RewardType.BADGE);
+  } */
+
+  @ResolveField('game', () => Game)
   async game(@Parent() root: Reward): Promise<Game> {
     const { game } = root;
     return await this.gameService.findOne(game);
   }
 
-  @ResolveProperty()
+  @ResolveField('parentChallenge', () => Challenge)
   async parentChallenge(@Parent() root: Reward): Promise<Challenge | undefined> {
     const { parentChallenge } = root;
     if (!parentChallenge) {

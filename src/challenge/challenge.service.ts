@@ -97,6 +97,7 @@ export class ChallengeService extends TypeOrmQueryService<Challenge> {
   /**
    * Find all challenges within a specific game or generally.
    *
+   * @param {any} query the query to filter items
    * @returns {Promise<Challenge[]>} the challenges.
    */
   async findAll(gameId?: string): Promise<Challenge[]> {

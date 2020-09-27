@@ -4,19 +4,18 @@ import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 
 import { ServiceHelper } from '../common/helpers/service.helper';
-import { RewardType } from './entities/reward-type.enum';
-import { HookService } from '../hook/hook.service';
+import { extractToJson } from '../common/utils/extraction.utils';
+import { ChallengeEntity as Challenge } from '../challenge/entities/challenge.entity';
+import { GameEntity as Game } from '../game/entities/game.entity';
+import { ActionHookService } from '../hook/action-hook.service';
+import { CategoryEnum } from '../hook/enum/category.enum';
 import { TriggerEventEnum as TriggerEvent } from '../hook/enum/trigger-event.enum';
 import { PlayerEntity as Player } from '../player/entities/player.entity';
-import { extractToJson } from '../common/utils/extraction.utils';
-import { GameEntity as Game } from '../game/entities/game.entity';
-import { ChallengeEntity as Challenge } from '../challenge/entities/challenge.entity';
+import { PlayerService } from '../player/player.service';
+import { RewardType } from './entities/reward-type.enum';
 import { RewardEntity as Reward } from './entities/reward.entity';
 import { RewardDto } from './dto/reward.dto';
 import { RewardRepository } from './repository/reward.repository';
-import { PlayerService } from 'src/player/player.service';
-import { ActionHookService } from 'src/hook/action-hook.service';
-import { CategoryEnum } from 'src/hook/enum/category.enum';
 
 @Injectable()
 export class RewardService {
@@ -28,36 +27,52 @@ export class RewardService {
     private actionHookService: ActionHookService,
   ) {}
 
+  /**
+   * Import GEdIL entries from rewards.
+   *
+   * @param {Game} game the game to which import concerns.
+   * @param {[path: string]: Buffer} entries the zipped entries to import.
+   * @param {Challenge} challenge the challenge to which this reward is
+   *                              appended (if any).
+   * @returns {Promise<Reward | undefined>} the imported reward.
+   */
   async importGEdIL(
     game: Game,
     entries: { [path: string]: Buffer },
     challenge?: Challenge,
   ): Promise<Reward | undefined> {
-    let reward: Reward;
-    for (const path of Object.keys(entries)) {
-      const encodedContent = extractToJson(entries[path]);
-      reward = await this.createReward({
-        ...encodedContent,
-        game: game.id,
-        parentChallenge: challenge?.id,
-      });
-      if (challenge) {
-        this.actionHookService.create({
-          game: game.id.toString(),
-          parentChallenge: challenge?.id?.toString(),
-          trigger: TriggerEvent.CHALLENGE_COMPLETED,
-          sourceId: challenge?.id?.toString(),
-          actions: [
-            {
-              type: CategoryEnum.GIVE,
-              parameters: [reward.id.toString()],
-            },
-          ],
-          recurrent: false,
-          active: true,
-        });
-      }
+    if (!('metadata.json' in entries)) {
+      return;
     }
+
+    const encodedContent = extractToJson(entries['metadata.json']);
+
+    // create reward
+    const reward: Reward = await this.createReward({
+      ...encodedContent,
+      game: game.id,
+      parentChallenge: challenge?.id,
+    });
+
+    // if reward is appended to a challenge, set up a hook to give it when
+    // challenge is complete
+    if (challenge) {
+      this.actionHookService.create({
+        game: game.id.toString(),
+        parentChallenge: challenge?.id?.toString(),
+        trigger: TriggerEvent.CHALLENGE_COMPLETED,
+        sourceId: challenge?.id?.toString(),
+        actions: [
+          {
+            type: CategoryEnum.GIVE,
+            parameters: [reward.id.toString()],
+          },
+        ],
+        recurrent: false,
+        active: true,
+      });
+    }
+
     return reward;
   }
 
@@ -69,10 +84,10 @@ export class RewardService {
   /**
    * Find all rewards.
    *
-   * @returns {Promise<Reward[]>} the rewards.
+   * @returns {Promise<RewardDto[]>} the rewards.
    */
-  async findAll(): Promise<Reward[]> {
-    return await this.rewardRepository.find();
+  async findAll(kind?: RewardType): Promise<RewardDto[]> {
+    return await this.rewardRepository.find({ kind });
   }
 
   async grantReward(reward: any, player: Player): Promise<any> {

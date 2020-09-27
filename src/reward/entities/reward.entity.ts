@@ -1,13 +1,13 @@
 import { Field, ID, ObjectType } from '@nestjs/graphql';
-import { Column, Entity, ManyToMany, ObjectID, ObjectIdColumn, OneToMany } from 'typeorm';
+import { Column, Entity, ObjectID, ObjectIdColumn } from 'typeorm';
 
 import { ChallengeEntity as Challenge } from '../../challenge/entities/challenge.entity';
 import { GameEntity as Game } from '../../game/entities/game.entity';
 import { PlayerRewardEntity as PlayerReward } from './player-reward.entity';
 import { RewardType } from './reward-type.enum';
 
+@ObjectType()
 @Entity('Reward')
-@ObjectType('Reward')
 export class RewardEntity {
   @Field(() => ID)
   @ObjectIdColumn()
@@ -41,26 +41,23 @@ export class RewardEntity {
   @Column({ default: false })
   recurrent: boolean;
 
-  @Field()
-  @Column()
-  cost: number;
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  cost?: number;
 
-  @Field()
-  @Column()
-  amount: number;
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  amount?: number;
 
-  @Field(() => [Challenge])
-  @ManyToMany(() => Challenge)
-  challenges: Challenge[];
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  message?: string;
 
-  @Field()
-  @Column()
-  message: string;
+  @Field(() => [Challenge], { nullable: true })
+  @Column({ nullable: true })
+  challenges?: string[];
 
   @Field(() => [PlayerReward])
-  @OneToMany(
-    () => PlayerReward,
-    playerReward => playerReward.rewards,
-  )
-  players: PlayerReward[];
+  @Column()
+  players: string[];
 }

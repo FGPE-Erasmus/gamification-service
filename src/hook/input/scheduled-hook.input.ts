@@ -6,7 +6,7 @@ import { CriteriaInput as Criteria } from './criteria.input';
 
 @InputType()
 export class ScheduledHookInput {
-  @Field(() => ID, { nullable: true })
+  @Field(() => ID)
   @IsOptional()
   @IsString()
   id?: string;
