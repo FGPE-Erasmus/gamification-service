@@ -1,35 +1,36 @@
 import { Entity, Column, PrimaryColumn } from 'typeorm';
 import { Field, ObjectType } from '@nestjs/graphql';
 import { State } from './state.enum';
+import { FilterableField } from '@nestjs-query/query-graphql/dist/src/decorators';
 
 @Entity('ChallengeStatus')
 @ObjectType('ChallengeStatus')
 export class ChallengeStatusEntity {
-  @Field(() => String)
+  @FilterableField(() => String)
   @PrimaryColumn()
   readonly studentId: string;
 
-  @Field(() => String)
+  @FilterableField(() => String)
   @PrimaryColumn()
   readonly challengeId: string;
 
-  @Field()
+  @FilterableField()
   @Column()
-  gameId: string;
+  game: string;
 
   @Field({ nullable: true })
   @Column()
   startedAt?: Date;
 
-  @Field({ nullable: true })
+  @FilterableField({ nullable: true })
   @Column()
   endedAt?: Date;
 
-  @Field(() => [State])
+  @FilterableField(() => [State])
   @Column()
   state: State[];
 
-  @Field({ nullable: true })
+  @FilterableField({ nullable: true })
   @Column()
   openedAt?: Date;
 }

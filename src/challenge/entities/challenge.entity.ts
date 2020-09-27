@@ -5,23 +5,20 @@ import { ChallengeEntity as Challenge } from '../../challenge/entities/challenge
 import { GameEntity as Game } from '../../game/entities/game.entity';
 import { Difficulty } from './difficulty.enum';
 import { Mode } from './mode.enum';
+import { FilterableField } from '@nestjs-query/query-graphql/dist/src/decorators/filterable-field.decorator';
 
 @Entity('Challenge')
 @ObjectType('Challenge')
 export class ChallengeEntity {
-  @Field(() => ID)
+  @FilterableField(() => ID)
   @ObjectIdColumn()
   readonly id: ObjectID;
 
-  @Field(() => Game)
-  @Column()
-  game: string;
-
-  @Field(() => Challenge, { nullable: true })
+  @FilterableField(() => Challenge, { nullable: true })
   @Column()
   parentChallenge: string;
 
-  @Field()
+  @FilterableField()
   @Column()
   name: string;
 
@@ -29,11 +26,15 @@ export class ChallengeEntity {
   @Column()
   description: string;
 
-  @Field(() => Difficulty)
+  @FilterableField(() => Game)
+  @Column()
+  game: string;
+
+  @FilterableField(() => Difficulty)
   @Column()
   difficulty: Difficulty;
 
-  @Field(() => Mode)
+  @FilterableField(() => Mode)
   @Column()
   mode: Mode;
 
@@ -45,11 +46,11 @@ export class ChallengeEntity {
   @Column()
   refs: string[];
 
-  @Field()
+  @FilterableField()
   @Column()
   locked: boolean;
 
-  @Field()
+  @FilterableField()
   @Column()
   hidden: boolean;
 }

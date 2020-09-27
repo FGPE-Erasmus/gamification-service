@@ -1,6 +1,3 @@
-import { Injectable } from '@nestjs/common';
-import { ObjectId } from 'mongodb';
-
 import { ServiceHelper } from '../common/helpers/service.helper';
 import { extractToJson } from '../common/utils/extraction.utils';
 import { GameEntity as Game } from '../game/entities/game.entity';
@@ -10,16 +7,21 @@ import { RewardService } from '../reward/reward.service';
 import { UpsertChallengeDto } from './dto/upsert-challenge.dto';
 import { ChallengeRepository } from './repositories/challenge.repository';
 import { ChallengeEntity as Challenge } from './entities/challenge.entity';
+import { QueryService } from '@nestjs-query/core';
+import { TypeOrmQueryService } from '@nestjs-query/query-typeorm';
+import { Mode } from './entities/mode.enum';
 
-@Injectable()
-export class ChallengeService {
+@QueryService(Challenge)
+export class ChallengeService extends TypeOrmQueryService<Challenge> {
   constructor(
     private readonly serviceHelper: ServiceHelper,
     private readonly challengeRepository: ChallengeRepository,
     private readonly leaderboardService: LeaderboardService,
     private readonly rewardService: RewardService,
     private readonly hookService: HookService,
-  ) {}
+  ) {
+    super(challengeRepository);
+  }
 
   async importGEdIL(
     game: Game,
@@ -89,16 +91,24 @@ export class ChallengeService {
    */
   async create(data: UpsertChallengeDto): Promise<Challenge> {
     const newChallenge: Challenge = await this.serviceHelper.getUpsertData(null, { ...data }, this.challengeRepository);
-    return this.challengeRepository.save(newChallenge);
+    return this.createOne(newChallenge);
   }
 
   /**
-   * Find all challenges.
+   * Find all challenges within a specific game or generally.
    *
    * @returns {Promise<Challenge[]>} the challenges.
    */
-  async findAll(): Promise<Challenge[]> {
-    return await this.challengeRepository.find();
+  async findAll(gameId?: string): Promise<Challenge[]> {
+    if (gameId) {
+      return await this.query({});
+    } else {
+      return await this.query({
+        filter: {
+          game: { eq: gameId },
+        },
+      });
+    }
   }
 
   /**
@@ -108,11 +118,109 @@ export class ChallengeService {
    * @returns {(Promise<Challenge | undefined>)}
    * @memberof ChallengeService
    */
-  async findOne(id: string): Promise<Challenge> {
-    return await this.challengeRepository.findOne({
-      where: {
-        _id: ObjectId(id),
+  async findOne(id: string): Promise<Challenge | undefined> {
+    try {
+      return await this.getById(id);
+    } catch (e) {
+      console.error(e);
+      console.error('Cannot find a challenge with this id: %s', id);
+    }
+  }
+
+  /**
+   * Find all children-challenges of a specified parent-challenge.
+   *
+   * @returns {Promise<Challenge[]>} the children-challenges.
+   */
+  async findChildren(parentId: string): Promise<Challenge[]> {
+    return await this.query({
+      filter: {
+        parentChallenge: { eq: parentId },
       },
     });
+  }
+
+  /**
+   * Find the challenges by name, within a game or generally.
+   *
+   * @returns {Promise<Challenge[]>} the challenges.
+   */
+  async findByName(name: string, gameId?: string): Promise<Challenge[]> {
+    if (!gameId) {
+      return await this.query({
+        filter: {
+          name: { eq: name, like: '%${name}%' },
+        },
+      });
+    } else {
+      return await this.query({
+        filter: {
+          and: [{ name: { eq: name, like: '%${name}%' } }, { game: { eq: gameId } }],
+        },
+      });
+    }
+  }
+
+  /**
+   * Find the challenges by mode, within a game or generally.
+   *
+   * @returns {Promise<Challenge[]>} the challenges.
+   */
+  async findByMode(mode: Mode, gameId?: string): Promise<Challenge[]> {
+    if (!gameId) {
+      return await this.query({
+        filter: {
+          mode: { eq: mode },
+        },
+      });
+    } else {
+      return await this.query({
+        filter: {
+          and: [{ mode: { eq: mode } }, { game: { eq: gameId } }],
+        },
+      });
+    }
+  }
+
+  /**
+   * Find the challenges by their 'locked' status, within a game or generally.
+   *
+   * @returns {Promise<Challenge[]>} the challenges.
+   */
+  async findLocked(locked: boolean, gameId: string): Promise<Challenge[]> {
+    if (!gameId) {
+      return await this.query({
+        filter: {
+          locked: { is: locked },
+        },
+      });
+    } else {
+      return await this.query({
+        filter: {
+          and: [{ locked: { is: locked } }, { game: { eq: gameId } }],
+        },
+      });
+    }
+  }
+
+  /**
+   * Find the challenges by their 'hidden' status, within a game or generally.
+   *
+   * @returns {Promise<Challenge[]>} the challenges.
+   */
+  async findHidden(hidden: boolean, gameId: string): Promise<Challenge[]> {
+    if (!gameId) {
+      return await this.query({
+        filter: {
+          hidden: { is: hidden },
+        },
+      });
+    } else {
+      return await this.query({
+        filter: {
+          and: [{ hidden: { is: hidden } }, { game: { eq: gameId } }],
+        },
+      });
+    }
   }
 }

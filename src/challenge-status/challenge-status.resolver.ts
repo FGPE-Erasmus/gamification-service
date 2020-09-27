@@ -10,7 +10,11 @@ export class ChallengeStatusResolver {
 
   @Query(() => ChallengeStatus)
   @UseGuards(GqlJwtAuthGuard)
-  async get(@Args('studentId') studentId: string, @Args('challengeId') challengeId: string): Promise<ChallengeStatus> {
-    return this.challengeStatusService.getStatus(studentId, challengeId);
+  async get(
+    @Args('studentId') studentId: string,
+    @Args('challengeId') challengeId: string,
+    @Args('gameId') gameId: string,
+  ): Promise<ChallengeStatus> {
+    return this.challengeStatusService.getStatus(studentId, challengeId, gameId);
   }
 }

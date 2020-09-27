@@ -1,5 +1,5 @@
 import { forwardRef, Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { NestjsQueryTypeOrmModule } from '@nestjs-query/query-typeorm';
 
 import { ServiceHelper } from '../common/helpers/service.helper';
 import { GameModule } from '../game/game.module';
@@ -13,7 +13,7 @@ import { ChallengeResolver } from './challenge.resolver';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([ChallengeRepository]),
+    NestjsQueryTypeOrmModule.forFeature([ChallengeRepository]),
     forwardRef(() => GameModule),
     HookModule,
     LeaderboardModule,

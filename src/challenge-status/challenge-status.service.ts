@@ -8,14 +8,18 @@ import { State } from './entities/state.enum';
 import { ServiceHelper } from '../common/helpers/service.helper';
 import { ChallengeStatusRepository } from './repositories/challenge-status.repository';
 import { TriggerEventEnum as TriggerEvent } from '../hook/enum/trigger-event.enum';
+import { QueryService } from '@nestjs-query/core';
+import { TypeOrmQueryService } from '@nestjs-query/query-typeorm';
 
-@Injectable()
-export class ChallengeStatusService {
+@QueryService(ChallengeStatus)
+export class ChallengeStatusService extends TypeOrmQueryService<ChallengeStatus> {
   constructor(
     @InjectQueue('hooksQueue') private hooksQueue: Queue,
     private readonly serviceHelper: ServiceHelper,
     private readonly challengeStatusRepository: ChallengeStatusRepository,
-  ) {}
+  ) {
+    super(challengeStatusRepository);
+  }
 
   /**
    * Creates a challenge status for locked and hidden statuses
@@ -37,12 +41,12 @@ export class ChallengeStatusService {
     return this.challengeStatusRepository.save(newStatus);
   }
 
-  async getStatus(studentId: string, challengeId: string): Promise<ChallengeStatus> {
-    return await this.challengeStatusRepository.findStatus(studentId, challengeId);
+  async getStatus(studentId: string, challengeId: string, gameId: string): Promise<ChallengeStatus> {
+    return await this.findStatus(studentId, challengeId, gameId);
   }
 
-  async markAsOpen(studentId: string, challengeId: string, date: Date): Promise<ChallengeStatus> {
-    const temp = await this.challengeStatusRepository.findStatus(studentId, challengeId);
+  async markAsOpen(gameId: string, studentId: string, challengeId: string, date: Date): Promise<ChallengeStatus> {
+    const temp = await this.findStatus(studentId, challengeId, gameId);
     temp.state = [State.OPENED];
     temp.openedAt = date;
     return this.challengeStatusRepository.save(temp);
@@ -55,7 +59,7 @@ export class ChallengeStatusService {
       player: player,
     });
 
-    const temp = await this.challengeStatusRepository.findStatus(player.id.toString(), challengeId);
+    const temp = await this.findStatus(player.id.toString(), challengeId, gameId);
     temp.state = [State.FAILED];
     temp.endedAt = date;
     return this.challengeStatusRepository.save(temp);
@@ -68,16 +72,26 @@ export class ChallengeStatusService {
       player: player,
     });
 
-    const temp = await this.challengeStatusRepository.findStatus(player.id.toString(), challengeId);
+    const temp = await this.findStatus(player.id.toString(), challengeId, gameId);
     temp.state = [State.COMPLETED];
     temp.endedAt = date;
     return this.challengeStatusRepository.save(temp);
   }
 
-  async markAsRejected(studentId: string, challengeId: string, date: Date): Promise<ChallengeStatus> {
-    const temp = await this.challengeStatusRepository.findStatus(studentId, challengeId);
+  async markAsRejected(gameId: string, studentId: string, challengeId: string, date: Date): Promise<ChallengeStatus> {
+    const temp = await this.findStatus(studentId, challengeId, gameId);
     temp.state = [State.REJECTED];
     temp.endedAt = date;
     return this.challengeStatusRepository.save(temp);
+  }
+
+  async findStatus(studentId: string, challengeId: string, gameId: string): Promise<ChallengeStatus> {
+    return this.challengeStatusRepository.findOne({
+      where: {
+        studentId: studentId,
+        challengeId: challengeId,
+        game: gameId,
+      },
+    });
   }
 }
