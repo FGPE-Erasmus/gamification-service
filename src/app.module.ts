@@ -1,7 +1,7 @@
 import { join } from 'path';
 import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { MongooseModule } from '@nestjs/mongoose';
 import { BullModule } from '@nestjs/bull';
 import { GraphQLJSON } from 'graphql-type-json';
 
@@ -25,7 +25,21 @@ import { QueueConfigService } from './queue.config';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot(appConfig.database),
+    MongooseModule.forRootAsync({
+      useFactory: () => ({
+        uri: `${appConfig.database.protocol}://${appConfig.database.username}:${appConfig.database.password}@${appConfig.database.host}:${appConfig.database.port}/${appConfig.database.database}`,
+        authSource: appConfig.database.authSource,
+        useUnifiedTopology: appConfig.database.useUnifiedTopology,
+        useNewUrlParser: appConfig.database.useNewUrlParser,
+        loggerLevel: appConfig.database.loggerLevel,
+        connectionFactory: connection => {
+          // eslint-disable-next-line @typescript-eslint/no-var-requires
+          connection.plugin(require('mongoose-autopopulate'));
+          // eslint-disable-next-line @typescript-eslint/no-var-requires
+          connection.plugin(require('mongoose-timestamp'));
+        }
+      })
+    }),
     GraphQLModule.forRoot({
       context: ({ req, res }) => ({ req, res }),
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),

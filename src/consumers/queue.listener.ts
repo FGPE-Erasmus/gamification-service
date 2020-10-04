@@ -5,7 +5,7 @@ import { Job } from 'bull';
 export class QueueListener {
   @OnQueueCompleted()
   async showResult(job: Job, result: any): Promise<any> {
-    console.log('Sucessful completion with the result: ');
+    console.log('Successful completion with the result: ');
     console.log(result);
   }
 

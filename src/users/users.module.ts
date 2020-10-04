@@ -1,17 +1,30 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { MongooseModule } from '@nestjs/mongoose';
 
-import { ServiceHelper } from '../common/helpers/service.helper';
 import { UsersService } from './users.service';
 import { UsersResolver } from './users.resolver';
+import { User, UserSchema } from './models/user.model';
 import { UserRepository } from './repositories/user.repository';
+import { UserToDtoMapper } from './mappers/user-to-dto.mapper';
+import { UserToPersistenceMapper } from './mappers/user-to-persistence.mapper';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UserRepository]),
-    // forwardRef(() => AuthModule),
+    MongooseModule.forFeatureAsync([
+      {
+        name: User.name,
+        useFactory: () => UserSchema
+      }
+    ]),
   ],
-  exports: [UsersService],
-  providers: [UsersService, UsersResolver, ServiceHelper],
+  providers: [
+    UserToDtoMapper,
+    UserToPersistenceMapper,
+    UserRepository,
+    UsersService,
+    UsersResolver
+  ],
+  exports: [ UsersService ],
 })
-export class UsersModule {}
+export class UsersModule {
+}

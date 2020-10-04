@@ -1,21 +1,21 @@
 import { Field, ID, ObjectType } from '@nestjs/graphql';
-import { ObjectID } from 'typeorm';
 
-import { ChallengeEntity as Challenge } from '../../challenge/entities/challenge.entity';
-import { GameEntity as Game } from '../../game/entities/game.entity';
-import { PlayerRewardEntity as PlayerReward } from '../entities/player-reward.entity';
-import { RewardType } from '../entities/reward-type.enum';
+import { RewardType } from '../models/reward-type.enum';
+import { ChallengeDto } from '../../challenge/dto/challenge.dto';
+import { GameDto } from '../../game/dto/game.dto';
+import { PlayerRewardDto } from '../../player-reward/dto/player-reward.dto';
 
 @ObjectType('Reward')
 export class RewardDto {
+
   @Field(() => ID)
-  id: ObjectID;
+  id: string;
 
-  @Field(() => Game, { nullable: true })
-  game: string;
+  @Field(() => GameDto)
+  game: GameDto | string;
 
-  @Field(() => Challenge, { nullable: true })
-  parentChallenge?: string;
+  @Field(() => ChallengeDto, { nullable: true })
+  parentChallenge?: ChallengeDto | string;
 
   @Field(() => RewardType)
   kind: RewardType;
@@ -41,9 +41,9 @@ export class RewardDto {
   @Field({ nullable: true })
   message?: string;
 
-  @Field(() => [Challenge], { nullable: true })
-  challenges?: string[];
+  @Field(() => [ChallengeDto], { nullable: true })
+  challenges?: ChallengeDto[] | string[];
 
-  @Field(() => [PlayerReward])
-  players: string[];
+  @Field(() => [PlayerRewardDto])
+  players?: PlayerRewardDto[] | string[];
 }

@@ -1,26 +1,27 @@
-import { SubmissionService } from './submission.service';
-import { Resolver, Args, Mutation, ID, Query } from '@nestjs/graphql';
 import { UseGuards, NotFoundException } from '@nestjs/common';
-import { SubmissionEntity as Submission } from './entities/submission.entity';
-import { SubmissionDto } from './dto/submission.dto';
-import { GqlJwtAuthGuard } from 'src/common/guards/gql-jwt-auth.guard';
-import { GqlUser } from 'src/common/decorators/gql-user.decorator';
-import { Role } from 'src/users/entities/role.enum';
+import { Resolver, Args, Mutation, ID, Query } from '@nestjs/graphql';
 
-@Resolver(() => Submission)
+import { GqlUser } from '../common/decorators/gql-user.decorator';
+import { GqlJwtAuthGuard } from '../common/guards/gql-jwt-auth.guard';
+import { Role } from '../users/models/role.enum';
+import { SubmissionService } from './submission.service';
+import { SendSubmissionInput } from './inputs/send-submission.input';
+import { SubmissionDto } from './dto/submission.dto';
+
+@Resolver(() => SubmissionDto)
 export class SubmissionResolver {
+
   constructor(private readonly submissionService: SubmissionService) {}
 
-  @Query(() => Submission)
+  @Query(() => SubmissionDto)
   @UseGuards(GqlJwtAuthGuard)
   async submission(
     @Args('submissionId') id: string,
-    @GqlUser('id') playerId: string,
+    @GqlUser('id') userId: string,
     @GqlUser('roles') roles: Role[],
-  ): Promise<Submission> {
-    const submission = await this.submissionService.getSubmission(id);
-
-    if (playerId !== submission.playerId && !roles.includes(Role.ADMIN)) {
+  ): Promise<SubmissionDto> {
+    const submission = await this.submissionService.findById(id);
+    if (userId !== submission.player.user.id && !roles.includes(Role.ADMIN)) {
       throw new Error('User does not have permissions');
     } else {
       if (!submission) {
@@ -30,15 +31,19 @@ export class SubmissionResolver {
     }
   }
 
-  @Query(() => [Submission])
+  @Query(() => [SubmissionDto])
   @UseGuards(GqlJwtAuthGuard)
-  async submissions(@Args('exerciseId') exerciseId: string, @GqlUser('id') playerId: string): Promise<Submission[]> {
-    return await this.submissionService.getAllSubmissions(exerciseId, playerId);
+  async submissions(
+    @GqlUser('id') userId: string,
+    @Args('gameId') gameId: string,
+    @Args('exerciseId') exerciseId?: string,
+  ): Promise<SubmissionDto[]> {
+    return await this.submissionService.findByUser(gameId, userId, exerciseId);
   }
 
-  @Mutation(() => Submission)
+  @Mutation(() => SubmissionDto)
   @UseGuards(GqlJwtAuthGuard)
-  async createSubmission(@Args() mutationArgs: SubmissionDto): Promise<Submission> {
-    return await this.submissionService.sendSubmission(mutationArgs);
+  async createSubmission(@Args('submissionData') input: SendSubmissionInput): Promise<SubmissionDto> {
+    return await this.submissionService.create(input);
   }
 }

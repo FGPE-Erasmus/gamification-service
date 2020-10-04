@@ -25,10 +25,10 @@ scalar Date
 
 type Challenge {
   id: ID!
+  game: Game!
   parentChallenge: Challenge
   name: String!
   description: String
-  game: Game!
   difficulty: Difficulty!
   mode: Mode!
   modeParameters: [String!]!
@@ -290,6 +290,39 @@ type Reveal {
   players: [PlayerReward!]!
 }
 
+type ChallengeEdge {
+  """The node containing the Challenge"""
+  node: Challenge!
+
+  """Cursor for this node."""
+  cursor: ConnectionCursor!
+}
+
+"""Cursor for paging through collections"""
+scalar ConnectionCursor
+
+type PageInfo {
+  """true if paging forward and there are more records."""
+  hasNextPage: Boolean
+
+  """true if paging backwards and there are more records."""
+  hasPreviousPage: Boolean
+
+  """The cursor of the first returned record."""
+  startCursor: ConnectionCursor
+
+  """The cursor of the last returned record."""
+  endCursor: ConnectionCursor
+}
+
+type ChallengeConnection {
+  """Paging information"""
+  pageInfo: PageInfo!
+
+  """Array of edges."""
+  edges: [ChallengeEdge!]!
+}
+
 type ChallengeStatus {
   studentId: String!
   challengeId: String!
@@ -346,15 +379,153 @@ type Query {
   virtualItems: [VirtualItem!]!
   unlocks: [Unlock!]!
   reveals: [Reveal!]!
-  challenges: [Challenge!]!
+  challenge(
+    """The id of the record to find."""
+    id: ID!
+  ): Challenge
+  challenges(
+    """Limit or page results."""
+    paging: CursorPaging = {first: 10}
+
+    """Specify to filter the records returned."""
+    filter: ChallengeFilter = {}
+
+    """Specify to sort results."""
+    sorting: [ChallengeSort!] = []
+  ): ChallengeConnection!
   game(id: String!): Game!
   get(gameId: String!, challengeId: String!, studentId: String!): ChallengeStatus!
   submission(submissionId: String!): Submission!
   submissions(exerciseId: String!): [Submission!]!
 }
 
+input CursorPaging {
+  """Paginate before opaque cursor"""
+  before: ConnectionCursor
+
+  """Paginate after opaque cursor"""
+  after: ConnectionCursor
+
+  """Paginate first"""
+  first: Int
+
+  """Paginate last"""
+  last: Int
+}
+
+input ChallengeFilter {
+  and: [ChallengeFilter!]
+  or: [ChallengeFilter!]
+  id: IDFilterComparison
+  name: StringFieldComparison
+  difficulty: DifficultyFilterComparison
+  mode: ModeFilterComparison
+  locked: BooleanFieldComparison
+  hidden: BooleanFieldComparison
+}
+
+input IDFilterComparison {
+  is: Boolean
+  isNot: Boolean
+  eq: ID
+  neq: ID
+  gt: ID
+  gte: ID
+  lt: ID
+  lte: ID
+  like: ID
+  notLike: ID
+  iLike: ID
+  notILike: ID
+  in: [ID!]
+  notIn: [ID!]
+}
+
+input StringFieldComparison {
+  is: Boolean
+  isNot: Boolean
+  eq: String
+  neq: String
+  gt: String
+  gte: String
+  lt: String
+  lte: String
+  like: String
+  notLike: String
+  iLike: String
+  notILike: String
+  in: [String!]
+  notIn: [String!]
+}
+
+input DifficultyFilterComparison {
+  is: Boolean
+  isNot: Boolean
+  eq: Difficulty
+  neq: Difficulty
+  gt: Difficulty
+  gte: Difficulty
+  lt: Difficulty
+  lte: Difficulty
+  like: Difficulty
+  notLike: Difficulty
+  iLike: Difficulty
+  notILike: Difficulty
+  in: [Difficulty!]
+  notIn: [Difficulty!]
+}
+
+input ModeFilterComparison {
+  is: Boolean
+  isNot: Boolean
+  eq: Mode
+  neq: Mode
+  gt: Mode
+  gte: Mode
+  lt: Mode
+  lte: Mode
+  like: Mode
+  notLike: Mode
+  iLike: Mode
+  notILike: Mode
+  in: [Mode!]
+  notIn: [Mode!]
+}
+
+input BooleanFieldComparison {
+  is: Boolean
+  isNot: Boolean
+}
+
+input ChallengeSort {
+  field: ChallengeSortFields!
+  direction: SortDirection!
+  nulls: SortNulls
+}
+
+enum ChallengeSortFields {
+  id
+  name
+  difficulty
+  mode
+  locked
+  hidden
+}
+
+"""Sort Directions"""
+enum SortDirection {
+  ASC
+  DESC
+}
+
+"""Sort Nulls Options"""
+enum SortNulls {
+  NULLS_FIRST
+  NULLS_LAST
+}
+
 type Mutation {
-  saveUser(id: ID, userInput: CreateUserInput!): User!
+  saveUser(id: ID, userInput: UserInput!): User!
   deleteUser(id: ID!): Boolean!
   login(login: String!, password: String!): User!
   signup(name: String!, username: String!, email: Email!, password: String!): User!
@@ -363,7 +534,7 @@ type Mutation {
   createSubmission(id: String!, gameId: String!, exerciseId: String!, playerId: String!, codeFile: String!): Submission!
 }
 
-input CreateUserInput {
+input UserInput {
   name: String!
   username: String!
   email: Email!

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ServiceHelper } from '../common/helpers/service.helper';
 import { PlayerLeaderboardRepository } from './repository/player-leaderboard.repository';
-import { PlayerLeaderboardEntity as PlayerLeaderboard } from './entities/player-leaderboard.entity';
+import { PlayerLeaderboardEntity as PlayerLeaderboard } from './models/player-leaderboard.model';
 import PlayerLeaderboardDto from './dto/player-leaderboard.dto';
 
 @Injectable()

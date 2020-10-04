@@ -1,25 +1,38 @@
 import { forwardRef, Module } from '@nestjs/common';
-import { NestjsQueryTypeOrmModule } from '@nestjs-query/query-typeorm';
+import { MongooseModule } from '@nestjs/mongoose';
 
-import { ServiceHelper } from '../common/helpers/service.helper';
 import { GameModule } from '../game/game.module';
 import { HookModule } from '../hook/hook.module';
 import { LeaderboardModule } from '../leaderboard/leaderboard.module';
 import { RewardModule } from '../reward/reward.module';
 
 import { ChallengeService } from './challenge.service';
-import { ChallengeRepository } from './repositories/challenge.repository';
 import { ChallengeResolver } from './challenge.resolver';
+import { Challenge, ChallengeSchema } from './models/challenge.model';
+import { ChallengeRepository } from './repositories/challenge.repository';
+import { ChallengeToDtoMapper } from './mappers/challenge-to-dto.mapper';
+import { ChallengeToPersistenceMapper } from './mappers/challenge-to-persistence.mapper';
 
 @Module({
   imports: [
-    NestjsQueryTypeOrmModule.forFeature([ChallengeRepository]),
+    MongooseModule.forFeatureAsync([
+      {
+        name: Challenge.name,
+        useFactory: () => ChallengeSchema
+      }
+    ]),
     forwardRef(() => GameModule),
     HookModule,
     LeaderboardModule,
     forwardRef(() => RewardModule),
   ],
-  providers: [ServiceHelper, ChallengeResolver, ChallengeService],
+  providers: [
+    ChallengeToDtoMapper,
+    ChallengeToPersistenceMapper,
+    ChallengeRepository,
+    ChallengeService,
+    ChallengeResolver
+  ],
   exports: [ChallengeService],
 })
 export class ChallengeModule {}

@@ -1,17 +1,15 @@
 import { UseGuards } from '@nestjs/common';
-import { Parent, Query, ResolveProperty, Resolver } from '@nestjs/graphql';
+import { Query, Resolver } from '@nestjs/graphql';
 
 import { GqlJwtAuthGuard } from '../common/guards/gql-jwt-auth.guard';
 import { GameService } from '../game/game.service';
-import { GameEntity as Game } from '../game/entities/game.entity';
 import { ChallengeService } from '../challenge/challenge.service';
-import { ChallengeEntity as Challenge } from '../challenge/entities/challenge.entity';
 import { ScheduledHookService } from './scheduled-hook.service';
 import { ScheduledHookDto } from './dto/scheduled-hook.dto';
-import { ScheduledHookEntity as ScheduledHook } from './entities/scheduled-hook.entity';
 
-@Resolver(() => ScheduledHook)
+@Resolver(() => ScheduledHookDto)
 export class ScheduledHookResolver {
+
   constructor(
     private readonly scheduledHookService: ScheduledHookService,
     private readonly gameService: GameService,
@@ -24,7 +22,7 @@ export class ScheduledHookResolver {
     return this.scheduledHookService.findAll();
   }
 
-  @ResolveProperty()
+  /*@ResolveProperty()
   async game(@Parent() root: ScheduledHook): Promise<Game> {
     const { game } = root;
     return await this.gameService.findOne(game);
@@ -37,5 +35,5 @@ export class ScheduledHookResolver {
       return;
     }
     return await this.challengeService.findOne(parentChallenge);
-  }
+  }*/
 }

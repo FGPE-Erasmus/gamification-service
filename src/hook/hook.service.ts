@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common';
 
 import { extractToJson } from '../common/utils/extraction.utils';
-import { ChallengeEntity as Challenge } from '../challenge/entities/challenge.entity';
-import { GameEntity as Game } from '../game/entities/game.entity';
-import { TriggerKindEnum as TriggerKind } from './enum/trigger-kind.enum';
+import { TriggerKindEnum as TriggerKind } from './enums/trigger-kind.enum';
 import { ScheduledHookService } from './scheduled-hook.service';
 import { ActionHookService } from './action-hook.service';
 import { ActionHookDto } from './dto/action-hook.dto';
 import { ScheduledHookDto } from './dto/scheduled-hook.dto';
-import { ScheduledHookInput } from './input/scheduled-hook.input';
-import { ActionHookInput } from './input/action-hook.input';
-import { ConditionInput } from './input/condition.input';
+import { ScheduledHookInput } from './inputs/scheduled-hook.input';
+import { ActionHookInput } from './inputs/action-hook.input';
+import { ConditionInput } from './inputs/condition.input';
+import { ChallengeDto } from '../challenge/dto/challenge.dto';
+import { GameDto } from '../game/dto/game.dto';
 
 @Injectable()
 export class HookService {
@@ -20,9 +20,9 @@ export class HookService {
   ) {}
 
   async importGEdIL(
-    game: Game,
+    game: GameDto,
     entries: { [path: string]: Buffer },
-    parentChallenge?: Challenge,
+    parentChallenge?: ChallengeDto,
   ): Promise<(ScheduledHookDto | ActionHookDto)[] | undefined> {
     const hooks: (ScheduledHookDto | ActionHookDto)[] = [];
 
@@ -38,7 +38,7 @@ export class HookService {
           parentChallenge: parentChallenge?.id?.toString(),
           criteria: {
             ...encodedContent.criteria,
-            conditions: this.transformConditions(encodedContent.criteria.conditions),
+            conditions: HookService.transformConditions(encodedContent.criteria.conditions),
           },
           actions: encodedContent.actions,
           recurrent: trigger.recurrent,
@@ -93,7 +93,7 @@ export class HookService {
 
   /** Helpers */
 
-  private transformConditions(data: [{ [key: string]: any }]): ConditionInput[] {
+  private static transformConditions(data: [{ [key: string]: any }]): ConditionInput[] {
     if (!data) {
       return [];
     }

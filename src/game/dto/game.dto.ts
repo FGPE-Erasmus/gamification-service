@@ -1,35 +1,34 @@
-import { Field, ArgsType } from '@nestjs/graphql';
-import { Type } from 'class-transformer';
-import { MinLength, MaxLength, IsString, IsOptional, IsArray, IsDate } from 'class-validator';
+import { Field, ID, ObjectType } from '@nestjs/graphql';
+import { PlayerDto } from '../../player/dto/player.dto';
+import { SubmissionDto } from '../../submission/dto/submission.dto';
 
-@ArgsType()
-export default class GameDto {
+@ObjectType('Game')
+export class GameDto {
+
+  @Field(() => ID)
+  readonly id: string;
+
   @Field()
-  @IsString()
-  @MinLength(2)
-  @MaxLength(200)
   name: string;
 
   @Field({ nullable: true })
-  @IsOptional()
-  @MaxLength(1000)
   description?: string;
 
   @Field({ nullable: true })
-  @Type(() => Date)
-  @IsOptional()
-  @IsDate()
+  gedilLayerId?: string;
+
+  @Field({ nullable: true })
+  gedilLayerDescription?: string;
+
+  @Field({ nullable: true })
   startDate?: Date;
 
   @Field({ nullable: true })
-  @Type(() => Date)
-  @IsOptional()
-  @IsDate()
   endDate?: Date;
 
-  @Field(() => [String], { nullable: true })
-  @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
-  users?: string[];
+  @Field(() => [PlayerDto])
+  players?: PlayerDto[];
+
+  @Field(() => [SubmissionDto])
+  submissions?: SubmissionDto[];
 }

@@ -1,6 +1,18 @@
-import { EntityRepository, Repository } from 'typeorm';
+import { Injectable, LoggerService } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 
-import { PlayerLeaderboardEntity as PlayerLeaderboard } from '../entities/player-leaderboard.entity';
+import { BaseRepository } from '../../common/repositories/base.repository';
+import { PlayerLeaderboard } from '../models/player-leaderboard.model';
 
-@EntityRepository(PlayerLeaderboard)
-export class PlayerLeaderboardRepository extends Repository<PlayerLeaderboard> {}
+@Injectable()
+export class PlayerLeaderboardRepository extends BaseRepository<PlayerLeaderboard> {
+
+  constructor(
+    protected readonly logger: LoggerService,
+    @InjectModel(PlayerLeaderboard.name) protected readonly model: Model<PlayerLeaderboard>
+  ) {
+    super(logger, model);
+  }
+
+}

@@ -1,11 +1,19 @@
 import { Module } from '@nestjs/common';
+import { MongooseModule } from '@nestjs/mongoose';
+
+import { ServiceHelper } from '../common/helpers/service.helper';
 import { PlayerLeaderboardService } from './player-leaderboard.service';
-import { ServiceHelper } from 'src/common/helpers/service.helper';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { PlayerLeaderboardRepository } from './repository/player-leaderboard.repository';
+import { PlayerLeaderboard, PlayerLeaderboardSchema } from './models/player-leaderboard.model';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([PlayerLeaderboardRepository])],
+  imports: [
+    MongooseModule.forFeatureAsync([
+      {
+        name: PlayerLeaderboard.name,
+        useFactory: () => PlayerLeaderboardSchema
+      }
+    ]),
+  ],
   providers: [ServiceHelper, PlayerLeaderboardService],
   exports: [PlayerLeaderboardService],
 })

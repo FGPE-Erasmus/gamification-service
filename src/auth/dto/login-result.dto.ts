@@ -1,6 +1,6 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 
-import { UserEntity as User } from '../../users/entities/user.entity';
+import { UserDto } from '../../users/dto/user.dto';
 
 @ObjectType('LoginResult')
 export default class LoginResultDto {
@@ -10,6 +10,6 @@ export default class LoginResultDto {
   @Field()
   token: string;
 
-  @Field(() => User)
-  user: User;
+  @Field(() => UserDto)
+  user: UserDto;
 }

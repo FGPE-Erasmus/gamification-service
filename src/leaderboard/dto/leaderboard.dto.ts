@@ -1,10 +1,20 @@
-import { ArgsType, Field } from '@nestjs/graphql';
-import { SortingOrders } from '../entities/sorting.enum';
+import { ObjectType, ID, Field } from '@nestjs/graphql';
 
-@ArgsType()
+import { ChallengeDto } from '../../challenge/dto/challenge.dto';
+import { GameDto } from '../../game/dto/game.dto';
+import { SortingOrder } from '../models/sorting.enum';
+
+@ObjectType('Leaderboard')
 export class LeaderboardDto {
-  @Field()
+
+  @Field(() => ID)
   id: string;
+
+  @Field(() => GameDto)
+  game: GameDto | string;
+
+  @Field(() => ChallengeDto, { nullable: true })
+  parentChallenge?: ChallengeDto | string;
 
   @Field()
   name: string;
@@ -12,6 +22,6 @@ export class LeaderboardDto {
   @Field(() => [String])
   metrics: string[];
 
-  @Field(() => [SortingOrders])
-  sortingOrders: SortingOrders[];
+  @Field(() => [SortingOrder])
+  sortingOrders: SortingOrder[];
 }

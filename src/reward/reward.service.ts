@@ -1,31 +1,38 @@
-import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { Injectable, LoggerService } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 
-import { ServiceHelper } from '../common/helpers/service.helper';
+import { ChallengeDto } from '../challenge/dto/challenge.dto';
+import { BaseService } from '../common/services/base.service';
 import { extractToJson } from '../common/utils/extraction.utils';
-import { ChallengeEntity as Challenge } from '../challenge/entities/challenge.entity';
-import { GameEntity as Game } from '../game/entities/game.entity';
+import { GameDto } from '../game/dto/game.dto';
 import { ActionHookService } from '../hook/action-hook.service';
-import { CategoryEnum } from '../hook/enum/category.enum';
-import { TriggerEventEnum as TriggerEvent } from '../hook/enum/trigger-event.enum';
-import { PlayerEntity as Player } from '../player/entities/player.entity';
+import { CategoryEnum } from '../hook/enums/category.enum';
+import { TriggerEventEnum as TriggerEvent } from '../hook/enums/trigger-event.enum';
+import { Player } from '../player/models/player.model';
 import { PlayerService } from '../player/player.service';
-import { RewardType } from './entities/reward-type.enum';
-import { RewardEntity as Reward } from './entities/reward.entity';
+import { RewardType } from './models/reward-type.enum';
+import { Reward } from './models/reward.model';
 import { RewardDto } from './dto/reward.dto';
 import { RewardRepository } from './repository/reward.repository';
+import { RewardInput } from './inputs/reward.input';
+import { RewardToDtoMapper } from './mappers/reward-to-dto.mapper';
+import { RewardToPersistenceMapper } from './mappers/reward-to-persistence.mapper';
 
 @Injectable()
-export class RewardService {
+export class RewardService extends BaseService<Reward, RewardInput, RewardDto> {
+
   constructor(
-    private readonly serviceHelper: ServiceHelper,
-    @InjectQueue('hooksQueue') private hooksQueue: Queue,
-    private playerService: PlayerService,
-    private rewardRepository: RewardRepository,
-    private actionHookService: ActionHookService,
-  ) {}
+    protected readonly logger: LoggerService,
+    protected readonly repository: RewardRepository,
+    protected readonly toDtoMapper: RewardToDtoMapper,
+    protected readonly toPersistenceMapper: RewardToPersistenceMapper,
+    @InjectQueue('hooksQueue') protected readonly hooksQueue: Queue,
+    protected readonly playerService: PlayerService,
+    protected readonly actionHookService: ActionHookService,
+  ) {
+    super(logger, repository, toDtoMapper, toPersistenceMapper);
+  }
 
   /**
    * Import GEdIL entries from rewards.
@@ -37,10 +44,10 @@ export class RewardService {
    * @returns {Promise<Reward | undefined>} the imported reward.
    */
   async importGEdIL(
-    game: Game,
+    game: GameDto,
     entries: { [path: string]: Buffer },
-    challenge?: Challenge,
-  ): Promise<Reward | undefined> {
+    challenge?: ChallengeDto,
+  ): Promise<RewardDto> {
     if (!('metadata.json' in entries)) {
       return;
     }
@@ -48,7 +55,7 @@ export class RewardService {
     const encodedContent = extractToJson(entries['metadata.json']);
 
     // create reward
-    const reward: Reward = await this.createReward({
+    const reward: RewardDto = await this.create({
       ...encodedContent,
       game: game.id,
       parentChallenge: challenge?.id,
@@ -57,7 +64,7 @@ export class RewardService {
     // if reward is appended to a challenge, set up a hook to give it when
     // challenge is complete
     if (challenge) {
-      this.actionHookService.create({
+      await this.actionHookService.create({
         game: game.id.toString(),
         parentChallenge: challenge?.id?.toString(),
         trigger: TriggerEvent.CHALLENGE_COMPLETED,
@@ -65,7 +72,7 @@ export class RewardService {
         actions: [
           {
             type: CategoryEnum.GIVE,
-            parameters: [reward.id.toString()],
+            parameters: [ reward.id.toString() ],
           },
         ],
         recurrent: false,
@@ -76,18 +83,13 @@ export class RewardService {
     return reward;
   }
 
-  async createReward<T extends RewardDto>(data: T): Promise<Reward> {
-    const newReward: Reward = await this.serviceHelper.getUpsertData(null, { ...data }, this.rewardRepository);
-    return await this.rewardRepository.save(newReward);
-  }
-
   /**
-   * Find all rewards.
+   * Find all rewards of a kind.
    *
    * @returns {Promise<RewardDto[]>} the rewards.
    */
-  async findAll(kind?: RewardType): Promise<RewardDto[]> {
-    return await this.rewardRepository.find({ kind });
+  async findByKind(kind?: RewardType): Promise<RewardDto[]> {
+    return await this.findAll({ kind });
   }
 
   async grantReward(reward: any, player: Player): Promise<any> {
@@ -147,18 +149,18 @@ export class RewardService {
     });
   }
 
-  async checkIfExists<T, U>(reward: T, rewardType: string, player: Player, repo: Repository<T>): Promise<boolean> {
-    let ifExists = false;
-    const playerRewards = rewardType.concat('s');
+  async checkIfExists<T, U>(reward: T, rewardType: string, player: Player): Promise<boolean> {
+    const ifExists = false;
+    /*const playerRewards = rewardType.concat('s');
     player[playerRewards].some(async entity => {
-      if (entity[rewardType]['id'] === reward['id']) {
+      if ( entity[rewardType]['id'] === reward['id'] ) {
         entity['count'] += 1;
         reward[rewardType] = player[playerRewards];
-        await this.playerService.createPlayer(player.id?.toString(), player);
+        await this.playerService.create(player.id?.toString(), player);
         await repo.save(reward);
         return (ifExists = true);
       }
-    });
+    });*/
     return ifExists;
   }
 
@@ -176,15 +178,23 @@ export class RewardService {
     });
   }
 
-  async addNewReward<T>(reward: any, rewardType: string, player: Player, playerReward: any, repo: Repository<T>) {
-    player[rewardType].push(playerReward);
+  async addNewReward<T>(reward: any, rewardType: string, player: Player, playerReward: any) {
+    /*player[rewardType].push(playerReward);
     reward.players.push(playerReward);
-    await this.playerService.createPlayer(player.id?.toString(), player);
-    await repo.save(reward);
+    await this.playerService.create(player.id?.toString(), player);
+    await repo.save(reward);*/
   }
 
   async ifEnoughForGranting(amount: string[]) {
     //after REWARD_GRANNTED trigger
     //to be implemented...
+  }
+
+  toPersistence(input: RewardInput | Partial<RewardInput>): Reward | Promise<Reward> {
+    throw new Error("Method not implemented.");
+  }
+
+  toDto(doc: Reward): RewardDto | Promise<RewardDto> {
+    throw new Error("Method not implemented.");
   }
 }

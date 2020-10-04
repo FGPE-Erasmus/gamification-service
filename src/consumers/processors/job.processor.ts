@@ -1,11 +1,11 @@
 import { Processor, Process } from '@nestjs/bull';
 import { Job } from 'bull';
 
-import { CategoryEnum as Category } from '../../hook/enum/category.enum';
+import { CategoryEnum as Category } from '../../hook/enums/category.enum';
 import { HookService } from '../../hook/hook.service';
-import { Criteria } from '../../hook/dto/criteria.dto';
-import { Action } from '../../hook/dto/action.dto';
-import { PlayerEntity as Player } from '../../player/entities/player.entity';
+import { Criteria } from '../../hook/dto/embedded/criteria.dto';
+import { Action } from '../../hook/dto/embedded/action.dto';
+import { Player } from '../../player/models/player.model';
 import { RewardService } from '../../reward/reward.service';
 
 @Processor('hooksQueue')

@@ -1,8 +1,10 @@
 import { Resolver, Args, Query } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
-import { ChallengeStatusEntity as ChallengeStatus } from './entities/challenge-status.entity';
+
 import { GqlJwtAuthGuard } from '../common/guards/gql-jwt-auth.guard';
 import { ChallengeStatusService } from './challenge-status.service';
+import { ChallengeStatus } from './models/challenge-status.model';
+import { ChallengeStatusDto } from './dto/challenge-status.dto';
 
 @Resolver()
 export class ChallengeStatusResolver {
@@ -11,10 +13,9 @@ export class ChallengeStatusResolver {
   @Query(() => ChallengeStatus)
   @UseGuards(GqlJwtAuthGuard)
   async get(
-    @Args('studentId') studentId: string,
-    @Args('challengeId') challengeId: string,
-    @Args('gameId') gameId: string,
-  ): Promise<ChallengeStatus> {
-    return this.challengeStatusService.getStatus(studentId, challengeId, gameId);
+    @Args('playerId') playerId: string,
+    @Args('challengeId') challengeId: string
+  ): Promise<ChallengeStatusDto> {
+    return this.challengeStatusService.findByChallengeIdAndPlayerId(challengeId, playerId);
   }
 }

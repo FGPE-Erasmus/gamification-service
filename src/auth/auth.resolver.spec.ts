@@ -5,7 +5,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { appConfig } from '../app.config';
 import { AuthService } from './auth.service';
 import { AuthResolver } from './auth.resolver';
-import { ServiceHelper } from '../common/helpers/service.helper';
 import { UserRepository } from '../users/repositories/user.repository';
 import { UsersService } from '../users/users.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
@@ -27,7 +26,7 @@ describe('AuthResolver', () => {
           },
         }),
       ],
-      providers: [AuthService, AuthResolver, JwtStrategy, UsersService, ServiceHelper, UserRepository],
+      providers: [AuthService, AuthResolver, JwtStrategy, UsersService, UserRepository],
     }).compile();
 
     resolver = module.get<AuthResolver>(AuthResolver);

@@ -1,11 +1,14 @@
 import { Parent, ResolveField, Resolver } from '@nestjs/graphql';
 
-import { ChallengeEntity as Challenge } from '../challenge/entities/challenge.entity';
-import { GameEntity as Game } from '../game/entities/game.entity';
+import { Challenge } from '../challenge/models/challenge.model';
+import { Game } from '../game/models/game.model';
 import { ChallengeService } from '../challenge/challenge.service';
+import { GameDto } from '../game/dto/game.dto';
 import { GameService } from '../game/game.service';
-import { RewardEntity as Reward } from './entities/reward.entity';
+import { Reward } from './models/reward.model';
 import { RewardService } from './reward.service';
+import { ChallengeDto } from '../challenge/dto/challenge.dto';
+import { RewardDto } from './dto/reward.dto';
 
 @Resolver(() => Reward, { isAbstract: true })
 export class RewardResolver {
@@ -28,13 +31,13 @@ export class RewardResolver {
   } */
 
   @ResolveField('game', () => Game)
-  async game(@Parent() root: Reward): Promise<Game> {
+  async game(@Parent() root: RewardDto): Promise<GameDto> {
     const { game } = root;
     return await this.gameService.findOne(game);
   }
 
   @ResolveField('parentChallenge', () => Challenge)
-  async parentChallenge(@Parent() root: Reward): Promise<Challenge | undefined> {
+  async parentChallenge(@Parent() root: RewardDto): Promise<ChallengeDto> {
     const { parentChallenge } = root;
     if (!parentChallenge) {
       return;

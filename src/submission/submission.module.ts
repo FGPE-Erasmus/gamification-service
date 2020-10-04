@@ -1,13 +1,24 @@
 import { Module } from '@nestjs/common';
+import { MongooseModule } from '@nestjs/mongoose';
+
+import { PlayerModule } from '../player/player.module';
 import { SubmissionService } from './submission.service';
-import { ServiceHelper } from 'src/common/helpers/service.helper';
 import { SubmissionResolver } from './submission.resolver';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { SubmissionRepository } from './repository/submission.repository';
+import { Submission, SubmissionSchema } from './models/submission.model';
+
 
 @Module({
-  imports: [TypeOrmModule.forFeature([SubmissionRepository])],
+  imports: [
+    MongooseModule.forFeatureAsync([
+      {
+        name: Submission.name,
+        useFactory: () => SubmissionSchema
+      }
+    ]),
+    PlayerModule,
+  ],
+  providers: [SubmissionRepository, SubmissionService, SubmissionResolver],
   exports: [SubmissionService],
-  providers: [SubmissionService, ServiceHelper, SubmissionResolver],
 })
 export class SubmissionModule {}

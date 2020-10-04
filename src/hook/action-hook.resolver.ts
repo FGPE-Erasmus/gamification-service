@@ -3,14 +3,11 @@ import { Parent, Query, ResolveProperty, Resolver } from '@nestjs/graphql';
 
 import { GqlJwtAuthGuard } from '../common/guards/gql-jwt-auth.guard';
 import { GameService } from '../game/game.service';
-import { GameEntity as Game } from '../game/entities/game.entity';
 import { ChallengeService } from '../challenge/challenge.service';
-import { ChallengeEntity as Challenge } from '../challenge/entities/challenge.entity';
 import { ActionHookService } from './action-hook.service';
 import { ActionHookDto } from './dto/action-hook.dto';
-import { ActionHookEntity as ActionHook } from './entities/action-hook.entity';
 
-@Resolver(() => ActionHook)
+@Resolver(() => ActionHookDto)
 export class ActionHookResolver {
   constructor(
     private readonly actionHookService: ActionHookService,
@@ -24,7 +21,7 @@ export class ActionHookResolver {
     return this.actionHookService.findAll();
   }
 
-  @ResolveProperty()
+  /*@ResolveProperty()
   async game(@Parent() root: ActionHook): Promise<Game> {
     const { game } = root;
     return await this.gameService.findOne(game);
@@ -37,5 +34,5 @@ export class ActionHookResolver {
       return;
     }
     return await this.challengeService.findOne(parentChallenge);
-  }
+  }*/
 }

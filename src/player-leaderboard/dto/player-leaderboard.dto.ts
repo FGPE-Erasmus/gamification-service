@@ -3,6 +3,7 @@ import graphqlTypeJson from 'graphql-type-json';
 
 @ArgsType()
 export default class PlayerLeaderboardDto {
+
   @Field()
   playerId: string;
 

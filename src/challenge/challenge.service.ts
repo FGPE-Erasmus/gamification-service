@@ -1,35 +1,41 @@
-import { ServiceHelper } from '../common/helpers/service.helper';
+import { Injectable, LoggerService } from '@nestjs/common';
+
+import { BaseService } from '../common/services/base.service';
 import { extractToJson } from '../common/utils/extraction.utils';
-import { GameEntity as Game } from '../game/entities/game.entity';
+import { GameDto } from '../game/dto/game.dto';
 import { HookService } from '../hook/hook.service';
 import { LeaderboardService } from '../leaderboard/leaderboard.service';
 import { RewardService } from '../reward/reward.service';
-import { UpsertChallengeDto } from './dto/upsert-challenge.dto';
 import { ChallengeRepository } from './repositories/challenge.repository';
-import { ChallengeEntity as Challenge } from './entities/challenge.entity';
-import { QueryService } from '@nestjs-query/core';
-import { TypeOrmQueryService } from '@nestjs-query/query-typeorm';
-import { Mode } from './entities/mode.enum';
+import { Challenge } from './models/challenge.model';
+import { Mode } from './models/mode.enum';
+import { ChallengeInput } from './inputs/challenge.input';
+import { ChallengeDto } from './dto/challenge.dto';
+import { ChallengeToDtoMapper } from './mappers/challenge-to-dto.mapper';
+import { ChallengeToPersistenceMapper } from './mappers/challenge-to-persistence.mapper';
 
-@QueryService(Challenge)
-export class ChallengeService extends TypeOrmQueryService<Challenge> {
+@Injectable()
+export class ChallengeService extends BaseService<Challenge, ChallengeInput, ChallengeDto> {
+
   constructor(
-    private readonly serviceHelper: ServiceHelper,
-    private readonly challengeRepository: ChallengeRepository,
-    private readonly leaderboardService: LeaderboardService,
-    private readonly rewardService: RewardService,
-    private readonly hookService: HookService,
+    protected readonly logger: LoggerService,
+    protected readonly repository: ChallengeRepository,
+    protected readonly toDtoMapper: ChallengeToDtoMapper,
+    protected readonly toPersistenceMapper: ChallengeToPersistenceMapper,
+    protected readonly leaderboardService: LeaderboardService,
+    protected readonly rewardService: RewardService,
+    protected readonly hookService: HookService,
   ) {
-    super(challengeRepository);
+    super(logger, repository, toDtoMapper, toPersistenceMapper);
   }
 
   async importGEdIL(
-    game: Game,
+    game: GameDto,
     gedilId: string,
     entries: { [path: string]: Buffer },
-    parentChallenge?: Challenge,
-  ): Promise<Challenge | undefined> {
-    let challenge: Challenge;
+    parentChallenge?: ChallengeDto,
+  ): Promise<ChallengeDto | undefined> {
+    let challenge: ChallengeDto;
 
     const subEntries = { challenges: {}, leaderboards: {}, rewards: {}, rules: {} };
     for (const path of Object.keys(entries)) {
@@ -58,7 +64,11 @@ export class ChallengeService extends TypeOrmQueryService<Challenge> {
 
     // inner challenges
     for (const gedilId of Object.keys(subEntries.challenges)) {
-      subObjects.challenges[gedilId] = await this.importGEdIL(game, gedilId, subEntries.challenges[gedilId], challenge);
+      subObjects.challenges[gedilId] = await this.importGEdIL(
+        game,
+        gedilId,
+        subEntries.challenges[gedilId], challenge
+      );
     }
 
     // inner leaderboards
@@ -72,60 +82,35 @@ export class ChallengeService extends TypeOrmQueryService<Challenge> {
 
     // inner rewards
     for (const gedilId of Object.keys(subEntries.rewards)) {
-      subObjects.rewards[gedilId] = await this.rewardService.importGEdIL(game, subEntries.rewards[gedilId], challenge);
+      subObjects.rewards[gedilId] = await this.rewardService.importGEdIL(
+        game,
+        subEntries.rewards[gedilId],
+        challenge
+      );
     }
 
     // inner rules
     for (const gedilId of Object.keys(subEntries.rules)) {
-      subObjects.rules[gedilId] = await this.hookService.importGEdIL(game, subEntries.rules[gedilId], challenge);
+      subObjects.rules[gedilId] = await this.hookService.importGEdIL(
+        game,
+        subEntries.rules[gedilId],
+        challenge
+      );
     }
 
     return challenge;
   }
 
   /**
-   * Create a challenge with a set of provides fields.
-   *
-   * @param id of the challenge to create
-   * @param data for creation
-   */
-  async create(data: UpsertChallengeDto): Promise<Challenge> {
-    const newChallenge: Challenge = await this.serviceHelper.getUpsertData(null, { ...data }, this.challengeRepository);
-    return this.createOne(newChallenge);
-  }
-
-  /**
    * Find all challenges within a specific game or generally.
    *
-   * @param {any} query the query to filter items
+   * @param gameId the ID of the game
    * @returns {Promise<Challenge[]>} the challenges.
    */
-  async findAll(gameId?: string): Promise<Challenge[]> {
-    if (gameId) {
-      return await this.query({});
-    } else {
-      return await this.query({
-        filter: {
-          game: { eq: gameId },
-        },
-      });
-    }
-  }
-
-  /**
-   * Finds a challenge by its ID.
-   *
-   * @param {string} id of challenge
-   * @returns {(Promise<Challenge | undefined>)}
-   * @memberof ChallengeService
-   */
-  async findOne(id: string): Promise<Challenge | undefined> {
-    try {
-      return await this.getById(id);
-    } catch (e) {
-      console.error(e);
-      console.error('Cannot find a challenge with this id: %s', id);
-    }
+  async findByGameId(gameId: string): Promise<ChallengeDto[]> {
+    return await this.findAll({
+      game: { eq: gameId },
+    });
   }
 
   /**
@@ -133,11 +118,9 @@ export class ChallengeService extends TypeOrmQueryService<Challenge> {
    *
    * @returns {Promise<Challenge[]>} the children-challenges.
    */
-  async findChildren(parentId: string): Promise<Challenge[]> {
-    return await this.query({
-      filter: {
-        parentChallenge: { eq: parentId },
-      },
+  async findChildren(parentId: string): Promise<ChallengeDto[]> {
+    return await this.findAll({
+      parentChallenge: { eq: parentId },
     });
   }
 
@@ -146,18 +129,15 @@ export class ChallengeService extends TypeOrmQueryService<Challenge> {
    *
    * @returns {Promise<Challenge[]>} the challenges.
    */
-  async findByName(name: string, gameId?: string): Promise<Challenge[]> {
+  async findByName(name: string, gameId?: string): Promise<ChallengeDto[]> {
     if (!gameId) {
-      return await this.query({
-        filter: {
-          name: { eq: name, like: '%${name}%' },
-        },
+      return await this.findAll({
+        name: { like: '%${name}%' },
       });
     } else {
-      return await this.query({
-        filter: {
-          and: [{ name: { eq: name, like: '%${name}%' } }, { game: { eq: gameId } }],
-        },
+      return await this.findAll({
+        name: { like: '%${name}%' },
+        game: { eq: gameId },
       });
     }
   }
@@ -167,18 +147,15 @@ export class ChallengeService extends TypeOrmQueryService<Challenge> {
    *
    * @returns {Promise<Challenge[]>} the challenges.
    */
-  async findByMode(mode: Mode, gameId?: string): Promise<Challenge[]> {
+  async findByMode(mode: Mode, gameId?: string): Promise<ChallengeDto[]> {
     if (!gameId) {
-      return await this.query({
-        filter: {
-          mode: { eq: mode },
-        },
+      return await this.findAll({
+        mode: { eq: mode },
       });
     } else {
-      return await this.query({
-        filter: {
-          and: [{ mode: { eq: mode } }, { game: { eq: gameId } }],
-        },
+      return await this.findAll({
+        mode: { eq: mode },
+        game: { eq: gameId }
       });
     }
   }
@@ -188,18 +165,15 @@ export class ChallengeService extends TypeOrmQueryService<Challenge> {
    *
    * @returns {Promise<Challenge[]>} the challenges.
    */
-  async findLocked(locked: boolean, gameId: string): Promise<Challenge[]> {
+  async findLocked(locked: boolean, gameId: string): Promise<ChallengeDto[]> {
     if (!gameId) {
-      return await this.query({
-        filter: {
-          locked: { is: locked },
-        },
+      return await this.findAll({
+        locked: { is: locked },
       });
     } else {
-      return await this.query({
-        filter: {
-          and: [{ locked: { is: locked } }, { game: { eq: gameId } }],
-        },
+      return await this.findAll({
+        locked: { is: locked },
+        game: { eq: gameId },
       });
     }
   }
@@ -209,18 +183,15 @@ export class ChallengeService extends TypeOrmQueryService<Challenge> {
    *
    * @returns {Promise<Challenge[]>} the challenges.
    */
-  async findHidden(hidden: boolean, gameId: string): Promise<Challenge[]> {
+  async findHidden(hidden: boolean, gameId: string): Promise<ChallengeDto[]> {
     if (!gameId) {
-      return await this.query({
-        filter: {
-          hidden: { is: hidden },
-        },
+      return await this.findAll({
+        hidden: { is: hidden },
       });
     } else {
-      return await this.query({
-        filter: {
-          and: [{ hidden: { is: hidden } }, { game: { eq: gameId } }],
-        },
+      return await this.findAll({
+        hidden: { is: hidden },
+        game: { eq: gameId },
       });
     }
   }

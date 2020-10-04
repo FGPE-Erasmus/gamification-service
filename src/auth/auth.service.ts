@@ -1,21 +1,21 @@
-import { Injectable, forwardRef, Inject } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 
 import { appConfig } from '../app.config';
-import { UserEntity as User } from '../users/entities/user.entity';
+import { UserDto } from '../users/dto/user.dto';
+import { Role } from '../users/models/role.enum';
 import { UsersService } from '../users/users.service';
-import { Role } from '../users/entities/role.enum';
-import SignupDto from './dto/signup.dto';
-import LoginDto from './dto/login.dto';
+import SignupArgs from './args/signup.args';
+import LoginArgs from './args/login.args';
 import LoginResultDto from './dto/login-result.dto';
 
 @Injectable()
 export class AuthService {
+
   constructor(
-    @Inject(forwardRef(() => UsersService))
-    private usersService: UsersService,
-    private jwtService: JwtService,
+    @Inject(forwardRef(() => UsersService)) protected readonly usersService: UsersService,
+    protected readonly jwtService: JwtService,
   ) {}
 
   /**
@@ -23,7 +23,8 @@ export class AuthService {
    *
    * @param credentials sent for validation
    */
-  async login(credentials: LoginDto): Promise<LoginResultDto | undefined> {
+  async login(credentials: LoginArgs): Promise<LoginResultDto | undefined> {
+
     let user = await this.usersService.findOneByEmail(credentials.login);
     if (!user) {
       user = await this.usersService.findOneByUsername(credentials.login);
@@ -43,30 +44,34 @@ export class AuthService {
 
     const jwt = this.createJwt(user);
 
-    return { token: jwt, expiresIn: appConfig.jwt.expirationTime, user };
+    return {
+      token: jwt,
+      expiresIn: appConfig.jwt.expirationTime,
+      user
+    };
   }
 
   /**
    * Register a new user who filled-in the signup form.
    *
-   * @param credentials sent for validation
+   * @param input
    */
-  async signup(signupDto: SignupDto): Promise<LoginResultDto | undefined> {
+  async signup(input: SignupArgs): Promise<LoginResultDto | undefined> {
     // find a user by email
-    let user = await this.usersService.findOneByEmail(signupDto.email);
+    let user: UserDto = await this.usersService.findOneByEmail(input.email);
     if (user) {
       throw Error('Email already in use');
     }
 
     // find a user by username
-    user = await this.usersService.findOneByUsername(signupDto.username);
+    user = await this.usersService.findOneByUsername(input.username);
     if (user) {
       throw Error('Username already in use');
     }
 
     // hash the password
-    user = await this.usersService.upsertUser(undefined, {
-      ...signupDto,
+    user = await this.usersService.upsert(undefined, {
+      ...input,
       roles: [Role.USER],
     });
 
@@ -79,19 +84,19 @@ export class AuthService {
    * Verifies that the JWT payload associated with a JWT is valid
    * by making sure the user exists and is enabled
    *
-   * @param {JwtPayload} payload
+   * @param {id: string} payload
    * @returns {(Promise<User | undefined>)} returns undefined if there is no
    * user or the account is not enabled
    * @memberof AuthService
    */
-  async validateJwtPayload({ id }: { id: string }): Promise<User | undefined> {
+  async validateJwtPayload({ id }: { id: string }): Promise<UserDto | undefined> {
     // user has already logged in and has a JWT (let's check)
-    const user = await this.usersService.findUserById(id);
+    const user = await this.usersService.findById(id);
 
     // the user exists and their account isn't disabled
     if (user && user.active) {
       user.updatedAt = new Date();
-      return this.usersService.updateUser(user);
+      return this.usersService.update(user.id, user);
     }
 
     return undefined;
@@ -104,11 +109,9 @@ export class AuthService {
    * @returns {string} the generated JWT
    * @memberof AuthService
    */
-  createJwt(user: User): string {
-    const jwt = this.jwtService.sign({
-      id: user.id.toHexString(),
+  createJwt(user: UserDto): string {
+    return this.jwtService.sign({
+      id: user.id,
     });
-
-    return jwt;
   }
 }

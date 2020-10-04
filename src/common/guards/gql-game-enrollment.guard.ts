@@ -1,6 +1,6 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
-import { UserEntity as User } from 'src/users/entities/user.entity';
+import { User as User } from 'src/users/models/user.model';
 import { PlayerRepository } from 'src/player/repository/player.repository';
 
 /**

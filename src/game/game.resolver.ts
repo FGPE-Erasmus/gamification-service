@@ -1,37 +1,36 @@
-import { Resolver, Mutation, Args, Query } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { NotFoundException, UseGuards } from '@nestjs/common';
 
 import { GqlJwtAuthGuard } from '../common/guards/gql-jwt-auth.guard';
 import { GqlAdminGuard } from '../common/guards/gql-admin.guard';
-import ImportGameDto from './dto/import-game.dto';
+import ImportGameArgs from './args/import-game.args';
 import { GameService } from './game.service';
-import { GameEntity as Game } from './entities/game.entity';
+import { GameDto } from './dto/game.dto';
 
 @Resolver()
 export class GameResolver {
   constructor(private gameService: GameService) {}
 
-  @Mutation(() => Game)
+  @Mutation(() => GameDto)
   @UseGuards(GqlJwtAuthGuard, GqlAdminGuard)
-  async importGEdILArchive(@Args() input: ImportGameDto): Promise<Game> {
+  async importGEdILArchive(@Args() input: ImportGameArgs): Promise<GameDto> {
     const { createReadStream } = await input.file;
-    const game: Game = await this.gameService.importGEdILArchive(
+    return await this.gameService.importGEdILArchive(
       {
         name: input.name,
         description: input.description,
         startDate: input.startDate,
         endDate: input.endDate,
-        users: input.users,
+
       },
       createReadStream(),
     );
-    return game;
   }
 
-  @Query(() => Game)
+  @Query(() => GameDto)
   @UseGuards(GqlJwtAuthGuard)
-  async game(@Args('id') id: string): Promise<Game> {
-    const game: Game = await this.gameService.findOne(id);
+  async game(@Args('id') id: string): Promise<GameDto> {
+    const game: GameDto = await this.gameService.findOne(id);
     if (!game) {
       throw new NotFoundException(id);
     }

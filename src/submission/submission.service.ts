@@ -1,77 +1,72 @@
-import { Injectable } from '@nestjs/common';
-import { SubmissionDto } from './dto/submission.dto';
-import { SubmissionEntity as Submission } from './entities/submission.entity';
-import { ServiceHelper } from 'src/common/helpers/service.helper';
-import { SubmissionRepository } from './repository/submission.repository';
-import { Result } from './entities/result.enum';
-import { EvaluationEvent } from './dto/evaluation-event.dto';
-import { response } from 'express';
-import { appConfig } from 'src/app.config';
-
+import { Injectable, LoggerService } from '@nestjs/common';
 import got from 'got';
 
+import { appConfig } from '../app.config';
+import { BaseService } from '../common/services/base.service';
+import { SubmissionDto } from './dto/submission.dto';
+import { ReportInput } from './inputs/report.input';
+import { SendSubmissionInput } from './inputs/send-submission.input';
+import { Submission } from './models/submission.model';
+import { Result } from './models/result.enum';
+import { SubmissionRepository } from './repository/submission.repository';
+import { PlayerService } from '../player/player.service';
+import { PlayerDto } from '../player/dto/player.dto';
+
+
 @Injectable()
-export class SubmissionService {
+export class SubmissionService extends BaseService<Submission, SendSubmissionInput, ReportInput, SubmissionDto> {
+
   constructor(
-    private readonly serviceHelper: ServiceHelper,
-    private readonly submissionRepository: SubmissionRepository,
-  ) {}
-
-  async saveSubmission(id: string | undefined, data: SubmissionDto): Promise<Submission> {
-    const fields: { [k: string]: any } = { ...data, submittedAt: new Date() };
-    const newSubmission = await this.serviceHelper.getUpsertData(id, fields, this.submissionRepository);
-    return await this.submissionRepository.save(newSubmission);
+    protected readonly logger: LoggerService,
+    protected readonly repository: SubmissionRepository,
+    protected readonly playerService: PlayerService
+  ) {
+    super(logger, repository);
   }
 
-  async getAllSubmissions(exerciseId: string, playerId: string): Promise<Submission[]> {
-    return await this.submissionRepository.find({
-      where: {
-        exerciseId: exerciseId,
-        playerId: playerId,
-      },
-    });
+  async findByUser(gameId: string, userId: string, exerciseId?: string): Promise<SubmissionDto[]> {
+    const player: PlayerDto = await this.playerService.findByGameAndUser(gameId, userId)
+    const query: Partial<Record<keyof Submission, any>> = {
+      player: player.id
+    };
+    if ( exerciseId ) {
+      query.exerciseId = exerciseId;
+    }
+    return this.findAll(query);
   }
 
-  async getSubmission(submissionId: string): Promise<Submission> {
-    const submission = await this.submissionRepository.findOne(submissionId);
-    return submission;
-  }
+  async create(input: SendSubmissionInput): Promise<SubmissionDto> {
+    const submission: SubmissionDto = await super.create(input);
 
-  async sendSubmission(submission: SubmissionDto): Promise<any> {
-    // I know that in doc we have parameters (exerciseid, playerId, submission), but two first ones are suppossed to be
-    // included in the submission object itself so I thought I would skip it, lemme know if I'm missing a point there
-    const codeFile = submission.codeFile;
-    delete submission.codeFile;
-    this.saveSubmission(submission.id, submission);
+    // TODO submit student's attempt to Evaluation Engine
     try {
       const response = await got(appConfig.evaluationEngine, {
         json: {
-          exerciseId: submission.exerciseId,
-          file: codeFile,
+          exerciseId: input.exerciseId,
+          file: input.codeFile,
         },
       }).json();
     } catch (e) {
       console.error(e);
     }
-    // also let me know if I should take care of something more when we send a GET like headers, options etc.
-    // or if we need to do smth more with the response than just returning it
-    return response;
+    return submission;
   }
 
   async onSubmissionAccepted(submission: Submission): Promise<Submission> {
-    submission.result = Result.ACCEPTED;
+    submission.result = Result.ACCEPT;
     return await this.submissionRepository.save(submission);
   }
 
   async onSubmissionRejected(submission: Submission): Promise<Submission> {
-    submission.result = Result.REJECTED;
+    submission.result = Result.WRONG_ANSWER;
     return await this.submissionRepository.save(submission);
   }
 
-  async onSubmissionEvaluated(data: EvaluationEvent): Promise<Submission> {
+  async onSubmissionEvaluated(id: string, data: ReportInput): Promise<Submission> {
+    const submission: Submission = this.patch(id, )
     let submission: Submission = await this.getSubmission(data.id.toString());
     submission = { ...submission, ...data };
-    return (await data.result) === Result.ACCEPTED
+    return (await data.result) === Result.ACCEPT
       ? this.onSubmissionAccepted(submission)
       : this.onSubmissionRejected(submission);
   }

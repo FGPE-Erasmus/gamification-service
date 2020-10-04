@@ -1,15 +1,30 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-
-import { ServiceHelper } from '../common/helpers/service.helper';
-import { PlayerLeaderboardRepository } from '../player-leaderboard/repository/player-leaderboard.repository';
+import { MongooseModule } from '@nestjs/mongoose';
 
 import { LeaderboardService } from './leaderboard.service';
+import { Leaderboard, LeaderboardSchema } from './models/leaderboard.model';
 import { LeaderboardRepository } from './repository/leaderboard.repository';
+import { LeaderboardResolver } from './leaderboard.resolver';
+import { LeaderboardToDtoMapper } from './mappers/leaderboard-to-dto.mapper';
+import { LeaderboardToPersistenceMapper } from './mappers/leaderboard-to-persistence.mapper';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([LeaderboardRepository, PlayerLeaderboardRepository])],
-  providers: [ServiceHelper, LeaderboardService],
+  imports: [
+    MongooseModule.forFeatureAsync([
+      {
+        name: Leaderboard.name,
+        useFactory: () => LeaderboardSchema
+      }
+    ]),
+
+  ],
+  providers: [
+    LeaderboardToDtoMapper,
+    LeaderboardToPersistenceMapper,
+    LeaderboardRepository,
+    LeaderboardService,
+    LeaderboardResolver,
+  ],
   exports: [LeaderboardService],
 })
 export class LeaderboardModule {}
