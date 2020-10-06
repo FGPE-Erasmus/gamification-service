@@ -1,4 +1,4 @@
-import { Injectable, LoggerService } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 
 import { BaseService } from '../common/services/base.service';
 import { extractToJson } from '../common/utils/extraction.utils';
@@ -6,6 +6,7 @@ import { GameDto } from '../game/dto/game.dto';
 import { HookService } from '../hook/hook.service';
 import { LeaderboardService } from '../leaderboard/leaderboard.service';
 import { RewardService } from '../reward/reward.service';
+
 import { ChallengeRepository } from './repositories/challenge.repository';
 import { Challenge } from './models/challenge.model';
 import { Mode } from './models/mode.enum';
@@ -16,9 +17,7 @@ import { ChallengeToPersistenceMapper } from './mappers/challenge-to-persistence
 
 @Injectable()
 export class ChallengeService extends BaseService<Challenge, ChallengeInput, ChallengeDto> {
-
   constructor(
-    protected readonly logger: LoggerService,
     protected readonly repository: ChallengeRepository,
     protected readonly toDtoMapper: ChallengeToDtoMapper,
     protected readonly toPersistenceMapper: ChallengeToPersistenceMapper,
@@ -26,7 +25,7 @@ export class ChallengeService extends BaseService<Challenge, ChallengeInput, Cha
     protected readonly rewardService: RewardService,
     protected readonly hookService: HookService,
   ) {
-    super(logger, repository, toDtoMapper, toPersistenceMapper);
+    super(new Logger(ChallengeService.name), repository, toDtoMapper, toPersistenceMapper);
   }
 
   async importGEdIL(
@@ -64,11 +63,7 @@ export class ChallengeService extends BaseService<Challenge, ChallengeInput, Cha
 
     // inner challenges
     for (const gedilId of Object.keys(subEntries.challenges)) {
-      subObjects.challenges[gedilId] = await this.importGEdIL(
-        game,
-        gedilId,
-        subEntries.challenges[gedilId], challenge
-      );
+      subObjects.challenges[gedilId] = await this.importGEdIL(game, gedilId, subEntries.challenges[gedilId], challenge);
     }
 
     // inner leaderboards
@@ -82,20 +77,12 @@ export class ChallengeService extends BaseService<Challenge, ChallengeInput, Cha
 
     // inner rewards
     for (const gedilId of Object.keys(subEntries.rewards)) {
-      subObjects.rewards[gedilId] = await this.rewardService.importGEdIL(
-        game,
-        subEntries.rewards[gedilId],
-        challenge
-      );
+      subObjects.rewards[gedilId] = await this.rewardService.importGEdIL(game, subEntries.rewards[gedilId], challenge);
     }
 
     // inner rules
     for (const gedilId of Object.keys(subEntries.rules)) {
-      subObjects.rules[gedilId] = await this.hookService.importGEdIL(
-        game,
-        subEntries.rules[gedilId],
-        challenge
-      );
+      subObjects.rules[gedilId] = await this.hookService.importGEdIL(game, subEntries.rules[gedilId], challenge);
     }
 
     return challenge;
@@ -155,7 +142,7 @@ export class ChallengeService extends BaseService<Challenge, ChallengeInput, Cha
     } else {
       return await this.findAll({
         mode: { eq: mode },
-        game: { eq: gameId }
+        game: { eq: gameId },
       });
     }
   }

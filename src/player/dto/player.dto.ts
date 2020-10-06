@@ -6,19 +6,18 @@ import { UserDto } from '../../users/dto/user.dto';
 
 @ObjectType('Player')
 export class PlayerDto {
-
   @Field(() => ID)
-  id: string;
+  id?: string;
 
   @Field(() => GameDto)
-  game: GameDto | string;
+  game?: GameDto;
 
   @Field(() => UserDto)
-  user: UserDto | string;
+  user?: UserDto;
 
   @Field()
-  points: number;
+  points?: number;
 
   @Field(() => [PlayerRewardDto])
-  rewards: PlayerRewardDto[];
+  rewards?: PlayerRewardDto[];
 }

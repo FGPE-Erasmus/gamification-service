@@ -1,26 +1,23 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
-import { Challenge } from '../../challenge/models/challenge.model';
-import { Game } from '../../game/models/game.model';
 import { SortingOrder } from './sorting.enum';
 
 @Schema()
 export class Leaderboard extends Document {
-
-  @Prop({ type: Types.ObjectId, ref: Game.name, required: true })
+  @Prop({ type: Types.ObjectId, ref: 'Game', required: true })
   game: any;
 
-  @Prop({ type: Types.ObjectId, ref: Challenge.name, required: false })
+  @Prop({ type: Types.ObjectId, ref: 'Challenge', required: false })
   parentChallenge?: any;
 
   @Prop()
   name: string;
 
-  @Prop()
+  @Prop({ type: () => [String] })
   metrics: string[];
 
-  @Prop({ type: [String], enum: SortingOrder })
+  @Prop({ type: () => [String], enum: SortingOrder })
   sortingOrders: SortingOrder[];
 }
 

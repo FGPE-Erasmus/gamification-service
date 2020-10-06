@@ -10,21 +10,14 @@ import { UserToPersistenceMapper } from './mappers/user-to-persistence.mapper';
 
 @Module({
   imports: [
-    MongooseModule.forFeatureAsync([
+    MongooseModule.forFeature([
       {
         name: User.name,
-        useFactory: () => UserSchema
-      }
+        schema: UserSchema,
+      },
     ]),
   ],
-  providers: [
-    UserToDtoMapper,
-    UserToPersistenceMapper,
-    UserRepository,
-    UsersService,
-    UsersResolver
-  ],
-  exports: [ UsersService ],
+  providers: [UserToDtoMapper, UserToPersistenceMapper, UserRepository, UsersService, UsersResolver],
+  exports: [UsersService],
 })
-export class UsersModule {
-}
+export class UsersModule {}

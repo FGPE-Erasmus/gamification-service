@@ -12,7 +12,6 @@ import { classToPlain, plainToClass } from 'class-transformer';
 
 @Injectable()
 export class GameToDtoMapper implements IMapper<Game, GameDto> {
-
   /*constructor(
     protected readonly playerToDtoMapper: PlayerToDtoMapper,
     protected readonly playerService: PlayerService,
@@ -31,6 +30,9 @@ export class GameToDtoMapper implements IMapper<Game, GameDto> {
         ? await this.resolvePlayers(obj.submissions)
         : obj.submissions
     } as GameDto;*/
+    if (!obj) {
+      return undefined;
+    }
     return plainToClass(GameDto, classToPlain(obj, { excludeExtraneousValues: true }));
   }
 

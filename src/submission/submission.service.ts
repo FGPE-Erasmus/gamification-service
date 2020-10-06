@@ -1,42 +1,52 @@
-import { Injectable, LoggerService } from '@nestjs/common';
+import { Injectable, Logger, LoggerService } from '@nestjs/common';
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
 import got from 'got';
 
 import { appConfig } from '../app.config';
 import { BaseService } from '../common/services/base.service';
+import { PlayerDto } from '../player/dto/player.dto';
+import { PlayerService } from '../player/player.service';
 import { SubmissionDto } from './dto/submission.dto';
 import { ReportInput } from './inputs/report.input';
 import { SendSubmissionInput } from './inputs/send-submission.input';
 import { Submission } from './models/submission.model';
 import { Result } from './models/result.enum';
-import { SubmissionRepository } from './repository/submission.repository';
-import { PlayerService } from '../player/player.service';
-import { PlayerDto } from '../player/dto/player.dto';
-
+import { SubmissionRepository } from './repositories/submission.repository';
+import { SubmissionInput } from './inputs/submission.input';
+import { SubmissionToDtoMapper } from './mappers/submission-to-dto.mapper';
+import { SubmissionToPersistenceMapper } from './mappers/submission-to-persistence.mapper';
+import { TriggerEventEnum, TriggerEventEnum as TriggerEvent } from '../hook/enums/trigger-event.enum';
 
 @Injectable()
-export class SubmissionService extends BaseService<Submission, SendSubmissionInput, ReportInput, SubmissionDto> {
-
+export class SubmissionService extends BaseService<Submission, SubmissionInput, SubmissionDto> {
   constructor(
-    protected readonly logger: LoggerService,
     protected readonly repository: SubmissionRepository,
-    protected readonly playerService: PlayerService
+    protected readonly toDtoMapper: SubmissionToDtoMapper,
+    protected readonly toPersistenceMapper: SubmissionToPersistenceMapper,
+    @InjectQueue('hooksQueue') protected readonly hooksQueue: Queue,
+    protected readonly playerService: PlayerService,
   ) {
-    super(logger, repository);
+    super(new Logger(SubmissionService.name), repository, toDtoMapper, toPersistenceMapper);
   }
 
   async findByUser(gameId: string, userId: string, exerciseId?: string): Promise<SubmissionDto[]> {
-    const player: PlayerDto = await this.playerService.findByGameAndUser(gameId, userId)
+    const player: PlayerDto = await this.playerService.findByGameAndUser(gameId, userId);
     const query: Partial<Record<keyof Submission, any>> = {
-      player: player.id
+      player: player.id,
     };
-    if ( exerciseId ) {
+    if (exerciseId) {
       query.exerciseId = exerciseId;
     }
     return this.findAll(query);
   }
 
-  async create(input: SendSubmissionInput): Promise<SubmissionDto> {
-    const submission: SubmissionDto = await super.create(input);
+  async sendSubmission(input: SendSubmissionInput): Promise<SubmissionDto> {
+    const submission: SubmissionDto = await super.create({
+      game: input.game,
+      player: input.player,
+      exerciseId: input.exerciseId,
+    });
 
     // TODO submit student's attempt to Evaluation Engine
     try {
@@ -53,21 +63,29 @@ export class SubmissionService extends BaseService<Submission, SendSubmissionInp
   }
 
   async onSubmissionAccepted(submission: Submission): Promise<Submission> {
-    submission.result = Result.ACCEPT;
-    return await this.submissionRepository.save(submission);
+    return null;
   }
 
   async onSubmissionRejected(submission: Submission): Promise<Submission> {
-    submission.result = Result.WRONG_ANSWER;
-    return await this.submissionRepository.save(submission);
+    return null;
   }
 
-  async onSubmissionEvaluated(id: string, data: ReportInput): Promise<Submission> {
-    const submission: Submission = this.patch(id, )
-    let submission: Submission = await this.getSubmission(data.id.toString());
-    submission = { ...submission, ...data };
-    return (await data.result) === Result.ACCEPT
-      ? this.onSubmissionAccepted(submission)
-      : this.onSubmissionRejected(submission);
+  async onSubmissionEvaluated(id: string, data: ReportInput): Promise<SubmissionDto> {
+    // save result
+    const submission: SubmissionDto = await this.patch(id, {
+      ...data,
+    });
+
+    // send notification to trigger further processing
+    await this.hooksQueue.add(
+      submission.result === Result.ACCEPT ? TriggerEvent.SUBMISSION_ACCEPTED : TriggerEventEnum.SUBMISSION_REJECTED,
+      {
+        submissionId: submission.id,
+        playerId: submission.player,
+        exerciseId: submission.exerciseId,
+      },
+    );
+
+    return submission;
   }
 }

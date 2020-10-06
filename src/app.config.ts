@@ -52,7 +52,7 @@ export const appConfig: IAppConfig = {
     database: process.env.DB_NAME,
     authSource: process.env.DB_AUTH,
     useUnifiedTopology: true,
-    useNewUrlParser: false,
+    useNewUrlParser: true,
     loggerLevel: process.env.DB_LOGGER_LEVEL,
   },
   port: parseInt(process.env.APP_PORT, 10),
@@ -61,5 +61,5 @@ export const appConfig: IAppConfig = {
     secret: process.env.JWT_SECRET,
     expirationTime: parseInt(process.env.JWT_EXPIRATION_TIME, 10),
   },
-  logger: process.env.APP_LOGGER_LEVELS?.split(',') as LogLevel[] || ['error', 'warn'],
+  logger: (process.env.APP_LOGGER_LEVELS?.split(',') as LogLevel[]) || ['error', 'warn'],
 };

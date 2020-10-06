@@ -1,33 +1,28 @@
-import { Injectable, LoggerService } from '@nestjs/common';
+import { Injectable, Logger, LoggerService } from '@nestjs/common';
 
 import { BaseService } from '../common/services/base.service';
-import { TriggerEventEnum as TriggerEvent } from '../hook/enums/trigger-event.enum';
-import { PlayerDto } from '../player/dto/player.dto';
-import { RewardDto } from '../reward/dto/reward.dto';
 import { Player } from '../player/models/player.model';
-import { PlayerRepository } from '../player/repository/player.repository';
+import { PlayerRepository } from '../player/repositories/player.repository';
 import { Reward } from '../reward/models/reward.model';
 import { RewardType } from '../reward/models/reward-type.enum';
-import { RewardRepository } from '../reward/repository/reward.repository';
+import { RewardRepository } from '../reward/repositories/reward.repository';
 import { PlayerReward } from './models/player-reward.model';
 import { PlayerRewardDto } from './dto/player-reward.dto';
 import { PlayerRewardInput } from './inputs/player-reward.input';
 import { PlayerRewardRepository } from './repositories/player-reward.repository';
+import { PlayerRewardToDtoMapper } from './mappers/player-reward-to-dto.mapper';
+import { PlayerRewardToPersistenceMapper } from './mappers/player-reward-to-persistence.mapper';
 
 @Injectable()
-export class PlayerRewardService extends BaseService<PlayerReward, PlayerRewardInput, PlayerRewardInput, PlayerRewardDto> {
-
+export class PlayerRewardService extends BaseService<PlayerReward, PlayerRewardInput, PlayerRewardDto> {
   constructor(
-    protected readonly logger: LoggerService,
     protected readonly repository: PlayerRewardRepository,
+    protected readonly toDtoMapper: PlayerRewardToDtoMapper,
+    protected readonly toPersistenceMapper: PlayerRewardToPersistenceMapper,
     protected readonly playerRepository: PlayerRepository,
     protected readonly rewardRepository: RewardRepository,
   ) {
-    super(logger, repository);
-  }
-
-  async create(input: PlayerRewardInput): Promise<PlayerRewardDto> {
-
+    super(new Logger(PlayerRewardService.name), repository, toDtoMapper, toPersistenceMapper);
   }
 
   async grantReward(reward: Reward, player: Player): Promise<any> {
@@ -81,13 +76,13 @@ export class PlayerRewardService extends BaseService<PlayerReward, PlayerRewardI
         } */
         break;
     }
-    const job = await this.hooksQueue.add(TriggerEvent.REWARD_GRANTED, {
+    /*const job = await this.hooksQueue.add(TriggerEvent.REWARD_GRANTED, {
       rewardId: reward.id,
       playerId: player.id,
-    });
+    });*/
   }
 
-  async checkIfExists<T, U>(reward: T, rewardType: string, player: Player): Promise<boolean> {
+  /*async checkIfExists<T, U>(reward: T, rewardType: string, player: Player): Promise<boolean> {
     let ifExists = false;
     const playerRewards = rewardType.concat('s');
     player[playerRewards].some(async entity => {
@@ -100,44 +95,31 @@ export class PlayerRewardService extends BaseService<PlayerReward, PlayerRewardI
       }
     });
     return ifExists;
-  }
+  }*/
 
-  async substractPoints(amount: string[], player: Player) {
+  /*async substractPoints(amount: string[], player: Player) {
     //substract points from the player, adding a field 'point' to Player entity?
     const job = await this.hooksQueue.add(TriggerEvent.POINTS_UPDATED, {
       playerId: player.id,
     });
-  }
+  }*/
 
-  async updatePlayer(params: string[], player: Player) {
+  /*async updatePlayer(params: string[], player: Player) {
     //updating user's properties (updated points? does this trigger concern update regarding all other rewards or smth more/else?)
     const job = await this.hooksQueue.add(TriggerEvent.PLAYER_UPDATED, {
       playerId: player.id,
     });
-  }
+  }*/
 
-  async addNewReward<T>(reward: any, rewardType: string, player: Player, playerReward: any) {
+  /*async addNewReward<T>(reward: any, rewardType: string, player: Player, playerReward: any) {
     player[rewardType].push(playerReward);
     reward.players.push(playerReward);
     await this.playerService.create(player.id?.toString(), player);
     await repo.save(reward);
-  }
+  }*/
 
   async ifEnoughForGranting(amount: string[]) {
     //after REWARD_GRANNTED trigger
     //to be implemented...
-  }
-
-  async toPersistence(input: PlayerRewardInput): Promise<PlayerReward> {
-    const player: Player = await this.playerRepository.getById(input.playerId);
-    const reward: Reward = await this.rewardRepository.getById(input.rewardId);
-    return {
-      player,
-      reward
-    } as PlayerReward;
-  }
-
-  toDto(doc: PlayerReward): Promise<PlayerRewardDto> {
-
   }
 }

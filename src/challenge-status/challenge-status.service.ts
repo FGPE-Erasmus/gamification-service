@@ -1,6 +1,6 @@
 import { Queue } from 'bull';
 import { InjectQueue } from '@nestjs/bull';
-import { Injectable, LoggerService } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { classToPlain, plainToClass } from 'class-transformer';
 
 import { BaseService } from '../common/services/base.service';
@@ -15,15 +15,13 @@ import { ChallengeStatusToPersistenceMapper } from './mappers/challenge-status-t
 
 @Injectable()
 export class ChallengeStatusService extends BaseService<ChallengeStatus, ChallengeStatusInput, ChallengeStatusDto> {
-
   constructor(
-    protected readonly logger: LoggerService,
     protected readonly repository: ChallengeStatusRepository,
     protected readonly toDtoMapper: ChallengeStatusToDtoMapper,
     protected readonly toPersistenceMapper: ChallengeStatusToPersistenceMapper,
-    @InjectQueue('hooksQueue') protected hooksQueue: Queue,
+    @InjectQueue('hooksQueue') protected readonly hooksQueue: Queue,
   ) {
-    super(logger, repository, toDtoMapper, toPersistenceMapper);
+    super(new Logger(ChallengeStatusService.name), repository, toDtoMapper, toPersistenceMapper);
   }
 
   /**
@@ -81,13 +79,5 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
     });
 
     return result;
-  }
-
-  toDto(doc: ChallengeStatus): ChallengeStatusDto {
-    return plainToClass(ChallengeStatusDto, classToPlain(doc, { excludeExtraneousValues: true }));
-  }
-
-  toPersistence(input: ChallengeStatusInput): ChallengeStatus {
-    return plainToClass(ChallengeStatus, classToPlain(input, { excludeExtraneousValues: true }));
   }
 }

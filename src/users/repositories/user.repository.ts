@@ -1,4 +1,4 @@
-import { Injectable, LoggerService } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
@@ -7,11 +7,7 @@ import { User } from '../models/user.model';
 
 @Injectable()
 export class UserRepository extends BaseRepository<User> {
-
-  constructor(
-    protected readonly logger: LoggerService,
-    @InjectModel(User.name) protected readonly userModel: Model<User>
-  ) {
-    super(logger, userModel);
+  constructor(@InjectModel(User.name) protected readonly userModel: Model<User>) {
+    super(new Logger(UserRepository.name), userModel);
   }
 }

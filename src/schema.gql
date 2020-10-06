@@ -2,13 +2,35 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type Player {
+type Submission {
   id: ID!
-  userId: String!
-  gameId: String!
-  points: Float!
-  rewards: [PlayerReward!]!
+  game: Game!
+  player: Player!
+  exerciseId: String!
+  metrics: JSON
+  result: Result
+  grade: Float
+  feedback: String
+  submittedAt: Date!
+  evaluatedAt: Date
 }
+
+"""
+The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON @specifiedBy(url: "http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf")
+
+enum Result {
+  ACCEPT
+  WRONG_ANSWER
+  TIMEOUT
+  OUTPUT_LIMIT_OVERFLOW
+  COMPILATION_ERROR
+  RUNTIME_ERROR
+}
+
+"""Date custom scalar type"""
+scalar Date
 
 type Game {
   id: ID!
@@ -18,10 +40,9 @@ type Game {
   gedilLayerDescription: String
   startDate: Date
   endDate: Date
+  players: [Player!]!
+  submissions: [Submission!]!
 }
-
-"""Date custom scalar type"""
-scalar Date
 
 type Challenge {
   id: ID!
@@ -55,9 +76,9 @@ enum Mode {
   DUEL
 }
 
-type RewardEntity {
+type Reward {
   id: ID!
-  game: Game
+  game: Game!
   parentChallenge: Challenge
   kind: RewardType!
   name: String!
@@ -84,9 +105,17 @@ enum RewardType {
 
 type PlayerReward {
   id: ID!
-  players: Player!
-  rewards: RewardEntity!
+  player: Player!
+  reward: Reward!
   count: Float!
+}
+
+type Player {
+  id: ID!
+  game: Game!
+  user: User!
+  points: Float!
+  rewards: [PlayerReward!]!
 }
 
 type User {
@@ -98,9 +127,10 @@ type User {
   photo: String
   telephone: String
   birthDate: Date
-  createdAt: Date!
-  updatedAt: Date!
-  players: [PlayerReward!]!
+  active: Boolean!
+  createdAt: Date
+  updatedAt: Date
+  registrations: [Player!]
 }
 
 """Email custom scalar type"""
@@ -109,22 +139,6 @@ scalar Email
 enum Role {
   USER
   ADMIN
-}
-
-type ListUsers {
-  items: [User!]!
-  total: Int!
-}
-
-type Action {
-  type: Category!
-  parameters: [String!]!
-}
-
-enum Category {
-  GIVE
-  TAKE
-  UPDATE
 }
 
 type Condition {
@@ -146,29 +160,27 @@ enum Junctor {
   OR
 }
 
-type ScheduledHook {
-  id: ID
-  game: Game
-  parentChallenge: Challenge
-  criteria: Criteria
-  actions: [Action!]
-  recurrent: Boolean
-  cron: String
-  interval: Float
-  active: Boolean
-  lastRun: Date
+type Action {
+  type: Category!
+  parameters: [String!]!
+}
+
+enum Category {
+  GIVE
+  TAKE
+  UPDATE
 }
 
 type ActionHook {
-  id: ID
-  game: Game
+  id: ID!
+  game: Game!
   parentChallenge: Challenge
-  trigger: TriggerEvent
+  trigger: TriggerEvent!
   sourceId: String
   criteria: Criteria
-  actions: [Action!]
-  recurrent: Boolean
-  active: Boolean
+  actions: [Action!]!
+  recurrent: Boolean!
+  active: Boolean!
   lastRun: Date
 }
 
@@ -179,6 +191,7 @@ enum TriggerEvent {
   SUBMISSION_REJECTED
   CHALLENGE_COMPLETED
   CHALLENGE_FAILED
+  CHALLENGE_REJECTED
   REWARD_GRANTED
   PLAYER_UPDATED
   POINTS_UPDATED
@@ -189,9 +202,41 @@ enum TriggerEvent {
   DUEL_COMPLETED
 }
 
+type ScheduledHook {
+  id: ID!
+  game: Game!
+  parentChallenge: Challenge
+  criteria: Criteria
+  actions: [Action!]!
+  recurrent: Boolean!
+  cron: String
+  interval: Float
+  active: Boolean!
+  lastRun: Date
+}
+
+type Leaderboard {
+  id: ID!
+  game: Game!
+  parentChallenge: Challenge
+  name: String!
+  metrics: [String!]!
+  sortingOrders: [SortingOrder!]!
+}
+
+enum SortingOrder {
+  ASC
+  DESC
+}
+
+type Ranking {
+  player: Player!
+  score: JSON!
+}
+
 type Badge {
   id: ID!
-  game: Game
+  game: Game!
   parentChallenge: Challenge
   name: String!
   description: String
@@ -203,7 +248,7 @@ type Badge {
 
 type Coupon {
   id: ID!
-  game: Game
+  game: Game!
   parentChallenge: Challenge
   name: String!
   description: String
@@ -216,7 +261,7 @@ type Coupon {
 
 type Hint {
   id: ID!
-  game: Game
+  game: Game!
   parentChallenge: Challenge
   name: String!
   description: String
@@ -230,7 +275,7 @@ type Hint {
 
 type Message {
   id: ID!
-  game: Game
+  game: Game!
   parentChallenge: Challenge
   name: String!
   description: String
@@ -244,7 +289,7 @@ type Message {
 
 type Point {
   id: ID!
-  game: Game
+  game: Game!
   parentChallenge: Challenge
   name: String!
   description: String
@@ -255,7 +300,7 @@ type Point {
 
 type VirtualItem {
   id: ID!
-  game: Game
+  game: Game!
   parentChallenge: Challenge
   name: String!
   description: String
@@ -268,109 +313,36 @@ type VirtualItem {
 
 type Unlock {
   id: ID!
-  game: Game
+  game: Game!
   parentChallenge: Challenge
   name: String!
   description: String
   recurrent: Boolean!
   cost: Float
-  challenges: [Challenge!]!
+  challenges: [Challenge!]
   players: [PlayerReward!]!
 }
 
 type Reveal {
   id: ID!
-  game: Game
+  game: Game!
   parentChallenge: Challenge
   name: String!
   description: String
   recurrent: Boolean!
   cost: Float
-  challenges: [Challenge!]!
+  challenges: [Challenge!]
   players: [PlayerReward!]!
-}
-
-type ChallengeEdge {
-  """The node containing the Challenge"""
-  node: Challenge!
-
-  """Cursor for this node."""
-  cursor: ConnectionCursor!
-}
-
-"""Cursor for paging through collections"""
-scalar ConnectionCursor
-
-type PageInfo {
-  """true if paging forward and there are more records."""
-  hasNextPage: Boolean
-
-  """true if paging backwards and there are more records."""
-  hasPreviousPage: Boolean
-
-  """The cursor of the first returned record."""
-  startCursor: ConnectionCursor
-
-  """The cursor of the last returned record."""
-  endCursor: ConnectionCursor
-}
-
-type ChallengeConnection {
-  """Paging information"""
-  pageInfo: PageInfo!
-
-  """Array of edges."""
-  edges: [ChallengeEdge!]!
-}
-
-type ChallengeStatus {
-  studentId: String!
-  challengeId: String!
-  game: String!
-  startedAt: Date
-  endedAt: Date
-  state: [State!]!
-  openedAt: Date
-}
-
-enum State {
-  LOCKED
-  HIDDEN
-  OPENED
-  FAILED
-  COMPLETED
-  REJECTED
-}
-
-type Submission {
-  id: ID!
-  exerciseId: String!
-  playerId: String!
-  gameId: String!
-  metrics: JSON
-  result: Result
-  grade: Float
-  feedback: String
-  submittedAt: Date!
-  evaluatedAt: Date
-}
-
-"""
-The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
-"""
-scalar JSON @specifiedBy(url: "http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf")
-
-enum Result {
-  ACCEPTED
-  REJECTED
 }
 
 type Query {
   user(id: String!): User!
-  users(skip: Int = 0, take: Int = 50, ids: [ID!], name: String, order: String = "DESC", fieldSort: String = "updatedAt"): ListUsers!
+  users: [User!]!
   queryCheck: String!
   scheduledHooks: [ScheduledHook!]!
   actionHooks: [ActionHook!]!
+  getAll: Leaderboard!
+  getPlayerRankings(leaderboardId: String!): [Ranking!]!
   badges: [Badge!]!
   coupons: [Coupon!]!
   hints: [Hint!]!
@@ -379,159 +351,20 @@ type Query {
   virtualItems: [VirtualItem!]!
   unlocks: [Unlock!]!
   reveals: [Reveal!]!
-  challenge(
-    """The id of the record to find."""
-    id: ID!
-  ): Challenge
-  challenges(
-    """Limit or page results."""
-    paging: CursorPaging = {first: 10}
-
-    """Specify to filter the records returned."""
-    filter: ChallengeFilter = {}
-
-    """Specify to sort results."""
-    sorting: [ChallengeSort!] = []
-  ): ChallengeConnection!
-  game(id: String!): Game!
-  get(gameId: String!, challengeId: String!, studentId: String!): ChallengeStatus!
+  challenges: [Challenge!]!
   submission(submissionId: String!): Submission!
-  submissions(exerciseId: String!): [Submission!]!
-}
-
-input CursorPaging {
-  """Paginate before opaque cursor"""
-  before: ConnectionCursor
-
-  """Paginate after opaque cursor"""
-  after: ConnectionCursor
-
-  """Paginate first"""
-  first: Int
-
-  """Paginate last"""
-  last: Int
-}
-
-input ChallengeFilter {
-  and: [ChallengeFilter!]
-  or: [ChallengeFilter!]
-  id: IDFilterComparison
-  name: StringFieldComparison
-  difficulty: DifficultyFilterComparison
-  mode: ModeFilterComparison
-  locked: BooleanFieldComparison
-  hidden: BooleanFieldComparison
-}
-
-input IDFilterComparison {
-  is: Boolean
-  isNot: Boolean
-  eq: ID
-  neq: ID
-  gt: ID
-  gte: ID
-  lt: ID
-  lte: ID
-  like: ID
-  notLike: ID
-  iLike: ID
-  notILike: ID
-  in: [ID!]
-  notIn: [ID!]
-}
-
-input StringFieldComparison {
-  is: Boolean
-  isNot: Boolean
-  eq: String
-  neq: String
-  gt: String
-  gte: String
-  lt: String
-  lte: String
-  like: String
-  notLike: String
-  iLike: String
-  notILike: String
-  in: [String!]
-  notIn: [String!]
-}
-
-input DifficultyFilterComparison {
-  is: Boolean
-  isNot: Boolean
-  eq: Difficulty
-  neq: Difficulty
-  gt: Difficulty
-  gte: Difficulty
-  lt: Difficulty
-  lte: Difficulty
-  like: Difficulty
-  notLike: Difficulty
-  iLike: Difficulty
-  notILike: Difficulty
-  in: [Difficulty!]
-  notIn: [Difficulty!]
-}
-
-input ModeFilterComparison {
-  is: Boolean
-  isNot: Boolean
-  eq: Mode
-  neq: Mode
-  gt: Mode
-  gte: Mode
-  lt: Mode
-  lte: Mode
-  like: Mode
-  notLike: Mode
-  iLike: Mode
-  notILike: Mode
-  in: [Mode!]
-  notIn: [Mode!]
-}
-
-input BooleanFieldComparison {
-  is: Boolean
-  isNot: Boolean
-}
-
-input ChallengeSort {
-  field: ChallengeSortFields!
-  direction: SortDirection!
-  nulls: SortNulls
-}
-
-enum ChallengeSortFields {
-  id
-  name
-  difficulty
-  mode
-  locked
-  hidden
-}
-
-"""Sort Directions"""
-enum SortDirection {
-  ASC
-  DESC
-}
-
-"""Sort Nulls Options"""
-enum SortNulls {
-  NULLS_FIRST
-  NULLS_LAST
+  submissions(exerciseId: String!, gameId: String!): [Submission!]!
+  game(id: String!): Game!
 }
 
 type Mutation {
   saveUser(id: ID, userInput: UserInput!): User!
-  deleteUser(id: ID!): Boolean!
+  deleteUser(id: ID!): User!
   login(login: String!, password: String!): User!
   signup(name: String!, username: String!, email: Email!, password: String!): User!
   mutationCheck: String!
-  importGEdILArchive(name: String!, description: String, startDate: Date, endDate: Date, users: [String!], file: Upload!): Game!
-  createSubmission(id: String!, gameId: String!, exerciseId: String!, playerId: String!, codeFile: String!): Submission!
+  createSubmission(submissionData: SendSubmissionInput!): Submission!
+  importGEdILArchive(file: Upload!): Game!
 }
 
 input UserInput {
@@ -540,8 +373,18 @@ input UserInput {
   email: Email!
   telephone: String
   birthDate: Date
+  photo: String
   roles: [Role!] = [USER]
   password: String
+  active: Boolean!
+}
+
+input SendSubmissionInput {
+  id: String!
+  game: String!
+  player: String!
+  exerciseId: String!
+  codeFile: String!
 }
 
 """The `Upload` scalar type represents a file upload."""

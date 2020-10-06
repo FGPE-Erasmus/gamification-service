@@ -1,34 +1,32 @@
-import { Injectable, LoggerService } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Readable } from 'stream';
 import { Parse } from 'unzipper';
 
 import { extractToJson } from '../common/utils/extraction.utils';
 import { BaseService } from '../common/services/base.service';
 import { ChallengeService } from '../challenge/challenge.service';
-import { ChallengeToDtoMapper } from '../challenge/mappers/challenge-to-dto.mapper';
-import { ChallengeToPersistenceMapper } from '../challenge/mappers/challenge-to-persistence.mapper';
 import { HookService } from '../hook/hook.service';
 import { LeaderboardService } from '../leaderboard/leaderboard.service';
 import { RewardService } from '../reward/reward.service';
-import GameInput from './inputs/game.input';
+import { GameInput } from './inputs/game.input';
 import { Game } from './models/game.model';
 import { GameRepository } from './repositories/game.repository';
 import { GameDto } from './dto/game.dto';
+import { GameToDtoMapper } from './mappers/game-to-dto.mapper';
+import { GameToPersistenceMapper } from './mappers/game-to-persistence.mapper';
 
 @Injectable()
 export class GameService extends BaseService<Game, GameInput, GameDto> {
-
   constructor(
-    protected readonly logger: LoggerService,
     protected readonly repository: GameRepository,
-    protected readonly toDtoMapper: ChallengeToDtoMapper,
-    protected readonly toPersistenceMapper: ChallengeToPersistenceMapper,
+    protected readonly toDtoMapper: GameToDtoMapper,
+    protected readonly toPersistenceMapper: GameToPersistenceMapper,
     protected readonly challengeService: ChallengeService,
     protected readonly rewardService: RewardService,
     protected readonly leaderboardService: LeaderboardService,
     protected readonly hookService: HookService,
   ) {
-    super(logger, repository, toDtoMapper, toPersistenceMapper);
+    super(new Logger(GameService.name), repository, toDtoMapper, toPersistenceMapper);
   }
 
   /**

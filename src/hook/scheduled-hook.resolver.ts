@@ -9,11 +9,9 @@ import { ScheduledHookDto } from './dto/scheduled-hook.dto';
 
 @Resolver(() => ScheduledHookDto)
 export class ScheduledHookResolver {
-
   constructor(
     private readonly scheduledHookService: ScheduledHookService,
-    private readonly gameService: GameService,
-    private readonly challengeService: ChallengeService,
+    private readonly gameService: GameService, //private readonly challengeService: ChallengeService,
   ) {}
 
   @Query(() => [ScheduledHookDto])

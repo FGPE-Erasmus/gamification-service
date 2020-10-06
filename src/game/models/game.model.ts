@@ -4,10 +4,8 @@ import { Document, Types } from 'mongoose';
 import { Player } from '../../player/models/player.model';
 import { Submission } from '../../submission/models/submission.model';
 
-
 @Schema()
 export class Game extends Document {
-
   @Prop()
   name: string;
 
@@ -26,10 +24,10 @@ export class Game extends Document {
   @Prop({ nullable: true })
   endDate?: Date;
 
-  @Prop({ type: [ Types.ObjectId ], ref: Player.name })
+  @Prop({ type: [Types.ObjectId], ref: 'Player' })
   players?: any[];
 
-  @Prop({ type: [ Types.ObjectId ], ref: Submission.name })
+  @Prop({ type: [Types.ObjectId], ref: 'Submission' })
   submissions?: any[];
 }
 

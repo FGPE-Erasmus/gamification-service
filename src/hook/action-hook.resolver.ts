@@ -11,8 +11,7 @@ import { ActionHookDto } from './dto/action-hook.dto';
 export class ActionHookResolver {
   constructor(
     private readonly actionHookService: ActionHookService,
-    private readonly gameService: GameService,
-    private readonly challengeService: ChallengeService,
+    private readonly gameService: GameService, //private readonly challengeService: ChallengeService,
   ) {}
 
   @Query(() => [ActionHookDto])

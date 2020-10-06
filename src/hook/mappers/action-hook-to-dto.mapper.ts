@@ -7,8 +7,10 @@ import { ActionHook } from '../models/action-hook.model';
 
 @Injectable()
 export class ActionHookToDtoMapper implements IMapper<ActionHook, ActionHookDto> {
-
   async transform(obj: ActionHook): Promise<ActionHookDto> {
+    if (!obj) {
+      return undefined;
+    }
     return plainToClass(ActionHookDto, classToPlain(obj, { excludeExtraneousValues: true }));
   }
 }

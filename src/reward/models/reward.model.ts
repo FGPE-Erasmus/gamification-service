@@ -8,14 +8,13 @@ import { RewardType } from './reward-type.enum';
 
 @Schema()
 export class Reward extends Document {
-
-  @Prop({ type: Types.ObjectId, ref: Game.name, required: true })
+  @Prop({ type: Types.ObjectId, ref: 'Game', required: true })
   game: any;
 
-  @Prop({ type: Types.ObjectId, ref: Game.name, nullable: true })
+  @Prop({ type: Types.ObjectId, ref: 'Challenge', nullable: true })
   parentChallenge?: any;
 
-  @Prop({ type: String, enum: RewardType })
+  @Prop({ type: () => String, enum: RewardType })
   kind: RewardType;
 
   @Prop()
@@ -27,7 +26,7 @@ export class Reward extends Document {
   @Prop({ nullable: true })
   image?: string;
 
-  @Prop({ default: () =>  false })
+  @Prop({ default: () => false })
   recurrent: boolean;
 
   @Prop({ default: () => -1 })

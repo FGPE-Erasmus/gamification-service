@@ -7,30 +7,29 @@ import { PlayerRewardDto } from '../../player-reward/dto/player-reward.dto';
 
 @ObjectType('Reward')
 export class RewardDto {
-
   @Field(() => ID)
-  id: string;
+  id?: string;
 
   @Field(() => GameDto)
-  game: GameDto | string;
+  game?: GameDto;
 
   @Field(() => ChallengeDto, { nullable: true })
-  parentChallenge?: ChallengeDto | string;
+  parentChallenge?: ChallengeDto;
 
   @Field(() => RewardType)
-  kind: RewardType;
+  kind?: RewardType;
 
   @Field()
-  name: string;
+  name?: string;
 
   @Field({ nullable: true })
-  description: string;
+  description?: string;
 
   @Field({ nullable: true })
   image?: string;
 
   @Field()
-  recurrent: boolean;
+  recurrent?: boolean;
 
   @Field({ nullable: true })
   cost?: number;
@@ -42,8 +41,8 @@ export class RewardDto {
   message?: string;
 
   @Field(() => [ChallengeDto], { nullable: true })
-  challenges?: ChallengeDto[] | string[];
+  challenges?: ChallengeDto[];
 
   @Field(() => [PlayerRewardDto])
-  players?: PlayerRewardDto[] | string[];
+  players?: PlayerRewardDto[];
 }

@@ -1,34 +1,31 @@
-import { Injectable, LoggerService } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 
 import { BaseService } from '../common/services/base.service';
 import { extractToJson } from '../common/utils/extraction.utils';
-import { Challenge } from '../challenge/models/challenge.model';
 import { GameDto } from '../game/dto/game.dto';
 import { Leaderboard } from './models/leaderboard.model';
-import { LeaderboardRepository } from './repository/leaderboard.repository';
+import { LeaderboardRepository } from './repositories/leaderboard.repository';
 import { LeaderboardInput } from './inputs/leaderboard.input';
 import { LeaderboardDto } from './dto/leaderboard.dto';
 import { LeaderboardToDtoMapper } from './mappers/leaderboard-to-dto.mapper';
 import { LeaderboardToPersistenceMapper } from './mappers/leaderboard-to-persistence.mapper';
-import { RankingDto } from './dto/ranking.dto';
+import { PlayerRankingDto } from './dto/player-ranking.dto';
 import { ChallengeDto } from '../challenge/dto/challenge.dto';
 
 @Injectable()
 export class LeaderboardService extends BaseService<Leaderboard, LeaderboardInput, LeaderboardDto> {
-
   constructor(
-    protected readonly logger: LoggerService,
     protected readonly repository: LeaderboardRepository,
     protected readonly toDtoMapper: LeaderboardToDtoMapper,
     protected readonly toPersistenceMapper: LeaderboardToPersistenceMapper,
   ) {
-    super(logger, repository, toDtoMapper, toPersistenceMapper);
+    super(new Logger(LeaderboardService.name), repository, toDtoMapper, toPersistenceMapper);
   }
 
   async importGEdIL(
     game: GameDto,
     entries: { [path: string]: Buffer },
-    challenge?: ChallengeDto
+    challenge?: ChallengeDto,
   ): Promise<LeaderboardDto> {
     let leaderboard: LeaderboardDto;
     for (const path of Object.keys(entries)) {
@@ -45,7 +42,7 @@ export class LeaderboardService extends BaseService<Leaderboard, LeaderboardInpu
   // TODO instead of maintaining & updating scores in a collection,
   // calculate rankings on-demand
 
-  async getRankings(leaderboardId: string): Promise<RankingDto[]> {
+  async getRankings(leaderboardId: string): Promise<PlayerRankingDto[]> {
     return [];
   }
 

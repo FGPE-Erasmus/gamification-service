@@ -14,18 +14,20 @@ import { ActionHookToDtoMapper } from './mappers/action-hook-to-dto.mapper';
 import { ActionHookToPersistenceMapper } from './mappers/action-hook-to-persistence.mapper';
 import { ScheduledHookToDtoMapper } from './mappers/scheduled-hook-to-dto.mapper';
 import { ScheduledHookToPersistenceMapper } from './mappers/scheduled-hook-to-persistence.mapper';
+import { ActionHookRepository } from './repositories/action-hook.repository';
+import { ScheduledHookRepository } from './repositories/scheduled-hook.repository';
 
 @Module({
   imports: [
-    MongooseModule.forFeatureAsync([
+    MongooseModule.forFeature([
       {
         name: ActionHook.name,
-        useFactory: () => ActionHookSchema
+        schema: ActionHookSchema,
       },
       {
         name: ScheduledHook.name,
-        useFactory: () => ScheduledHookSchema
-      }
+        schema: ScheduledHookSchema,
+      },
     ]),
     forwardRef(() => GameModule),
     forwardRef(() => ChallengeModule),
@@ -35,13 +37,14 @@ import { ScheduledHookToPersistenceMapper } from './mappers/scheduled-hook-to-pe
     ActionHookToPersistenceMapper,
     ScheduledHookToDtoMapper,
     ScheduledHookToPersistenceMapper,
+    ActionHookRepository,
+    ScheduledHookRepository,
     HookService,
     ActionHookService,
     ScheduledHookService,
     ActionHookResolver,
-    ScheduledHookResolver
+    ScheduledHookResolver,
   ],
-  exports: [ HookService, ActionHookService, ScheduledHookService ],
+  exports: [HookService, ActionHookService, ScheduledHookService],
 })
-export class HookModule {
-}
+export class HookModule {}

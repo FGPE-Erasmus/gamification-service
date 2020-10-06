@@ -1,17 +1,15 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
-import { Game } from '../../game/models/game.model';
 import { Difficulty } from './difficulty.enum';
 import { Mode } from './mode.enum';
 
 @Schema()
 export class Challenge extends Document {
-
-  @Prop({ type: Types.ObjectId, ref: Game.name, required: true })
+  @Prop({ type: Types.ObjectId, ref: 'Game', required: true })
   game: any;
 
-  @Prop({ type: Types.ObjectId, ref: Game.name, required: false })
+  @Prop({ type: Types.ObjectId, ref: 'Challenge', required: false })
   parentChallenge?: any;
 
   @Prop()
@@ -20,16 +18,16 @@ export class Challenge extends Document {
   @Prop({ nullable: true })
   description: string;
 
-  @Prop({ type: String, enum: Difficulty, default: () => Difficulty.AVERAGE })
+  @Prop({ type: () => String, enum: Difficulty, default: () => Difficulty.AVERAGE })
   difficulty: Difficulty;
 
-  @Prop({ type: String, enum: Mode, default: () => Mode.NORMAL })
+  @Prop({ type: () => String, enum: Mode, default: () => Mode.NORMAL })
   mode: Mode;
 
-  @Prop({ type: [ String ], default: () => [] })
+  @Prop({ type: () => [String], default: () => [] })
   modeParameters: string[];
 
-  @Prop({ type: [ String ], default: () => [] })
+  @Prop({ type: () => [String], default: () => [] })
   refs: string[];
 
   @Prop({ default: false })

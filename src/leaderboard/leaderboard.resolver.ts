@@ -3,15 +3,12 @@ import { UseGuards } from '@nestjs/common';
 
 import { GqlJwtAuthGuard } from '../common/guards/gql-jwt-auth.guard';
 import { LeaderboardService } from './leaderboard.service';
-import { RankingDto } from './dto/ranking.dto';
+import { PlayerRankingDto } from './dto/player-ranking.dto';
 import { LeaderboardDto } from './dto/leaderboard.dto';
 
-@Resolver(() => LeaderboardDto)
+@Resolver()
 export class LeaderboardResolver {
-
-  constructor(
-    private leaderboardService: LeaderboardService,
-  ) {}
+  constructor(private leaderboardService: LeaderboardService) {}
 
   @Query(() => LeaderboardDto)
   @UseGuards(GqlJwtAuthGuard)
@@ -19,9 +16,9 @@ export class LeaderboardResolver {
     return this.leaderboardService.findAll();
   }
 
-  @Query(() => [RankingDto])
+  @Query(() => [PlayerRankingDto])
   @UseGuards(GqlJwtAuthGuard)
-  async getSorted(@Args() leaderboardId: string): Promise<RankingDto[]> {
+  async getPlayerRankings(@Args('leaderboardId') leaderboardId: string): Promise<PlayerRankingDto[]> {
     return this.leaderboardService.getRankings(leaderboardId);
   }
 

@@ -4,11 +4,10 @@ import graphqlTypeJson from 'graphql-type-json';
 import { PlayerDto } from '../../player/dto/player.dto';
 
 @ObjectType('Ranking')
-export class RankingDto {
-
+export class PlayerRankingDto {
   @Field(() => PlayerDto)
-  player: PlayerDto | string;
+  player?: PlayerDto;
 
   @Field(() => graphqlTypeJson, { defaultValue: () => ({}) })
-  score: Map<string, number>;
+  score?: Map<string, number>;
 }

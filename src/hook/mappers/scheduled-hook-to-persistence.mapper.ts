@@ -6,9 +6,14 @@ import { ScheduledHookInput } from '../inputs/scheduled-hook.input';
 import { ScheduledHook } from '../models/scheduled-hook.model';
 
 @Injectable()
-export class ScheduledHookToPersistenceMapper implements IMapper<ScheduledHookInput | Partial<ScheduledHookInput>, ScheduledHook | Partial<ScheduledHook>> {
-
-  async transform(obj: ScheduledHookInput | Partial<ScheduledHookInput>): Promise<ScheduledHook | Partial<ScheduledHook>> {
+export class ScheduledHookToPersistenceMapper
+  implements IMapper<ScheduledHookInput | Partial<ScheduledHookInput>, ScheduledHook | Partial<ScheduledHook>> {
+  async transform(
+    obj: ScheduledHookInput | Partial<ScheduledHookInput>,
+  ): Promise<ScheduledHook | Partial<ScheduledHook>> {
+    if (!obj) {
+      return undefined;
+    }
     return plainToClass(ScheduledHook, classToPlain(obj, { excludeExtraneousValues: true }));
   }
 }

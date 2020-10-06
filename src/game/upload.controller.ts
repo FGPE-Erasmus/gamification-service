@@ -5,7 +5,7 @@ import 'multer';
 
 import { RestJwtGuard } from '../common/guards/rest-jwt-auth.guard';
 import { RestAdminGuard } from '../common/guards/rest-admin.guard';
-import GameInput from './inputs/game.input';
+import { GameInput } from './inputs/game.input';
 import { GameService } from './game.service';
 import { GameDto } from './dto/game.dto';
 

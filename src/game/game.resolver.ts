@@ -3,11 +3,11 @@ import { NotFoundException, UseGuards } from '@nestjs/common';
 
 import { GqlJwtAuthGuard } from '../common/guards/gql-jwt-auth.guard';
 import { GqlAdminGuard } from '../common/guards/gql-admin.guard';
-import ImportGameArgs from './args/import-game.args';
+import { ImportGameArgs } from './args/import-game.args';
 import { GameService } from './game.service';
 import { GameDto } from './dto/game.dto';
 
-@Resolver()
+@Resolver(() => GameDto)
 export class GameResolver {
   constructor(private gameService: GameService) {}
 
@@ -21,7 +21,6 @@ export class GameResolver {
         description: input.description,
         startDate: input.startDate,
         endDate: input.endDate,
-
       },
       createReadStream(),
     );

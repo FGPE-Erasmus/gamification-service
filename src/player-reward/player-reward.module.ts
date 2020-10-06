@@ -14,11 +14,11 @@ import { PlayerReward, PlayerRewardSchema } from './models/player-reward.model';
 
 @Module({
   imports: [
-    MongooseModule.forFeatureAsync([
+    MongooseModule.forFeature([
       {
         name: PlayerReward.name,
-        useFactory: () => PlayerRewardSchema
-      }
+        schema: PlayerRewardSchema,
+      },
     ]),
     BullModule.registerQueueAsync({
       name: 'hooksQueue',
@@ -30,8 +30,7 @@ import { PlayerReward, PlayerRewardSchema } from './models/player-reward.model';
     forwardRef(() => PlayerModule),
     forwardRef(() => RewardModule),
   ],
-  providers: [ PlayerRewardRepository, PlayerRewardService ],
-  exports: [ PlayerRewardService ],
+  providers: [PlayerRewardRepository, PlayerRewardService],
+  exports: [PlayerRewardService],
 })
-export class PlayerRewardModule {
-}
+export class PlayerRewardModule {}

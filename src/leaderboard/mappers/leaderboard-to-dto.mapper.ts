@@ -5,11 +5,12 @@ import { IMapper } from '../../common/interfaces/mapper.interface';
 import { Leaderboard } from '../models/leaderboard.model';
 import { LeaderboardDto } from '../dto/leaderboard.dto';
 
-
 @Injectable()
 export class LeaderboardToDtoMapper implements IMapper<Leaderboard, LeaderboardDto> {
-
   async transform(obj: Leaderboard): Promise<LeaderboardDto> {
+    if (!obj) {
+      return undefined;
+    }
     return plainToClass(LeaderboardDto, classToPlain(obj, { excludeExtraneousValues: true }));
   }
 
@@ -21,5 +22,4 @@ export class LeaderboardToDtoMapper implements IMapper<Leaderboard, LeaderboardD
       return this.playerToDtoMapper.transform(player);
     }));
   }*/
-
 }

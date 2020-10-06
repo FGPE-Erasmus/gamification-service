@@ -1,23 +1,21 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
-import { Game } from '../../game/models/game.model';
 import { ActionEmbed as Action } from './embedded/action.embed';
 import { CriteriaEmbed as Criteria } from './embedded/criteria.embed';
 
 @Schema()
 export class ScheduledHook extends Document {
-
-  @Prop({ type: Types.ObjectId, ref: Game.name, required: true })
+  @Prop({ type: Types.ObjectId, ref: 'Game', required: true })
   game: any;
 
-  @Prop({ type: Types.ObjectId, ref: Game.name, nullable: true })
+  @Prop({ type: Types.ObjectId, ref: 'Challenge', nullable: true })
   parentChallenge?: any;
 
-  @Prop({ nullable: true })
+  @Prop({ type: () => Criteria, nullable: true })
   criteria?: Criteria;
 
-  @Prop({ default: () => [] })
+  @Prop({ type: () => [Action], default: () => [] })
   actions: Action[];
 
   @Prop()

@@ -1,30 +1,28 @@
 import { Field, HideField, ID, ObjectType } from '@nestjs/graphql';
 
 import { EmailScalar as Email } from '../../common/scalars/email.scalar';
-import { Player } from '../../player/models/player.model';
-import { Role } from '../models/role.enum';
 import { PlayerDto } from '../../player/dto/player.dto';
+import { Role } from '../models/role.enum';
 
 @ObjectType('User')
 export class UserDto {
-
   @Field(() => ID)
-  id: string;
+  id?: string;
 
   @Field()
-  name: string;
+  name?: string;
 
   @Field()
-  username: string;
+  username?: string;
 
   @Field(() => Email)
-  email: string;
+  email?: string;
 
   @HideField()
-  password: string;
+  password?: string;
 
-  @Field(() => [ Role ])
-  roles: Role[];
+  @Field(() => [Role])
+  roles?: Role[];
 
   @Field({ nullable: true })
   photo?: string;
@@ -36,14 +34,14 @@ export class UserDto {
   birthDate?: Date;
 
   @Field()
-  active: boolean;
+  active?: boolean;
 
-  @Field(() => Date)
+  @Field(() => Date, { nullable: true })
   createdAt?: Date;
 
-  @Field(() => Date)
+  @Field(() => Date, { nullable: true })
   updatedAt?: Date;
 
-  @Field(() => [ PlayerDto ])
-  registrations: PlayerDto[];
+  @Field(() => [PlayerDto], { nullable: true })
+  registrations?: PlayerDto[];
 }

@@ -7,21 +7,20 @@ import { Result } from '../models/result.enum';
 
 @ObjectType('Submission')
 export class SubmissionDto {
-
   @Field(() => ID)
-  id: string;
+  id?: string;
 
   @Field(() => GameDto)
-  game: GameDto | string;
+  game?: GameDto;
 
   @Field(() => PlayerDto)
-  player: PlayerDto | string;
+  player?: PlayerDto;
 
   @Field()
-  exerciseId: string;
+  exerciseId?: string;
 
   @Field(() => graphqlTypeJson, { nullable: true })
-  metrics: Map<string, any>;
+  metrics?: Map<string, any>;
 
   @Field(() => Result, { nullable: true })
   result?: Result;
@@ -33,7 +32,7 @@ export class SubmissionDto {
   feedback?: string;
 
   @Field()
-  submittedAt: Date;
+  submittedAt?: Date;
 
   @Field({ nullable: true })
   evaluatedAt?: Date;

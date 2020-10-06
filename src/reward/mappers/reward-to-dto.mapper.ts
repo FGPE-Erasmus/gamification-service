@@ -7,8 +7,10 @@ import { Reward } from '../models/reward.model';
 
 @Injectable()
 export class RewardToDtoMapper implements IMapper<Reward, RewardDto> {
-
   async transform(obj: Reward): Promise<RewardDto> {
+    if (!obj) {
+      return undefined;
+    }
     return plainToClass(RewardDto, classToPlain(obj, { excludeExtraneousValues: true }));
   }
 }

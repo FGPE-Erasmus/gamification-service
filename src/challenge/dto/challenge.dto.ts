@@ -1,44 +1,41 @@
 import { Field, ID, ObjectType } from '@nestjs/graphql';
 
-import { Game } from '../../game/models/game.model';
-import { Challenge } from '../models/challenge.model';
 import { Difficulty } from '../models/difficulty.enum';
 import { Mode } from '../models/mode.enum';
 import { GameDto } from '../../game/dto/game.dto';
 
 @ObjectType('Challenge')
 export class ChallengeDto {
-
   @Field(() => ID)
-  id: string;
+  id?: string;
 
-  @Field(() => Game)
-  game: GameDto | string;
+  @Field(() => GameDto)
+  game?: GameDto;
 
-  @Field(() => Challenge, { nullable: true })
-  parentChallenge?: ChallengeDto | string;
+  @Field(() => ChallengeDto, { nullable: true })
+  parentChallenge?: ChallengeDto;
 
   @Field()
-  name: string;
+  name?: string;
 
   @Field({ nullable: true })
   description?: string;
 
   @Field(() => Difficulty)
-  difficulty: Difficulty;
+  difficulty?: Difficulty;
 
   @Field(() => Mode)
-  mode: Mode;
+  mode?: Mode;
 
   @Field(() => [String])
-  modeParameters: string[];
+  modeParameters?: string[];
 
   @Field(() => [String])
-  refs: string[];
+  refs?: string[];
 
   @Field()
-  locked: boolean;
+  locked?: boolean;
 
   @Field()
-  hidden: boolean;
+  hidden?: boolean;
 }

@@ -12,7 +12,6 @@ import LoginResultDto from './dto/login-result.dto';
 
 @Injectable()
 export class AuthService {
-
   constructor(
     @Inject(forwardRef(() => UsersService)) protected readonly usersService: UsersService,
     protected readonly jwtService: JwtService,
@@ -24,13 +23,9 @@ export class AuthService {
    * @param credentials sent for validation
    */
   async login(credentials: LoginArgs): Promise<LoginResultDto | undefined> {
-
-    let user = await this.usersService.findOneByEmail(credentials.login);
+    const user = await this.usersService.findOneByLogin(credentials.login);
     if (!user) {
-      user = await this.usersService.findOneByUsername(credentials.login);
-      if (!user) {
-        throw Error('Email or password incorrect');
-      }
+      throw Error('Email or password incorrect');
     }
 
     if (!user.active) {
@@ -47,7 +42,7 @@ export class AuthService {
     return {
       token: jwt,
       expiresIn: appConfig.jwt.expirationTime,
-      user
+      user,
     };
   }
 
@@ -87,7 +82,7 @@ export class AuthService {
    * @param {id: string} payload
    * @returns {(Promise<User | undefined>)} returns undefined if there is no
    * user or the account is not enabled
-   * @memberof AuthService
+   * @memberOf AuthService
    */
   async validateJwtPayload({ id }: { id: string }): Promise<UserDto | undefined> {
     // user has already logged in and has a JWT (let's check)
@@ -96,7 +91,7 @@ export class AuthService {
     // the user exists and their account isn't disabled
     if (user && user.active) {
       user.updatedAt = new Date();
-      return this.usersService.update(user.id, user);
+      return this.usersService.patch(user.id, user);
     }
 
     return undefined;

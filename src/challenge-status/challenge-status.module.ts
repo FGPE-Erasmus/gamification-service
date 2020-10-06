@@ -8,15 +8,15 @@ import { ChallengeStatusResolver } from './challenge-status.resolver';
 import { ChallengeStatus, ChallengeStatusSchema } from './models/challenge-status.model';
 import { ChallengeStatusRepository } from './repositories/challenge-status.repository';
 import { ChallengeStatusToDtoMapper } from './mappers/challenge-status-to-dto.mapper';
-import { ChallengeToPersistenceMapper } from '../challenge/mappers/challenge-to-persistence.mapper';
+import { ChallengeStatusToPersistenceMapper } from './mappers/challenge-status-to-persistence.mapper';
 
 @Module({
   imports: [
-    MongooseModule.forFeatureAsync([
+    MongooseModule.forFeature([
       {
         name: ChallengeStatus.name,
-        useFactory: () => ChallengeStatusSchema
-      }
+        schema: ChallengeStatusSchema,
+      },
     ]),
     BullModule.registerQueueAsync({
       name: 'hooksQueue',
@@ -25,10 +25,10 @@ import { ChallengeToPersistenceMapper } from '../challenge/mappers/challenge-to-
   ],
   providers: [
     ChallengeStatusToDtoMapper,
-    ChallengeToPersistenceMapper,
+    ChallengeStatusToPersistenceMapper,
     ChallengeStatusRepository,
     ChallengeStatusService,
-    ChallengeStatusResolver
+    ChallengeStatusResolver,
   ],
   exports: [ChallengeStatusService],
 })

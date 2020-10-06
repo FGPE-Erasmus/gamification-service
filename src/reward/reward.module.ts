@@ -3,7 +3,6 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { BullModule } from '@nestjs/bull';
 
 import { QueueConfigService } from '../queue.config';
-import { ServiceHelper } from '../common/helpers/service.helper';
 import { ChallengeModule } from '../challenge/challenge.module';
 import { GameModule } from '../game/game.module';
 import { HookModule } from '../hook/hook.module';
@@ -19,14 +18,17 @@ import { VirtualItemResolver } from './virtual-item.resolver';
 import { UnlockResolver } from './unlock.resolver';
 import { RevealResolver } from './reveal.resolver';
 import { Reward, RewardSchema } from './models/reward.model';
+import { RewardRepository } from './repositories/reward.repository';
+import { RewardToDtoMapper } from './mappers/reward-to-dto.mapper';
+import { RewardToPersistenceMapper } from './mappers/reward-to-persistence.mapper';
 
 @Module({
   imports: [
-    MongooseModule.forFeatureAsync([
+    MongooseModule.forFeature([
       {
         name: Reward.name,
-        useFactory: () => RewardSchema
-      }
+        schema: RewardSchema,
+      },
     ]),
     BullModule.registerQueueAsync({
       name: 'hooksQueue',
@@ -38,7 +40,9 @@ import { Reward, RewardSchema } from './models/reward.model';
     PlayerModule,
   ],
   providers: [
-    ServiceHelper,
+    RewardToDtoMapper,
+    RewardToPersistenceMapper,
+    RewardRepository,
     RewardService,
     RewardResolver,
     BadgeResolver,

@@ -6,7 +6,6 @@ import { Role } from '../models/role.enum';
 
 @InputType()
 export class UserInput {
-
   @Field()
   @MinLength(4)
   @MaxLength(200)
@@ -31,7 +30,11 @@ export class UserInput {
   @IsOptional()
   birthDate?: Date;
 
-  @Field(() => [ Role ], { nullable: true, defaultValue: [ Role.USER ] })
+  @Field({ nullable: true })
+  @IsOptional()
+  photo?: string;
+
+  @Field(() => [Role], { nullable: true, defaultValue: [Role.USER] })
   @IsOptional()
   @IsArray()
   @IsEnum(Role, { each: true })
@@ -40,4 +43,7 @@ export class UserInput {
   @Field({ nullable: true })
   @MinLength(6)
   password?: string;
+
+  @Field()
+  active?: boolean;
 }

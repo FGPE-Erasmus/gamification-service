@@ -6,11 +6,10 @@ import { Reward } from '../../reward/models/reward.model';
 
 @Schema()
 export class PlayerReward extends Document {
-
-  @Prop({ type: Types.ObjectId, ref: Player.name })
+  @Prop({ type: Types.ObjectId, ref: 'Player' })
   player: Player;
 
-  @Prop({ type: Types.ObjectId, ref: Reward.name })
+  @Prop({ type: Types.ObjectId, ref: 'Reward' })
   reward: Reward;
 
   @Prop({ default: 1 })

@@ -8,18 +8,17 @@ import { ActionEmbedDto } from './embedded/action.dto';
 
 @ObjectType('ActionHook')
 export class ActionHookDto {
-
   @Field(() => ID)
-  id: string;
+  id?: string;
 
   @Field(() => GameDto)
-  game: GameDto | string;
+  game?: GameDto;
 
   @Field(() => ChallengeDto, { nullable: true })
-  parentChallenge?: string;
+  parentChallenge?: ChallengeDto;
 
   @Field(() => TriggerEvent)
-  trigger: TriggerEvent;
+  trigger?: TriggerEvent;
 
   @Field({ nullable: true })
   sourceId?: string;
@@ -28,13 +27,13 @@ export class ActionHookDto {
   criteria?: CriteriaEmbedDto;
 
   @Field(() => [ActionEmbedDto])
-  actions: ActionEmbedDto[];
+  actions?: ActionEmbedDto[];
 
   @Field()
-  recurrent: boolean;
+  recurrent?: boolean;
 
   @Field()
-  active: boolean;
+  active?: boolean;
 
   @Field({ nullable: true })
   lastRun?: Date;

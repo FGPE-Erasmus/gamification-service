@@ -6,9 +6,12 @@ import { LeaderboardInput } from '../inputs/leaderboard.input';
 import { Leaderboard } from '../models/leaderboard.model';
 
 @Injectable()
-export class LeaderboardToPersistenceMapper implements IMapper<LeaderboardInput | Partial<LeaderboardInput>, Leaderboard | Partial<Leaderboard>> {
-
+export class LeaderboardToPersistenceMapper
+  implements IMapper<LeaderboardInput | Partial<LeaderboardInput>, Leaderboard | Partial<Leaderboard>> {
   async transform(obj: LeaderboardInput | Partial<LeaderboardInput>): Promise<Leaderboard | Partial<Leaderboard>> {
+    if (!obj) {
+      return undefined;
+    }
     return plainToClass(Leaderboard, classToPlain(obj, { excludeExtraneousValues: true }));
   }
 }

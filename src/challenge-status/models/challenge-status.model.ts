@@ -7,7 +7,6 @@ import { State } from './state.enum';
 
 @Schema()
 export class ChallengeStatus extends Document {
-
   @Prop({ type: Types.ObjectId, ref: Player.name, required: true })
   player: any;
 
@@ -23,7 +22,7 @@ export class ChallengeStatus extends Document {
   @Prop({ nullable: true })
   endedAt?: Date;
 
-  @Prop({ type: String, enum: State, default: () => State.AVAILABLE })
+  @Prop({ type: () => String, enum: State, default: () => State.AVAILABLE })
   state: State;
 }
 

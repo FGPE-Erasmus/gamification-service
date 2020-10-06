@@ -6,9 +6,12 @@ import { PlayerInput } from '../inputs/player.input';
 import { Player } from '../models/player.model';
 
 @Injectable()
-export class PlayerToPersistenceMapper implements IMapper<PlayerInput | Partial<PlayerInput>, Player | Partial<Player>> {
-
+export class PlayerToPersistenceMapper
+  implements IMapper<PlayerInput | Partial<PlayerInput>, Player | Partial<Player>> {
   async transform(obj: PlayerInput | Partial<PlayerInput>): Promise<Player | Partial<Player>> {
+    if (!obj) {
+      return undefined;
+    }
     return plainToClass(Player, classToPlain(obj, { excludeExtraneousValues: true }));
   }
 }

@@ -1,4 +1,4 @@
-import { Injectable, LoggerService } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
@@ -7,11 +7,7 @@ import { ScheduledHook } from '../models/scheduled-hook.model';
 
 @Injectable()
 export class ScheduledHookRepository extends BaseRepository<ScheduledHook> {
-
-  constructor(
-    protected readonly logger: LoggerService,
-    @InjectModel(ScheduledHook.name) protected readonly model: Model<ScheduledHook>
-  ) {
-    super(logger, model);
+  constructor(@InjectModel(ScheduledHook.name) protected readonly model: Model<ScheduledHook>) {
+    super(new Logger(ScheduledHookRepository.name), model);
   }
 }

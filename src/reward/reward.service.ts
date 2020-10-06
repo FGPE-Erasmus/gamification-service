@@ -1,4 +1,4 @@
-import { Injectable, LoggerService } from '@nestjs/common';
+import { Injectable, Logger, LoggerService } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 
@@ -14,16 +14,14 @@ import { PlayerService } from '../player/player.service';
 import { RewardType } from './models/reward-type.enum';
 import { Reward } from './models/reward.model';
 import { RewardDto } from './dto/reward.dto';
-import { RewardRepository } from './repository/reward.repository';
+import { RewardRepository } from './repositories/reward.repository';
 import { RewardInput } from './inputs/reward.input';
 import { RewardToDtoMapper } from './mappers/reward-to-dto.mapper';
 import { RewardToPersistenceMapper } from './mappers/reward-to-persistence.mapper';
 
 @Injectable()
 export class RewardService extends BaseService<Reward, RewardInput, RewardDto> {
-
   constructor(
-    protected readonly logger: LoggerService,
     protected readonly repository: RewardRepository,
     protected readonly toDtoMapper: RewardToDtoMapper,
     protected readonly toPersistenceMapper: RewardToPersistenceMapper,
@@ -31,7 +29,7 @@ export class RewardService extends BaseService<Reward, RewardInput, RewardDto> {
     protected readonly playerService: PlayerService,
     protected readonly actionHookService: ActionHookService,
   ) {
-    super(logger, repository, toDtoMapper, toPersistenceMapper);
+    super(new Logger(RewardService.name), repository, toDtoMapper, toPersistenceMapper);
   }
 
   /**
@@ -43,11 +41,7 @@ export class RewardService extends BaseService<Reward, RewardInput, RewardDto> {
    *                              appended (if any).
    * @returns {Promise<Reward | undefined>} the imported reward.
    */
-  async importGEdIL(
-    game: GameDto,
-    entries: { [path: string]: Buffer },
-    challenge?: ChallengeDto,
-  ): Promise<RewardDto> {
+  async importGEdIL(game: GameDto, entries: { [path: string]: Buffer }, challenge?: ChallengeDto): Promise<RewardDto> {
     if (!('metadata.json' in entries)) {
       return;
     }
@@ -72,7 +66,7 @@ export class RewardService extends BaseService<Reward, RewardInput, RewardDto> {
         actions: [
           {
             type: CategoryEnum.GIVE,
-            parameters: [ reward.id.toString() ],
+            parameters: [reward.id.toString()],
           },
         ],
         recurrent: false,
@@ -191,10 +185,10 @@ export class RewardService extends BaseService<Reward, RewardInput, RewardDto> {
   }
 
   toPersistence(input: RewardInput | Partial<RewardInput>): Reward | Promise<Reward> {
-    throw new Error("Method not implemented.");
+    throw new Error('Method not implemented.');
   }
 
   toDto(doc: Reward): RewardDto | Promise<RewardDto> {
-    throw new Error("Method not implemented.");
+    throw new Error('Method not implemented.');
   }
 }

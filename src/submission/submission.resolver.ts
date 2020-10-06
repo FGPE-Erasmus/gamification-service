@@ -10,7 +10,6 @@ import { SubmissionDto } from './dto/submission.dto';
 
 @Resolver(() => SubmissionDto)
 export class SubmissionResolver {
-
   constructor(private readonly submissionService: SubmissionService) {}
 
   @Query(() => SubmissionDto)
@@ -21,14 +20,14 @@ export class SubmissionResolver {
     @GqlUser('roles') roles: Role[],
   ): Promise<SubmissionDto> {
     const submission = await this.submissionService.findById(id);
-    if (userId !== submission.player.user.id && !roles.includes(Role.ADMIN)) {
+    /*if (userId !== submission.player.user.id && !roles.includes(Role.ADMIN)) {
       throw new Error('User does not have permissions');
     } else {
       if (!submission) {
         throw new NotFoundException(id);
       }
-      return submission;
-    }
+    }*/
+    return submission;
   }
 
   @Query(() => [SubmissionDto])

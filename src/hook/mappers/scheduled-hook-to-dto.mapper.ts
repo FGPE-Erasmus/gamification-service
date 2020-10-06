@@ -7,8 +7,10 @@ import { ScheduledHookDto } from '../dto/scheduled-hook.dto';
 
 @Injectable()
 export class ScheduledHookToDtoMapper implements IMapper<ScheduledHook, ScheduledHookDto> {
-
   async transform(obj: ScheduledHook): Promise<ScheduledHookDto> {
+    if (!obj) {
+      return undefined;
+    }
     return plainToClass(ScheduledHookDto, classToPlain(obj, { excludeExtraneousValues: true }));
   }
 }

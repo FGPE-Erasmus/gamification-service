@@ -3,8 +3,7 @@ import { Type } from 'class-transformer';
 import { MinLength, MaxLength, IsString, IsOptional, IsArray, IsDate, IsUUID } from 'class-validator';
 
 @InputType()
-export default class GameInput {
-
+export class GameInput {
   @Field()
   @IsString()
   @MinLength(2)

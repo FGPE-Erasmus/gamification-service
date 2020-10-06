@@ -9,23 +9,22 @@ import { ChallengeStatus } from '../../challenge-status/models/challenge-status.
 
 @Schema()
 export class Player extends Document {
-
-  @Prop({ type: Types.ObjectId, ref: User.name })
+  @Prop({ type: Types.ObjectId, ref: 'User' })
   user: any;
 
-  @Prop({ type: Types.ObjectId, ref: Game.name })
+  @Prop({ type: Types.ObjectId, ref: 'Game' })
   game: any;
 
   @Prop({ default: () => 0 })
   points: number;
 
-  @Prop({ type: [ Types.ObjectId ], ref: Submission.name })
+  @Prop({ type: [Types.ObjectId], ref: 'Submission' })
   submissions: any[];
 
-  @Prop({ type: [ Types.ObjectId ], ref: ChallengeStatus.name })
+  @Prop({ type: [Types.ObjectId], ref: 'ChallengeStatus' })
   learningPath: any[];
 
-  @Prop({ type: [ Types.ObjectId ], ref: PlayerReward.name })
+  @Prop({ type: [Types.ObjectId], ref: 'PlayerReward' })
   rewards: any[];
 }
 

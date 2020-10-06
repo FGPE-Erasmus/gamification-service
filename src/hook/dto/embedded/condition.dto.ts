@@ -2,22 +2,21 @@ import { Field, ObjectType, PartialType } from '@nestjs/graphql';
 
 @ObjectType('Condition')
 export class ConditionEmbedDto {
+  @Field()
+  order?: number;
 
   @Field()
-  order: number;
+  leftEntity?: string;
 
   @Field()
-  leftEntity: string;
+  leftProperty?: string;
 
   @Field()
-  leftProperty: string;
+  comparingFunction?: string;
 
   @Field()
-  comparingFunction: string;
+  rightEntity?: string;
 
   @Field()
-  rightEntity: string;
-
-  @Field()
-  rightProperty: string;
+  rightProperty?: string;
 }

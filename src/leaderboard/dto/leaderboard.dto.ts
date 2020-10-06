@@ -6,22 +6,21 @@ import { SortingOrder } from '../models/sorting.enum';
 
 @ObjectType('Leaderboard')
 export class LeaderboardDto {
-
   @Field(() => ID)
-  id: string;
+  id?: string;
 
   @Field(() => GameDto)
-  game: GameDto | string;
+  game?: GameDto;
 
   @Field(() => ChallengeDto, { nullable: true })
-  parentChallenge?: ChallengeDto | string;
+  parentChallenge?: ChallengeDto;
 
   @Field()
-  name: string;
+  name?: string;
 
   @Field(() => [String])
-  metrics: string[];
+  metrics?: string[];
 
   @Field(() => [SortingOrder])
-  sortingOrders: SortingOrder[];
+  sortingOrders?: SortingOrder[];
 }

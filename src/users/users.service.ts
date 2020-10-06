@@ -1,4 +1,4 @@
-import { Injectable, LoggerService, OnModuleInit } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
 
 import { BaseService } from '../common/services/base.service';
@@ -13,28 +13,47 @@ import { UserToPersistenceMapper } from './mappers/user-to-persistence.mapper';
 
 @Injectable()
 export class UsersService extends BaseService<User, UserInput, UserDto> implements OnModuleInit {
-
   constructor(
-    protected readonly logger: LoggerService,
     protected readonly repository: UserRepository,
     protected readonly toDtoMapper: UserToDtoMapper,
     protected readonly toPersistenceMapper: UserToPersistenceMapper,
   ) {
-    super(logger, repository, toDtoMapper, toPersistenceMapper);
+    super(new Logger(UsersService.name), repository, toDtoMapper, toPersistenceMapper);
   }
 
   async onModuleInit(): Promise<void> {
     const admin: UserDto = await this.findOneByUsername('admin');
-    if ( !admin ) {
-      await this.repository.save({
+    this.logger.error(admin);
+    if (!admin) {
+      const saved = await this.repository.save({
         name: 'Administrator',
         username: 'admin',
         email: 'admin@fgpe-gs.com',
         password: await bcrypt.hash('4dm1nS.', 10),
-        roles: [ Role.ADMIN ],
+        roles: [Role.ADMIN],
         active: true,
-      })
+      });
+      this.logger.error(saved);
     }
+  }
+
+  /**
+   * Returns a user by their unique username/email address or undefined
+   *
+   * @param {string} login address of user, not case sensitive, or username
+   * @returns {(Promise<UserDto | undefined>)}
+   * @memberOf UsersService
+   */
+  async findOneByLogin(login: string): Promise<UserDto> {
+    let user = await this.findOneByEmail(login);
+    if (!user) {
+      user = await this.findOneByUsername(login);
+      if (!user) {
+        return undefined;
+      }
+      return user;
+    }
+    return user;
   }
 
   /**
@@ -101,28 +120,24 @@ export class UsersService extends BaseService<User, UserInput, UserDto> implemen
       throw new Error(`Username is a mandatory field.`);
     }
 
-    const fields: { [k: string]: any } = { ...data };
-
     let newUser: UserDto;
     if (!id) {
-      // set active on create
-      fields.active = true;
       // create user
-      newUser = await this.create(data);
+      newUser = await this.create({ ...data, active: true });
     } else {
       // update user
       newUser = await this.patch(id, data);
     }
 
     // encrypt password if sent
-    let password: string
+    let password: string;
     if (data.password) {
       password = await bcrypt.hash(data.password, 10);
     } else if (!id) {
       newUser.password = await bcrypt.hash(generatePassword(20), 10);
     }
 
-    if ( password ) {
+    if (password) {
       newUser = await this.patch(newUser.id, { password });
     }
 

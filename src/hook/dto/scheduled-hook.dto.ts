@@ -7,24 +7,23 @@ import { ActionEmbedDto } from './embedded/action.dto';
 
 @ObjectType('ScheduledHook')
 export class ScheduledHookDto {
-
   @Field(() => ID)
-  id: string;
+  id?: string;
 
   @Field(() => GameDto)
-  game: GameDto | string;
+  game?: GameDto;
 
   @Field(() => ChallengeDto, { nullable: true })
-  parentChallenge?: ChallengeDto | string;
+  parentChallenge?: ChallengeDto;
 
   @Field(() => CriteriaEmbedDto, { nullable: true })
   criteria?: CriteriaEmbedDto;
 
   @Field(() => [ActionEmbedDto])
-  actions: ActionEmbedDto[];
+  actions?: ActionEmbedDto[];
 
   @Field()
-  recurrent: boolean;
+  recurrent?: boolean;
 
   @Field({ nullable: true })
   cron?: string;
@@ -33,7 +32,7 @@ export class ScheduledHookDto {
   interval?: number;
 
   @Field()
-  active: boolean;
+  active?: boolean;
 
   @Field({ nullable: true })
   lastRun?: Date;

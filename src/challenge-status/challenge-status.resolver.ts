@@ -6,16 +6,13 @@ import { ChallengeStatusService } from './challenge-status.service';
 import { ChallengeStatus } from './models/challenge-status.model';
 import { ChallengeStatusDto } from './dto/challenge-status.dto';
 
-@Resolver()
+@Resolver(() => ChallengeStatusDto)
 export class ChallengeStatusResolver {
   constructor(private challengeStatusService: ChallengeStatusService) {}
 
-  @Query(() => ChallengeStatus)
+  @Query(() => ChallengeStatusDto)
   @UseGuards(GqlJwtAuthGuard)
-  async get(
-    @Args('playerId') playerId: string,
-    @Args('challengeId') challengeId: string
-  ): Promise<ChallengeStatusDto> {
+  async get(@Args('playerId') playerId: string, @Args('challengeId') challengeId: string): Promise<ChallengeStatusDto> {
     return this.challengeStatusService.findByChallengeIdAndPlayerId(challengeId, playerId);
   }
 }

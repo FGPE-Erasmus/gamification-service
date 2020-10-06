@@ -15,15 +15,10 @@ import { ChallengeToPersistenceMapper } from './mappers/challenge-to-persistence
 
 @Module({
   imports: [
-    MongooseModule.forFeatureAsync([
-      {
-        name: Challenge.name,
-        useFactory: () => ChallengeSchema
-      }
-    ]),
+    MongooseModule.forFeature([{ name: Challenge.name, schema: ChallengeSchema }]),
     forwardRef(() => GameModule),
     HookModule,
-    LeaderboardModule,
+    forwardRef(() => LeaderboardModule),
     forwardRef(() => RewardModule),
   ],
   providers: [
@@ -31,7 +26,7 @@ import { ChallengeToPersistenceMapper } from './mappers/challenge-to-persistence
     ChallengeToPersistenceMapper,
     ChallengeRepository,
     ChallengeService,
-    ChallengeResolver
+    ChallengeResolver,
   ],
   exports: [ChallengeService],
 })

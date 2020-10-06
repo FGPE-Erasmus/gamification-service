@@ -1,12 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
-import { Player } from '../../player/models/player.model';
 import { Role } from './role.enum';
 
 @Schema()
 export class User extends Document {
-
   @Prop()
   name: string;
 
@@ -16,10 +14,10 @@ export class User extends Document {
   @Prop({ required: true, unique: true })
   email: string;
 
-  @Prop({ required: true, select: false })
+  @Prop({ required: true })
   password?: string;
 
-  @Prop({ type: [ String ], enum: Role, default: [ Role.USER ] })
+  @Prop({ type: () => [String], enum: Role, default: () => [Role.USER] })
   roles: Role[];
 
   @Prop()
@@ -36,7 +34,7 @@ export class User extends Document {
 
   @Prop({
     type: [Types.ObjectId],
-    ref: Player.name
+    ref: 'Player',
   })
   registrations: any[];
 }

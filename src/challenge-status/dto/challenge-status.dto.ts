@@ -6,15 +6,14 @@ import { State } from '../models/state.enum';
 
 @ObjectType('ChallengeStatus')
 export class ChallengeStatusDto {
-
   @Field(() => ID)
-  id: string;
+  id?: string;
 
   @Field(() => PlayerDto)
-  player: PlayerDto | string;
+  player?: PlayerDto;
 
   @Field(() => ChallengeDto)
-  challenge: ChallengeDto | string;
+  challenge?: ChallengeDto;
 
   @Field({ nullable: true })
   startedAt?: Date;
@@ -26,5 +25,5 @@ export class ChallengeStatusDto {
   endedAt?: Date;
 
   @Field(() => State)
-  state: State;
+  state?: State;
 }

@@ -3,13 +3,12 @@ import { Query, Mutation, Args, Resolver, ID } from '@nestjs/graphql';
 
 import { GqlAdminGuard } from '../common/guards/gql-admin.guard';
 import { GqlJwtAuthGuard } from '../common/guards/gql-jwt-auth.guard';
-import { User } from './models/user.model';
 import { UserInput } from './inputs/user.input';
 import { UpsertUserArgs } from './args/upsert-user.args';
 import { UsersService } from './users.service';
 import { UserDto } from './dto/user.dto';
 
-@Resolver(() => User)
+@Resolver(() => UserDto)
 export class UsersResolver {
   constructor(private readonly usersService: UsersService) {}
 

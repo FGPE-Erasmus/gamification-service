@@ -1,7 +1,7 @@
-import { Prop } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
+@Schema()
 export class ConditionEmbed {
-
   @Prop()
   order: number;
 
@@ -20,3 +20,5 @@ export class ConditionEmbed {
   @Prop()
   rightProperty: string;
 }
+
+export const ConditionEmbedSchema = SchemaFactory.createForClass(ConditionEmbed);

@@ -4,12 +4,11 @@ import { SubmissionDto } from '../../submission/dto/submission.dto';
 
 @ObjectType('Game')
 export class GameDto {
-
   @Field(() => ID)
-  readonly id: string;
+  id?: string;
 
   @Field()
-  name: string;
+  name?: string;
 
   @Field({ nullable: true })
   description?: string;

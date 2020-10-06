@@ -16,7 +16,6 @@ import { ChallengeModule } from './challenge/challenge.module';
 import { ChallengeStatusModule } from './challenge-status/challenge-status.module';
 import { SubmissionModule } from './submission/submission.module';
 import { LeaderboardModule } from './leaderboard/leaderboard.module';
-import { PlayerLeaderboardModule } from './player-leaderboard/player-leaderboard.module';
 import { PlayerModule } from './player/player.module';
 import { ProcessorModule } from './consumers/processor.module';
 import { HookModule } from './hook/hook.module';
@@ -37,8 +36,10 @@ import { QueueConfigService } from './queue.config';
           connection.plugin(require('mongoose-autopopulate'));
           // eslint-disable-next-line @typescript-eslint/no-var-requires
           connection.plugin(require('mongoose-timestamp'));
-        }
-      })
+          return connection;
+        },
+        useFindAndModify: false,
+      }),
     }),
     GraphQLModule.forRoot({
       context: ({ req, res }) => ({ req, res }),
@@ -52,20 +53,18 @@ import { QueueConfigService } from './queue.config';
       name: 'hooksQueue',
       useClass: QueueConfigService,
     }),
-    RewardModule,
-    ProcessorModule,
+    // ProcessorModule,
     HealthModule,
     AuthModule,
     UsersModule,
     GameModule,
-    ChallengeModule,
-    ChallengeStatusModule,
-    LeaderboardModule,
-    PlayerLeaderboardModule,
+    // ChallengeModule,
+    // ChallengeStatusModule,
+    // LeaderboardModule,
     PlayerModule,
     SubmissionModule,
-    RewardModule,
-    HookModule,
+    // RewardModule,
+    // HookModule,
   ],
   providers: [DateScalar, EmailScalar],
 })

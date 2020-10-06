@@ -5,16 +5,15 @@ import { RewardDto } from '../../reward/dto/reward.dto';
 
 @ObjectType('PlayerReward')
 export class PlayerRewardDto {
-
   @Field(() => ID)
-  id: string;
+  id?: string;
 
   @Field(() => PlayerDto)
-  player: PlayerDto;
+  player?: PlayerDto;
 
   @Field(() => RewardDto)
-  reward: RewardDto;
+  reward?: RewardDto;
 
   @Field()
-  count: number;
+  count?: number;
 }
