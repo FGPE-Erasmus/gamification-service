@@ -5,7 +5,6 @@ import { LeaderboardInput } from '../inputs/leaderboard.input';
 
 @ArgsType()
 export class UpsertLeaderboardArgs {
-
   @Field(() => ID, { nullable: true })
   @IsOptional()
   @IsMongoId()

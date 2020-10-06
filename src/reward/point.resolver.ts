@@ -8,7 +8,6 @@ import { RewardResolver } from './reward.resolver';
 
 @Resolver(() => PointDto)
 export class PointResolver extends RewardResolver {
-
   @Query(() => [PointDto])
   @UseGuards(GqlJwtAuthGuard)
   async points(): Promise<PointDto[]> {

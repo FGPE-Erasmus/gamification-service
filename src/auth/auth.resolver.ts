@@ -1,7 +1,6 @@
 import { Args, Resolver, Mutation } from '@nestjs/graphql';
 import { Response } from 'express';
 
-import { User } from '../users/models/user.model';
 import { GqlResponse } from '../common/decorators/gql-response.decorator';
 import { UserDto } from '../users/dto/user.dto';
 import { AuthService } from './auth.service';

@@ -8,7 +8,6 @@ import { RewardResolver } from './reward.resolver';
 
 @Resolver(() => CouponDto)
 export class CouponResolver extends RewardResolver {
-
   @Query(() => [CouponDto])
   @UseGuards(GqlJwtAuthGuard)
   async coupons(): Promise<CouponDto[]> {

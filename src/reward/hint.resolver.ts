@@ -8,7 +8,6 @@ import { RewardResolver } from './reward.resolver';
 
 @Resolver(() => HintDto)
 export class HintResolver extends RewardResolver {
-
   @Query(() => [HintDto])
   @UseGuards(GqlJwtAuthGuard)
   async hints(): Promise<HintDto[]> {

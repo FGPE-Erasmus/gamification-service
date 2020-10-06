@@ -5,7 +5,6 @@ import { EmailScalar as Email } from '../../common/scalars/email.scalar';
 
 @ArgsType()
 export default class SignupArgs {
-
   @Field()
   @MinLength(4)
   @MaxLength(200)

@@ -5,15 +5,10 @@ import { IRepository } from '../interfaces/repository.interface';
 import { toMongoId } from '../utils/mongo.utils';
 
 export class BaseRepository<E extends Document> implements IRepository<E> {
-
-  protected constructor(
-    protected readonly logger: LoggerService,
-    protected readonly model: Model<E>
-  ) {
-  }
+  protected constructor(protected readonly logger: LoggerService, protected readonly model: Model<E>) {}
 
   async exists(doc: Partial<E>): Promise<boolean> {
-    if ( ! doc._id ) {
+    if (!doc._id) {
       return false;
     }
     return this.model.exists({ _id: doc._id });
@@ -26,15 +21,12 @@ export class BaseRepository<E extends Document> implements IRepository<E> {
   async getById(
     id: string,
     projection: string | Record<string, unknown> = {},
-    options: Record<string, unknown> = {}
+    options: Record<string, unknown> = {},
   ): Promise<E> {
     return this.model.findById(id, projection, options);
   }
 
-  async getAll(
-    projection: string | Record<string, unknown> = {},
-    options: Record<string, unknown> = {}
-  ): Promise<E[]> {
+  async getAll(projection: string | Record<string, unknown> = {}, options: Record<string, unknown> = {}): Promise<E[]> {
     return this.model.find({}, projection, options).exec();
   }
 
@@ -56,15 +48,13 @@ export class BaseRepository<E extends Document> implements IRepository<E> {
 
   async save(doc: Partial<E>, overwrite = true): Promise<any> {
     const exists: boolean = await this.exists(doc);
-    if ( ! exists ) {
+    if (!exists) {
       return new this.model(doc).save();
     } else {
-      if ( ! overwrite ) {
-        return this.model.findByIdAndUpdate(doc._id, doc, { new: true });
+      if (!overwrite) {
+        return this.model.findByIdAndUpdate(doc._id, doc, { new: true, omitUndefined: true });
       } else {
-        return this.model
-          .replaceOne({ _id: doc._id }, doc)
-          .setOptions({ upsert: true });
+        return this.model.replaceOne({ _id: doc._id }, doc).setOptions({ upsert: true });
       }
     }
   }
@@ -76,5 +66,4 @@ export class BaseRepository<E extends Document> implements IRepository<E> {
   async deleteById(id: string): Promise<E> {
     return this.model.findByIdAndRemove(id);
   }
-
 }

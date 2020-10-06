@@ -9,7 +9,11 @@ import { IRepository } from '../interfaces/repository.interface';
 
 @Injectable()
 export class ServiceHelper {
-  async getUpsertData(id: string | undefined, fields: { [k: string]: any }, repository: IRepository<any>): Promise<any> {
+  async getUpsertData(
+    id: string | undefined,
+    fields: { [k: string]: any },
+    repository: IRepository<any>,
+  ): Promise<any> {
     if (id) {
       return {
         ...(await repository.getById(id)),

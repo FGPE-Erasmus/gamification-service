@@ -19,6 +19,7 @@ export class UserToPersistenceMapper implements IMapper<UserInput, User> {
       photo: obj.photo,
       telephone: obj.telephone,
       roles: obj.roles,
+      active: obj.active,
     } as User;
   }
 }

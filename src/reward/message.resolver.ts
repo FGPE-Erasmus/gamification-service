@@ -8,7 +8,6 @@ import { RewardResolver } from './reward.resolver';
 
 @Resolver(() => MessageDto)
 export class MessageResolver extends RewardResolver {
-
   @Query(() => [MessageDto])
   @UseGuards(GqlJwtAuthGuard)
   async messages(): Promise<MessageDto[]> {

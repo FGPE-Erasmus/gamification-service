@@ -5,7 +5,6 @@ import { CategoryEnum as Category } from '../enums/category.enum';
 
 @InputType()
 export class ActionInput {
-
   @Field(() => Category, { defaultValue: [] })
   @IsEnum(Category)
   type: Category;

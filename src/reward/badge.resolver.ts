@@ -8,7 +8,6 @@ import { RewardResolver } from './reward.resolver';
 
 @Resolver(() => BadgeDto)
 export class BadgeResolver extends RewardResolver {
-
   @Query(() => [BadgeDto])
   @UseGuards(GqlJwtAuthGuard)
   async badges(): Promise<BadgeDto[]> {

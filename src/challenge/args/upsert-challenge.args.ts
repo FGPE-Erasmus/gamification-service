@@ -5,7 +5,6 @@ import { ChallengeInput } from '../inputs/challenge.input';
 
 @ArgsType()
 export class UpsertChallengeArgs {
-
   @Field(() => ID, { nullable: true })
   @IsOptional()
   @IsMongoId()

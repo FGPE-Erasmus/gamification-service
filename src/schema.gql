@@ -335,6 +335,26 @@ type Reveal {
   players: [PlayerReward!]!
 }
 
+type ChallengeStatus {
+  id: ID!
+  player: Player!
+  challenge: Challenge!
+  startedAt: Date
+  openedAt: Date
+  endedAt: Date
+  state: State!
+}
+
+enum State {
+  AVAILABLE
+  LOCKED
+  HIDDEN
+  OPENED
+  FAILED
+  COMPLETED
+  REJECTED
+}
+
 type Query {
   user(id: String!): User!
   users: [User!]!
@@ -355,6 +375,7 @@ type Query {
   submission(submissionId: String!): Submission!
   submissions(exerciseId: String!, gameId: String!): [Submission!]!
   game(id: String!): Game!
+  get(challengeId: String!, playerId: String!): ChallengeStatus!
 }
 
 type Mutation {

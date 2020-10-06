@@ -1,10 +1,9 @@
-import { Field, InputType} from '@nestjs/graphql';
+import { Field, InputType } from '@nestjs/graphql';
 
 import { RewardType } from '../models/reward-type.enum';
 
 @InputType()
 export class RewardInput {
-
   @Field()
   game: string;
 
@@ -40,5 +39,4 @@ export class RewardInput {
 
   @Field({ nullable: true })
   players?: string[];
-
 }

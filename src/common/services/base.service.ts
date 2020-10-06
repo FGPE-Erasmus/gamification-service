@@ -7,14 +7,12 @@ import { toMongoId } from '../utils/mongo.utils';
 import { IMapper } from '../interfaces/mapper.interface';
 
 export abstract class BaseService<E extends Document, I, O> implements IService<E, I, O> {
-
   protected constructor(
     protected readonly logger: LoggerService,
     protected readonly repository: IRepository<E>,
     protected readonly toDtoMapper: IMapper<E, O>,
     protected readonly toPersistenceMapper: IMapper<I | Partial<I>, E | Partial<E>>,
-  ) {
-  }
+  ) {}
 
   async create(input: I): Promise<O> {
     const doc: Partial<E> = await this.toPersistenceMapper.transform(input);
@@ -39,7 +37,7 @@ export abstract class BaseService<E extends Document, I, O> implements IService<
   async findById(
     id: string,
     projection?: string | Record<string, unknown>,
-    options?: Record<string, unknown>
+    options?: Record<string, unknown>,
   ): Promise<O> {
     const savedDoc: E = await this.repository.getById(id, projection, options);
     return this.toDtoMapper.transform(savedDoc);
@@ -48,7 +46,7 @@ export abstract class BaseService<E extends Document, I, O> implements IService<
   async findOne(
     conditions: Partial<Record<keyof E, unknown>>,
     projection?: string | Record<string, unknown>,
-    options?: Record<string, unknown>
+    options?: Record<string, unknown>,
   ): Promise<O> {
     const savedDoc: E = await this.repository.findOne(conditions, projection, options);
     return this.toDtoMapper.transform(savedDoc);
@@ -57,10 +55,10 @@ export abstract class BaseService<E extends Document, I, O> implements IService<
   async findAll(
     conditions?: Partial<Record<keyof E, unknown>>,
     projection?: string | Record<string, unknown>,
-    options?: Record<string, unknown>
+    options?: Record<string, unknown>,
   ): Promise<O[]> {
     let docs: E[];
-    if ( conditions ) {
+    if (conditions) {
       docs = await this.repository.findAll(conditions, projection, options);
     } else {
       docs = await this.repository.getAll(projection, options);
@@ -75,5 +73,4 @@ export abstract class BaseService<E extends Document, I, O> implements IService<
     const savedDoc: E = await this.repository.deleteById(id);
     return this.toDtoMapper.transform(savedDoc);
   }
-
 }

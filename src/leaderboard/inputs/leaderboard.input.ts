@@ -3,7 +3,6 @@ import { SortingOrder } from '../models/sorting.enum';
 
 @InputType()
 export class LeaderboardInput {
-
   @Field()
   game: string;
 

@@ -5,7 +5,6 @@ import { Result } from '../models/result.enum';
 
 @InputType()
 export class ReportInput {
-
   @Field()
   result: Result;
 

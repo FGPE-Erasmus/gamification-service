@@ -1,7 +1,6 @@
 import { Document } from 'mongoose';
 
 export interface IRepository<E extends Document> {
-
   /**
    * Check if the document is already saved in the database.
    *
@@ -23,11 +22,7 @@ export interface IRepository<E extends Document> {
    * @param projection the projections to apply in the query.
    * @param options the query options.
    */
-  getById(
-    id: string,
-    projection?: string | Record<string, unknown>,
-    options?: Record<string, unknown>
-  ): Promise<E>;
+  getById(id: string, projection?: string | Record<string, unknown>, options?: Record<string, unknown>): Promise<E>;
 
   /**
    * Get all documents in collection.
@@ -35,10 +30,7 @@ export interface IRepository<E extends Document> {
    * @param projection the projections to apply in the query.
    * @param options the query options.
    */
-  getAll(
-    projection?: string | Record<string, unknown>,
-    options?: Record<string, unknown>
-  ): Promise<E[]>;
+  getAll(projection?: string | Record<string, unknown>, options?: Record<string, unknown>): Promise<E[]>;
 
   /**
    * Find a document matching the given criteria.
@@ -50,7 +42,7 @@ export interface IRepository<E extends Document> {
   findOne(
     conditions: Partial<Record<keyof E, unknown>>,
     projection?: string | Record<string, unknown>,
-    options?: Record<string, unknown>
+    options?: Record<string, unknown>,
   ): Promise<E>;
 
   /**
@@ -63,7 +55,7 @@ export interface IRepository<E extends Document> {
   findAll(
     conditions?: Partial<Record<keyof E, unknown>>,
     projection?: string | Record<string, unknown>,
-    options?: Record<string, unknown>
+    options?: Record<string, unknown>,
   ): Promise<E[]>;
 
   /**

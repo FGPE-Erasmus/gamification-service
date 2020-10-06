@@ -4,7 +4,6 @@ import { State } from '../models/state.enum';
 
 @InputType()
 export class ChallengeStatusInput {
-
   @Field()
   player: string;
 

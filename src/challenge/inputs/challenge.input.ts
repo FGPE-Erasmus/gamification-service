@@ -6,7 +6,6 @@ import { Mode } from '../models/mode.enum';
 
 @InputType()
 export class ChallengeInput {
-
   @Field()
   @IsMongoId()
   game: string;

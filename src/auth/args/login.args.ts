@@ -3,7 +3,6 @@ import { MinLength, MaxLength } from 'class-validator';
 
 @ArgsType()
 export default class LoginArgs {
-
   @Field()
   @MinLength(4)
   @MaxLength(200)

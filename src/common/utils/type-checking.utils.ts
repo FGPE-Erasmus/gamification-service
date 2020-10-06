@@ -1,4 +1,3 @@
-
 /**
  * Check if a given value is of type number.
  *

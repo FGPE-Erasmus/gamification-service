@@ -2,7 +2,6 @@ import { Field, InputType } from '@nestjs/graphql';
 
 @InputType()
 export class SendSubmissionInput {
-
   @Field()
   id: string;
 

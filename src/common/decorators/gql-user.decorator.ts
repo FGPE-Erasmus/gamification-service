@@ -1,7 +1,7 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 
-import { User as User } from '../../users/models/user.model';
+import { User } from '../../users/models/user.model';
 
 /**
  * Decorator to extract user from request.
