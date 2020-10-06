@@ -1,16 +1,14 @@
 import { Injectable } from '@nestjs/common';
 
 import { extractToJson } from '../common/utils/extraction.utils';
+import { Challenge } from '../challenge/models/challenge.model';
+import { Game } from '../game/models/game.model';
 import { TriggerKindEnum as TriggerKind } from './enums/trigger-kind.enum';
 import { ScheduledHookService } from './scheduled-hook.service';
 import { ActionHookService } from './action-hook.service';
-import { ActionHookDto } from './dto/action-hook.dto';
-import { ScheduledHookDto } from './dto/scheduled-hook.dto';
-import { ScheduledHookInput } from './inputs/scheduled-hook.input';
-import { ActionHookInput } from './inputs/action-hook.input';
 import { ConditionInput } from './inputs/condition.input';
-import { ChallengeDto } from '../challenge/dto/challenge.dto';
-import { GameDto } from '../game/dto/game.dto';
+import { ScheduledHook } from './models/scheduled-hook.model';
+import { ActionHook } from './models/action-hook.model';
 
 @Injectable()
 export class HookService {
@@ -20,18 +18,18 @@ export class HookService {
   ) {}
 
   async importGEdIL(
-    game: GameDto,
+    game: Game,
     entries: { [path: string]: Buffer },
-    parentChallenge?: ChallengeDto,
-  ): Promise<(ScheduledHookDto | ActionHookDto)[] | undefined> {
-    const hooks: (ScheduledHookDto | ActionHookDto)[] = [];
+    parentChallenge?: Challenge,
+  ): Promise<(ScheduledHook | ActionHook)[] | undefined> {
+    const hooks: (ScheduledHook | ActionHook)[] = [];
 
     for (const path of Object.keys(entries)) {
       const encodedContent = extractToJson(entries[path]);
 
       const triggers = encodedContent.triggers;
       for (const trigger of triggers) {
-        let hook: ScheduledHookDto | ActionHookDto;
+        let hook: ScheduledHook | ActionHook;
 
         const data: { [key: string]: any } = {
           game: game.id?.toString(),
@@ -49,7 +47,7 @@ export class HookService {
             ...data,
             trigger: trigger.event,
             sourceId: trigger.parameters[0],
-          } as ActionHookInput);
+          } as ActionHook);
         } else if (trigger.kind === TriggerKind.SCHEDULED) {
           if (trigger.event === 'INTERVAL') {
             data.interval = parseInt(trigger.parameters[0]);
@@ -58,7 +56,7 @@ export class HookService {
           }
           hook = await this.scheduledHookService.create({
             ...data,
-          } as ScheduledHookInput);
+          } as ScheduledHook);
         }
         hooks.push(hook);
       }
@@ -70,9 +68,9 @@ export class HookService {
   /**
    * Find all hooks.
    *
-   * @returns {Promise<(ActionHookDto | ScheduledHookDto)[]>} the hooks.
+   * @returns {Promise<(ActionHook | ScheduledHook)[]>} the hooks.
    */
-  async findAll(): Promise<(ActionHookDto | ScheduledHookDto)[]> {
+  async findAll(): Promise<(ActionHook | ScheduledHook)[]> {
     return [...(await this.actionHookService.findAll()), ...(await this.scheduledHookService.findAll())];
   }
 
@@ -80,11 +78,11 @@ export class HookService {
    * Finds an hook by its ID.
    *
    * @param {string} id of the hook
-   * @returns {(Promise<ActionHookDto | ScheduledHookDto | undefined>)}
-   * @memberof ChallengeService
+   * @returns {(Promise<ActionHook | ScheduledHook | undefined>)}
+   * @memberOf ChallengeService
    */
-  async findOne(id: string): Promise<ActionHookDto | ScheduledHookDto | undefined> {
-    let hook: ActionHookDto | ScheduledHookDto = await this.actionHookService.findOne(id);
+  async findOne(id: string): Promise<ActionHook | ScheduledHook | undefined> {
+    let hook: ActionHook | ScheduledHook = await this.actionHookService.findOne(id);
     if (!hook) {
       hook = await this.scheduledHookService.findOne(id);
     }

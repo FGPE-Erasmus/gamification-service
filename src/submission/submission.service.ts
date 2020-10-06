@@ -17,9 +17,10 @@ import { SubmissionInput } from './inputs/submission.input';
 import { SubmissionToDtoMapper } from './mappers/submission-to-dto.mapper';
 import { SubmissionToPersistenceMapper } from './mappers/submission-to-persistence.mapper';
 import { TriggerEventEnum, TriggerEventEnum as TriggerEvent } from '../hook/enums/trigger-event.enum';
+import { Player } from '../player/models/player.model';
 
 @Injectable()
-export class SubmissionService extends BaseService<Submission, SubmissionInput, SubmissionDto> {
+export class SubmissionService extends BaseService<Submission> {
   constructor(
     protected readonly repository: SubmissionRepository,
     protected readonly toDtoMapper: SubmissionToDtoMapper,
@@ -27,11 +28,11 @@ export class SubmissionService extends BaseService<Submission, SubmissionInput, 
     @InjectQueue('hooksQueue') protected readonly hooksQueue: Queue,
     protected readonly playerService: PlayerService,
   ) {
-    super(new Logger(SubmissionService.name), repository, toDtoMapper, toPersistenceMapper);
+    super(new Logger(SubmissionService.name), repository);
   }
 
-  async findByUser(gameId: string, userId: string, exerciseId?: string): Promise<SubmissionDto[]> {
-    const player: PlayerDto = await this.playerService.findByGameAndUser(gameId, userId);
+  async findByUser(gameId: string, userId: string, exerciseId?: string): Promise<Submission[]> {
+    const player: Player = await this.playerService.findByGameAndUser(gameId, userId);
     const query: Partial<Record<keyof Submission, any>> = {
       player: player.id,
     };
@@ -41,12 +42,12 @@ export class SubmissionService extends BaseService<Submission, SubmissionInput, 
     return this.findAll(query);
   }
 
-  async sendSubmission(input: SendSubmissionInput): Promise<SubmissionDto> {
-    const submission: SubmissionDto = await super.create({
+  async sendSubmission(input: SendSubmissionInput): Promise<Submission> {
+    const submission: Submission = await super.create({
       game: input.game,
       player: input.player,
       exerciseId: input.exerciseId,
-    });
+    } as Submission);
 
     // TODO submit student's attempt to Evaluation Engine
     try {
@@ -70,9 +71,9 @@ export class SubmissionService extends BaseService<Submission, SubmissionInput, 
     return null;
   }
 
-  async onSubmissionEvaluated(id: string, data: ReportInput): Promise<SubmissionDto> {
+  async onSubmissionEvaluated(id: string, data: ReportInput): Promise<Submission> {
     // save result
-    const submission: SubmissionDto = await this.patch(id, {
+    const submission: Submission = await this.patch(id, {
       ...data,
     });
 

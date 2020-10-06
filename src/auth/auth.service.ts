@@ -5,6 +5,7 @@ import * as bcrypt from 'bcryptjs';
 import { appConfig } from '../app.config';
 import { UserDto } from '../users/dto/user.dto';
 import { Role } from '../users/models/role.enum';
+import { User } from '../users/models/user.model';
 import { UsersService } from '../users/users.service';
 import SignupArgs from './args/signup.args';
 import LoginArgs from './args/login.args';
@@ -86,14 +87,13 @@ export class AuthService {
    * user or the account is not enabled
    * @memberOf AuthService
    */
-  async validateJwtPayload({ id }: { id: string }): Promise<UserDto | undefined> {
+  async validateJwtPayload({ id }: { id: string }): Promise<User | undefined> {
     // user has already logged in and has a JWT (let's check)
     const user = await this.usersService.findById(id);
 
     // the user exists and their account isn't disabled
     if (user && user.active) {
-      user.updatedAt = new Date();
-      return this.usersService.patch(user.id, user);
+      return await this.usersService.patch(user.id, { lastActivityAt: new Date() });
     }
 
     return undefined;
@@ -106,7 +106,7 @@ export class AuthService {
    * @returns {string} the generated JWT
    * @memberof AuthService
    */
-  createJwt(user: UserDto): string {
+  createJwt(user: User): string {
     return this.jwtService.sign({
       id: user.id,
     });

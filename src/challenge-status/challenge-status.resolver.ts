@@ -3,7 +3,6 @@ import { UseGuards } from '@nestjs/common';
 
 import { GqlJwtAuthGuard } from '../common/guards/gql-jwt-auth.guard';
 import { ChallengeStatusService } from './challenge-status.service';
-import { ChallengeStatus } from './models/challenge-status.model';
 import { ChallengeStatusDto } from './dto/challenge-status.dto';
 
 @Resolver(() => ChallengeStatusDto)

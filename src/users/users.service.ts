@@ -8,22 +8,15 @@ import { UserInput } from './inputs/user.input';
 import { Role } from './models/role.enum';
 import { UserDto } from './dto/user.dto';
 import { UserRepository } from './repositories/user.repository';
-import { UserToDtoMapper } from './mappers/user-to-dto.mapper';
-import { UserToPersistenceMapper } from './mappers/user-to-persistence.mapper';
 
 @Injectable()
-export class UsersService extends BaseService<User, UserInput, UserDto> implements OnModuleInit {
-  constructor(
-    protected readonly repository: UserRepository,
-    protected readonly toDtoMapper: UserToDtoMapper,
-    protected readonly toPersistenceMapper: UserToPersistenceMapper,
-  ) {
-    super(new Logger(UsersService.name), repository, toDtoMapper, toPersistenceMapper);
+export class UsersService extends BaseService<User> implements OnModuleInit {
+  constructor(protected readonly repository: UserRepository) {
+    super(new Logger(UsersService.name), repository);
   }
 
   async onModuleInit(): Promise<void> {
     const admin: UserDto = await this.findOneByUsername('admin');
-    this.logger.error(admin);
     if (!admin) {
       const saved = await this.repository.save({
         name: 'Administrator',
@@ -44,7 +37,7 @@ export class UsersService extends BaseService<User, UserInput, UserDto> implemen
    * @returns {(Promise<UserDto | undefined>)}
    * @memberOf UsersService
    */
-  async findOneByLogin(login: string): Promise<UserDto> {
+  async findOneByLogin(login: string): Promise<User> {
     let user = await this.findOneByEmail(login);
     if (!user) {
       user = await this.findOneByUsername(login);
@@ -63,7 +56,7 @@ export class UsersService extends BaseService<User, UserInput, UserDto> implemen
    * @returns {(Promise<User | undefined>)}
    * @memberOf UsersService
    */
-  async findOneByEmail(email: string): Promise<UserDto> {
+  async findOneByEmail(email: string): Promise<User> {
     const user = await this.findOne({ email: email.toLowerCase() });
     if (user) {
       return user;
@@ -78,7 +71,7 @@ export class UsersService extends BaseService<User, UserInput, UserDto> implemen
    * @returns {(Promise<User | undefined>)}
    * @memberOf UsersService
    */
-  async findOneByUsername(username: string): Promise<UserDto> {
+  async findOneByUsername(username: string): Promise<User> {
     const user = await this.findOne({ username: username.toLowerCase() });
     if (user) {
       return user;
@@ -92,7 +85,7 @@ export class UsersService extends BaseService<User, UserInput, UserDto> implemen
    * @param id of the user to update (if any)
    * @param data to update
    */
-  async upsert(id: string | undefined, data: UserInput): Promise<UserDto> {
+  async upsert(id: string | undefined, data: UserInput): Promise<User> {
     const { email, username } = data;
 
     let userExists: User;
@@ -101,7 +94,7 @@ export class UsersService extends BaseService<User, UserInput, UserDto> implemen
       userExists = await this.repository.findOne({
         email,
       });
-      if (userExists && id !== userExists.id.toHexString()) {
+      if (userExists && id !== userExists._id.toHexString()) {
         throw new Error(`E-mail ${email} is already in use.`);
       }
     } else if (!id) {
@@ -113,14 +106,14 @@ export class UsersService extends BaseService<User, UserInput, UserDto> implemen
       userExists = await this.repository.findOne({
         username,
       });
-      if (userExists && id !== userExists.id.toHexString()) {
+      if (userExists && id !== userExists._id.toHexString()) {
         throw new Error(`Username ${username} is already in use.`);
       }
     } else if (!id) {
       throw new Error(`Username is a mandatory field.`);
     }
 
-    let newUser: UserDto;
+    let newUser: User;
     if (!id) {
       // create user
       newUser = await this.create({ ...data, active: true });
@@ -134,7 +127,7 @@ export class UsersService extends BaseService<User, UserInput, UserDto> implemen
     if (data.password) {
       password = await bcrypt.hash(data.password, 10);
     } else if (!id) {
-      newUser.password = await bcrypt.hash(generatePassword(20), 10);
+      password = await bcrypt.hash(generatePassword(20), 10);
     }
 
     if (password) {
@@ -145,7 +138,7 @@ export class UsersService extends BaseService<User, UserInput, UserDto> implemen
     return newUser;
   }
 
-  async delete(id: string): Promise<UserDto> {
+  async delete(id: string): Promise<User> {
     return super.delete(id, true);
   }
 

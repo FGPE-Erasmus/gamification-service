@@ -2,32 +2,26 @@ import { Injectable, Logger } from '@nestjs/common';
 
 import { BaseService } from '../common/services/base.service';
 import { extractToJson } from '../common/utils/extraction.utils';
-import { GameDto } from '../game/dto/game.dto';
+import { Challenge } from '../challenge/models/challenge.model';
+import { Game } from '../game/models/game.model';
 import { Leaderboard } from './models/leaderboard.model';
 import { LeaderboardRepository } from './repositories/leaderboard.repository';
-import { LeaderboardInput } from './inputs/leaderboard.input';
-import { LeaderboardDto } from './dto/leaderboard.dto';
 import { LeaderboardToDtoMapper } from './mappers/leaderboard-to-dto.mapper';
 import { LeaderboardToPersistenceMapper } from './mappers/leaderboard-to-persistence.mapper';
 import { PlayerRankingDto } from './dto/player-ranking.dto';
-import { ChallengeDto } from '../challenge/dto/challenge.dto';
 
 @Injectable()
-export class LeaderboardService extends BaseService<Leaderboard, LeaderboardInput, LeaderboardDto> {
+export class LeaderboardService extends BaseService<Leaderboard> {
   constructor(
     protected readonly repository: LeaderboardRepository,
     protected readonly toDtoMapper: LeaderboardToDtoMapper,
     protected readonly toPersistenceMapper: LeaderboardToPersistenceMapper,
   ) {
-    super(new Logger(LeaderboardService.name), repository, toDtoMapper, toPersistenceMapper);
+    super(new Logger(LeaderboardService.name), repository);
   }
 
-  async importGEdIL(
-    game: GameDto,
-    entries: { [path: string]: Buffer },
-    challenge?: ChallengeDto,
-  ): Promise<LeaderboardDto> {
-    let leaderboard: LeaderboardDto;
+  async importGEdIL(game: Game, entries: { [path: string]: Buffer }, challenge?: Challenge): Promise<Leaderboard> {
+    let leaderboard: Leaderboard;
     for (const path of Object.keys(entries)) {
       const encodedContent = extractToJson(entries[path]);
       leaderboard = await this.create({

@@ -1,4 +1,4 @@
-import { Injectable, Logger, LoggerService } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 
 import { BaseService } from '../common/services/base.service';
 import { Player } from '../player/models/player.model';
@@ -7,14 +7,12 @@ import { Reward } from '../reward/models/reward.model';
 import { RewardType } from '../reward/models/reward-type.enum';
 import { RewardRepository } from '../reward/repositories/reward.repository';
 import { PlayerReward } from './models/player-reward.model';
-import { PlayerRewardDto } from './dto/player-reward.dto';
-import { PlayerRewardInput } from './inputs/player-reward.input';
 import { PlayerRewardRepository } from './repositories/player-reward.repository';
 import { PlayerRewardToDtoMapper } from './mappers/player-reward-to-dto.mapper';
 import { PlayerRewardToPersistenceMapper } from './mappers/player-reward-to-persistence.mapper';
 
 @Injectable()
-export class PlayerRewardService extends BaseService<PlayerReward, PlayerRewardInput, PlayerRewardDto> {
+export class PlayerRewardService extends BaseService<PlayerReward> {
   constructor(
     protected readonly repository: PlayerRewardRepository,
     protected readonly toDtoMapper: PlayerRewardToDtoMapper,
@@ -22,7 +20,7 @@ export class PlayerRewardService extends BaseService<PlayerReward, PlayerRewardI
     protected readonly playerRepository: PlayerRepository,
     protected readonly rewardRepository: RewardRepository,
   ) {
-    super(new Logger(PlayerRewardService.name), repository, toDtoMapper, toPersistenceMapper);
+    super(new Logger(PlayerRewardService.name), repository);
   }
 
   async grantReward(reward: Reward, player: Player): Promise<any> {

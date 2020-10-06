@@ -14,8 +14,8 @@ export class Submission extends Document {
   @Prop()
   exerciseId: string;
 
-  @Prop(raw({ type: Types.Map, of: String }))
-  metrics: Map<string, any>;
+  @Prop(raw({ type: Types.Map, of: String, default: () => ({}) }))
+  metrics?: Map<string, any>;
 
   @Prop({ type: () => String, enum: Result })
   result?: Result;
@@ -27,7 +27,7 @@ export class Submission extends Document {
   feedback?: string;
 
   @Prop({ type: Date, default: () => Date.now() })
-  submittedAt: Date;
+  submittedAt?: Date;
 
   @Prop({ type: Date, nullable: true })
   evaluatedAt?: Date;

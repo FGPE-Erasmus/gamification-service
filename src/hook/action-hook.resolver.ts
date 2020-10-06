@@ -1,9 +1,9 @@
 import { UseGuards } from '@nestjs/common';
-import { Parent, Query, ResolveProperty, Resolver } from '@nestjs/graphql';
+import { Query, Resolver } from '@nestjs/graphql';
 
 import { GqlJwtAuthGuard } from '../common/guards/gql-jwt-auth.guard';
-import { GameService } from '../game/game.service';
 import { ChallengeService } from '../challenge/challenge.service';
+import { GameService } from '../game/game.service';
 import { ActionHookService } from './action-hook.service';
 import { ActionHookDto } from './dto/action-hook.dto';
 
@@ -11,7 +11,8 @@ import { ActionHookDto } from './dto/action-hook.dto';
 export class ActionHookResolver {
   constructor(
     private readonly actionHookService: ActionHookService,
-    private readonly gameService: GameService, //private readonly challengeService: ChallengeService,
+    private readonly gameService: GameService,
+    private readonly challengeService: ChallengeService,
   ) {}
 
   @Query(() => [ActionHookDto])

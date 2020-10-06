@@ -3,6 +3,7 @@ import { Document, FilterQuery, Model } from 'mongoose';
 
 import { IRepository } from '../interfaces/repository.interface';
 import { toMongoId } from '../utils/mongo.utils';
+import { pick } from '../utils/object.utils';
 
 export class BaseRepository<E extends Document> implements IRepository<E> {
   protected constructor(protected readonly logger: LoggerService, protected readonly model: Model<E>) {}
@@ -52,9 +53,17 @@ export class BaseRepository<E extends Document> implements IRepository<E> {
       return new this.model(doc).save();
     } else {
       if (!overwrite) {
-        return this.model.findByIdAndUpdate(doc._id, doc, { new: true, omitUndefined: true });
+        return this.model.findByIdAndUpdate(
+          doc._id,
+          { ...doc },
+          {
+            new: true,
+            omitUndefined: true,
+            useFindAndModify: false,
+          },
+        );
       } else {
-        return this.model.replaceOne({ _id: doc._id }, doc).setOptions({ upsert: true });
+        return this.model.replaceOne({ _id: doc._id }, new this.model(doc)).setOptions({ upsert: true });
       }
     }
   }

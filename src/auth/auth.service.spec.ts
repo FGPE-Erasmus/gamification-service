@@ -1,10 +1,12 @@
 import { ObjectID } from 'mongodb';
 import { JwtModule } from '@nestjs/jwt';
+import { getModelToken } from '@nestjs/mongoose';
 import { PassportModule } from '@nestjs/passport';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as bcrypt from 'bcryptjs';
 
 import { appConfig } from '../app.config';
+import { UserDto } from '../users/dto/user.dto';
 import { UsersService } from '../users/users.service';
 import { UserRepository } from '../users/repositories/user.repository';
 import { Role } from '../users/models/role.enum';
@@ -13,10 +15,16 @@ import { AuthResolver } from './auth.resolver';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import SignupArgs from './args/signup.args';
 import LoginResultDto from './dto/login-result.dto';
-import { UserDto } from '../users/dto/user.dto';
 
 describe('AuthService', () => {
   let service: AuthService;
+
+  function mockUserModel(dto: any) {
+    this.data = dto;
+    this.save = () => {
+      return this.data;
+    };
+  }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -32,7 +40,17 @@ describe('AuthService', () => {
           },
         }),
       ],
-      providers: [AuthService, AuthResolver, JwtStrategy, UsersService, UserRepository],
+      providers: [
+        {
+          provide: getModelToken('User'),
+          useValue: mockUserModel,
+        },
+        AuthService,
+        AuthResolver,
+        JwtStrategy,
+        UsersService,
+        UserRepository,
+      ],
     }).compile();
 
     service = module.get<AuthService>(AuthService);

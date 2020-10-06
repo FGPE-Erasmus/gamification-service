@@ -18,7 +18,7 @@ export class User extends Document {
   password?: string;
 
   @Prop({ type: () => [String], enum: Role, default: () => [Role.USER] })
-  roles: Role[];
+  roles?: Role[];
 
   @Prop()
   photo?: string;
@@ -32,11 +32,14 @@ export class User extends Document {
   @Prop()
   active: boolean;
 
+  @Prop()
+  lastActivityAt?: Date;
+
   @Prop({
     type: [Types.ObjectId],
     ref: 'Player',
   })
-  registrations: any[];
+  registrations?: any[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

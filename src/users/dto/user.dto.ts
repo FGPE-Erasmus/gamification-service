@@ -37,6 +37,9 @@ export class UserDto {
   active?: boolean;
 
   @Field(() => Date, { nullable: true })
+  lastActivityAt?: Date;
+
+  @Field(() => Date, { nullable: true })
   createdAt?: Date;
 
   @Field(() => Date, { nullable: true })

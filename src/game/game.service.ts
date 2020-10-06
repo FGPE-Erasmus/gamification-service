@@ -11,12 +11,11 @@ import { RewardService } from '../reward/reward.service';
 import { GameInput } from './inputs/game.input';
 import { Game } from './models/game.model';
 import { GameRepository } from './repositories/game.repository';
-import { GameDto } from './dto/game.dto';
 import { GameToDtoMapper } from './mappers/game-to-dto.mapper';
 import { GameToPersistenceMapper } from './mappers/game-to-persistence.mapper';
 
 @Injectable()
-export class GameService extends BaseService<Game, GameInput, GameDto> {
+export class GameService extends BaseService<Game> {
   constructor(
     protected readonly repository: GameRepository,
     protected readonly toDtoMapper: GameToDtoMapper,
@@ -26,7 +25,7 @@ export class GameService extends BaseService<Game, GameInput, GameDto> {
     protected readonly leaderboardService: LeaderboardService,
     protected readonly hookService: HookService,
   ) {
-    super(new Logger(GameService.name), repository, toDtoMapper, toPersistenceMapper);
+    super(new Logger(GameService.name), repository);
   }
 
   /**
@@ -35,8 +34,8 @@ export class GameService extends BaseService<Game, GameInput, GameDto> {
    * @param {GameInput} input the game attributes
    * @param {Readable} gedilStream a read stream to the GEdIL specification package.
    */
-  async importGEdILArchive(input: GameInput, gedilStream: Readable): Promise<GameDto | undefined> {
-    let game: GameDto;
+  async importGEdILArchive(input: GameInput, gedilStream: Readable): Promise<Game | undefined> {
+    let game: Game;
     const entries = { challenges: {}, leaderboards: {}, rewards: {}, rules: {} };
 
     const zip = gedilStream.pipe(Parse({ forceStream: true }));

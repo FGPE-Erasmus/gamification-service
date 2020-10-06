@@ -128,6 +128,7 @@ type User {
   telephone: String
   birthDate: Date
   active: Boolean!
+  lastActivityAt: Date
   createdAt: Date
   updatedAt: Date
   registrations: [Player!]
@@ -397,7 +398,7 @@ input UserInput {
   photo: String
   roles: [Role!] = [USER]
   password: String
-  active: Boolean!
+  active: Boolean
 }
 
 input SendSubmissionInput {

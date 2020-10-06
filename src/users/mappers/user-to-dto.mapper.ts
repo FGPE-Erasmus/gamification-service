@@ -21,6 +21,7 @@ export class UserToDtoMapper implements IMapper<User, UserDto> {
       telephone: obj.telephone,
       roles: obj.roles,
       active: obj.active,
+      lastActivityAt: obj.lastActivityAt,
       registrations: obj.registrations,
       createdAt: obj['createdAt'],
       updatedAt: obj['updatedAt'],

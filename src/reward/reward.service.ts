@@ -18,9 +18,11 @@ import { RewardRepository } from './repositories/reward.repository';
 import { RewardInput } from './inputs/reward.input';
 import { RewardToDtoMapper } from './mappers/reward-to-dto.mapper';
 import { RewardToPersistenceMapper } from './mappers/reward-to-persistence.mapper';
+import { Game } from '../game/models/game.model';
+import { Challenge } from '../challenge/models/challenge.model';
 
 @Injectable()
-export class RewardService extends BaseService<Reward, RewardInput, RewardDto> {
+export class RewardService extends BaseService<Reward> {
   constructor(
     protected readonly repository: RewardRepository,
     protected readonly toDtoMapper: RewardToDtoMapper,
@@ -29,7 +31,7 @@ export class RewardService extends BaseService<Reward, RewardInput, RewardDto> {
     protected readonly playerService: PlayerService,
     protected readonly actionHookService: ActionHookService,
   ) {
-    super(new Logger(RewardService.name), repository, toDtoMapper, toPersistenceMapper);
+    super(new Logger(RewardService.name), repository);
   }
 
   /**
@@ -41,7 +43,7 @@ export class RewardService extends BaseService<Reward, RewardInput, RewardDto> {
    *                              appended (if any).
    * @returns {Promise<Reward | undefined>} the imported reward.
    */
-  async importGEdIL(game: GameDto, entries: { [path: string]: Buffer }, challenge?: ChallengeDto): Promise<RewardDto> {
+  async importGEdIL(game: Game, entries: { [path: string]: Buffer }, challenge?: Challenge): Promise<Reward> {
     if (!('metadata.json' in entries)) {
       return;
     }
@@ -49,7 +51,7 @@ export class RewardService extends BaseService<Reward, RewardInput, RewardDto> {
     const encodedContent = extractToJson(entries['metadata.json']);
 
     // create reward
-    const reward: RewardDto = await this.create({
+    const reward: Reward = await this.create({
       ...encodedContent,
       game: game.id,
       parentChallenge: challenge?.id,
@@ -80,9 +82,9 @@ export class RewardService extends BaseService<Reward, RewardInput, RewardDto> {
   /**
    * Find all rewards of a kind.
    *
-   * @returns {Promise<RewardDto[]>} the rewards.
+   * @returns {Promise<Reward[]>} the rewards.
    */
-  async findByKind(kind?: RewardType): Promise<RewardDto[]> {
+  async findByKind(kind?: RewardType): Promise<Reward[]> {
     return await this.findAll({ kind });
   }
 
@@ -182,13 +184,5 @@ export class RewardService extends BaseService<Reward, RewardInput, RewardDto> {
   async ifEnoughForGranting(amount: string[]) {
     //after REWARD_GRANNTED trigger
     //to be implemented...
-  }
-
-  toPersistence(input: RewardInput | Partial<RewardInput>): Reward | Promise<Reward> {
-    throw new Error('Method not implemented.');
-  }
-
-  toDto(doc: Reward): RewardDto | Promise<RewardDto> {
-    throw new Error('Method not implemented.');
   }
 }

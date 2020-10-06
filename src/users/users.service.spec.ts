@@ -8,13 +8,30 @@ import { UserRepository } from './repositories/user.repository';
 import { UserInput } from './inputs/user.input';
 import { Role } from './models/role.enum';
 import { UserDto } from './dto/user.dto';
+import { User } from './models/user.model';
+import { getModelToken } from '@nestjs/mongoose';
 
 describe('UsersService', () => {
   let service: UsersService;
 
+  function mockUserModel(dto: any) {
+    this.data = dto;
+    this.save = () => {
+      return this.data;
+    };
+  }
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [UsersService, UserRepository, ServiceHelper],
+      providers: [
+        {
+          provide: getModelToken('User'),
+          useValue: mockUserModel,
+        },
+        UsersService,
+        UserRepository,
+        ServiceHelper,
+      ],
     }).compile();
 
     service = module.get<UsersService>(UsersService);
@@ -33,14 +50,14 @@ describe('UsersService', () => {
       birthDate: new Date('1980-05-10'),
     };
 
-    const newUser: UserDto = {
+    const newUser: User = {
       id: new ObjectID().toHexString(),
       active: true,
       roles: [Role.USER],
       password: await bcrypt.hash('password', 10),
       registrations: [],
       ...mockCreateUserDto,
-    };
+    } as User;
 
     jest.spyOn(service, 'upsert').mockImplementation(() => Promise.resolve(newUser));
 

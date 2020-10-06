@@ -7,10 +7,12 @@ import { UserInput } from './inputs/user.input';
 import { UpsertUserArgs } from './args/upsert-user.args';
 import { UsersService } from './users.service';
 import { UserDto } from './dto/user.dto';
+import { UserToDtoMapper } from './mappers/user-to-dto.mapper';
+import { UserToPersistenceMapper } from './mappers/user-to-persistence.mapper';
 
 @Resolver(() => UserDto)
 export class UsersResolver {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(protected readonly usersService: UsersService, protected readonly toDtoMapper: UserToDtoMapper) {}
 
   @Query(() => UserDto)
   @UseGuards(GqlJwtAuthGuard)
@@ -19,13 +21,14 @@ export class UsersResolver {
     if (!user) {
       throw new NotFoundException(id);
     }
-    return user;
+    return this.toDtoMapper.transform(user);
   }
 
   @Query(() => [UserDto])
   @UseGuards(GqlJwtAuthGuard)
   async users(/*@Args() queryArgs: FindUsersDto*/): Promise<UserDto[]> {
-    return this.usersService.findAll(/*queryArgs*/);
+    const users = await this.usersService.findAll(/*queryArgs*/);
+    return Promise.all(users.map(async user => this.toDtoMapper.transform(user)));
   }
 
   @Mutation(() => UserDto)

@@ -17,7 +17,6 @@ import { ChallengeStatusModule } from './challenge-status/challenge-status.modul
 import { SubmissionModule } from './submission/submission.module';
 import { LeaderboardModule } from './leaderboard/leaderboard.module';
 import { PlayerModule } from './player/player.module';
-import { ProcessorModule } from './consumers/processor.module';
 import { HookModule } from './hook/hook.module';
 import { RewardModule } from './reward/reward.module';
 import { QueueConfigService } from './queue.config';

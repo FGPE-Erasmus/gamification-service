@@ -1,5 +1,15 @@
 import { Field, InputType } from '@nestjs/graphql';
-import { IsOptional, MinLength, IsEmail, MaxLength, IsString, Matches, IsArray, IsEnum } from 'class-validator';
+import {
+  IsOptional,
+  MinLength,
+  IsEmail,
+  MaxLength,
+  IsString,
+  Matches,
+  IsArray,
+  IsEnum,
+  IsBoolean,
+} from 'class-validator';
 
 import { EmailScalar as Email } from '../../common/scalars/email.scalar';
 import { Role } from '../models/role.enum';
@@ -41,9 +51,12 @@ export class UserInput {
   roles?: Role[];
 
   @Field({ nullable: true })
+  @IsOptional()
   @MinLength(6)
   password?: string;
 
-  @Field()
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsBoolean()
   active?: boolean;
 }
