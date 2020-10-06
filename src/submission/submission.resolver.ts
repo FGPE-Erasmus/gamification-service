@@ -33,7 +33,7 @@ export class SubmissionResolver {
   @Query(() => [Submission])
   @UseGuards(GqlJwtAuthGuard)
   async submissions(@Args('exerciseId') exerciseId: string, @GqlUser('id') playerId: string): Promise<Submission[]> {
-    return await this.submissionService.getAllSubmissions(exerciseId, playerId);
+    return await this.submissionService.getPlayerSubmissions(exerciseId, playerId);
   }
 
   @Mutation(() => Submission)

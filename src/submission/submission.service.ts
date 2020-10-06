@@ -1,20 +1,27 @@
 import { Injectable } from '@nestjs/common';
+import got from 'got';
+import { response } from 'express';
+
 import { SubmissionDto } from './dto/submission.dto';
 import { SubmissionEntity as Submission } from './entities/submission.entity';
 import { ServiceHelper } from 'src/common/helpers/service.helper';
 import { SubmissionRepository } from './repository/submission.repository';
 import { Result } from './entities/result.enum';
 import { EvaluationEvent } from './dto/evaluation-event.dto';
-import { response } from 'express';
 import { appConfig } from 'src/app.config';
-
-import got from 'got';
+import { ActionHookEntity as ActionHook } from 'src/hook/entities/action-hook.entity';
+import { ActionHookRepository } from 'src/hook/repository/action-hook.repository';
+import { TriggerEventEnum } from 'src/hook/enum/trigger-event.enum';
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
 
 @Injectable()
 export class SubmissionService {
   constructor(
+    @InjectQueue('hooksQueue') private hooksQueue: Queue,
     private readonly serviceHelper: ServiceHelper,
     private readonly submissionRepository: SubmissionRepository,
+    private readonly actionHookRepository: ActionHookRepository,
   ) {}
 
   async saveSubmission(id: string | undefined, data: SubmissionDto): Promise<Submission> {
@@ -23,11 +30,19 @@ export class SubmissionService {
     return await this.submissionRepository.save(newSubmission);
   }
 
-  async getAllSubmissions(exerciseId: string, playerId: string): Promise<Submission[]> {
+  async getPlayerSubmissions(exerciseId: string, playerId: string): Promise<Submission[]> {
     return await this.submissionRepository.find({
       where: {
         exerciseId: exerciseId,
         playerId: playerId,
+      },
+    });
+  }
+
+  async getAllSubmissions(gameId: string): Promise<Submission[]> {
+    return await this.submissionRepository.find({
+      where: {
+        gameId: gameId,
       },
     });
   }
@@ -56,6 +71,25 @@ export class SubmissionService {
     // also let me know if I should take care of something more when we send a GET like headers, options etc.
     // or if we need to do smth more with the response than just returning it
     return response;
+  }
+
+  async onSubmissionReceived(exerciseId: string, playerId: string): Promise<any> {
+    const hooks: ActionHook[] = await this.actionHookRepository.find({
+      where: {
+        trigger: TriggerEventEnum.SUBMISSION_RECEIVED,
+        sourceId: exerciseId,
+      },
+    });
+    hooks.forEach(async hook => {
+      const job = await this.hooksQueue.add({
+        hook: hook,
+        params: {
+          exerciseId: exerciseId,
+          playerId: playerId,
+          exercise: { obj: 'example exerciseObj' },
+        },
+      });
+    });
   }
 
   async onSubmissionAccepted(submission: Submission): Promise<Submission> {

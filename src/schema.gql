@@ -231,59 +231,6 @@ enum Result {
   REJECTED
 }
 
-type Coupon {
-  id: ID!
-  players: [PlayerCoupon!]!
-  kind: RewardType!
-  gameId: String!
-  name: String!
-  description: String!
-  recurrenceLimit: Float!
-}
-
-type PlayerCoupon {
-  id: ID!
-  player: Player!
-  coupon: Coupon!
-  count: Float!
-}
-
-type Hint {
-  id: ID!
-  kind: RewardType!
-  gameId: String!
-  players: [PlayerHint!]!
-  exerciseId: String!
-  name: String!
-  description: String!
-  recurrenceLimit: Float!
-  message: String!
-}
-
-type PlayerHint {
-  id: ID!
-  player: Player!
-  hint: Hint!
-  count: Float!
-}
-
-type VirtualItem {
-  id: ID!
-  players: [PlayerVirtualItem!]!
-  kind: RewardType!
-  gameId: String!
-  name: String!
-  description: String!
-  recurrenceLimit: Float!
-}
-
-type PlayerVirtualItem {
-  id: ID!
-  player: Player!
-  virtualItem: VirtualItem!
-  count: Float!
-}
-
 type Query {
   user(id: String!): User!
   users(skip: Int = 0, take: Int = 50, ids: [ID!], name: String, order: String = "DESC", fieldSort: String = "updatedAt"): ListUsers!

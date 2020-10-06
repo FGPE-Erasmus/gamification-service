@@ -13,4 +13,16 @@ export class PlayerService {
     const newPlayer: Player = await this.serviceHelper.getUpsertData(id, fields, this.playerRepository);
     return this.playerRepository.save(newPlayer);
   }
+
+  async getGamePlayers(gameId: string): Promise<Player[]> {
+    return this.playerRepository.find({
+      where: {
+        gameId: gameId,
+      },
+    });
+  }
+
+  async getPlayer(playerId: string): Promise<Player> {
+    return this.playerRepository.findOne(playerId);
+  }
 }

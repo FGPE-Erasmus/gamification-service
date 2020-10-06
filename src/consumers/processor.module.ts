@@ -7,6 +7,8 @@ import { QueueListener } from './queue.listener';
 import { HookModule } from '../hook/hook.module';
 import { RewardModule } from '../reward/reward.module';
 import { JobProcessor } from './processors/job.processor';
+import { PlayerModule } from 'src/player/player.module';
+import { SubmissionModule } from 'src/submission/submission.module';
 
 @Module({
   imports: [
@@ -16,6 +18,8 @@ import { JobProcessor } from './processors/job.processor';
     }),
     HookModule,
     RewardModule,
+    PlayerModule,
+    SubmissionModule,
   ],
   providers: [ServiceHelper, JobProcessor, QueueListener],
 })
