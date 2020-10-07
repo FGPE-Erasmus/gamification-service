@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 
 import { BaseService } from '../common/services/base.service';
 import { extractToJson } from '../common/utils/extraction.utils';
+import { Game } from '../game/models/game.model';
 import { HookService } from '../hook/hook.service';
 import { LeaderboardService } from '../leaderboard/leaderboard.service';
 import { RewardService } from '../reward/reward.service';
@@ -9,16 +10,11 @@ import { RewardService } from '../reward/reward.service';
 import { ChallengeRepository } from './repositories/challenge.repository';
 import { Challenge } from './models/challenge.model';
 import { Mode } from './models/mode.enum';
-import { ChallengeToDtoMapper } from './mappers/challenge-to-dto.mapper';
-import { ChallengeToPersistenceMapper } from './mappers/challenge-to-persistence.mapper';
-import { Game } from '../game/models/game.model';
 
 @Injectable()
 export class ChallengeService extends BaseService<Challenge> {
   constructor(
     protected readonly repository: ChallengeRepository,
-    protected readonly toDtoMapper: ChallengeToDtoMapper,
-    protected readonly toPersistenceMapper: ChallengeToPersistenceMapper,
     protected readonly leaderboardService: LeaderboardService,
     protected readonly rewardService: RewardService,
     protected readonly hookService: HookService,
@@ -40,6 +36,7 @@ export class ChallengeService extends BaseService<Challenge> {
         const encodedContent = extractToJson(entries[path]);
         challenge = await this.create({
           ...encodedContent,
+          modeParameters: encodedContent.mode_parameters,
           game: game.id,
           parentChallenge: parentChallenge?.id,
         });

@@ -34,6 +34,6 @@ import { GameToPersistenceMapper } from './mappers/game-to-persistence.mapper';
   ],
   controllers: [GameUploadController],
   providers: [GameToDtoMapper, GameToPersistenceMapper, GameRepository, GameService, GameResolver],
-  exports: [GameService],
+  exports: [GameToDtoMapper, GameToPersistenceMapper, GameService],
 })
 export class GameModule {}

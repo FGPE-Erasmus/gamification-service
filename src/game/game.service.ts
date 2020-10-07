@@ -11,15 +11,11 @@ import { RewardService } from '../reward/reward.service';
 import { GameInput } from './inputs/game.input';
 import { Game } from './models/game.model';
 import { GameRepository } from './repositories/game.repository';
-import { GameToDtoMapper } from './mappers/game-to-dto.mapper';
-import { GameToPersistenceMapper } from './mappers/game-to-persistence.mapper';
 
 @Injectable()
 export class GameService extends BaseService<Game> {
   constructor(
     protected readonly repository: GameRepository,
-    protected readonly toDtoMapper: GameToDtoMapper,
-    protected readonly toPersistenceMapper: GameToPersistenceMapper,
     protected readonly challengeService: ChallengeService,
     protected readonly rewardService: RewardService,
     protected readonly leaderboardService: LeaderboardService,

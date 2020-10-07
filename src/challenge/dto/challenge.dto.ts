@@ -10,10 +10,10 @@ export class ChallengeDto {
   id?: string;
 
   @Field(() => GameDto)
-  game?: GameDto;
+  game?: string;
 
   @Field(() => ChallengeDto, { nullable: true })
-  parentChallenge?: ChallengeDto;
+  parentChallenge?: string;
 
   @Field()
   name?: string;

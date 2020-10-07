@@ -8,10 +8,10 @@ import { RewardModule } from '../reward/reward.module';
 
 import { ChallengeService } from './challenge.service';
 import { ChallengeResolver } from './challenge.resolver';
-import { Challenge, ChallengeSchema } from './models/challenge.model';
-import { ChallengeRepository } from './repositories/challenge.repository';
 import { ChallengeToDtoMapper } from './mappers/challenge-to-dto.mapper';
 import { ChallengeToPersistenceMapper } from './mappers/challenge-to-persistence.mapper';
+import { Challenge, ChallengeSchema } from './models/challenge.model';
+import { ChallengeRepository } from './repositories/challenge.repository';
 
 @Module({
   imports: [
@@ -28,6 +28,6 @@ import { ChallengeToPersistenceMapper } from './mappers/challenge-to-persistence
     ChallengeService,
     ChallengeResolver,
   ],
-  exports: [ChallengeService],
+  exports: [ChallengeToDtoMapper, ChallengeToPersistenceMapper, ChallengeService],
 })
 export class ChallengeModule {}

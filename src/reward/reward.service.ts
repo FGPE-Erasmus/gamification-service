@@ -1,11 +1,11 @@
-import { Injectable, Logger, LoggerService } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 
-import { ChallengeDto } from '../challenge/dto/challenge.dto';
 import { BaseService } from '../common/services/base.service';
 import { extractToJson } from '../common/utils/extraction.utils';
-import { GameDto } from '../game/dto/game.dto';
+import { Challenge } from '../challenge/models/challenge.model';
+import { Game } from '../game/models/game.model';
 import { ActionHookService } from '../hook/action-hook.service';
 import { CategoryEnum } from '../hook/enums/category.enum';
 import { TriggerEventEnum as TriggerEvent } from '../hook/enums/trigger-event.enum';
@@ -13,13 +13,9 @@ import { Player } from '../player/models/player.model';
 import { PlayerService } from '../player/player.service';
 import { RewardType } from './models/reward-type.enum';
 import { Reward } from './models/reward.model';
-import { RewardDto } from './dto/reward.dto';
 import { RewardRepository } from './repositories/reward.repository';
-import { RewardInput } from './inputs/reward.input';
 import { RewardToDtoMapper } from './mappers/reward-to-dto.mapper';
 import { RewardToPersistenceMapper } from './mappers/reward-to-persistence.mapper';
-import { Game } from '../game/models/game.model';
-import { Challenge } from '../challenge/models/challenge.model';
 
 @Injectable()
 export class RewardService extends BaseService<Reward> {

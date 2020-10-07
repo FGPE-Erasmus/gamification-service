@@ -386,7 +386,7 @@ type Mutation {
   signup(name: String!, username: String!, email: Email!, password: String!): User!
   mutationCheck: String!
   createSubmission(submissionData: SendSubmissionInput!): Submission!
-  importGEdILArchive(file: Upload!): Game!
+  importGEdILArchive(gameInput: GameInput!, file: Upload!): Game!
 }
 
 input UserInput {
@@ -407,6 +407,15 @@ input SendSubmissionInput {
   player: String!
   exerciseId: String!
   codeFile: String!
+}
+
+input GameInput {
+  name: String!
+  description: String
+  gedilLayerId: String
+  gedilLayerDescription: String
+  startDate: Date
+  endDate: Date
 }
 
 """The `Upload` scalar type represents a file upload."""

@@ -6,33 +6,42 @@ import { GqlAdminGuard } from '../common/guards/gql-admin.guard';
 import { ImportGameArgs } from './args/import-game.args';
 import { GameService } from './game.service';
 import { GameDto } from './dto/game.dto';
+import { GameToDtoMapper } from './mappers/game-to-dto.mapper';
+import { GameToPersistenceMapper } from './mappers/game-to-persistence.mapper';
+import { Game } from './models/game.model';
 
 @Resolver(() => GameDto)
 export class GameResolver {
-  constructor(private gameService: GameService) {}
+  constructor(
+    protected readonly gameService: GameService,
+    protected readonly toDtoMapper: GameToDtoMapper,
+    protected readonly toPersistenceMapper: GameToPersistenceMapper,
+  ) {}
 
   @Mutation(() => GameDto)
   @UseGuards(GqlJwtAuthGuard, GqlAdminGuard)
-  async importGEdILArchive(@Args() input: ImportGameArgs): Promise<GameDto> {
-    const { createReadStream } = await input.file;
-    return await this.gameService.importGEdILArchive(
+  async importGEdILArchive(@Args() importGameArgs: ImportGameArgs): Promise<GameDto> {
+    const { file, gameInput } = importGameArgs;
+    const { createReadStream } = await file;
+    const game = await this.gameService.importGEdILArchive(
       {
-        name: input.name,
-        description: input.description,
-        startDate: input.startDate,
-        endDate: input.endDate,
+        name: gameInput.name,
+        description: gameInput.description,
+        startDate: gameInput.startDate,
+        endDate: gameInput.endDate,
       },
       createReadStream(),
     );
+    return this.toDtoMapper.transform(game);
   }
 
   @Query(() => GameDto)
   @UseGuards(GqlJwtAuthGuard)
   async game(@Args('id') id: string): Promise<GameDto> {
-    const game: GameDto = await this.gameService.findOne(id);
+    const game: Game = await this.gameService.findOne(id);
     if (!game) {
       throw new NotFoundException(id);
     }
-    return game;
+    return this.toDtoMapper.transform(game);
   }
 }

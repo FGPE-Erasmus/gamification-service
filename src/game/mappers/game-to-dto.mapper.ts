@@ -9,6 +9,7 @@ import { SubmissionDto } from '../../submission/dto/submission.dto';
 import { GameDto } from '../dto/game.dto';
 import { Game } from '../models/game.model';
 import { classToPlain, plainToClass } from 'class-transformer';
+import { pick } from '../../common/utils/object.utils';
 
 @Injectable()
 export class GameToDtoMapper implements IMapper<Game, GameDto> {
@@ -20,7 +21,7 @@ export class GameToDtoMapper implements IMapper<Game, GameDto> {
   ) {
   }*/
 
-  async transform(obj: Game, resolve: (keyof Game)[] = ['players', 'submissions']): Promise<GameDto> {
+  async transform(obj: Game): Promise<GameDto> {
     /*return {
       ...obj,
       players: resolve.includes('players')
@@ -33,7 +34,20 @@ export class GameToDtoMapper implements IMapper<Game, GameDto> {
     if (!obj) {
       return undefined;
     }
-    return plainToClass(GameDto, classToPlain(obj, { excludeExtraneousValues: true }));
+    return pick(
+      [
+        'id',
+        'name',
+        'description',
+        'gedilLayerId',
+        'gedilLayerDescription',
+        'startDate',
+        'endDate',
+        'players',
+        'submissions',
+      ],
+      obj,
+    ) as GameDto;
   }
 
   /*async resolvePlayers(players: any[] = []): Promise<PlayerDto[]> {

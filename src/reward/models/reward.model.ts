@@ -1,9 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
-import { Challenge } from '../../challenge/models/challenge.model';
-import { Game } from '../../game/models/game.model';
-import { Player } from '../../player/models/player.model';
 import { RewardType } from './reward-type.enum';
 
 @Schema()
@@ -38,11 +35,11 @@ export class Reward extends Document {
   @Prop({ nullable: true })
   message?: string;
 
-  @Prop({ type: [Types.ObjectId], ref: Challenge.name, nullable: true })
-  challenges?: Challenge[];
+  @Prop({ type: [Types.ObjectId], ref: 'Challenge', nullable: true })
+  challenges?: any[];
 
-  @Prop({ type: [Types.ObjectId], ref: Challenge.name })
-  players?: Player[];
+  @Prop({ type: [Types.ObjectId], ref: 'PlayerReward' })
+  players?: any[];
 }
 
 export const RewardSchema = SchemaFactory.createForClass(Reward);
