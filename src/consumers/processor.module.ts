@@ -9,6 +9,7 @@ import { RewardModule } from '../reward/reward.module';
 import { JobProcessor } from './processors/job.processor';
 import { PlayerModule } from 'src/player/player.module';
 import { SubmissionModule } from 'src/submission/submission.module';
+import { CriteriaHelper } from 'src/common/helpers/criteria.helper';
 
 @Module({
   imports: [
@@ -21,6 +22,6 @@ import { SubmissionModule } from 'src/submission/submission.module';
     PlayerModule,
     SubmissionModule,
   ],
-  providers: [ServiceHelper, JobProcessor, QueueListener],
+  providers: [ServiceHelper, CriteriaHelper, JobProcessor, QueueListener],
 })
 export class ProcessorModule {}
