@@ -11,10 +11,10 @@ export class RewardDto {
   id?: string;
 
   @Field(() => GameDto)
-  game?: GameDto;
+  game?: string;
 
   @Field(() => ChallengeDto, { nullable: true })
-  parentChallenge?: ChallengeDto;
+  parentChallenge?: string;
 
   @Field(() => RewardType)
   kind?: RewardType;
@@ -41,8 +41,14 @@ export class RewardDto {
   message?: string;
 
   @Field(() => [ChallengeDto], { nullable: true })
-  challenges?: ChallengeDto[];
+  challenges?: string[];
 
   @Field(() => [PlayerRewardDto])
-  players?: PlayerRewardDto[];
+  players?: string[];
+
+  @Field(() => Date)
+  createdAt?: Date;
+
+  @Field(() => Date, { nullable: true })
+  updatedAt?: Date;
 }

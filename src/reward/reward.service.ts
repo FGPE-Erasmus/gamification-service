@@ -14,15 +14,11 @@ import { PlayerService } from '../player/player.service';
 import { RewardType } from './models/reward-type.enum';
 import { Reward } from './models/reward.model';
 import { RewardRepository } from './repositories/reward.repository';
-import { RewardToDtoMapper } from './mappers/reward-to-dto.mapper';
-import { RewardToPersistenceMapper } from './mappers/reward-to-persistence.mapper';
 
 @Injectable()
 export class RewardService extends BaseService<Reward> {
   constructor(
     protected readonly repository: RewardRepository,
-    protected readonly toDtoMapper: RewardToDtoMapper,
-    protected readonly toPersistenceMapper: RewardToPersistenceMapper,
     @InjectQueue('hooksQueue') protected readonly hooksQueue: Queue,
     protected readonly playerService: PlayerService,
     protected readonly actionHookService: ActionHookService,
@@ -31,15 +27,21 @@ export class RewardService extends BaseService<Reward> {
   }
 
   /**
-   * Import GEdIL entries from rewards.
+   * Import GEdIL entries from a reward.
    *
-   * @param {Game} game the game to which import concerns.
-   * @param {[path: string]: Buffer} entries the zipped entries to import.
+   * @param {any} importTracker the objects already imported from the same archive.
+   * @param {Game} game the game which is being imported.
+   * @param {[path: string]: Buffer} entries the archive entries to import.
    * @param {Challenge} challenge the challenge to which this reward is
    *                              appended (if any).
    * @returns {Promise<Reward | undefined>} the imported reward.
    */
-  async importGEdIL(game: Game, entries: { [path: string]: Buffer }, challenge?: Challenge): Promise<Reward> {
+  async importGEdIL(
+    importTracker: { [t in 'challenges' | 'leaderboards' | 'rewards' | 'rules']: { [k: string]: string } },
+    game: Game,
+    entries: { [path: string]: Buffer },
+    challenge?: Challenge,
+  ): Promise<Reward | undefined> {
     if (!('metadata.json' in entries)) {
       return;
     }
@@ -49,6 +51,7 @@ export class RewardService extends BaseService<Reward> {
     // create reward
     const reward: Reward = await this.create({
       ...encodedContent,
+      challenges: encodedContent.challenges?.map(gedilId => importTracker.challenges[gedilId]),
       game: game.id,
       parentChallenge: challenge?.id,
     });
@@ -81,7 +84,7 @@ export class RewardService extends BaseService<Reward> {
    * @returns {Promise<Reward[]>} the rewards.
    */
   async findByKind(kind?: RewardType): Promise<Reward[]> {
-    return await this.findAll({ kind });
+    return await this.findAll({ kind: { $eq: kind } });
   }
 
   async grantReward(reward: any, player: Player): Promise<any> {

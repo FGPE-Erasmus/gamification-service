@@ -14,11 +14,16 @@ export class Leaderboard extends Document {
   @Prop()
   name: string;
 
-  @Prop({ type: () => [String] })
+  @Prop({ type: () => [String], default: () => [] })
   metrics: string[];
 
-  @Prop({ type: () => [String], enum: SortingOrder })
+  @Prop({ type: () => [String], enum: SortingOrder, default: () => [] })
   sortingOrders: SortingOrder[];
+
+  /* Timestamps */
+
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export const LeaderboardSchema = SchemaFactory.createForClass(Leaderboard);

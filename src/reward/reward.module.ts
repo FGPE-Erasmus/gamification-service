@@ -36,8 +36,8 @@ import { RewardToPersistenceMapper } from './mappers/reward-to-persistence.mappe
     }),
     forwardRef(() => GameModule),
     forwardRef(() => ChallengeModule),
+    forwardRef(() => PlayerModule),
     HookModule,
-    PlayerModule,
   ],
   providers: [
     RewardToDtoMapper,
@@ -54,6 +54,6 @@ import { RewardToPersistenceMapper } from './mappers/reward-to-persistence.mappe
     VirtualItemResolver,
     UnlockResolver,
   ],
-  exports: [RewardService],
+  exports: [RewardToDtoMapper, RewardToPersistenceMapper, RewardService],
 })
 export class RewardModule {}

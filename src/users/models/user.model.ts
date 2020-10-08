@@ -40,6 +40,11 @@ export class User extends Document {
     ref: 'Player',
   })
   registrations?: any[];
+
+  /* Timestamps */
+
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

@@ -18,6 +18,6 @@ import { UserToPersistenceMapper } from './mappers/user-to-persistence.mapper';
     ]),
   ],
   providers: [UserToDtoMapper, UserToPersistenceMapper, UserRepository, UsersService, UsersResolver],
-  exports: [UsersService],
+  exports: [UserToDtoMapper, UserToPersistenceMapper, UsersService],
 })
 export class UsersModule {}

@@ -2,23 +2,17 @@ import { Injectable, Logger } from '@nestjs/common';
 
 import { BaseService } from '../common/services/base.service';
 import { Player } from '../player/models/player.model';
-import { PlayerRepository } from '../player/repositories/player.repository';
 import { Reward } from '../reward/models/reward.model';
 import { RewardType } from '../reward/models/reward-type.enum';
-import { RewardRepository } from '../reward/repositories/reward.repository';
 import { PlayerReward } from './models/player-reward.model';
 import { PlayerRewardRepository } from './repositories/player-reward.repository';
 import { PlayerRewardToDtoMapper } from './mappers/player-reward-to-dto.mapper';
-import { PlayerRewardToPersistenceMapper } from './mappers/player-reward-to-persistence.mapper';
 
 @Injectable()
 export class PlayerRewardService extends BaseService<PlayerReward> {
   constructor(
     protected readonly repository: PlayerRewardRepository,
     protected readonly toDtoMapper: PlayerRewardToDtoMapper,
-    protected readonly toPersistenceMapper: PlayerRewardToPersistenceMapper,
-    protected readonly playerRepository: PlayerRepository,
-    protected readonly rewardRepository: RewardRepository,
   ) {
     super(new Logger(PlayerRewardService.name), repository);
   }

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { classToPlain, plainToClass } from 'class-transformer';
 
 import { IMapper } from '../../common/interfaces/mapper.interface';
+import { pick } from '../../common/utils/object.utils';
 import { Leaderboard } from '../models/leaderboard.model';
 import { LeaderboardDto } from '../dto/leaderboard.dto';
 
@@ -11,15 +11,6 @@ export class LeaderboardToDtoMapper implements IMapper<Leaderboard, LeaderboardD
     if (!obj) {
       return undefined;
     }
-    return plainToClass(LeaderboardDto, classToPlain(obj, { excludeExtraneousValues: true }));
+    return pick(['id', 'game', 'parentChallenge', 'name', 'metrics', 'sortingOrders', 'createdAt', 'updatedAt'], obj);
   }
-
-  /*async resolvePlayers(players: any[] = []): Promise<PlayerDto[]> {
-    return Promise.all<PlayerDto>(players.map(async player => {
-      if ( typeof player === 'string' || player instanceof Types.ObjectId ) {
-        return this.playerService.findById(player);
-      }
-      return this.playerToDtoMapper.transform(player);
-    }));
-  }*/
 }

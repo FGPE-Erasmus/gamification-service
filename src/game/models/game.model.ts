@@ -29,6 +29,11 @@ export class Game extends Document {
 
   @Prop({ type: [Types.ObjectId], ref: 'Submission' })
   submissions?: any[];
+
+  /* Timestamps */
+
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export const GameSchema = SchemaFactory.createForClass(Game);

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { classToPlain, plainToClass } from 'class-transformer';
 
 import { IMapper } from '../../common/interfaces/mapper.interface';
+import { pick } from '../../common/utils/object.utils';
 import { PlayerDto } from '../dto/player.dto';
 import { Player } from '../models/player.model';
 
@@ -11,6 +11,9 @@ export class PlayerToDtoMapper implements IMapper<Player, PlayerDto> {
     if (!obj) {
       return undefined;
     }
-    return plainToClass(PlayerDto, classToPlain(obj, { excludeExtraneousValues: true }));
+    return pick(
+      ['id', 'game', 'user', 'points', 'submissions', 'learningPath', 'rewards', 'createdAt', 'updatedAt'],
+      obj,
+    );
   }
 }

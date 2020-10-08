@@ -7,15 +7,11 @@ import { TriggerEventEnum as TriggerEvent } from '../hook/enums/trigger-event.en
 import { ChallengeStatus } from './models/challenge-status.model';
 import { State } from './models/state.enum';
 import { ChallengeStatusRepository } from './repositories/challenge-status.repository';
-import { ChallengeStatusToDtoMapper } from './mappers/challenge-status-to-dto.mapper';
-import { ChallengeStatusToPersistenceMapper } from './mappers/challenge-status-to-persistence.mapper';
 
 @Injectable()
 export class ChallengeStatusService extends BaseService<ChallengeStatus> {
   constructor(
     protected readonly repository: ChallengeStatusRepository,
-    protected readonly toDtoMapper: ChallengeStatusToDtoMapper,
-    protected readonly toPersistenceMapper: ChallengeStatusToPersistenceMapper,
     @InjectQueue('hooksQueue') protected readonly hooksQueue: Queue,
   ) {
     super(new Logger(ChallengeStatusService.name), repository);

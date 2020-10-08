@@ -28,16 +28,18 @@ export class ChallengeResolver {
 
   @ResolveField()
   async game(@Parent() root: ChallengeDto): Promise<GameDto> {
-    const { game } = root;
-    return this.gameToDtoMapper.transform(await this.gameService.findById(game));
+    const { game: gameId } = root;
+    const game = await this.gameService.findById(gameId);
+    return this.gameToDtoMapper.transform(game);
   }
 
   @ResolveField()
   async parentChallenge(@Parent() root: ChallengeDto): Promise<ChallengeDto | undefined> {
-    const { parentChallenge } = root;
-    if (!parentChallenge) {
+    const { parentChallenge: parentChallengeId } = root;
+    if (!parentChallengeId) {
       return;
     }
-    return this.challengeToDtoMapper.transform(await this.challengeService.findOne({ parentChallenge }));
+    const parentChallenge = await this.challengeService.findById(parentChallengeId);
+    return this.challengeToDtoMapper.transform(parentChallenge);
   }
 }

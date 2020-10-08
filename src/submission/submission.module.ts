@@ -10,7 +10,6 @@ import { SubmissionResolver } from './submission.resolver';
 import { SubmissionRepository } from './repositories/submission.repository';
 import { Submission, SubmissionSchema } from './models/submission.model';
 import { SubmissionToDtoMapper } from './mappers/submission-to-dto.mapper';
-import { SubmissionToPersistenceMapper } from './mappers/submission-to-persistence.mapper';
 
 @Module({
   imports: [
@@ -25,15 +24,9 @@ import { SubmissionToPersistenceMapper } from './mappers/submission-to-persisten
       useClass: QueueConfigService,
     }),
     forwardRef(() => GameModule),
-    PlayerModule,
+    forwardRef(() => PlayerModule),
   ],
-  providers: [
-    SubmissionToDtoMapper,
-    SubmissionToPersistenceMapper,
-    SubmissionRepository,
-    SubmissionService,
-    SubmissionResolver,
-  ],
-  exports: [SubmissionService],
+  providers: [SubmissionToDtoMapper, SubmissionRepository, SubmissionService, SubmissionResolver],
+  exports: [SubmissionToDtoMapper, SubmissionService],
 })
 export class SubmissionModule {}

@@ -6,21 +6,27 @@ import { SortingOrder } from '../models/sorting.enum';
 
 @ObjectType('Leaderboard')
 export class LeaderboardDto {
-  @Field(() => ID)
+  @Field(() => ID, { nullable: true })
   id?: string;
 
-  @Field(() => GameDto)
-  game?: GameDto;
+  @Field(() => GameDto, { nullable: true })
+  game?: string;
 
   @Field(() => ChallengeDto, { nullable: true })
-  parentChallenge?: ChallengeDto;
+  parentChallenge?: string;
 
-  @Field()
+  @Field({ nullable: true })
   name?: string;
 
-  @Field(() => [String])
+  @Field(() => [String], { nullable: true })
   metrics?: string[];
 
-  @Field(() => [SortingOrder])
+  @Field(() => [SortingOrder], { nullable: true })
   sortingOrders?: SortingOrder[];
+
+  @Field(() => Date)
+  createdAt?: Date;
+
+  @Field(() => Date, { nullable: true })
+  updatedAt?: Date;
 }

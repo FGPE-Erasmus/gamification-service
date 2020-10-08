@@ -13,11 +13,12 @@ import { ActionHook } from './models/action-hook.model';
 @Injectable()
 export class HookService {
   constructor(
-    private readonly scheduledHookService: ScheduledHookService,
-    private readonly actionHookService: ActionHookService,
+    protected readonly actionHookService: ActionHookService,
+    protected readonly scheduledHookService: ScheduledHookService,
   ) {}
 
   async importGEdIL(
+    imported: { [t in 'challenges' | 'leaderboards' | 'rewards' | 'rules']: { [k: string]: string } },
     game: Game,
     entries: { [path: string]: Buffer },
     parentChallenge?: Challenge,

@@ -20,16 +20,36 @@ export class LeaderboardService extends BaseService<Leaderboard> {
     super(new Logger(LeaderboardService.name), repository);
   }
 
-  async importGEdIL(game: Game, entries: { [path: string]: Buffer }, challenge?: Challenge): Promise<Leaderboard> {
-    let leaderboard: Leaderboard;
-    for (const path of Object.keys(entries)) {
-      const encodedContent = extractToJson(entries[path]);
-      leaderboard = await this.create({
-        ...encodedContent,
-        game: game.id,
-        parentChallenge: challenge?.id,
-      });
+  /**
+   * Import GEdIL entries from a leaderboard.
+   *
+   * @param {any} importTracker the objects already imported from the same archive.
+   * @param {Game} game the game which is being imported.
+   * @param {[path: string]: Buffer} entries the archive entries to import.
+   * @param {Challenge} challenge the challenge to which this leaderboard is
+   *                              appended (if any).
+   * @returns {Promise<Leaderboard | undefined>} the imported leaderboard.
+   */
+  async importGEdIL(
+    importTracker: { [t in 'challenges' | 'leaderboards' | 'rewards' | 'rules']: { [k: string]: string } },
+    game: Game,
+    entries: { [path: string]: Buffer },
+    challenge?: Challenge,
+  ): Promise<Leaderboard | undefined> {
+    if (!('metadata.json' in entries)) {
+      return;
     }
+
+    const encodedContent = extractToJson(entries['metadata.json']);
+
+    // create leaderboard
+    const leaderboard: Leaderboard = await this.create({
+      ...encodedContent,
+      sortingOrders: encodedContent.sorting_orders,
+      game: game.id,
+      parentChallenge: challenge?.id,
+    });
+
     return leaderboard;
   }
 

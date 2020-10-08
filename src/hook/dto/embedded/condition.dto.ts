@@ -1,4 +1,4 @@
-import { Field, ObjectType, PartialType } from '@nestjs/graphql';
+import { Field, ObjectType } from '@nestjs/graphql';
 
 @ObjectType('Condition')
 export class ConditionEmbedDto {

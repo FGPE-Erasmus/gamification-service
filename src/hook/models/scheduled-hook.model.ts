@@ -32,6 +32,11 @@ export class ScheduledHook extends Document {
 
   @Prop({ nullable: true })
   lastRun?: Date;
+
+  /* Timestamps */
+
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export const ScheduledHookSchema = SchemaFactory.createForClass(ScheduledHook);

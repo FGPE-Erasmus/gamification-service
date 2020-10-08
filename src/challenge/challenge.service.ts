@@ -23,6 +23,7 @@ export class ChallengeService extends BaseService<Challenge> {
   }
 
   async importGEdIL(
+    imported: { [t in 'challenges' | 'leaderboards' | 'rewards' | 'rules']: { [k: string]: string } },
     game: Game,
     gedilId: string,
     entries: { [path: string]: Buffer },
@@ -58,12 +59,19 @@ export class ChallengeService extends BaseService<Challenge> {
 
     // inner challenges
     for (const gedilId of Object.keys(subEntries.challenges)) {
-      subObjects.challenges[gedilId] = await this.importGEdIL(game, gedilId, subEntries.challenges[gedilId], challenge);
+      subObjects.challenges[gedilId] = await this.importGEdIL(
+        imported,
+        game,
+        gedilId,
+        subEntries.challenges[gedilId],
+        challenge,
+      );
     }
 
     // inner leaderboards
     for (const gedilId of Object.keys(subEntries.leaderboards)) {
       subObjects.leaderboards[gedilId] = await this.leaderboardService.importGEdIL(
+        imported,
         game,
         subEntries.leaderboards[gedilId],
         challenge,
@@ -72,12 +80,22 @@ export class ChallengeService extends BaseService<Challenge> {
 
     // inner rewards
     for (const gedilId of Object.keys(subEntries.rewards)) {
-      subObjects.rewards[gedilId] = await this.rewardService.importGEdIL(game, subEntries.rewards[gedilId], challenge);
+      subObjects.rewards[gedilId] = await this.rewardService.importGEdIL(
+        imported,
+        game,
+        subEntries.rewards[gedilId],
+        challenge,
+      );
     }
 
     // inner rules
     for (const gedilId of Object.keys(subEntries.rules)) {
-      subObjects.rules[gedilId] = await this.hookService.importGEdIL(game, subEntries.rules[gedilId], challenge);
+      subObjects.rules[gedilId] = await this.hookService.importGEdIL(
+        imported,
+        game,
+        subEntries.rules[gedilId],
+        challenge,
+      );
     }
 
     return challenge;

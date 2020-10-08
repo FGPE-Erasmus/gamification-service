@@ -1,4 +1,4 @@
-import { Field, ObjectType, PartialType } from '@nestjs/graphql';
+import { Field, ObjectType } from '@nestjs/graphql';
 
 import { JunctorEnum as Junctor } from '../../enums/junctor.enum';
 import { ConditionEmbedDto } from './condition.dto';

@@ -8,7 +8,6 @@ import { UpsertUserArgs } from './args/upsert-user.args';
 import { UsersService } from './users.service';
 import { UserDto } from './dto/user.dto';
 import { UserToDtoMapper } from './mappers/user-to-dto.mapper';
-import { UserToPersistenceMapper } from './mappers/user-to-persistence.mapper';
 
 @Resolver(() => UserDto)
 export class UsersResolver {

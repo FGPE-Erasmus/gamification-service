@@ -1,30 +1,23 @@
-import { Injectable, Logger, LoggerService } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 import got from 'got';
 
 import { appConfig } from '../app.config';
 import { BaseService } from '../common/services/base.service';
-import { PlayerDto } from '../player/dto/player.dto';
+import { TriggerEventEnum, TriggerEventEnum as TriggerEvent } from '../hook/enums/trigger-event.enum';
+import { Player } from '../player/models/player.model';
 import { PlayerService } from '../player/player.service';
-import { SubmissionDto } from './dto/submission.dto';
 import { ReportInput } from './inputs/report.input';
 import { SendSubmissionInput } from './inputs/send-submission.input';
 import { Submission } from './models/submission.model';
 import { Result } from './models/result.enum';
 import { SubmissionRepository } from './repositories/submission.repository';
-import { SubmissionInput } from './inputs/submission.input';
-import { SubmissionToDtoMapper } from './mappers/submission-to-dto.mapper';
-import { SubmissionToPersistenceMapper } from './mappers/submission-to-persistence.mapper';
-import { TriggerEventEnum, TriggerEventEnum as TriggerEvent } from '../hook/enums/trigger-event.enum';
-import { Player } from '../player/models/player.model';
 
 @Injectable()
 export class SubmissionService extends BaseService<Submission> {
   constructor(
     protected readonly repository: SubmissionRepository,
-    protected readonly toDtoMapper: SubmissionToDtoMapper,
-    protected readonly toPersistenceMapper: SubmissionToPersistenceMapper,
     @InjectQueue('hooksQueue') protected readonly hooksQueue: Queue,
     protected readonly playerService: PlayerService,
   ) {

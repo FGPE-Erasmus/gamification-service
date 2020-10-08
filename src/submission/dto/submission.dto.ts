@@ -11,10 +11,10 @@ export class SubmissionDto {
   id?: string;
 
   @Field(() => GameDto)
-  game?: GameDto;
+  game?: string;
 
   @Field(() => PlayerDto)
-  player?: PlayerDto;
+  player?: string;
 
   @Field()
   exerciseId?: string;

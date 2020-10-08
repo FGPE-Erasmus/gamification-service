@@ -1,6 +1,8 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
+import { ChallengeModule } from '../challenge/challenge.module';
+import { GameModule } from '../game/game.module';
 import { LeaderboardService } from './leaderboard.service';
 import { Leaderboard, LeaderboardSchema } from './models/leaderboard.model';
 import { LeaderboardRepository } from './repositories/leaderboard.repository';
@@ -16,6 +18,8 @@ import { LeaderboardToPersistenceMapper } from './mappers/leaderboard-to-persist
         schema: LeaderboardSchema,
       },
     ]),
+    forwardRef(() => GameModule),
+    forwardRef(() => ChallengeModule),
   ],
   providers: [
     LeaderboardToDtoMapper,
@@ -24,6 +28,6 @@ import { LeaderboardToPersistenceMapper } from './mappers/leaderboard-to-persist
     LeaderboardService,
     LeaderboardResolver,
   ],
-  exports: [LeaderboardService],
+  exports: [LeaderboardToDtoMapper, LeaderboardToPersistenceMapper, LeaderboardService],
 })
 export class LeaderboardModule {}

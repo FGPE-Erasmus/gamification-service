@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { classToPlain, plainToClass } from 'class-transformer';
 
 import { IMapper } from '../../common/interfaces/mapper.interface';
+import { pick } from '../../common/utils/object.utils';
 import { ActionHookDto } from '../dto/action-hook.dto';
 import { ActionHook } from '../models/action-hook.model';
 
@@ -11,6 +11,22 @@ export class ActionHookToDtoMapper implements IMapper<ActionHook, ActionHookDto>
     if (!obj) {
       return undefined;
     }
-    return plainToClass(ActionHookDto, classToPlain(obj, { excludeExtraneousValues: true }));
+    return pick(
+      [
+        'id',
+        'game',
+        'parentChallenge',
+        'sourceId',
+        'trigger',
+        'criteria',
+        'actions',
+        'recurrent',
+        'active',
+        'lastRun',
+        'createdAt',
+        'updatedAt',
+      ],
+      obj,
+    );
   }
 }

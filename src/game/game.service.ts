@@ -32,6 +32,7 @@ export class GameService extends BaseService<Game> {
    */
   async importGEdILArchive(input: GameInput, gedilStream: Readable): Promise<Game | undefined> {
     let game: Game;
+
     const entries = { challenges: {}, leaderboards: {}, rewards: {}, rules: {} };
 
     const zip = gedilStream.pipe(Parse({ forceStream: true }));
@@ -66,6 +67,7 @@ export class GameService extends BaseService<Game> {
     // challenges
     for (const gedilId of Object.keys(entries.challenges)) {
       subObjects.challenges[gedilId] = await this.challengeService.importGEdIL(
+        subObjects,
         game,
         gedilId,
         entries.challenges[gedilId],
@@ -74,17 +76,21 @@ export class GameService extends BaseService<Game> {
 
     // leaderboards
     for (const gedilId of Object.keys(entries.leaderboards)) {
-      subObjects.leaderboards[gedilId] = await this.leaderboardService.importGEdIL(game, entries.leaderboards[gedilId]);
+      subObjects.leaderboards[gedilId] = await this.leaderboardService.importGEdIL(
+        subObjects,
+        game,
+        entries.leaderboards[gedilId],
+      );
     }
 
     // rewards
     for (const gedilId of Object.keys(entries.rewards)) {
-      subObjects.rewards[gedilId] = await this.rewardService.importGEdIL(game, entries.rewards[gedilId]);
+      subObjects.rewards[gedilId] = await this.rewardService.importGEdIL(subObjects, game, entries.rewards[gedilId]);
     }
 
     // rules
     for (const gedilId of Object.keys(entries.rules)) {
-      subObjects.rules[gedilId] = await this.hookService.importGEdIL(game, entries.rules[gedilId]);
+      subObjects.rules[gedilId] = await this.hookService.importGEdIL(subObjects, game, entries.rules[gedilId]);
     }
 
     return game;

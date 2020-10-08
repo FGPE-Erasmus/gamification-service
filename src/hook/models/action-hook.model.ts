@@ -33,6 +33,11 @@ export class ActionHook extends Document {
 
   @Prop({ nullable: true })
   lastRun?: Date;
+
+  /* Timestamps */
+
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export const ActionHookSchema = SchemaFactory.createForClass(ActionHook);

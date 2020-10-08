@@ -11,10 +11,10 @@ export class ScheduledHookDto {
   id?: string;
 
   @Field(() => GameDto)
-  game?: GameDto;
+  game?: string;
 
   @Field(() => ChallengeDto, { nullable: true })
-  parentChallenge?: ChallengeDto;
+  parentChallenge?: string;
 
   @Field(() => CriteriaEmbedDto, { nullable: true })
   criteria?: CriteriaEmbedDto;
@@ -36,4 +36,10 @@ export class ScheduledHookDto {
 
   @Field({ nullable: true })
   lastRun?: Date;
+
+  @Field(() => Date)
+  createdAt?: Date;
+
+  @Field(() => Date, { nullable: true })
+  updatedAt?: Date;
 }

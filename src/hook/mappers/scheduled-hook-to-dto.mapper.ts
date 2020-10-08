@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { classToPlain, plainToClass } from 'class-transformer';
 
 import { IMapper } from '../../common/interfaces/mapper.interface';
 import { ScheduledHook } from '../models/scheduled-hook.model';
 import { ScheduledHookDto } from '../dto/scheduled-hook.dto';
+import { pick } from '../../common/utils/object.utils';
 
 @Injectable()
 export class ScheduledHookToDtoMapper implements IMapper<ScheduledHook, ScheduledHookDto> {
@@ -11,6 +11,22 @@ export class ScheduledHookToDtoMapper implements IMapper<ScheduledHook, Schedule
     if (!obj) {
       return undefined;
     }
-    return plainToClass(ScheduledHookDto, classToPlain(obj, { excludeExtraneousValues: true }));
+    return pick(
+      [
+        'id',
+        'game',
+        'parentChallenge',
+        'cron',
+        'interval',
+        'criteria',
+        'actions',
+        'recurrent',
+        'active',
+        'lastRun',
+        'createdAt',
+        'updatedAt',
+      ],
+      obj,
+    );
   }
 }

@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { classToPlain, plainToClass } from 'class-transformer';
 
 import { IMapper } from '../../common/interfaces/mapper.interface';
 import { ChallengeStatusDto } from '../dto/challenge-status.dto';
 import { ChallengeStatus } from '../models/challenge-status.model';
+import { pick } from '../../common/utils/object.utils';
 
 @Injectable()
 export class ChallengeStatusToDtoMapper implements IMapper<ChallengeStatus, ChallengeStatusDto> {
@@ -11,6 +11,6 @@ export class ChallengeStatusToDtoMapper implements IMapper<ChallengeStatus, Chal
     if (!obj) {
       return undefined;
     }
-    return plainToClass(ChallengeStatusDto, classToPlain(obj, { excludeExtraneousValues: true }));
+    return pick(['id', 'player', 'challenge', 'openedAt', 'startedAt', 'endedAt', 'state'], obj);
   }
 }

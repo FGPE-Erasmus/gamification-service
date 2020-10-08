@@ -40,6 +40,11 @@ export class Reward extends Document {
 
   @Prop({ type: [Types.ObjectId], ref: 'PlayerReward' })
   players?: any[];
+
+  /* Timestamps */
+
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export const RewardSchema = SchemaFactory.createForClass(Reward);

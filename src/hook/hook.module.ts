@@ -11,9 +11,7 @@ import { ActionHookResolver } from './action-hook.resolver';
 import { ActionHook, ActionHookSchema } from './models/action-hook.model';
 import { ScheduledHook, ScheduledHookSchema } from './models/scheduled-hook.model';
 import { ActionHookToDtoMapper } from './mappers/action-hook-to-dto.mapper';
-import { ActionHookToPersistenceMapper } from './mappers/action-hook-to-persistence.mapper';
 import { ScheduledHookToDtoMapper } from './mappers/scheduled-hook-to-dto.mapper';
-import { ScheduledHookToPersistenceMapper } from './mappers/scheduled-hook-to-persistence.mapper';
 import { ActionHookRepository } from './repositories/action-hook.repository';
 import { ScheduledHookRepository } from './repositories/scheduled-hook.repository';
 
@@ -34,9 +32,7 @@ import { ScheduledHookRepository } from './repositories/scheduled-hook.repositor
   ],
   providers: [
     ActionHookToDtoMapper,
-    ActionHookToPersistenceMapper,
     ScheduledHookToDtoMapper,
-    ScheduledHookToPersistenceMapper,
     ActionHookRepository,
     ScheduledHookRepository,
     HookService,

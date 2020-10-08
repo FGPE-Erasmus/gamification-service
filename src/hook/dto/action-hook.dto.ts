@@ -12,10 +12,10 @@ export class ActionHookDto {
   id?: string;
 
   @Field(() => GameDto)
-  game?: GameDto;
+  game?: string;
 
   @Field(() => ChallengeDto, { nullable: true })
-  parentChallenge?: ChallengeDto;
+  parentChallenge?: string;
 
   @Field(() => TriggerEvent)
   trigger?: TriggerEvent;
@@ -37,4 +37,10 @@ export class ActionHookDto {
 
   @Field({ nullable: true })
   lastRun?: Date;
+
+  @Field(() => Date)
+  createdAt?: Date;
+
+  @Field(() => Date, { nullable: true })
+  updatedAt?: Date;
 }

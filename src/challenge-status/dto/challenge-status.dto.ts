@@ -10,10 +10,10 @@ export class ChallengeStatusDto {
   id?: string;
 
   @Field(() => PlayerDto)
-  player?: PlayerDto;
+  player?: string;
 
   @Field(() => ChallengeDto)
-  challenge?: ChallengeDto;
+  challenge?: string;
 
   @Field({ nullable: true })
   startedAt?: Date;
