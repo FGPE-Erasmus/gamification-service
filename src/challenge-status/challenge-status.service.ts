@@ -1,83 +1,109 @@
-import { Injectable } from '@nestjs/common';
 import { Queue } from 'bull';
 import { InjectQueue } from '@nestjs/bull';
+import { Injectable, Logger } from '@nestjs/common';
 
-import { ChallengeStatusEntity as ChallengeStatus } from './entities/challenge-status.entity';
-import { PlayerEntity as Player } from 'src/player/entities/player.entity';
-import { State } from './entities/state.enum';
-import { ServiceHelper } from '../common/helpers/service.helper';
+import { BaseService } from '../common/services/base.service';
+import { TriggerEventEnum as TriggerEvent } from '../hook/enums/trigger-event.enum';
+import { ChallengeStatus } from './models/challenge-status.model';
+import { State } from './models/state.enum';
 import { ChallengeStatusRepository } from './repositories/challenge-status.repository';
-import { TriggerEventEnum as TriggerEvent } from '../hook/enum/trigger-event.enum';
 
 @Injectable()
-export class ChallengeStatusService {
+export class ChallengeStatusService extends BaseService<ChallengeStatus> {
   constructor(
-    @InjectQueue('hooksQueue') private hooksQueue: Queue,
-    private readonly serviceHelper: ServiceHelper,
-    private readonly challengeStatusRepository: ChallengeStatusRepository,
-  ) {}
+    protected readonly repository: ChallengeStatusRepository,
+    @InjectQueue('hooksQueue') protected readonly hooksQueue: Queue,
+  ) {
+    super(new Logger(ChallengeStatusService.name), repository);
+  }
 
   /**
-   * Creates a challenge status for locked and hidden statuses
-   * @param studentId a student id
-   * @param challenge a challenge student has taken up.
+   * Find the status of a challenge by challenge ID and player ID.
+   *
+   * @param {string} challengeId the ID of the challenge
+   * @param {string} playerId the ID of the player
+   * @returns {ChallengeStatus} the challenge status
    */
-  async createStatus(studentId: string, challengeId: string): Promise<ChallengeStatus> {
-    const status = {
-      studentId: studentId,
+  async findByChallengeIdAndPlayerId(challengeId: string, playerId: string): Promise<ChallengeStatus> {
+    return this.findOne({
+      challenge: challengeId,
+      player: playerId,
+    });
+  }
+
+  /**
+   * Mark a challenge as open for a certain player.
+   *
+   * @param {string} playerId the ID of the player
+   * @param {string} challengeId the ID of the challenge
+   * @param {Date} date the date at which it was opened
+   * @returns {ChallengeStatus} the challenge status
+   */
+  async markAsOpen(challengeId: string, playerId: string, date: Date): Promise<ChallengeStatus> {
+    const temp: ChallengeStatus = await this.findByChallengeIdAndPlayerId(challengeId, playerId);
+    return this.patch(temp.id, { state: State.OPENED, openedAt: date });
+  }
+
+  /**
+   * Mark a challenge as failed for a certain player.
+   *
+   * @param {string} playerId the ID of the player
+   * @param {string} challengeId the ID of the challenge
+   * @param {Date} date the date at which the player failed it
+   * @returns {ChallengeStatus} the challenge status
+   */
+  async markAsFailed(challengeId: string, playerId: string, date: Date): Promise<ChallengeStatus> {
+    const temp: ChallengeStatus = await this.findByChallengeIdAndPlayerId(challengeId, playerId);
+    const result: ChallengeStatus = await this.patch(temp.id, { state: State.FAILED, endedAt: date });
+
+    // send CHALLENGE_FAILED message to execute attached hooks
+    await this.hooksQueue.add(TriggerEvent.CHALLENGE_FAILED, {
       challengeId: challengeId,
-      state: [State.LOCKED], //the default one?
-    };
-
-    const newStatus: ChallengeStatus = await this.serviceHelper.getUpsertData(
-      undefined,
-      { ...status },
-      this.challengeStatusRepository,
-    );
-    return this.challengeStatusRepository.save(newStatus);
-  }
-
-  async getStatus(studentId: string, challengeId: string): Promise<ChallengeStatus> {
-    return await this.challengeStatusRepository.findStatus(studentId, challengeId);
-  }
-
-  async markAsOpen(studentId: string, challengeId: string, date: Date): Promise<ChallengeStatus> {
-    const temp = await this.challengeStatusRepository.findStatus(studentId, challengeId);
-    temp.state = [State.OPENED];
-    temp.openedAt = date;
-    return this.challengeStatusRepository.save(temp);
-  }
-
-  async markAsFailed(gameId: string, player: Player, challengeId: string, date: Date): Promise<ChallengeStatus> {
-    const job = await this.hooksQueue.add(TriggerEvent.CHALLENGE_FAILED, {
-      gameId: gameId,
-      challengeId: challengeId,
-      player: player,
+      playerId: playerId,
     });
 
-    const temp = await this.challengeStatusRepository.findStatus(player.id.toString(), challengeId);
-    temp.state = [State.FAILED];
-    temp.endedAt = date;
-    return this.challengeStatusRepository.save(temp);
+    return result;
   }
 
-  async markAsCompleted(gameId: string, player: Player, challengeId: string, date: Date): Promise<ChallengeStatus> {
-    const job = await this.hooksQueue.add(TriggerEvent.CHALLENGE_COMPLETED, {
-      gameId: gameId,
+  /**
+   * Mark a challenge as completed for a certain player.
+   *
+   * @param {string} playerId the ID of the player
+   * @param {string} challengeId the ID of the challenge
+   * @param {Date} date the date at which the player completed it
+   * @returns {ChallengeStatus} the challenge status
+   */
+  async markAsCompleted(playerId: string, challengeId: string, date: Date): Promise<ChallengeStatus> {
+    const temp: ChallengeStatus = await this.findByChallengeIdAndPlayerId(challengeId, playerId);
+    const result: ChallengeStatus = await this.patch(temp.id, { state: State.COMPLETED, endedAt: date });
+
+    // send CHALLENGE_COMPLETED message to execute attached hooks
+    await this.hooksQueue.add(TriggerEvent.CHALLENGE_COMPLETED, {
       challengeId: challengeId,
-      player: player,
+      playerId: playerId,
     });
 
-    const temp = await this.challengeStatusRepository.findStatus(player.id.toString(), challengeId);
-    temp.state = [State.COMPLETED];
-    temp.endedAt = date;
-    return this.challengeStatusRepository.save(temp);
+    return result;
   }
 
-  async markAsRejected(studentId: string, challengeId: string, date: Date): Promise<ChallengeStatus> {
-    const temp = await this.challengeStatusRepository.findStatus(studentId, challengeId);
-    temp.state = [State.REJECTED];
-    temp.endedAt = date;
-    return this.challengeStatusRepository.save(temp);
+  /**
+   * Mark a challenge as rejected by a certain player.
+   *
+   * @param {string} playerId the ID of the player
+   * @param {string} challengeId the ID of the challenge
+   * @param {Date} date the date at which the player rejected it
+   * @returns {ChallengeStatus} the challenge status
+   */
+  async markAsRejected(playerId: string, challengeId: string, date: Date): Promise<ChallengeStatus> {
+    const temp: ChallengeStatus = await this.findByChallengeIdAndPlayerId(challengeId, playerId);
+    const result: ChallengeStatus = await this.patch(temp.id, { state: State.REJECTED, endedAt: date });
+
+    // send CHALLENGE_REJECTED message to execute attached hooks
+    await this.hooksQueue.add(TriggerEvent.CHALLENGE_REJECTED, {
+      challengeId: challengeId,
+      playerId: playerId,
+    });
+
+    return result;
   }
 }

@@ -1,17 +1,25 @@
-import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { forwardRef, Module } from '@nestjs/common';
+import { MongooseModule } from '@nestjs/mongoose';
 
-import { ServiceHelper } from '../common/helpers/service.helper';
 import { UsersService } from './users.service';
 import { UsersResolver } from './users.resolver';
+import { User, UserSchema } from './models/user.model';
 import { UserRepository } from './repositories/user.repository';
+import { UserToDtoMapper } from './mappers/user-to-dto.mapper';
+import { UserToPersistenceMapper } from './mappers/user-to-persistence.mapper';
+import { PlayerModule } from '../player/player.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UserRepository]),
-    // forwardRef(() => AuthModule),
+    MongooseModule.forFeature([
+      {
+        name: User.name,
+        schema: UserSchema,
+      },
+    ]),
+    forwardRef(() => PlayerModule),
   ],
-  exports: [UsersService],
-  providers: [UsersService, UsersResolver, ServiceHelper],
+  providers: [UserToDtoMapper, UserToPersistenceMapper, UserRepository, UsersService, UsersResolver],
+  exports: [UserToDtoMapper, UserToPersistenceMapper, UsersService],
 })
 export class UsersModule {}

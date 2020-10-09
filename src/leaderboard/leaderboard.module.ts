@@ -1,15 +1,33 @@
-import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { forwardRef, Module } from '@nestjs/common';
+import { MongooseModule } from '@nestjs/mongoose';
 
-import { ServiceHelper } from '../common/helpers/service.helper';
-import { PlayerLeaderboardRepository } from '../player-leaderboard/repository/player-leaderboard.repository';
-
+import { ChallengeModule } from '../challenge/challenge.module';
+import { GameModule } from '../game/game.module';
 import { LeaderboardService } from './leaderboard.service';
-import { LeaderboardRepository } from './repository/leaderboard.repository';
+import { Leaderboard, LeaderboardSchema } from './models/leaderboard.model';
+import { LeaderboardRepository } from './repositories/leaderboard.repository';
+import { LeaderboardResolver } from './leaderboard.resolver';
+import { LeaderboardToDtoMapper } from './mappers/leaderboard-to-dto.mapper';
+import { LeaderboardToPersistenceMapper } from './mappers/leaderboard-to-persistence.mapper';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([LeaderboardRepository, PlayerLeaderboardRepository])],
-  providers: [ServiceHelper, LeaderboardService],
-  exports: [LeaderboardService],
+  imports: [
+    MongooseModule.forFeature([
+      {
+        name: Leaderboard.name,
+        schema: LeaderboardSchema,
+      },
+    ]),
+    forwardRef(() => GameModule),
+    forwardRef(() => ChallengeModule),
+  ],
+  providers: [
+    LeaderboardToDtoMapper,
+    LeaderboardToPersistenceMapper,
+    LeaderboardRepository,
+    LeaderboardService,
+    LeaderboardResolver,
+  ],
+  exports: [LeaderboardToDtoMapper, LeaderboardToPersistenceMapper, LeaderboardService],
 })
 export class LeaderboardModule {}

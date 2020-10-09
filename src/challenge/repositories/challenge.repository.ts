@@ -1,6 +1,13 @@
-import { EntityRepository, Repository } from 'typeorm';
+import { Injectable, Logger } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 
-import { ChallengeEntity } from '../entities/challenge.entity';
+import { BaseRepository } from '../../common/repositories/base.repository';
+import { Challenge } from '../models/challenge.model';
 
-@EntityRepository(ChallengeEntity)
-export class ChallengeRepository extends Repository<ChallengeEntity> {}
+@Injectable()
+export class ChallengeRepository extends BaseRepository<Challenge> {
+  constructor(@InjectModel(Challenge.name) protected readonly model: Model<Challenge>) {
+    super(new Logger(ChallengeRepository.name), model);
+  }
+}

@@ -17,7 +17,7 @@ describe('UsersModule (Queries and Mutations)', () => {
     const email: string = fakeInternet.email();
 
     const mutation = `
-      mutation saveUser($user: CreateUserInput!) {
+      mutation saveUser($user: UserInput!) {
         saveUser(userInput: $user) {
           name
           username

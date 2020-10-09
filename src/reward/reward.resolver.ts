@@ -1,40 +1,68 @@
 import { UseGuards } from '@nestjs/common';
-import { Parent, Query, ResolveProperty, Resolver } from '@nestjs/graphql';
+import { Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 
 import { GqlJwtAuthGuard } from '../common/guards/gql-jwt-auth.guard';
-import { ChallengeEntity as Challenge } from '../challenge/entities/challenge.entity';
-import { GameEntity as Game } from '../game/entities/game.entity';
 import { ChallengeService } from '../challenge/challenge.service';
+import { ChallengeDto } from '../challenge/dto/challenge.dto';
+import { GameDto } from '../game/dto/game.dto';
 import { GameService } from '../game/game.service';
-import { RewardEntity as Reward } from './entities/reward.entity';
+import { GameToDtoMapper } from '../game/mappers/game-to-dto.mapper';
 import { RewardService } from './reward.service';
+import { RewardDto } from './dto/reward.dto';
+import { RewardToDtoMapper } from './mappers/reward-to-dto.mapper';
+import { ChallengeToDtoMapper } from '../challenge/mappers/challenge-to-dto.mapper';
+import { Reward } from './models/reward.model';
+import { PlayerDto } from '../player/dto/player.dto';
+import { Player } from '../player/models/player.model';
+import { PlayerService } from '../player/player.service';
+import { PlayerToDtoMapper } from '../player/mappers/player-to-dto.mapper';
 
-@Resolver(() => Reward)
+@Resolver(() => RewardDto, { isAbstract: true })
 export class RewardResolver {
   constructor(
-    private readonly rewardService: RewardService,
-    private readonly gameService: GameService,
-    private readonly challengeService: ChallengeService,
+    protected readonly rewardService: RewardService,
+    protected readonly rewardToDtoMapper: RewardToDtoMapper,
+    protected readonly gameService: GameService,
+    protected readonly gameToDtoMapper: GameToDtoMapper,
+    protected readonly playerService: PlayerService,
+    protected readonly playerToDtoMapper: PlayerToDtoMapper,
+    protected readonly challengeService: ChallengeService,
+    protected readonly challengeToDtoMapper: ChallengeToDtoMapper,
   ) {}
 
-  @Query(() => [Reward])
+  @Query(() => [RewardDto])
   @UseGuards(GqlJwtAuthGuard)
-  async rewards(): Promise<Reward[]> {
-    return this.rewardService.findAll();
+  async rewards(): Promise<RewardDto[]> {
+    const rewards: Reward[] = await this.rewardService.findAll();
+    return Promise.all(rewards.map(async reward => this.rewardToDtoMapper.transform(reward)));
   }
 
-  @ResolveProperty()
-  async game(@Parent() root: Reward): Promise<Game> {
-    const { game } = root;
-    return await this.gameService.findOne(game);
+  @ResolveField('game', () => GameDto)
+  async game(@Parent() root: RewardDto): Promise<GameDto> {
+    const { game: gameId } = root;
+    const game = await this.gameService.findById(gameId);
+    return this.gameToDtoMapper.transform(game);
   }
 
-  @ResolveProperty()
-  async parentChallenge(@Parent() root: Reward): Promise<Challenge | undefined> {
-    const { parentChallenge } = root;
-    if (!parentChallenge) {
+  @ResolveField('parentChallenge', () => ChallengeDto)
+  async parentChallenge(@Parent() root: RewardDto): Promise<ChallengeDto> {
+    const { parentChallenge: parentChallengeId } = root;
+    if (!parentChallengeId) {
       return;
     }
-    return await this.challengeService.findOne(parentChallenge);
+    const parentChallenge = await this.challengeService.findById(parentChallengeId);
+    return this.challengeToDtoMapper.transform(parentChallenge);
+  }
+
+  @ResolveField('players', () => [PlayerDto])
+  async players(@Parent() root: RewardDto): Promise<PlayerDto[]> {
+    const { players: playerIds } = root;
+    if (!playerIds || playerIds.length === 0) {
+      return [];
+    }
+    const players: Player[] = await this.playerService.findAll({
+      _id: { $in: playerIds },
+    });
+    return Promise.all(players.map(async player => this.playerToDtoMapper.transform(player)));
   }
 }

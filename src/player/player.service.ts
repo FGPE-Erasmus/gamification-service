@@ -1,17 +1,33 @@
-import { Injectable } from '@nestjs/common';
-import { ServiceHelper } from 'src/common/helpers/service.helper';
-import { PlayerRepository } from './repository/player.repository';
-import { PlayerEntity as Player } from './entities/player.entity';
-import { PlayerDto } from './dto/player.dto';
+import { Injectable, Logger } from '@nestjs/common';
+
+import { BaseService } from '../common/services/base.service';
+import { Player } from './models/player.model';
+import { PlayerRepository } from './repositories/player.repository';
 
 @Injectable()
-export class PlayerService {
-  constructor(private readonly serviceHelper: ServiceHelper, private readonly playerRepository: PlayerRepository) {}
+export class PlayerService extends BaseService<Player> {
+  constructor(protected readonly repository: PlayerRepository) {
+    super(new Logger(PlayerService.name), repository);
+  }
 
-  async createPlayer(id: string | undefined, data: PlayerDto): Promise<Player> {
-    const fields: { [k: string]: any } = { ...data };
-    const newPlayer: Player = await this.serviceHelper.getUpsertData(id, fields, this.playerRepository);
-    return this.playerRepository.save(newPlayer);
+  async findByGame(gameId: string): Promise<Player[]> {
+    return this.findAll({ game: { $eq: gameId } });
+  }
+
+  async findByGameAndUser(gameId: string, userId: string): Promise<Player> {
+    return await this.findOne({
+      $and: [{ user: { $eq: userId } }, { game: { $eq: gameId } }],
+    });
+  }
+
+  async enroll(gameId: string, userId: string): Promise<Player> {
+    const player: Player = await this.findByGameAndUser(gameId, userId);
+    if (player) {
+      return player;
+    }
+    const newPlayer: Player = await this.create({ game: gameId, user: userId });
+    this.logger.error(newPlayer);
+    return newPlayer;
   }
 
   async getGamePlayers(gameId: string): Promise<Player[]> {

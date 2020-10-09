@@ -1,6 +1,6 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
-import { UserEntity as User } from '../../users/entities/user.entity';
+import { User } from '../../users/models/user.model';
 
 /**
  * Check if the user performing the request has admin role.

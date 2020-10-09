@@ -1,55 +1,67 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 
-import { ServiceHelper } from 'src/common/helpers/service.helper';
-import { extractToJson } from 'src/common/utils/extraction.utils';
-import { SortingOrders } from './entities/sorting.enum';
-import { GameEntity as Game } from '../game/entities/game.entity';
-import { ChallengeEntity as Challenge } from '../challenge/entities/challenge.entity';
-import { LeaderboardEntity as Leaderboard } from './entities/leaderboard.entity';
-import { LeaderboardRepository } from './repository/leaderboard.repository';
-import { LeaderboardDto } from './dto/leaderboard.dto';
-import { PlayerLeaderboardRepository } from 'src/player-leaderboard/repository/player-leaderboard.repository';
+import { BaseService } from '../common/services/base.service';
+import { extractToJson } from '../common/utils/extraction.utils';
+import { Challenge } from '../challenge/models/challenge.model';
+import { Game } from '../game/models/game.model';
+import { Leaderboard } from './models/leaderboard.model';
+import { LeaderboardRepository } from './repositories/leaderboard.repository';
+import { LeaderboardToDtoMapper } from './mappers/leaderboard-to-dto.mapper';
+import { LeaderboardToPersistenceMapper } from './mappers/leaderboard-to-persistence.mapper';
+import { PlayerRankingDto } from './dto/player-ranking.dto';
 
 @Injectable()
-export class LeaderboardService {
+export class LeaderboardService extends BaseService<Leaderboard> {
   constructor(
-    private readonly serviceHelper: ServiceHelper,
-    private readonly leaderboardRepository: LeaderboardRepository,
-    private readonly playerLeaderboardRepository: PlayerLeaderboardRepository,
-  ) {}
+    protected readonly repository: LeaderboardRepository,
+    protected readonly toDtoMapper: LeaderboardToDtoMapper,
+    protected readonly toPersistenceMapper: LeaderboardToPersistenceMapper,
+  ) {
+    super(new Logger(LeaderboardService.name), repository);
+  }
 
+  /**
+   * Import GEdIL entries from a leaderboard.
+   *
+   * @param {any} importTracker the objects already imported from the same archive.
+   * @param {Game} game the game which is being imported.
+   * @param {[path: string]: Buffer} entries the archive entries to import.
+   * @param {Challenge} challenge the challenge to which this leaderboard is
+   *                              appended (if any).
+   * @returns {Promise<Leaderboard | undefined>} the imported leaderboard.
+   */
   async importGEdIL(
+    importTracker: { [t in 'challenges' | 'leaderboards' | 'rewards' | 'rules']: { [k: string]: string } },
     game: Game,
     entries: { [path: string]: Buffer },
     challenge?: Challenge,
   ): Promise<Leaderboard | undefined> {
-    let leaderboard: Leaderboard;
-
-    for (const path of Object.keys(entries)) {
-      const encodedContent = extractToJson(entries[path]);
-      leaderboard = await this.createLeaderboard({
-        ...encodedContent,
-        game: game.id,
-        parentChallenge: challenge?.id,
-      });
+    if (!('metadata.json' in entries)) {
+      return;
     }
+
+    const encodedContent = extractToJson(entries['metadata.json']);
+
+    // create leaderboard
+    const leaderboard: Leaderboard = await this.create({
+      ...encodedContent,
+      sortingOrders: encodedContent.sorting_orders,
+      game: game.id,
+      parentChallenge: challenge?.id,
+    });
+
     return leaderboard;
   }
 
-  async createLeaderboard(data: LeaderboardDto): Promise<Leaderboard> {
-    const fields: { [key: string]: any } = { ...data };
-    fields.sortingOrders = fields.sorting_orders as [SortingOrders];
-    delete fields.sorting_orders;
-    const newLeaderboard: Leaderboard = await this.serviceHelper.getUpsertData(
-      null,
-      fields,
-      this.leaderboardRepository,
-    );
-    return await this.leaderboardRepository.save(newLeaderboard);
+  // TODO instead of maintaining & updating scores in a collection,
+  // calculate rankings on-demand
+
+  async getRankings(leaderboardId: string): Promise<PlayerRankingDto[]> {
+    return [];
   }
 
-  async sortLeaderboard(leaderboardId: string): Promise<any> {
-    const leaderboard: Leaderboard = await this.leaderboardRepository.findOne(leaderboardId);
+  /*async sortLeaderboard(leaderboardId: string): Promise<any> {
+    const leaderboard: Leaderboard = await this.findById(leaderboardId);
     const list = await this.playerLeaderboardRepository.find({
       where: {
         leaderboardId: leaderboardId,
@@ -59,7 +71,7 @@ export class LeaderboardService {
       for (let i = 0; i < leaderboard.metrics.length; i++) {
         const metric = leaderboard.metrics[i];
         const sortingOrder = leaderboard.sortingOrders[i];
-        const reverse = sortingOrder === SortingOrders.DESC ? -1 : 1;
+        const reverse = sortingOrder === SortingOrder.DESC ? -1 : 1;
         if (a.score[metric] < b.score[metric]) {
           return reverse * -1;
         } else if (a.score[metric] > b.score[metric]) {
@@ -69,5 +81,22 @@ export class LeaderboardService {
       return 0;
     });
     return list;
-  }
+  }*/
+
+  /*async sortPlayers(players: PlayerDto[], metrics: string[]): Promise<PlayerDto[]> {
+    const submissionss = players.
+    players.sort((a, b) => {
+      for (let i = 0; i < leaderboard.metrics.length; i++) {
+        const metric = leaderboard.metrics[i];
+        const sortingOrder = leaderboard.sortingOrders[i];
+        const reverse = sortingOrder === SortingOrder.DESC ? -1 : 1;
+        if (a.score[metric] < b.score[metric]) {
+          return reverse * -1;
+        } else if (a.score[metric] > b.score[metric]) {
+          return reverse * 1;
+        }
+      }
+      return 0;
+    });
+  }*/
 }

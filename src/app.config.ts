@@ -1,4 +1,4 @@
-import { ConnectionOptions } from 'typeorm';
+import { LoggerService, LogLevel } from '@nestjs/common';
 
 interface IAppConfig {
   version: string;
@@ -8,7 +8,18 @@ interface IAppConfig {
   isDevelopment: boolean;
   isTesting: boolean;
   assetsPath: string;
-  database: ConnectionOptions;
+  database: {
+    protocol: string;
+    host: string;
+    port: number;
+    username: string;
+    password: string;
+    database: string;
+    authSource: string;
+    loggerLevel: string;
+    useNewUrlParser: boolean;
+    useUnifiedTopology: boolean;
+  };
   evaluationEngine: string;
   queueHost: string;
   queuePort: number;
@@ -18,10 +29,7 @@ interface IAppConfig {
     secret: string;
     expirationTime: number;
   };
-  logger: {
-    level: string;
-    transports?: any[];
-  };
+  logger: LoggerService | LogLevel[] | boolean;
 }
 
 export const appConfig: IAppConfig = {
@@ -36,23 +44,16 @@ export const appConfig: IAppConfig = {
   queueHost: process.env.REDIS_HOST,
   queuePort: parseInt(process.env.REDIS_PORT, 10),
   database: {
-    type: 'mongodb',
+    protocol: 'mongodb',
     host: process.env.DB_HOST,
     port: parseInt(process.env.DB_PORT, 10),
     username: process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
     authSource: process.env.DB_AUTH,
-
-    synchronize: true,
     useUnifiedTopology: true,
-    logging: 'all',
-    migrationsRun: true,
-    migrations: [__dirname + '/migrations/*{.ts,.js}'],
-    cli: {
-      migrationsDir: __dirname + '/migrations',
-    },
-    entities: [__dirname + '/**/entities/*.entity{.ts,.js}'],
+    useNewUrlParser: true,
+    loggerLevel: process.env.DB_LOGGER_LEVEL,
   },
   port: parseInt(process.env.APP_PORT, 10),
   host: process.env.APP_HOST,
@@ -60,7 +61,5 @@ export const appConfig: IAppConfig = {
     secret: process.env.JWT_SECRET,
     expirationTime: parseInt(process.env.JWT_EXPIRATION_TIME, 10),
   },
-  logger: {
-    level: process.env.APP_LOGGER_LEVEL,
-  },
+  logger: (process.env.APP_LOGGER_LEVELS?.split(',') as LogLevel[]) || ['error', 'warn'],
 };
