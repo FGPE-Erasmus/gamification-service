@@ -7,39 +7,37 @@ import { CriteriaEmbedDto } from '../../hook/dto/embedded/criteria.dto';
 import { ActionEmbedDto } from '../../hook/dto/embedded/action.dto';
 import { Player } from '../../player/models/player.model';
 import { RewardService } from '../../reward/reward.service';
+import { SubmissionService } from 'src/submission/submission.service';
+import { PlayerService } from 'src/player/player.service';
+import { ActionHookDto } from 'src/hook/dto/action-hook.dto';
+import { ScheduledHookDto } from 'src/hook/dto/scheduled-hook.dto';
+import { CriteriaHelper } from 'src/common/helpers/criteria.helper';
+import { PlayerRepository } from 'src/player/repository/player.repository';
+import { SubmissionRepository } from 'src/submission/repository/submission.repository';
 
 @Processor('hooksQueue')
 export class JobProcessor {
-  constructor(private readonly hookService: HookService, private readonly rewardService: RewardService) {}
-
-  @Process()
-  async performActionOnCompleted(job: Job<unknown>): Promise<any> {
-    /* const hooks = await this.hookService.find({
-      where: {
-        gameId: job.data['gameId'],
-        trigger: job.name,
-      },
-    });
-    hooks.forEach(hook => {
-      if (this.checkCriteria(hook.criteria)) {
-        this.runActions(hook.actions, job.data['player'] as Player);
-      }
-    }); */
+  constructor(
+    private readonly hookService: HookService,
+    private readonly rewardService: RewardService,
+    private readonly criteriaHelper: CriteriaHelper,
+    private readonly submissionRepository: SubmissionRepository,
+    private readonly playerRepository: PlayerRepository,
+  ) {
+    this.criteriaHelper = new CriteriaHelper(this.playerRepository, this.submissionRepository);
   }
 
-  //to be changed
-  checkCriteria(criterias: CriteriaEmbedDto[]): boolean {
-    // criterias.some(criteria => {
-    //   const conditional = '';
-    //   const junctorsLength = criteria.junctors.length;
-    //   for (let i = 0; i < junctorsLength; i++) {
-    //     const junctor = criteria.junctors[i] === Junctor.AND ? '&&' : '||';
-    //     conditional.concat(criteria.conditions[i] + ' ' + junctor + ' ');
-    //   }
-    //   conditional.concat(criteria.conditions[junctorsLength]);
-    // if (!eval(conditional)) return false;
-    // });
-    return true;
+  @Process()
+  async hookExecution(job: Job<unknown>): Promise<any> {
+    let hook: ActionHookDto | ScheduledHookDto;
+    if (typeof job.data['trigger'] !== undefined) {
+      hook = job.data['hook'] as ActionHookDto;
+    } else {
+      hook = job.data['hook'] as ScheduledHookDto;
+    }
+    if (this.criteriaHelper.checkCriteria(hook, job.data['params'])) {
+      // this.runActions(hook.actions, player);
+    }
   }
 
   async runActions(actions: ActionEmbedDto[], player: Player): Promise<any> {

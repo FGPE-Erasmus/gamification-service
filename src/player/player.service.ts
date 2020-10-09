@@ -29,4 +29,16 @@ export class PlayerService extends BaseService<Player> {
     this.logger.error(newPlayer);
     return newPlayer;
   }
+
+  async getGamePlayers(gameId: string): Promise<Player[]> {
+    return this.playerRepository.find({
+      where: {
+        gameId: gameId,
+      },
+    });
+  }
+
+  async getPlayer(playerId: string): Promise<Player> {
+    return this.playerRepository.findOne(playerId);
+  }
 }

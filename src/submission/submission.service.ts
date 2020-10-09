@@ -56,6 +56,25 @@ export class SubmissionService extends BaseService<Submission> {
     return submission;
   }
 
+  async onSubmissionReceived(exerciseId: string, playerId: string): Promise<any> {
+    const hooks: ActionHook[] = await this.actionHookRepository.find({
+      where: {
+        trigger: TriggerEventEnum.SUBMISSION_RECEIVED,
+        sourceId: exerciseId,
+      },
+    });
+    hooks.forEach(async hook => {
+      const job = await this.hooksQueue.add({
+        hook: hook,
+        params: {
+          exerciseId: exerciseId,
+          playerId: playerId,
+          exercise: { obj: 'example exerciseObj' },
+        },
+      });
+    });
+  }
+
   async onSubmissionAccepted(submission: Submission): Promise<Submission> {
     return null;
   }
