@@ -6,11 +6,17 @@ import { ConditionEmbed } from 'src/hook/entities/embedded/condition.embed';
 import { CriteriaEmbed } from 'src/hook/entities/embedded/criteria.embed';
 import { ComparingFunctionEnum } from 'src/hook/enum/comparing-function.enum';
 import { JunctorEnum } from 'src/hook/enum/junctor.enum';
-import { PlayerService } from 'src/player/player.service';
-import { SubmissionService } from 'src/submission/submission.service';
+import { Repository } from 'typeorm';
 
 export class CriteriaHelper {
-  constructor(private playerService: PlayerService, private submissionService: SubmissionService) {}
+  playerRepository: Repository<any>;
+  submissionRepository: Repository<any>;
+
+  constructor(playerRepository: Repository<any>, submissionRepository: Repository<any>) {
+    this.playerRepository = playerRepository;
+    this.submissionRepository = submissionRepository;
+  }
+
   checkCriteria(hook: ActionHookDto | ScheduledHookDto, params: any): boolean {
     const criterias: CriteriaEmbed = hook.criteria;
     criterias.conditions.sort((a, b) => (a.order > b.order ? 1 : -1));
@@ -40,7 +46,10 @@ export class CriteriaHelper {
     gameId: string,
     params: any,
   ): Promise<{ [key: string]: any } | string> {
-    const player = await this.playerService.getPlayer(params.PLAYER_ID);
+    const player = () => this.playerRepository.findOne(params.playerId);
+    const submissions = () => this.submissionRepository.find({ where: { gameId: gameId } });
+    const players = () => this.playerRepository.find({ where: { gameId: gameId } });
+
     switch (identity) {
       case 'FIXED': //value of the property is already the value to check
         return property;
@@ -59,11 +68,11 @@ export class CriteriaHelper {
         let environment;
         if (property.includes('submissions')) {
           environment = {
-            submissions: await this.submissionService.getAllSubmissions(gameId),
+            submissions: submissions,
           };
         } else if (property.includes('players')) {
           environment = {
-            players: await this.playerService.getGamePlayers(gameId),
+            players: players,
           };
         } else {
           environment = {

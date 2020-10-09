@@ -11,20 +11,25 @@ import { PlayerService } from 'src/player/player.service';
 import { ActionHookDto } from 'src/hook/dto/action-hook.dto';
 import { ScheduledHookDto } from 'src/hook/dto/scheduled-hook.dto';
 import { CriteriaHelper } from 'src/common/helpers/criteria.helper';
+import { PlayerRepository } from 'src/player/repository/player.repository';
+import { SubmissionRepository } from 'src/submission/repository/submission.repository';
 
 @Processor('hooksQueue')
 export class JobProcessor {
   constructor(
     private readonly hookService: HookService,
     private readonly rewardService: RewardService,
-    private readonly submissionService: SubmissionService,
-    private readonly playerService: PlayerService,
     private readonly criteriaHelper: CriteriaHelper,
-  ) {}
+    private readonly submissionRepository: SubmissionRepository,
+    private readonly playerRepository: PlayerRepository,
+  ) {
+    this.criteriaHelper = new CriteriaHelper(this.playerRepository, this.submissionRepository);
+  }
 
   @Process()
   async hookExecution(job: Job<unknown>): Promise<any> {
     let hook: ActionHookDto | ScheduledHookDto;
+
     if (typeof job.data['trigger'] !== undefined) {
       hook = job.data['hook'] as ActionHookDto;
     } else {
