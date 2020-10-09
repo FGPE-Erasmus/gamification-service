@@ -1,34 +1,45 @@
 import { UseGuards } from '@nestjs/common';
-import { Parent, Query, ResolveProperty, Resolver } from '@nestjs/graphql';
+import { Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 
 import { GqlJwtAuthGuard } from '../common/guards/gql-jwt-auth.guard';
+import { GameDto } from '../game/dto/game.dto';
+import { GameToDtoMapper } from '../game/mappers/game-to-dto.mapper';
 import { GameService } from '../game/game.service';
-import { GameEntity as Game } from '../game/entities/game.entity';
 import { ChallengeService } from './challenge.service';
-import { ChallengeEntity as Challenge } from './entities/challenge.entity';
+import { ChallengeDto } from './dto/challenge.dto';
+import { ChallengeToDtoMapper } from './mappers/challenge-to-dto.mapper';
+import { Challenge } from './models/challenge.model';
 
-@Resolver(() => Challenge)
+@Resolver(() => ChallengeDto)
 export class ChallengeResolver {
-  constructor(private readonly challengeService: ChallengeService, private readonly gameService: GameService) {}
+  constructor(
+    protected readonly challengeService: ChallengeService,
+    protected readonly challengeToDtoMapper: ChallengeToDtoMapper,
+    protected readonly gameService: GameService,
+    protected readonly gameToDtoMapper: GameToDtoMapper,
+  ) {}
 
-  @Query(() => [Challenge])
+  @Query(() => [ChallengeDto])
   @UseGuards(GqlJwtAuthGuard)
-  async challenges(): Promise<Challenge[]> {
-    return this.challengeService.findAll();
+  async challenges(): Promise<ChallengeDto[]> {
+    const challenges: Challenge[] = await this.challengeService.findAll();
+    return Promise.all(challenges.map(async challenge => this.challengeToDtoMapper.transform(challenge)));
   }
 
-  @ResolveProperty()
-  async game(@Parent() root: Challenge): Promise<Game> {
-    const { game } = root;
-    return await this.gameService.findOne(game);
+  @ResolveField()
+  async game(@Parent() root: ChallengeDto): Promise<GameDto> {
+    const { game: gameId } = root;
+    const game = await this.gameService.findById(gameId);
+    return this.gameToDtoMapper.transform(game);
   }
 
-  @ResolveProperty()
-  async parentChallenge(@Parent() root: Challenge): Promise<Challenge | undefined> {
-    const { parentChallenge } = root;
-    if (!parentChallenge) {
+  @ResolveField()
+  async parentChallenge(@Parent() root: ChallengeDto): Promise<ChallengeDto | undefined> {
+    const { parentChallenge: parentChallengeId } = root;
+    if (!parentChallengeId) {
       return;
     }
-    return await this.challengeService.findOne(parentChallenge);
+    const parentChallenge = await this.challengeService.findById(parentChallengeId);
+    return this.challengeToDtoMapper.transform(parentChallenge);
   }
 }

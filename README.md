@@ -4,7 +4,7 @@ This is a Gamification Service for educational contexts. It consumes a JSON obje
 
 ## Getting Started
 
-Docker + Make + Node.js + TypeScript + NestJS + TypeORM + TypeGraphQL + Jest + TSLint + EasyGraphQL Tester
+Docker + Make + Node.js + TypeScript + NestJS + Mongoose + TypeGraphQL + Jest + TSLint + EasyGraphQL Tester
 
 ### Requirements
 
@@ -94,7 +94,7 @@ $ npm run test:cov
 * [TypeScript](https://sass-lang.com/)
 * [NestJS](https://nestjs.com/)
 * [Express](https://expressjs.com)
-* [TypeORM](https://typeorm.io/)
+* [Mongoose](https://mongoosejs.com/)
 * [TypeGraphQL](https://typegraphql.ml/)
 * [Jest](https://jestjs.io/)
 * [EasyGraphQL Tester](https://easygraphql.com/docs/easygraphql-tester/overview/)

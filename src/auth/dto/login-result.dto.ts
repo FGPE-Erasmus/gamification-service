@@ -1,15 +1,19 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
+import { Expose } from 'class-transformer';
 
-import { UserEntity as User } from '../../users/entities/user.entity';
+import { UserDto } from '../../users/dto/user.dto';
 
 @ObjectType('LoginResult')
 export default class LoginResultDto {
   @Field(() => Int)
+  @Expose()
   expiresIn: number;
 
   @Field()
+  @Expose()
   token: string;
 
-  @Field(() => User)
-  user: User;
+  @Field(() => UserDto)
+  @Expose()
+  user: UserDto;
 }

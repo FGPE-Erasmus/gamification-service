@@ -1,41 +1,57 @@
-import { Resolver, Args, Query, ResolveProperty, Parent } from '@nestjs/graphql';
+import { Resolver, Args, Query, ResolveField, Parent } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 
 import { GqlJwtAuthGuard } from '../common/guards/gql-jwt-auth.guard';
+import { ChallengeDto } from '../challenge/dto/challenge.dto';
+import { GameDto } from '../game/dto/game.dto';
 import { ChallengeService } from '../challenge/challenge.service';
-import { ChallengeEntity as Challenge } from '../challenge/entities/challenge.entity';
-import { GameEntity as Game } from '../game/entities/game.entity';
+import { ChallengeToDtoMapper } from '../challenge/mappers/challenge-to-dto.mapper';
 import { GameService } from '../game/game.service';
-import { LeaderboardEntity as Leaderboard } from './entities/leaderboard.entity';
+import { GameToDtoMapper } from '../game/mappers/game-to-dto.mapper';
 import { LeaderboardService } from './leaderboard.service';
-import { SortedResult } from './dto/sorted-result.dto';
+import { PlayerRankingDto } from './dto/player-ranking.dto';
+import { LeaderboardDto } from './dto/leaderboard.dto';
+import { Leaderboard } from './models/leaderboard.model';
+import { LeaderboardToDtoMapper } from './mappers/leaderboard-to-dto.mapper';
 
-@Resolver()
+@Resolver(() => LeaderboardDto)
 export class LeaderboardResolver {
   constructor(
-    private leaderboardService: LeaderboardService,
-    private gameService: GameService,
-    private challengeService: ChallengeService,
+    protected readonly leaderboardService: LeaderboardService,
+    protected readonly leaderboardToDtoMapper: LeaderboardToDtoMapper,
+    protected readonly gameService: GameService,
+    protected readonly gameToDtoMapper: GameToDtoMapper,
+    protected readonly challengeService: ChallengeService,
+    protected readonly challengeToDtoMapper: ChallengeToDtoMapper,
   ) {}
 
-  @Query(() => Leaderboard)
+  @Query(() => [LeaderboardDto])
   @UseGuards(GqlJwtAuthGuard)
-  async getSorted(@Args() leaderboardId: string): Promise<SortedResult> {
-    return this.leaderboardService.sortLeaderboard(leaderboardId);
+  async leaderboards(): Promise<LeaderboardDto[]> {
+    const leaderboards: Leaderboard[] = await this.leaderboardService.findAll();
+    return Promise.all(leaderboards.map(async leaderboard => this.leaderboardToDtoMapper.transform(leaderboard)));
   }
 
-  @ResolveProperty()
-  async game(@Parent() root: Leaderboard): Promise<Game> {
-    const { game } = root;
-    return await this.gameService.findOne(game);
+  @Query(() => [PlayerRankingDto])
+  @UseGuards(GqlJwtAuthGuard)
+  async playerRankings(@Args('leaderboardId') leaderboardId: string): Promise<PlayerRankingDto[]> {
+    return this.leaderboardService.getRankings(leaderboardId);
   }
 
-  @ResolveProperty()
-  async parentChallenge(@Parent() root: Leaderboard): Promise<Challenge | undefined> {
-    const { parentChallenge } = root;
-    if (!parentChallenge) {
+  @ResolveField()
+  async game(@Parent() root: LeaderboardDto): Promise<GameDto> {
+    const { game: gameId } = root;
+    const game = await this.gameService.findById(gameId);
+    return this.gameToDtoMapper.transform(game);
+  }
+
+  @ResolveField()
+  async parentChallenge(@Parent() root: LeaderboardDto): Promise<ChallengeDto | undefined> {
+    const { parentChallenge: parentChallengeId } = root;
+    if (!parentChallengeId) {
       return;
     }
-    return await this.challengeService.findOne(parentChallenge);
+    const parentChallenge = await this.challengeService.findById(parentChallengeId);
+    return this.challengeToDtoMapper.transform(parentChallenge);
   }
 }

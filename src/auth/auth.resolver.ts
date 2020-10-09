@@ -1,26 +1,26 @@
 import { Args, Resolver, Mutation } from '@nestjs/graphql';
 import { Response } from 'express';
 
-import { UserEntity as User } from '../users/entities/user.entity';
 import { GqlResponse } from '../common/decorators/gql-response.decorator';
+import { UserDto } from '../users/dto/user.dto';
 import { AuthService } from './auth.service';
-import LoginDto from './dto/login.dto';
+import LoginArgs from './args/login.args';
+import SignupArgs from './args/signup.args';
 import LoginResultDto from './dto/login-result.dto';
-import SignupDto from './dto/signup.dto';
 
 @Resolver('Auth')
 export class AuthResolver {
   constructor(private authService: AuthService) {}
 
-  @Mutation(() => User)
-  async login(@Args() input: LoginDto, @GqlResponse() res: Response): Promise<User> {
+  @Mutation(() => UserDto)
+  async login(@Args() input: LoginArgs, @GqlResponse() res: Response): Promise<UserDto> {
     const result: LoginResultDto = await this.authService.login(input);
     res.cookie('token', result.token, { httpOnly: true });
     return result.user;
   }
 
-  @Mutation(() => User)
-  async signup(@Args() input: SignupDto, @GqlResponse() res: Response): Promise<User> {
+  @Mutation(() => UserDto)
+  async signup(@Args() input: SignupArgs, @GqlResponse() res: Response): Promise<UserDto> {
     const result: LoginResultDto = await this.authService.signup(input);
     res.cookie('token', result.token, { httpOnly: true });
     return result.user;

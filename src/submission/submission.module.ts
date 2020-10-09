@@ -1,13 +1,32 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
+import { MongooseModule } from '@nestjs/mongoose';
+import { BullModule } from '@nestjs/bull';
+
+import { QueueConfigService } from '../queue.config';
+import { GameModule } from '../game/game.module';
+import { PlayerModule } from '../player/player.module';
 import { SubmissionService } from './submission.service';
-import { ServiceHelper } from 'src/common/helpers/service.helper';
 import { SubmissionResolver } from './submission.resolver';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { SubmissionRepository } from './repository/submission.repository';
+import { SubmissionRepository } from './repositories/submission.repository';
+import { Submission, SubmissionSchema } from './models/submission.model';
+import { SubmissionToDtoMapper } from './mappers/submission-to-dto.mapper';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([SubmissionRepository])],
-  exports: [SubmissionService],
-  providers: [SubmissionService, ServiceHelper, SubmissionResolver],
+  imports: [
+    MongooseModule.forFeature([
+      {
+        name: Submission.name,
+        schema: SubmissionSchema,
+      },
+    ]),
+    BullModule.registerQueueAsync({
+      name: 'hooksQueue',
+      useClass: QueueConfigService,
+    }),
+    forwardRef(() => GameModule),
+    forwardRef(() => PlayerModule),
+  ],
+  providers: [SubmissionToDtoMapper, SubmissionRepository, SubmissionService, SubmissionResolver],
+  exports: [SubmissionToDtoMapper, SubmissionService],
 })
 export class SubmissionModule {}

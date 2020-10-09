@@ -1,27 +1,29 @@
-import { Injectable } from '@nestjs/common';
-import { ObjectId } from 'mongodb';
+import { Injectable, Logger } from '@nestjs/common';
 
-import { ServiceHelper } from '../common/helpers/service.helper';
+import { BaseService } from '../common/services/base.service';
 import { extractToJson } from '../common/utils/extraction.utils';
-import { GameEntity as Game } from '../game/entities/game.entity';
+import { Game } from '../game/models/game.model';
 import { HookService } from '../hook/hook.service';
 import { LeaderboardService } from '../leaderboard/leaderboard.service';
 import { RewardService } from '../reward/reward.service';
-import { UpsertChallengeDto } from './dto/upsert-challenge.dto';
+
 import { ChallengeRepository } from './repositories/challenge.repository';
-import { ChallengeEntity as Challenge } from './entities/challenge.entity';
+import { Challenge } from './models/challenge.model';
+import { Mode } from './models/mode.enum';
 
 @Injectable()
-export class ChallengeService {
+export class ChallengeService extends BaseService<Challenge> {
   constructor(
-    private readonly serviceHelper: ServiceHelper,
-    private readonly challengeRepository: ChallengeRepository,
-    private readonly leaderboardService: LeaderboardService,
-    private readonly rewardService: RewardService,
-    private readonly hookService: HookService,
-  ) {}
+    protected readonly repository: ChallengeRepository,
+    protected readonly leaderboardService: LeaderboardService,
+    protected readonly rewardService: RewardService,
+    protected readonly hookService: HookService,
+  ) {
+    super(new Logger(ChallengeService.name), repository);
+  }
 
   async importGEdIL(
+    imported: { [t in 'challenges' | 'leaderboards' | 'rewards' | 'rules']: { [k: string]: string } },
     game: Game,
     gedilId: string,
     entries: { [path: string]: Buffer },
@@ -35,6 +37,7 @@ export class ChallengeService {
         const encodedContent = extractToJson(entries[path]);
         challenge = await this.create({
           ...encodedContent,
+          modeParameters: encodedContent.mode_parameters,
           game: game.id,
           parentChallenge: parentChallenge?.id,
         });
@@ -56,12 +59,19 @@ export class ChallengeService {
 
     // inner challenges
     for (const gedilId of Object.keys(subEntries.challenges)) {
-      subObjects.challenges[gedilId] = await this.importGEdIL(game, gedilId, subEntries.challenges[gedilId], challenge);
+      subObjects.challenges[gedilId] = await this.importGEdIL(
+        imported,
+        game,
+        gedilId,
+        subEntries.challenges[gedilId],
+        challenge,
+      );
     }
 
     // inner leaderboards
     for (const gedilId of Object.keys(subEntries.leaderboards)) {
       subObjects.leaderboards[gedilId] = await this.leaderboardService.importGEdIL(
+        imported,
         game,
         subEntries.leaderboards[gedilId],
         challenge,
@@ -70,50 +80,115 @@ export class ChallengeService {
 
     // inner rewards
     for (const gedilId of Object.keys(subEntries.rewards)) {
-      subObjects.rewards[gedilId] = await this.rewardService.importGEdIL(game, subEntries.rewards[gedilId], challenge);
+      subObjects.rewards[gedilId] = await this.rewardService.importGEdIL(
+        imported,
+        game,
+        subEntries.rewards[gedilId],
+        challenge,
+      );
     }
 
     // inner rules
     for (const gedilId of Object.keys(subEntries.rules)) {
-      subObjects.rules[gedilId] = await this.hookService.importGEdIL(game, subEntries.rules[gedilId], challenge);
+      subObjects.rules[gedilId] = await this.hookService.importGEdIL(
+        imported,
+        game,
+        subEntries.rules[gedilId],
+        challenge,
+      );
     }
 
     return challenge;
   }
 
   /**
-   * Create a challenge with a set of provides fields.
+   * Find all challenges within a specific game or generally.
    *
-   * @param id of the challenge to create
-   * @param data for creation
-   */
-  async create(data: UpsertChallengeDto): Promise<Challenge> {
-    const newChallenge: Challenge = await this.serviceHelper.getUpsertData(null, { ...data }, this.challengeRepository);
-    return this.challengeRepository.save(newChallenge);
-  }
-
-  /**
-   * Find all challenges.
-   *
-   * @param {any} query the query to filter items
+   * @param gameId the ID of the game
    * @returns {Promise<Challenge[]>} the challenges.
    */
-  async findAll(query?: any): Promise<Challenge[]> {
-    return await this.challengeRepository.find(query);
+  async findByGameId(gameId: string): Promise<Challenge[]> {
+    return await this.findAll({
+      game: { eq: gameId },
+    });
   }
 
   /**
-   * Finds a challenge by its ID.
+   * Find all children-challenges of a specified parent-challenge.
    *
-   * @param {string} id of challenge
-   * @returns {(Promise<Challenge | undefined>)}
-   * @memberof ChallengeService
+   * @returns {Promise<Challenge[]>} the children-challenges.
    */
-  async findOne(id: string): Promise<Challenge> {
-    return await this.challengeRepository.findOne({
-      where: {
-        _id: ObjectId(id),
-      },
+  async findChildren(parentId: string): Promise<Challenge[]> {
+    return await this.findAll({
+      parentChallenge: { eq: parentId },
     });
+  }
+
+  /**
+   * Find the challenges by name, within a game or generally.
+   *
+   * @returns {Promise<Challenge[]>} the challenges.
+   */
+  async findByName(name: string, gameId?: string): Promise<Challenge[]> {
+    if (!gameId) {
+      return await this.findAll({
+        name: { $regex: `.*${name}.*` },
+      });
+    } else {
+      return await this.findAll({
+        $and: [{ name: { $regex: `.*${name}.*` } }, { game: { $eq: gameId } }],
+      });
+    }
+  }
+
+  /**
+   * Find the challenges by mode, within a game or generally.
+   *
+   * @returns {Promise<Challenge[]>} the challenges.
+   */
+  async findByMode(mode: Mode, gameId?: string): Promise<Challenge[]> {
+    if (!gameId) {
+      return await this.findAll({
+        mode: { $eq: mode },
+      });
+    } else {
+      return await this.findAll({
+        $and: [{ mode: { $eq: mode } }, { game: { $eq: gameId } }],
+      });
+    }
+  }
+
+  /**
+   * Find the challenges by their 'locked' status, within a game or generally.
+   *
+   * @returns {Promise<Challenge[]>} the challenges.
+   */
+  async findLocked(locked: boolean, gameId: string): Promise<Challenge[]> {
+    if (!gameId) {
+      return await this.findAll({
+        locked: { $eq: locked },
+      });
+    } else {
+      return await this.findAll({
+        $and: [{ locked: { $eq: locked } }, { game: { $eq: gameId } }],
+      });
+    }
+  }
+
+  /**
+   * Find the challenges by their 'hidden' status, within a game or generally.
+   *
+   * @returns {Promise<Challenge[]>} the challenges.
+   */
+  async findHidden(hidden: boolean, gameId: string): Promise<Challenge[]> {
+    if (!gameId) {
+      return await this.findAll({
+        hidden: { $eq: hidden },
+      });
+    } else {
+      return await this.findAll({
+        $and: [{ locked: { $eq: hidden } }, { game: { $eq: gameId } }],
+      });
+    }
   }
 }

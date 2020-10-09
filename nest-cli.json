@@ -1,4 +1,12 @@
 {
   "collection": "@nestjs/schematics",
-  "sourceRoot": "src"
+  "sourceRoot": "src",
+  "plugins": [
+    {
+      "name": "@nestjs/graphql/plugin",
+      "options": {
+        "typeFileNameSuffix": [".args.ts", ".dto.ts", ".input.ts", ".model.ts"]
+      }
+    }
+  ]
 }

@@ -1,11 +1,11 @@
 import { Processor, Process } from '@nestjs/bull';
 import { Job } from 'bull';
 
-import { CategoryEnum as Category } from '../../hook/enum/category.enum';
+import { CategoryEnum as Category } from '../../hook/enums/category.enum';
 import { HookService } from '../../hook/hook.service';
-import { Criteria } from '../../hook/dto/criteria.dto';
-import { Action } from '../../hook/dto/action.dto';
-import { PlayerEntity as Player } from '../../player/entities/player.entity';
+import { CriteriaEmbedDto } from '../../hook/dto/embedded/criteria.dto';
+import { ActionEmbedDto } from '../../hook/dto/embedded/action.dto';
+import { Player } from '../../player/models/player.model';
 import { RewardService } from '../../reward/reward.service';
 
 @Processor('hooksQueue')
@@ -28,7 +28,7 @@ export class JobProcessor {
   }
 
   //to be changed
-  checkCriteria(criterias: Criteria[]): boolean {
+  checkCriteria(criterias: CriteriaEmbedDto[]): boolean {
     // criterias.some(criteria => {
     //   const conditional = '';
     //   const junctorsLength = criteria.junctors.length;
@@ -42,7 +42,7 @@ export class JobProcessor {
     return true;
   }
 
-  async runActions(actions: Action[], player: Player): Promise<any> {
+  async runActions(actions: ActionEmbedDto[], player: Player): Promise<any> {
     actions.forEach(action => {
       // TODO: get a reward obj from its id located in action.parameters and pass it as the first argument in methods below
       switch (action.type) {

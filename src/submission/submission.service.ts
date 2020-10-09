@@ -1,78 +1,85 @@
-import { Injectable } from '@nestjs/common';
-import { SubmissionDto } from './dto/submission.dto';
-import { SubmissionEntity as Submission } from './entities/submission.entity';
-import { ServiceHelper } from 'src/common/helpers/service.helper';
-import { SubmissionRepository } from './repository/submission.repository';
-import { Result } from './entities/result.enum';
-import { EvaluationEvent } from './dto/evaluation-event.dto';
-import { response } from 'express';
-import { appConfig } from 'src/app.config';
-
+import { Injectable, Logger } from '@nestjs/common';
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
 import got from 'got';
 
+import { appConfig } from '../app.config';
+import { BaseService } from '../common/services/base.service';
+import { TriggerEventEnum, TriggerEventEnum as TriggerEvent } from '../hook/enums/trigger-event.enum';
+import { Player } from '../player/models/player.model';
+import { PlayerService } from '../player/player.service';
+import { ReportInput } from './inputs/report.input';
+import { SendSubmissionInput } from './inputs/send-submission.input';
+import { Submission } from './models/submission.model';
+import { Result } from './models/result.enum';
+import { SubmissionRepository } from './repositories/submission.repository';
+
 @Injectable()
-export class SubmissionService {
+export class SubmissionService extends BaseService<Submission> {
   constructor(
-    private readonly serviceHelper: ServiceHelper,
-    private readonly submissionRepository: SubmissionRepository,
-  ) {}
-
-  async saveSubmission(id: string | undefined, data: SubmissionDto): Promise<Submission> {
-    const fields: { [k: string]: any } = { ...data, submittedAt: new Date() };
-    const newSubmission = await this.serviceHelper.getUpsertData(id, fields, this.submissionRepository);
-    return await this.submissionRepository.save(newSubmission);
+    protected readonly repository: SubmissionRepository,
+    @InjectQueue('hooksQueue') protected readonly hooksQueue: Queue,
+    protected readonly playerService: PlayerService,
+  ) {
+    super(new Logger(SubmissionService.name), repository);
   }
 
-  async getAllSubmissions(exerciseId: string, playerId: string): Promise<Submission[]> {
-    return await this.submissionRepository.find({
-      where: {
-        exerciseId: exerciseId,
-        playerId: playerId,
-      },
-    });
+  async findByUser(gameId: string, userId: string, exerciseId?: string): Promise<Submission[]> {
+    const player: Player = await this.playerService.findByGameAndUser(gameId, userId);
+    const query: Partial<Record<keyof Submission, any>> = {
+      player: player.id,
+    };
+    if (exerciseId) {
+      query.exerciseId = exerciseId;
+    }
+    return this.findAll(query);
   }
 
-  async getSubmission(submissionId: string): Promise<Submission> {
-    const submission = await this.submissionRepository.findOne(submissionId);
-    return submission;
-  }
+  async sendSubmission(input: SendSubmissionInput): Promise<Submission> {
+    const submission: Submission = await super.create({
+      game: input.game,
+      player: input.player,
+      exerciseId: input.exerciseId,
+    } as Submission);
 
-  async sendSubmission(submission: SubmissionDto): Promise<any> {
-    // I know that in doc we have parameters (exerciseid, playerId, submission), but two first ones are suppossed to be
-    // included in the submission object itself so I thought I would skip it, lemme know if I'm missing a point there
-    const codeFile = submission.codeFile;
-    delete submission.codeFile;
-    this.saveSubmission(submission.id, submission);
+    // TODO submit student's attempt to Evaluation Engine
     try {
       const response = await got(appConfig.evaluationEngine, {
         json: {
-          exerciseId: submission.exerciseId,
-          file: codeFile,
+          exerciseId: input.exerciseId,
+          file: input.codeFile,
         },
       }).json();
     } catch (e) {
       console.error(e);
     }
-    // also let me know if I should take care of something more when we send a GET like headers, options etc.
-    // or if we need to do smth more with the response than just returning it
-    return response;
+    return submission;
   }
 
   async onSubmissionAccepted(submission: Submission): Promise<Submission> {
-    submission.result = Result.ACCEPTED;
-    return await this.submissionRepository.save(submission);
+    return null;
   }
 
   async onSubmissionRejected(submission: Submission): Promise<Submission> {
-    submission.result = Result.REJECTED;
-    return await this.submissionRepository.save(submission);
+    return null;
   }
 
-  async onSubmissionEvaluated(data: EvaluationEvent): Promise<Submission> {
-    let submission: Submission = await this.getSubmission(data.id.toString());
-    submission = { ...submission, ...data };
-    return (await data.result) === Result.ACCEPTED
-      ? this.onSubmissionAccepted(submission)
-      : this.onSubmissionRejected(submission);
+  async onSubmissionEvaluated(id: string, data: ReportInput): Promise<Submission> {
+    // save result
+    const submission: Submission = await this.patch(id, {
+      ...data,
+    });
+
+    // send notification to trigger further processing
+    await this.hooksQueue.add(
+      submission.result === Result.ACCEPT ? TriggerEvent.SUBMISSION_ACCEPTED : TriggerEventEnum.SUBMISSION_REJECTED,
+      {
+        submissionId: submission.id,
+        playerId: submission.player,
+        exerciseId: submission.exerciseId,
+      },
+    );
+
+    return submission;
   }
 }

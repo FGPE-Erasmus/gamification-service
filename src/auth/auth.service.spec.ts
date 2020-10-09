@@ -1,23 +1,30 @@
 import { ObjectID } from 'mongodb';
 import { JwtModule } from '@nestjs/jwt';
+import { getModelToken } from '@nestjs/mongoose';
 import { PassportModule } from '@nestjs/passport';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as bcrypt from 'bcryptjs';
 
 import { appConfig } from '../app.config';
-import { ServiceHelper } from '../common/helpers/service.helper';
+import { UserDto } from '../users/dto/user.dto';
 import { UsersService } from '../users/users.service';
 import { UserRepository } from '../users/repositories/user.repository';
-import { UserEntity } from '../users/entities/user.entity';
-import { Role } from '../users/entities/role.enum';
+import { Role } from '../users/models/role.enum';
 import { AuthService } from './auth.service';
 import { AuthResolver } from './auth.resolver';
 import { JwtStrategy } from './strategies/jwt.strategy';
-import SignupDto from './dto/signup.dto';
+import SignupArgs from './args/signup.args';
 import LoginResultDto from './dto/login-result.dto';
 
 describe('AuthService', () => {
   let service: AuthService;
+
+  function mockUserModel(dto: any) {
+    this.data = dto;
+    this.save = () => {
+      return this.data;
+    };
+  }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -33,7 +40,17 @@ describe('AuthService', () => {
           },
         }),
       ],
-      providers: [AuthService, AuthResolver, JwtStrategy, UsersService, ServiceHelper, UserRepository],
+      providers: [
+        {
+          provide: getModelToken('User'),
+          useValue: mockUserModel,
+        },
+        AuthService,
+        AuthResolver,
+        JwtStrategy,
+        UsersService,
+        UserRepository,
+      ],
     }).compile();
 
     service = module.get<AuthService>(AuthService);
@@ -44,15 +61,15 @@ describe('AuthService', () => {
   });
 
   it('should signup a new User', async () => {
-    const mockSignupDto: SignupDto = {
+    const mockSignupDto: SignupArgs = {
       name: 'John Doe',
       username: 'johndoe',
       email: 'johndoe@johndoe.com',
       password: 'j0hnD03',
     };
 
-    const newUser: UserEntity = {
-      id: new ObjectID(),
+    const newUser: UserDto = {
+      id: new ObjectID().toHexString(),
       createdAt: new Date(),
       active: true,
       roles: [Role.USER],

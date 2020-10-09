@@ -1,17 +1,32 @@
-import { ArgsType, Field } from '@nestjs/graphql';
-import { SortingOrders } from '../entities/sorting.enum';
+import { ObjectType, ID, Field } from '@nestjs/graphql';
 
-@ArgsType()
+import { ChallengeDto } from '../../challenge/dto/challenge.dto';
+import { GameDto } from '../../game/dto/game.dto';
+import { SortingOrder } from '../models/sorting.enum';
+
+@ObjectType('Leaderboard')
 export class LeaderboardDto {
-  @Field()
-  id: string;
+  @Field(() => ID, { nullable: true })
+  id?: string;
 
-  @Field()
-  name: string;
+  @Field(() => GameDto, { nullable: true })
+  game?: string;
 
-  @Field(() => [String])
-  metrics: string[];
+  @Field(() => ChallengeDto, { nullable: true })
+  parentChallenge?: string;
 
-  @Field(() => [SortingOrders])
-  sortingOrders: SortingOrders[];
+  @Field({ nullable: true })
+  name?: string;
+
+  @Field(() => [String], { nullable: true })
+  metrics?: string[];
+
+  @Field(() => [SortingOrder], { nullable: true })
+  sortingOrders?: SortingOrder[];
+
+  @Field(() => Date)
+  createdAt?: Date;
+
+  @Field(() => Date, { nullable: true })
+  updatedAt?: Date;
 }

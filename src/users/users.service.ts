@@ -1,33 +1,52 @@
-import { ObjectId } from 'mongodb';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
 
-import { ServiceHelper } from '../common/helpers/service.helper';
+import { BaseService } from '../common/services/base.service';
 import { generatePassword } from '../common/utils/password-generator.util';
-import { UserEntity as User } from './entities/user.entity';
-import { FindUsersDto } from './dto/find-users.dto';
-import { CreateUserDto } from './dto/create-user.dto';
-import { ListUsersEntity } from './entities/list-users.entity';
+import { User } from './models/user.model';
+import { UserInput } from './inputs/user.input';
+import { Role } from './models/role.enum';
+import { UserDto } from './dto/user.dto';
 import { UserRepository } from './repositories/user.repository';
-import { Role } from './entities/role.enum';
 
 @Injectable()
-export class UsersService {
-  constructor(private readonly serviceHelper: ServiceHelper, private readonly userRepository: UserRepository) {}
+export class UsersService extends BaseService<User> implements OnModuleInit {
+  constructor(protected readonly repository: UserRepository) {
+    super(new Logger(UsersService.name), repository);
+  }
+
+  async onModuleInit(): Promise<void> {
+    const admin: UserDto = await this.findOneByUsername('admin');
+    if (!admin) {
+      const saved = await this.repository.save({
+        name: 'Administrator',
+        username: 'admin',
+        email: 'admin@fgpe-gs.com',
+        password: await bcrypt.hash('4dm1nS.', 10),
+        roles: [Role.ADMIN],
+        active: true,
+      });
+      this.logger.error(saved);
+    }
+  }
 
   /**
-   * Returns a user by their ID
+   * Returns a user by their unique username/email address or undefined
    *
-   * @param {string} id of user
-   * @returns {(Promise<User | undefined>)}
-   * @memberof UsersService
+   * @param {string} login address of user, not case sensitive, or username
+   * @returns {(Promise<UserDto | undefined>)}
+   * @memberOf UsersService
    */
-  async findUserById(id: string): Promise<User> {
-    return await this.userRepository.findOne({
-      where: {
-        _id: ObjectId(id),
-      },
-    });
+  async findOneByLogin(login: string): Promise<User> {
+    let user = await this.findOneByEmail(login);
+    if (!user) {
+      user = await this.findOneByUsername(login);
+      if (!user) {
+        return undefined;
+      }
+      return user;
+    }
+    return user;
   }
 
   /**
@@ -35,10 +54,10 @@ export class UsersService {
    *
    * @param {string} email address of user, not case sensitive
    * @returns {(Promise<User | undefined>)}
-   * @memberof UsersService
+   * @memberOf UsersService
    */
   async findOneByEmail(email: string): Promise<User> {
-    const user = await this.userRepository.findOne({ email: email.toLowerCase() });
+    const user = await this.findOne({ email: email.toLowerCase() });
     if (user) {
       return user;
     }
@@ -50,25 +69,14 @@ export class UsersService {
    *
    * @param {string} username of user, not case sensitive
    * @returns {(Promise<User | undefined>)}
-   * @memberof UsersService
+   * @memberOf UsersService
    */
   async findOneByUsername(username: string): Promise<User> {
-    const user = await this.userRepository.findOne({ username: username.toLowerCase() });
+    const user = await this.findOne({ username: username.toLowerCase() });
     if (user) {
       return user;
     }
     return undefined;
-  }
-
-  /**
-   * Find users matching given criteria
-   *
-   * @param {FindUsersDto} params to search for
-   * @returns {Promise<ListUsersEntity>}
-   * @memberof UsersService
-   */
-  async findUsers(params: FindUsersDto): Promise<ListUsersEntity> {
-    return await this.serviceHelper.findAllByNameOrIds(params, this.userRepository);
   }
 
   /**
@@ -77,18 +85,16 @@ export class UsersService {
    * @param id of the user to update (if any)
    * @param data to update
    */
-  async upsertUser(id: string | undefined, data: CreateUserDto): Promise<User> {
+  async upsert(id: string | undefined, data: UserInput): Promise<User> {
     const { email, username } = data;
 
     let userExists: User;
     if (email) {
       // check if there are other users with this email
-      userExists = await this.userRepository.findOne({
-        where: {
-          email,
-        },
+      userExists = await this.repository.findOne({
+        email,
       });
-      if (userExists && id !== userExists.id.toHexString()) {
+      if (userExists && id !== userExists._id.toHexString()) {
         throw new Error(`E-mail ${email} is already in use.`);
       }
     } else if (!id) {
@@ -97,59 +103,43 @@ export class UsersService {
 
     if (username) {
       // check if there are other users with this username
-      userExists = await this.userRepository.findOne({
-        where: {
-          username,
-        },
+      userExists = await this.repository.findOne({
+        username,
       });
-      if (userExists && id !== userExists.id.toHexString()) {
+      if (userExists && id !== userExists._id.toHexString()) {
         throw new Error(`Username ${username} is already in use.`);
       }
     } else if (!id) {
       throw new Error(`Username is a mandatory field.`);
     }
 
-    // set active on create
-    const fields: { [k: string]: any } = { ...data };
+    let newUser: User;
     if (!id) {
-      fields.active = true;
+      // create user
+      newUser = await this.create({ ...data, active: true });
+    } else {
+      // update user
+      newUser = await this.patch(id, data);
     }
 
-    // merge data with repository
-    const newUser: User = await this.serviceHelper.getUpsertData(id, fields, this.userRepository);
-
     // encrypt password if sent
+    let password: string;
     if (data.password) {
-      newUser.password = await bcrypt.hash(data.password, 10);
+      password = await bcrypt.hash(data.password, 10);
     } else if (!id) {
-      newUser.password = await bcrypt.hash(generatePassword(20), 10);
+      password = await bcrypt.hash(generatePassword(20), 10);
+    }
+
+    if (password) {
+      newUser = await this.patch(newUser.id, { password });
     }
 
     // save user
-    return this.userRepository.save(newUser);
+    return newUser;
   }
 
-  /**
-   * Update a user.
-   *
-   * @param user with updated properties
-   * @returns {User} updated user
-   * @memberof UsersService
-   */
-  async updateUser(user: Partial<User>): Promise<User> {
-    return this.userRepository.save(user);
-  }
-
-  /**
-   * Delete the user with given ID
-   *
-   * @param {string} user to delete
-   * @returns {boolean}
-   * @memberof UsersService
-   */
-  async deleteUser(id: string): Promise<boolean> {
-    const user: User = await this.userRepository.findOne(id);
-    return Boolean(this.updateUser({ ...user, active: false }));
+  async delete(id: string): Promise<User> {
+    return super.delete(id, true);
   }
 
   /**
@@ -157,7 +147,7 @@ export class UsersService {
    *
    * @param {User} user to check for admin role
    * @returns {boolean}
-   * @memberof UsersService
+   * @memberOf UsersService
    */
   isAdmin(user: User): boolean {
     return user.roles.includes(Role.ADMIN);

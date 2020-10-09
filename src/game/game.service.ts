@@ -1,35 +1,38 @@
-import { Injectable } from '@nestjs/common';
-import { ObjectId } from 'mongodb';
+import { Injectable, Logger } from '@nestjs/common';
 import { Readable } from 'stream';
 import { Parse } from 'unzipper';
 
 import { extractToJson } from '../common/utils/extraction.utils';
+import { BaseService } from '../common/services/base.service';
 import { ChallengeService } from '../challenge/challenge.service';
-import GameDto from './dto/game.dto';
-import { GameEntity as Game } from './entities/game.entity';
+import { HookService } from '../hook/hook.service';
+import { LeaderboardService } from '../leaderboard/leaderboard.service';
+import { RewardService } from '../reward/reward.service';
+import { GameInput } from './inputs/game.input';
+import { Game } from './models/game.model';
 import { GameRepository } from './repositories/game.repository';
-import { LeaderboardService } from 'src/leaderboard/leaderboard.service';
-import { HookService } from 'src/hook/hook.service';
-import { RewardService } from 'src/reward/reward.service';
 
 @Injectable()
-export class GameService {
+export class GameService extends BaseService<Game> {
   constructor(
-    private gameRepository: GameRepository,
-    private readonly challengeService: ChallengeService,
-    private readonly rewardService: RewardService,
-    private readonly leaderboardService: LeaderboardService,
-    private readonly hookService: HookService,
-  ) {}
+    protected readonly repository: GameRepository,
+    protected readonly challengeService: ChallengeService,
+    protected readonly rewardService: RewardService,
+    protected readonly leaderboardService: LeaderboardService,
+    protected readonly hookService: HookService,
+  ) {
+    super(new Logger(GameService.name), repository);
+  }
 
   /**
    * Import a game from a GEdIL layer archive.
    *
-   * @param game {Game} the game properties
-   * @param gedilStream {Readable} a read stream to the GEdIL specification package.
+   * @param {GameInput} input the game attributes
+   * @param {Readable} gedilStream a read stream to the GEdIL specification package.
    */
-  async importGEdILArchive(gameDto: GameDto, gedilStream: Readable): Promise<Game | undefined> {
+  async importGEdILArchive(input: GameInput, gedilStream: Readable): Promise<Game | undefined> {
     let game: Game;
+
     const entries = { challenges: {}, leaderboards: {}, rewards: {}, rules: {} };
 
     const zip = gedilStream.pipe(Parse({ forceStream: true }));
@@ -37,17 +40,13 @@ export class GameService {
       const fileName = entry.path;
       const buffer = await entry.buffer();
 
-      // if (regexChallenge.test(fileName) && regexRewards.test(fileName)) {
-      //   switch (encodedContent.kind) {
-      //     case RewardType.BADGE:
-      //     case RewardType.COUPON:
-      //     case RewardType.HINT:
-      //     case RewardType.VIRTUAL_ITEM:
-      //   }
-      // }
-
       if (fileName === 'metadata.json') {
-        game = await this.create(gameDto, extractToJson(buffer));
+        const gedilLayer = extractToJson(buffer);
+        game = await this.create({
+          ...input,
+          gedilLayerId: gedilLayer.id,
+          gedilLayerDescription: `[${gedilLayer.name}] ${gedilLayer.description}`,
+        });
       } else {
         const result = /^(challenges|leaderboards|rewards|rules)\/([^/]+)\//.exec(fileName);
         if (result) {
@@ -68,6 +67,7 @@ export class GameService {
     // challenges
     for (const gedilId of Object.keys(entries.challenges)) {
       subObjects.challenges[gedilId] = await this.challengeService.importGEdIL(
+        subObjects,
         game,
         gedilId,
         entries.challenges[gedilId],
@@ -76,48 +76,23 @@ export class GameService {
 
     // leaderboards
     for (const gedilId of Object.keys(entries.leaderboards)) {
-      subObjects.leaderboards[gedilId] = await this.leaderboardService.importGEdIL(game, entries.leaderboards[gedilId]);
+      subObjects.leaderboards[gedilId] = await this.leaderboardService.importGEdIL(
+        subObjects,
+        game,
+        entries.leaderboards[gedilId],
+      );
     }
 
     // rewards
     for (const gedilId of Object.keys(entries.rewards)) {
-      subObjects.rewards[gedilId] = await this.rewardService.importGEdIL(game, entries.rewards[gedilId]);
+      subObjects.rewards[gedilId] = await this.rewardService.importGEdIL(subObjects, game, entries.rewards[gedilId]);
     }
 
     // rules
     for (const gedilId of Object.keys(entries.rules)) {
-      subObjects.rules[gedilId] = await this.hookService.importGEdIL(game, entries.rules[gedilId]);
+      subObjects.rules[gedilId] = await this.hookService.importGEdIL(subObjects, game, entries.rules[gedilId]);
     }
 
     return game;
-  }
-
-  /**
-   * Create a game.
-   *
-   * @param game {Game} the game properties
-   * @param gedilLayer {any} data about the GEdIL layer.
-   */
-  async create(gameDto: GameDto, gedilLayer: { id: string; name: string; description: string }): Promise<Game> {
-    return this.gameRepository.save({
-      ...gameDto,
-      gedilLayerId: gedilLayer.id,
-      gedilLayerDescription: `[${gedilLayer.name}] ${gedilLayer.description}`,
-    });
-  }
-
-  /**
-   * Returns a game by its ID.
-   *
-   * @param {string} id of game
-   * @returns {(Promise<Game | undefined>)}
-   * @memberof GameService
-   */
-  async findOne(id: string): Promise<Game> {
-    return await this.gameRepository.findOne({
-      where: {
-        _id: ObjectId(id),
-      },
-    });
   }
 }

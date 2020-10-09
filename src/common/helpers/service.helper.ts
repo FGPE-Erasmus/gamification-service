@@ -1,23 +1,27 @@
-import { ObjectId } from 'mongodb';
-import { Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 
 import { IWhereName } from '../interfaces/where-name.interface';
 import { IWhereIds } from '../interfaces/where-ids.interface';
 import { findOrder } from '../types/find-order.type';
 import { FindNameDto } from '../dto/find-name.dto';
+import { toMongoId } from '../utils/mongo.utils';
+import { IRepository } from '../interfaces/repository.interface';
 
 @Injectable()
 export class ServiceHelper {
-  async getUpsertData(id: string | undefined, fields: { [k: string]: any }, repository: Repository<any>): Promise<any> {
+  async getUpsertData(
+    id: string | undefined,
+    fields: { [k: string]: any },
+    repository: IRepository<any>,
+  ): Promise<any> {
     if (id) {
       return {
-        ...(await repository.findOne(id)),
+        ...(await repository.getById(id)),
         ...fields,
       };
     }
 
-    return repository.create(fields);
+    return repository.save(fields);
   }
 
   getWhereByName(name: string | undefined): IWhereName {
@@ -33,15 +37,13 @@ export class ServiceHelper {
   }
 
   getWhereByIds(ids: string[]): IWhereIds {
-    const $where: IWhereIds = {
-      _id: { $in: ids.map((mongoId: string): string => ObjectId(mongoId)) },
+    return {
+      _id: { $in: ids.map((mongoId: string): string => toMongoId(mongoId)) },
       active: true,
     };
-
-    return $where;
   }
 
-  async findAllByNameOrIds(dto: FindNameDto, repository: Repository<any>): Promise<any> {
+  /*async findAllByNameOrIds(dto: FindNameDto, repository: IRepository<any>): Promise<any> {
     const { skip, take, ids, name, order, fieldSort }: FindNameDto = dto;
     const $order: findOrder = { [fieldSort]: order };
     const $where: IWhereName | IWhereIds = ids ? this.getWhereByIds(ids) : this.getWhereByName(name);
@@ -62,5 +64,5 @@ export class ServiceHelper {
       items: result,
       total: count.length,
     };
-  }
+  }*/
 }
