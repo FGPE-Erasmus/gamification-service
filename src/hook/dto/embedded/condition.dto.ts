@@ -1,5 +1,7 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 
+import { ComparingFunctionEnum as ComparingFunction } from '../../enums/comparing-function.enum';
+
 @ObjectType('Condition')
 export class ConditionEmbedDto {
   @Field()
@@ -11,7 +13,7 @@ export class ConditionEmbedDto {
   @Field()
   leftProperty?: string;
 
-  @Field()
+  @Field(() => ComparingFunction)
   comparingFunction?: string;
 
   @Field()

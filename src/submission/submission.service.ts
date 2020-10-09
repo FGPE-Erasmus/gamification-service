@@ -13,13 +13,16 @@ import { SendSubmissionInput } from './inputs/send-submission.input';
 import { Submission } from './models/submission.model';
 import { Result } from './models/result.enum';
 import { SubmissionRepository } from './repositories/submission.repository';
+import { ActionHookService } from '../hook/action-hook.service';
+import { ActionHook } from '../hook/models/action-hook.model';
 
 @Injectable()
 export class SubmissionService extends BaseService<Submission> {
   constructor(
     protected readonly repository: SubmissionRepository,
-    @InjectQueue('hooksQueue') protected readonly hooksQueue: Queue,
     protected readonly playerService: PlayerService,
+    @InjectQueue('hooksQueue') protected readonly hooksQueue: Queue,
+    protected readonly actionHookService: ActionHookService,
   ) {
     super(new Logger(SubmissionService.name), repository);
   }
@@ -57,22 +60,19 @@ export class SubmissionService extends BaseService<Submission> {
   }
 
   async onSubmissionReceived(exerciseId: string, playerId: string): Promise<any> {
-    const hooks: ActionHook[] = await this.actionHookRepository.find({
-      where: {
-        trigger: TriggerEventEnum.SUBMISSION_RECEIVED,
-        sourceId: exerciseId,
-      },
+    const hooks: ActionHook[] = await this.actionHookService.findAll({
+      $and: [{ trigger: { $eq: TriggerEventEnum.SUBMISSION_RECEIVED } }, { sourceId: { $eq: exerciseId } }],
     });
-    hooks.forEach(async hook => {
+    for (const hook of hooks) {
       const job = await this.hooksQueue.add({
         hook: hook,
         params: {
           exerciseId: exerciseId,
           playerId: playerId,
-          exercise: { obj: 'example exerciseObj' },
         },
       });
-    });
+      this.logger.debug(`Job ${job.id} added to the queue (hook: ${hook.id})`);
+    }
   }
 
   async onSubmissionAccepted(submission: Submission): Promise<Submission> {

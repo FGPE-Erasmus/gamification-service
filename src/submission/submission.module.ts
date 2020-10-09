@@ -4,6 +4,7 @@ import { BullModule } from '@nestjs/bull';
 
 import { QueueConfigService } from '../queue.config';
 import { GameModule } from '../game/game.module';
+import { HookModule } from '../hook/hook.module';
 import { PlayerModule } from '../player/player.module';
 import { SubmissionService } from './submission.service';
 import { SubmissionResolver } from './submission.resolver';
@@ -25,6 +26,7 @@ import { SubmissionToDtoMapper } from './mappers/submission-to-dto.mapper';
     }),
     forwardRef(() => GameModule),
     forwardRef(() => PlayerModule),
+    forwardRef(() => HookModule),
   ],
   providers: [SubmissionToDtoMapper, SubmissionRepository, SubmissionService, SubmissionResolver],
   exports: [SubmissionToDtoMapper, SubmissionService],

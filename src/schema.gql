@@ -172,9 +172,25 @@ type Condition {
   order: Float!
   leftEntity: String!
   leftProperty: String!
-  comparingFunction: String!
+  comparingFunction: ComparingFunction!
   rightEntity: String!
   rightProperty: String!
+}
+
+enum ComparingFunction {
+  LESS_THAN
+  GREATER_THAN
+  LESS_OR_EQUAL
+  GREAT_OR_EQUAL
+  EQUAL
+  NOT_EQUAL
+  STARTS_WITH
+  MATCHES
+  NOT_MATCHES
+  IS_EMPTY
+  NOT_EMPTY
+  IN
+  NOT_IN
 }
 
 type Criteria {
