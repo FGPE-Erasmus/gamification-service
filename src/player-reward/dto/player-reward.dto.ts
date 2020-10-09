@@ -9,10 +9,10 @@ export class PlayerRewardDto {
   id?: string;
 
   @Field(() => PlayerDto)
-  player?: PlayerDto;
+  player?: string;
 
   @Field(() => RewardDto)
-  reward?: RewardDto;
+  reward?: string;
 
   @Field()
   count?: number;

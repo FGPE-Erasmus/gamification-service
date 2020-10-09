@@ -1,16 +1,13 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
-import { Player } from '../../player/models/player.model';
-import { Reward } from '../../reward/models/reward.model';
-
 @Schema()
 export class PlayerReward extends Document {
   @Prop({ type: Types.ObjectId, ref: 'Player' })
-  player: Player;
+  player: any;
 
   @Prop({ type: Types.ObjectId, ref: 'Reward' })
-  reward: Reward;
+  reward: any;
 
   @Prop({ default: 1 })
   count?: number;

@@ -7,16 +7,11 @@ import { ImportGameArgs } from './args/import-game.args';
 import { GameService } from './game.service';
 import { GameDto } from './dto/game.dto';
 import { GameToDtoMapper } from './mappers/game-to-dto.mapper';
-import { GameToPersistenceMapper } from './mappers/game-to-persistence.mapper';
 import { Game } from './models/game.model';
 
 @Resolver(() => GameDto)
 export class GameResolver {
-  constructor(
-    protected readonly gameService: GameService,
-    protected readonly toDtoMapper: GameToDtoMapper,
-    protected readonly toPersistenceMapper: GameToPersistenceMapper,
-  ) {}
+  constructor(protected readonly gameService: GameService, protected readonly gameToDtoMapper: GameToDtoMapper) {}
 
   @Mutation(() => GameDto)
   @UseGuards(GqlJwtAuthGuard, GqlAdminGuard)
@@ -32,16 +27,23 @@ export class GameResolver {
       },
       createReadStream(),
     );
-    return this.toDtoMapper.transform(game);
+    return this.gameToDtoMapper.transform(game);
+  }
+
+  @Query(() => [GameDto])
+  @UseGuards(GqlJwtAuthGuard, GqlAdminGuard)
+  async games(): Promise<GameDto[]> {
+    const games: Game[] = await this.gameService.findAll();
+    return Promise.all(games.map(async game => this.gameToDtoMapper.transform(game)));
   }
 
   @Query(() => GameDto)
   @UseGuards(GqlJwtAuthGuard)
   async game(@Args('id') id: string): Promise<GameDto> {
-    const game: Game = await this.gameService.findOne(id);
+    const game: Game = await this.gameService.findById(id);
     if (!game) {
-      throw new NotFoundException(id);
+      throw new NotFoundException();
     }
-    return this.toDtoMapper.transform(game);
+    return this.gameToDtoMapper.transform(game);
   }
 }

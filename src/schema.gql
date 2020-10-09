@@ -387,17 +387,10 @@ type Reveal {
 type Query {
   user(id: String!): User!
   users: [User!]!
-  queryCheck: String!
   scheduledHooks: [ScheduledHook!]!
   actionHooks: [ActionHook!]!
   leaderboards: [Leaderboard!]!
   playerRankings(leaderboardId: String!): [Ranking!]!
-  submission(submissionId: String!): Submission!
-  submissions(exerciseId: String!, gameId: String!): [Submission!]!
-  players(gameId: String!): [Player!]!
-  profileInGame(gameId: String!): Player!
-  player(userId: String!, gameId: String!): Player!
-  get(challengeId: String!, playerId: String!): ChallengeStatus!
   rewards: [Reward!]!
   badges: [Badge!]!
   coupons: [Coupon!]!
@@ -407,18 +400,27 @@ type Query {
   virtualItems: [VirtualItem!]!
   unlocks: [Unlock!]!
   reveals: [Reveal!]!
-  challenges: [Challenge!]!
+  submission(submissionId: String!): Submission!
+  submissions(exerciseId: String!, gameId: String!): [Submission!]!
+  games: [Game!]!
   game(id: String!): Game!
+  challenges: [Challenge!]!
+  get(challengeId: String!, playerId: String!): ChallengeStatus!
+  players(gameId: String!): [Player!]!
+  profileInGame(gameId: String!): Player!
+  player(userId: String!, gameId: String!): Player!
+  queryCheck: String!
 }
 
 type Mutation {
   saveUser(id: ID, userInput: UserInput!): User!
   deleteUser(id: ID!): User!
+  createSubmission(submissionData: SendSubmissionInput!): Submission!
+  importGEdILArchive(gameInput: GameInput!, file: Upload!): Game!
+  enroll(gameId: String!): Player!
   login(login: String!, password: String!): User!
   signup(name: String!, username: String!, email: Email!, password: String!): User!
   mutationCheck: String!
-  createSubmission(submissionData: SendSubmissionInput!): Submission!
-  importGEdILArchive(gameInput: GameInput!, file: Upload!): Game!
 }
 
 input UserInput {

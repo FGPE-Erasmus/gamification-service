@@ -132,12 +132,11 @@ export class ChallengeService extends BaseService<Challenge> {
   async findByName(name: string, gameId?: string): Promise<Challenge[]> {
     if (!gameId) {
       return await this.findAll({
-        name: { like: '%${name}%' },
+        name: { $regex: `.*${name}.*` },
       });
     } else {
       return await this.findAll({
-        name: { like: '%${name}%' },
-        game: { eq: gameId },
+        $and: [{ name: { $regex: `.*${name}.*` } }, { game: { $eq: gameId } }],
       });
     }
   }
@@ -150,12 +149,11 @@ export class ChallengeService extends BaseService<Challenge> {
   async findByMode(mode: Mode, gameId?: string): Promise<Challenge[]> {
     if (!gameId) {
       return await this.findAll({
-        mode: { eq: mode },
+        mode: { $eq: mode },
       });
     } else {
       return await this.findAll({
-        mode: { eq: mode },
-        game: { eq: gameId },
+        $and: [{ mode: { $eq: mode } }, { game: { $eq: gameId } }],
       });
     }
   }
@@ -168,12 +166,11 @@ export class ChallengeService extends BaseService<Challenge> {
   async findLocked(locked: boolean, gameId: string): Promise<Challenge[]> {
     if (!gameId) {
       return await this.findAll({
-        locked: { is: locked },
+        locked: { $eq: locked },
       });
     } else {
       return await this.findAll({
-        locked: { is: locked },
-        game: { eq: gameId },
+        $and: [{ locked: { $eq: locked } }, { game: { $eq: gameId } }],
       });
     }
   }
@@ -186,12 +183,11 @@ export class ChallengeService extends BaseService<Challenge> {
   async findHidden(hidden: boolean, gameId: string): Promise<Challenge[]> {
     if (!gameId) {
       return await this.findAll({
-        hidden: { is: hidden },
+        hidden: { $eq: hidden },
       });
     } else {
       return await this.findAll({
-        hidden: { is: hidden },
-        game: { eq: gameId },
+        $and: [{ locked: { $eq: hidden } }, { game: { $eq: gameId } }],
       });
     }
   }

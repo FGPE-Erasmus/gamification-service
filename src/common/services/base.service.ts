@@ -1,5 +1,5 @@
 import { LoggerService } from '@nestjs/common';
-import { Document } from 'mongoose';
+import { Document, FilterQuery } from 'mongoose';
 
 import { IService } from '../interfaces/service.interface';
 import { IRepository } from '../interfaces/repository.interface';
@@ -38,7 +38,7 @@ export abstract class BaseService<E extends Document> implements IService<E> {
   }
 
   async findOne(
-    conditions: Partial<Record<keyof E, unknown>>,
+    conditions: FilterQuery<E>,
     projection?: string | Record<string, unknown>,
     options?: Record<string, unknown>,
   ): Promise<E> {
@@ -46,7 +46,7 @@ export abstract class BaseService<E extends Document> implements IService<E> {
   }
 
   async findAll(
-    conditions?: Partial<Record<keyof E, unknown>>,
+    conditions?: FilterQuery<E>,
     projection?: string | Record<string, unknown>,
     options?: Record<string, unknown>,
   ): Promise<E[]> {

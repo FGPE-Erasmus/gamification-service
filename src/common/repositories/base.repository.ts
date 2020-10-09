@@ -32,19 +32,19 @@ export class BaseRepository<E extends Document> implements IRepository<E> {
   }
 
   async findOne(
-    conditions: Partial<Record<keyof E, unknown>>,
+    conditions: FilterQuery<E>,
     projection: string | Record<string, unknown> = {},
     options: Record<string, unknown> = {},
   ): Promise<E> {
-    return this.model.findOne(conditions as FilterQuery<E>, projection, options).exec();
+    return this.model.findOne(conditions, projection, options).exec();
   }
 
   async findAll(
-    conditions: Partial<Record<keyof E, unknown>> = {},
+    conditions: FilterQuery<E>,
     projection: string | Record<string, unknown> = {},
     options: Record<string, unknown> = {},
   ): Promise<E[]> {
-    return this.model.find(conditions as FilterQuery<E>, projection, options).exec();
+    return this.model.find(conditions, projection, options).exec();
   }
 
   async save(doc: Partial<E>, overwrite = true): Promise<any> {

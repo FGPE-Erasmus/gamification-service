@@ -17,7 +17,7 @@ import { ChallengeRepository } from './repositories/challenge.repository';
   imports: [
     MongooseModule.forFeature([{ name: Challenge.name, schema: ChallengeSchema }]),
     forwardRef(() => GameModule),
-    HookModule,
+    forwardRef(() => HookModule),
     forwardRef(() => LeaderboardModule),
     forwardRef(() => RewardModule),
   ],

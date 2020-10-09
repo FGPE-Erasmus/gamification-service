@@ -10,16 +10,16 @@ export class Player extends Document {
   game: any;
 
   @Prop({ default: () => 0 })
-  points: number;
+  points?: number;
 
   @Prop({ type: [Types.ObjectId], ref: 'Submission' })
-  submissions: any[];
+  submissions?: any[];
 
   @Prop({ type: [Types.ObjectId], ref: 'ChallengeStatus' })
-  learningPath: any[];
+  learningPath?: any[];
 
   @Prop({ type: [Types.ObjectId], ref: 'PlayerReward' })
-  rewards: any[];
+  rewards?: any[];
 
   /* Timestamps */
 

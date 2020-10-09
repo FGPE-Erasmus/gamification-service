@@ -1,4 +1,4 @@
-import { Resolver, Args, Query, ResolveField, Parent } from '@nestjs/graphql';
+import { Resolver, Args, Query, ResolveField, Parent, Mutation } from '@nestjs/graphql';
 import { NotFoundException, UseGuards } from '@nestjs/common';
 
 import { GqlUser } from '../common/decorators/gql-user.decorator';
@@ -28,6 +28,8 @@ import { ChallengeStatusDto } from '../challenge-status/dto/challenge-status.dto
 import { ChallengeStatus } from '../challenge-status/models/challenge-status.model';
 import { PlayerRewardDto } from '../player-reward/dto/player-reward.dto';
 import { PlayerReward } from '../player-reward/models/player-reward.model';
+import { GqlPlayer } from '../common/decorators/gql-player.decorator';
+import { GqlEnrolledInGame } from '../common/guards/gql-game-enrollment.guard';
 
 @Resolver(() => PlayerDto)
 export class PlayerResolver {
@@ -46,6 +48,20 @@ export class PlayerResolver {
     protected readonly playerRewardToDtoMapper: PlayerRewardToDtoMapper,
   ) {}
 
+  @Mutation(() => PlayerDto)
+  @UseGuards(GqlJwtAuthGuard)
+  async enroll(
+    @GqlUser('id') userId: string,
+    @GqlPlayer() playerDto: PlayerDto,
+    @Args('gameId') gameId: string,
+  ): Promise<PlayerDto> {
+    if (playerDto) {
+      return playerDto;
+    }
+    const player: Player = await this.playerService.enroll(gameId, userId);
+    return this.playerToDtoMapper.transform(player);
+  }
+
   @Query(() => [PlayerDto])
   @UseGuards(GqlJwtAuthGuard)
   async players(@Args('gameId') gameId: string): Promise<PlayerDto[]> {
@@ -54,8 +70,15 @@ export class PlayerResolver {
   }
 
   @Query(() => PlayerDto)
-  @UseGuards(GqlJwtAuthGuard)
-  async profileInGame(@GqlUser('id') userId: string, @Args('gameId') gameId: string): Promise<PlayerDto> {
+  @UseGuards(GqlJwtAuthGuard, GqlEnrolledInGame)
+  async profileInGame(
+    @GqlUser('id') userId: string,
+    @GqlPlayer() playerDto: PlayerDto,
+    @Args('gameId') gameId: string,
+  ): Promise<PlayerDto> {
+    if (playerDto) {
+      return playerDto;
+    }
     const player: Player = await this.playerService.findByGameAndUser(gameId, userId);
     if (!player) {
       throw new NotFoundException();

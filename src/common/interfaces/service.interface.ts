@@ -1,4 +1,4 @@
-import { Document } from 'mongoose';
+import { Document, FilterQuery } from 'mongoose';
 
 export interface IService<E extends Document> {
   create(input: Omit<E, keyof Document>): Promise<E>;
@@ -10,13 +10,13 @@ export interface IService<E extends Document> {
   findById(id: string, projection?: string | Record<string, unknown>, options?: Record<string, unknown>): Promise<E>;
 
   findOne(
-    conditions: Partial<Record<keyof E, unknown>>,
+    conditions: FilterQuery<E>,
     projection?: string | Record<string, unknown>,
     options?: Record<string, unknown>,
   ): Promise<E>;
 
   findAll(
-    conditions?: Partial<Record<keyof E, unknown>>,
+    conditions?: FilterQuery<E>,
     projection?: string | Record<string, unknown>,
     options?: Record<string, unknown>,
   ): Promise<E[]>;

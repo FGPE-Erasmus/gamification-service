@@ -1,4 +1,4 @@
-import { UseGuards, NotFoundException } from '@nestjs/common';
+import { UseGuards, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { Resolver, Args, Mutation, Query, ResolveField, Parent } from '@nestjs/graphql';
 
 import { GqlUser } from '../common/decorators/gql-user.decorator';
@@ -8,7 +8,6 @@ import { SubmissionService } from './submission.service';
 import { SendSubmissionInput } from './inputs/send-submission.input';
 import { SubmissionDto } from './dto/submission.dto';
 import { GameDto } from '../game/dto/game.dto';
-import { RewardDto } from '../reward/dto/reward.dto';
 import { SubmissionToDtoMapper } from './mappers/submission-to-dto.mapper';
 import { GameService } from '../game/game.service';
 import { GameToDtoMapper } from '../game/mappers/game-to-dto.mapper';
@@ -17,6 +16,7 @@ import { PlayerToDtoMapper } from '../player/mappers/player-to-dto.mapper';
 import { PlayerDto } from '../player/dto/player.dto';
 import { Game } from '../game/models/game.model';
 import { Player } from '../player/models/player.model';
+import { GqlPlayer } from '../common/decorators/gql-player.decorator';
 
 @Resolver(() => SubmissionDto)
 export class SubmissionResolver {
@@ -33,17 +33,15 @@ export class SubmissionResolver {
   @UseGuards(GqlJwtAuthGuard)
   async submission(
     @Args('submissionId') id: string,
-    @GqlUser('id') userId: string,
+    @GqlPlayer('id') playerId: string,
     @GqlUser('roles') roles: Role[],
   ): Promise<SubmissionDto> {
     const submission = await this.submissionService.findById(id);
-    /*if (userId !== submission.player.user.id && !roles.includes(Role.ADMIN)) {
-      throw new Error('User does not have permissions');
-    } else {
-      if (!submission) {
-        throw new NotFoundException(id);
-      }
-    }*/
+    if (!submission) {
+      throw new NotFoundException();
+    } else if (playerId !== submission.player.id && !roles.includes(Role.ADMIN)) {
+      throw new ForbiddenException();
+    }
     return submission;
   }
 
@@ -60,7 +58,7 @@ export class SubmissionResolver {
   @Mutation(() => SubmissionDto)
   @UseGuards(GqlJwtAuthGuard)
   async createSubmission(@Args('submissionData') input: SendSubmissionInput): Promise<SubmissionDto> {
-    return await this.submissionService.create(input);
+    return await this.submissionService.sendSubmission(input);
   }
 
   @ResolveField('game', () => GameDto)

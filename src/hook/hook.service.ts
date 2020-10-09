@@ -82,10 +82,10 @@ export class HookService {
    * @returns {(Promise<ActionHook | ScheduledHook | undefined>)}
    * @memberOf ChallengeService
    */
-  async findOne(id: string): Promise<ActionHook | ScheduledHook | undefined> {
-    let hook: ActionHook | ScheduledHook = await this.actionHookService.findOne(id);
+  async findById(id: string): Promise<ActionHook | ScheduledHook | undefined> {
+    let hook: ActionHook | ScheduledHook = await this.actionHookService.findById(id);
     if (!hook) {
-      hook = await this.scheduledHookService.findOne(id);
+      hook = await this.scheduledHookService.findById(id);
     }
     return hook;
   }

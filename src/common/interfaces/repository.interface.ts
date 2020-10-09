@@ -1,4 +1,4 @@
-import { Document } from 'mongoose';
+import { Document, FilterQuery } from 'mongoose';
 
 export interface IRepository<E extends Document> {
   /**
@@ -40,7 +40,7 @@ export interface IRepository<E extends Document> {
    * @param options the query options.
    */
   findOne(
-    conditions: Partial<Record<keyof E, unknown>>,
+    conditions: FilterQuery<E>,
     projection?: string | Record<string, unknown>,
     options?: Record<string, unknown>,
   ): Promise<E>;
@@ -53,7 +53,7 @@ export interface IRepository<E extends Document> {
    * @param options the query options.
    */
   findAll(
-    conditions?: Partial<Record<keyof E, unknown>>,
+    conditions?: FilterQuery<E>,
     projection?: string | Record<string, unknown>,
     options?: Record<string, unknown>,
   ): Promise<E[]>;

@@ -7,4 +7,7 @@ export class PlayerRewardInput {
 
   @Field()
   rewardId: string;
+
+  @Field()
+  count?: number;
 }

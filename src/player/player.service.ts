@@ -10,14 +10,23 @@ export class PlayerService extends BaseService<Player> {
     super(new Logger(PlayerService.name), repository);
   }
 
-  findByGame(gameId: string): Promise<Player[]> {
+  async findByGame(gameId: string): Promise<Player[]> {
     return this.findAll({ game: { $eq: gameId } });
   }
 
-  findByGameAndUser(gameId: string, userId: string): Promise<Player> {
-    return this.findOne({
-      game: { $eq: gameId },
-      user: { $eq: userId },
+  async findByGameAndUser(gameId: string, userId: string): Promise<Player> {
+    return await this.findOne({
+      $and: [{ user: { $eq: userId } }, { game: { $eq: gameId } }],
     });
+  }
+
+  async enroll(gameId: string, userId: string): Promise<Player> {
+    const player: Player = await this.findByGameAndUser(gameId, userId);
+    if (player) {
+      return player;
+    }
+    const newPlayer: Player = await this.create({ game: gameId, user: userId });
+    this.logger.error(newPlayer);
+    return newPlayer;
   }
 }
