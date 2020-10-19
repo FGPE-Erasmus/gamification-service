@@ -100,7 +100,7 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus> {
    * @param {Date} date the date at which the player completed it
    * @returns {ChallengeStatus} the challenge status
    */
-  async markAsCompleted(playerId: string, challengeId: string, date: Date): Promise<ChallengeStatus> {
+  async markAsCompleted(challengeId: string, playerId: string, date: Date): Promise<ChallengeStatus> {
     const temp: ChallengeStatus = await this.findByChallengeIdAndPlayerId(challengeId, playerId);
     const result: ChallengeStatus = await this.patch(temp.id, { state: State.COMPLETED, endedAt: date });
     const hooks: ActionHook[] = await this.actionHookService.findAll({
@@ -129,7 +129,7 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus> {
    * @param {Date} date the date at which the player rejected it
    * @returns {ChallengeStatus} the challenge status
    */
-  async markAsRejected(playerId: string, challengeId: string): Promise<ChallengeStatus> {
+  async markAsRejected(challengeId: string, playerId: string): Promise<ChallengeStatus> {
     const temp: ChallengeStatus = await this.findByChallengeIdAndPlayerId(challengeId, playerId);
     const result: ChallengeStatus = await this.patch(temp.id, { state: State.REJECTED });
     const hooks: ActionHook[] = await this.actionHookService.findAll({
@@ -158,7 +158,7 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus> {
    * @param {Date} date the date at which the player made it available
    * @returns {ChallengeStatus} the challenge status
    */
-  async markAsAvailable(playerId: string, challengeId: string): Promise<ChallengeStatus> {
+  async markAsAvailable(challengeId: string, playerId: string): Promise<ChallengeStatus> {
     const temp: ChallengeStatus = await this.findByChallengeIdAndPlayerId(challengeId, playerId);
     const result: ChallengeStatus = await this.patch(temp.id, { state: State.AVAILABLE });
     const hooks: ActionHook[] = await this.actionHookService.findAll({
@@ -187,7 +187,7 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus> {
    * @param {Date} date the date at which the player made it hidden
    * @returns {ChallengeStatus} the challenge status
    */
-  async markAsHidden(playerId: string, challengeId: string): Promise<ChallengeStatus> {
+  async markAsHidden(challengeId: string, playerId: string): Promise<ChallengeStatus> {
     const temp: ChallengeStatus = await this.findByChallengeIdAndPlayerId(challengeId, playerId);
     const result: ChallengeStatus = await this.patch(temp.id, { state: State.HIDDEN });
     const hooks: ActionHook[] = await this.actionHookService.findAll({
@@ -216,7 +216,7 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus> {
    * @param {Date} date the date at which the player made it locked
    * @returns {ChallengeStatus} the challenge status
    */
-  async markAsLocked(playerId: string, challengeId: string): Promise<ChallengeStatus> {
+  async markAsLocked(challengeId: string, playerId: string): Promise<ChallengeStatus> {
     const temp: ChallengeStatus = await this.findByChallengeIdAndPlayerId(challengeId, playerId);
     const result: ChallengeStatus = await this.patch(temp.id, { state: State.LOCKED });
     const hooks: ActionHook[] = await this.actionHookService.findAll({
