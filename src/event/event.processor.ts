@@ -1,19 +1,20 @@
-import { Processor, Process } from '@nestjs/bull';
+import { Process, Processor } from '@nestjs/bull';
 import { Job } from 'bull';
 
-import { checkCriteria } from '../../common/helpers/criteria.helper';
-import { ActionEmbedDto } from '../../hook/dto/embedded/action.dto';
-import { CategoryEnum as Category } from '../../hook/enums/category.enum';
-import { ActionHook } from '../../hook/models/action-hook.model';
-import { ScheduledHook } from '../../hook/models/scheduled-hook.model';
-import { HookService } from '../../hook/hook.service';
-import { Player } from '../../player/models/player.model';
-import { RewardService } from '../../reward/reward.service';
-import { SubmissionService } from '../../submission/submission.service';
-import { PlayerService } from '../../player/player.service';
+import { checkCriteria } from '../common/helpers/criteria.helper';
+import { CategoryEnum as Category } from '../hook/enums/category.enum';
+import { HookService } from '../hook/hook.service';
+import { ActionHook } from '../hook/models/action-hook.model';
+import { ActionEmbed } from '../hook/models/embedded/action.embed';
+import { ScheduledHook } from '../hook/models/scheduled-hook.model';
+import { Player } from '../player/models/player.model';
+import { PlayerService } from '../player/player.service';
+import { RewardService } from '../reward/reward.service';
+import { SubmissionService } from '../submission/submission.service';
+import { appConfig } from '../app.config';
 
-@Processor('hooksQueue')
-export class JobProcessor {
+@Processor(appConfig.queue.event.name)
+export class EventProcessor {
   constructor(
     private readonly hookService: HookService,
     private readonly playerService: PlayerService,
@@ -44,7 +45,7 @@ export class JobProcessor {
     }
   }
 
-  async runActions(actions: ActionEmbedDto[], player: Player): Promise<any> {
+  async runActions(actions: ActionEmbed[], player: Player): Promise<any> {
     actions.forEach(action => {
       // TODO: get a reward obj from its id located in action.parameters and pass it as the first argument in methods below
       switch (action.type) {
@@ -52,7 +53,7 @@ export class JobProcessor {
           this.rewardService.grantReward(action.parameters, player);
           break;
         case Category.TAKE:
-          //what other 'things' we can substract/take from the player? apart from points ofc
+          //what other 'things' we can subtract/take from the player? apart from points ofc
           this.rewardService.substractPoints(action.parameters, player);
           break;
         case Category.UPDATE:

@@ -17,7 +17,7 @@ export class GameResolver {
   @UseGuards(GqlJwtAuthGuard, GqlAdminGuard)
   async importGEdILArchive(@Args() importGameArgs: ImportGameArgs): Promise<GameDto> {
     const { file, gameInput } = importGameArgs;
-    const { createReadStream } = await file;
+    const { filename, mimetype, encoding, createReadStream } = await file;
     const game = await this.gameService.importGEdILArchive(
       {
         name: gameInput.name,
@@ -25,7 +25,7 @@ export class GameResolver {
         startDate: gameInput.startDate,
         endDate: gameInput.endDate,
       },
-      createReadStream(),
+      { filename, mimetype, encoding: encoding as BufferEncoding, content: createReadStream() },
     );
     return this.gameToDtoMapper.transform(game);
   }

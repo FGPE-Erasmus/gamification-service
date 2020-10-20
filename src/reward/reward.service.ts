@@ -1,11 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { InjectQueue } from '@nestjs/bull';
-import { Queue } from 'bull';
 
 import { BaseService } from '../common/services/base.service';
 import { extractToJson } from '../common/utils/extraction.utils';
 import { Challenge } from '../challenge/models/challenge.model';
 import { Game } from '../game/models/game.model';
+import { EventService } from '../event/event.service';
 import { ActionHookService } from '../hook/action-hook.service';
 import { CategoryEnum } from '../hook/enums/category.enum';
 import { TriggerEventEnum as TriggerEvent } from '../hook/enums/trigger-event.enum';
@@ -19,7 +18,7 @@ import { RewardRepository } from './repositories/reward.repository';
 export class RewardService extends BaseService<Reward> {
   constructor(
     protected readonly repository: RewardRepository,
-    @InjectQueue('hooksQueue') protected readonly hooksQueue: Queue,
+    protected readonly eventService: EventService,
     protected readonly playerService: PlayerService,
     protected readonly actionHookService: ActionHookService,
   ) {

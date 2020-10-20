@@ -9,6 +9,7 @@ import { Player } from '../../player/models/player.model';
 export async function checkCriteria(
   criteria: CriteriaEmbed,
   params: { [key: string]: any },
+  actionObj: { [key: string]: any },
   resolvers: {
     submissions: () => Promise<Submission[]>;
     players: () => Promise<Player[]>;
@@ -22,12 +23,23 @@ export async function checkCriteria(
   let i = 0;
   do {
     const condition = conditions[i];
-    const leftSide = await inferCriteriaEntityValue(condition.leftEntity, condition.leftProperty, params, resolvers);
+    const leftSide = await inferCriteriaEntityValue(
+      condition.leftEntity,
+      condition.leftProperty,
+      params,
+      actionObj,
+      resolvers,
+    );
     let rightSide: any = null;
     if (![ComparingFunction.IS_EMPTY, ComparingFunction.NOT_EMPTY].includes(condition.comparingFunction)) {
-      rightSide = await inferCriteriaEntityValue(condition.rightEntity, condition.rightProperty, params, resolvers);
+      rightSide = await inferCriteriaEntityValue(
+        condition.rightEntity,
+        condition.rightProperty,
+        params,
+        actionObj,
+        resolvers,
+      );
     }
-
     const partial: boolean = evaluateCondition(leftSide, rightSide, condition.comparingFunction);
     if (i === 0 || criteria.junctors[i - 1] === Junctor.AND) {
       result = result && partial;
@@ -43,6 +55,7 @@ export async function inferCriteriaEntityValue(
   identity: string,
   property: string,
   params: { [key: string]: any },
+  actionObj: { [key: string]: any },
   resolvers: {
     submissions: () => Promise<Submission[]>;
     players: () => Promise<Player[]>;

@@ -20,6 +20,7 @@ import { PlayerModule } from './player/player.module';
 import { HookModule } from './hook/hook.module';
 import { RewardModule } from './reward/reward.module';
 import { QueueConfigService } from './queue.config';
+import { EventModule } from './event/event.module';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { QueueConfigService } from './queue.config';
     }),
     // ProcessorModule,
     HealthModule,
+    EventModule,
     AuthModule,
     UsersModule,
     GameModule,

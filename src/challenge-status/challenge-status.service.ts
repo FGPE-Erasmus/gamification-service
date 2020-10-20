@@ -7,13 +7,11 @@ import { TriggerEventEnum as TriggerEvent } from '../hook/enums/trigger-event.en
 import { ChallengeStatus } from './models/challenge-status.model';
 import { State } from './models/state.enum';
 import { ChallengeStatusRepository } from './repositories/challenge-status.repository';
+import { EventService } from '../event/event.service';
 
 @Injectable()
 export class ChallengeStatusService extends BaseService<ChallengeStatus> {
-  constructor(
-    protected readonly repository: ChallengeStatusRepository,
-    @InjectQueue('hooksQueue') protected readonly hooksQueue: Queue,
-  ) {
+  constructor(protected readonly repository: ChallengeStatusRepository, protected readonly eventService: EventService) {
     super(new Logger(ChallengeStatusService.name), repository);
   }
 
@@ -57,7 +55,7 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus> {
     const result: ChallengeStatus = await this.patch(temp.id, { state: State.FAILED, endedAt: date });
 
     // send CHALLENGE_FAILED message to execute attached hooks
-    await this.hooksQueue.add(TriggerEvent.CHALLENGE_FAILED, {
+    await this.eventService.fireEvent(TriggerEvent.CHALLENGE_FAILED, {
       challengeId: challengeId,
       playerId: playerId,
     });
@@ -78,7 +76,7 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus> {
     const result: ChallengeStatus = await this.patch(temp.id, { state: State.COMPLETED, endedAt: date });
 
     // send CHALLENGE_COMPLETED message to execute attached hooks
-    await this.hooksQueue.add(TriggerEvent.CHALLENGE_COMPLETED, {
+    await this.eventService.fireEvent(TriggerEvent.CHALLENGE_COMPLETED, {
       challengeId: challengeId,
       playerId: playerId,
     });
@@ -99,7 +97,7 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus> {
     const result: ChallengeStatus = await this.patch(temp.id, { state: State.REJECTED, endedAt: date });
 
     // send CHALLENGE_REJECTED message to execute attached hooks
-    await this.hooksQueue.add(TriggerEvent.CHALLENGE_REJECTED, {
+    await this.eventService.fireEvent(TriggerEvent.CHALLENGE_REJECTED, {
       challengeId: challengeId,
       playerId: playerId,
     });

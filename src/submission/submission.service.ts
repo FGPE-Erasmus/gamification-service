@@ -1,28 +1,22 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { InjectQueue } from '@nestjs/bull';
-import { Queue } from 'bull';
-import got from 'got';
 
-import { appConfig } from '../app.config';
+import { IFile } from '../common/interfaces/file.interface';
 import { BaseService } from '../common/services/base.service';
-import { TriggerEventEnum, TriggerEventEnum as TriggerEvent } from '../hook/enums/trigger-event.enum';
+import { EvaluationEngineService } from '../evaluation-engine/evaluation-engine.service';
+import { EventService } from '../event/event.service';
+import { TriggerEventEnum as TriggerEvent } from '../hook/enums/trigger-event.enum';
 import { Player } from '../player/models/player.model';
 import { PlayerService } from '../player/player.service';
-import { ReportInput } from './inputs/report.input';
-import { SendSubmissionInput } from './inputs/send-submission.input';
 import { Submission } from './models/submission.model';
-import { Result } from './models/result.enum';
 import { SubmissionRepository } from './repositories/submission.repository';
-import { ActionHookService } from '../hook/action-hook.service';
-import { ActionHook } from '../hook/models/action-hook.model';
 
 @Injectable()
 export class SubmissionService extends BaseService<Submission> {
   constructor(
     protected readonly repository: SubmissionRepository,
+    protected readonly eventService: EventService,
+    protected readonly evaluationEngineService: EvaluationEngineService,
     protected readonly playerService: PlayerService,
-    @InjectQueue('hooksQueue') protected readonly hooksQueue: Queue,
-    protected readonly actionHookService: ActionHookService,
   ) {
     super(new Logger(SubmissionService.name), repository);
   }
@@ -38,28 +32,25 @@ export class SubmissionService extends BaseService<Submission> {
     return this.findAll(query);
   }
 
-  async sendSubmission(input: SendSubmissionInput): Promise<Submission> {
+  async sendSubmission(gameId: string, exerciseId: string, playerId: string, file: IFile): Promise<Submission> {
     const submission: Submission = await super.create({
-      game: input.game,
-      player: input.player,
-      exerciseId: input.exerciseId,
+      game: gameId,
+      player: playerId,
+      exerciseId: exerciseId,
     } as Submission);
 
-    // TODO submit student's attempt to Evaluation Engine
-    try {
-      const response = await got(appConfig.evaluationEngine, {
-        json: {
-          exerciseId: input.exerciseId,
-          file: input.codeFile,
-        },
-      }).json();
-    } catch (e) {
-      console.error(e);
-    }
+    await this.eventService.fireEvent(TriggerEvent.SUBMISSION_RECEIVED, {
+      gameId: gameId,
+      playerId: playerId,
+      exerciseId: exerciseId,
+    });
+
+    await this.evaluationEngineService.evaluate(submission.id, file);
+
     return submission;
   }
 
-  async onSubmissionReceived(exerciseId: string, playerId: string): Promise<any> {
+  /*async onSubmissionReceived(exerciseId: string, playerId: string): Promise<any> {
     const hooks: ActionHook[] = await this.actionHookService.findAll({
       $and: [{ trigger: { $eq: TriggerEventEnum.SUBMISSION_RECEIVED } }, { sourceId: { $eq: exerciseId } }],
     });
@@ -73,17 +64,9 @@ export class SubmissionService extends BaseService<Submission> {
       });
       this.logger.debug(`Job ${job.id} added to the queue (hook: ${hook.id})`);
     }
-  }
+  }*/
 
-  async onSubmissionAccepted(submission: Submission): Promise<Submission> {
-    return null;
-  }
-
-  async onSubmissionRejected(submission: Submission): Promise<Submission> {
-    return null;
-  }
-
-  async onSubmissionEvaluated(id: string, data: ReportInput): Promise<Submission> {
+  /*async onSubmissionEvaluated(id: string, data: ReportInput): Promise<Submission> {
     // save result
     const submission: Submission = await this.patch(id, {
       ...data,
@@ -100,5 +83,5 @@ export class SubmissionService extends BaseService<Submission> {
     );
 
     return submission;
-  }
+  }*/
 }

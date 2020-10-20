@@ -1,5 +1,4 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Readable } from 'stream';
 import { Parse } from 'unzipper';
 
 import { extractToJson } from '../common/utils/extraction.utils';
@@ -11,6 +10,7 @@ import { RewardService } from '../reward/reward.service';
 import { GameInput } from './inputs/game.input';
 import { Game } from './models/game.model';
 import { GameRepository } from './repositories/game.repository';
+import { IFile } from '../common/interfaces/file.interface';
 
 @Injectable()
 export class GameService extends BaseService<Game> {
@@ -28,14 +28,14 @@ export class GameService extends BaseService<Game> {
    * Import a game from a GEdIL layer archive.
    *
    * @param {GameInput} input the game attributes
-   * @param {Readable} gedilStream a read stream to the GEdIL specification package.
+   * @param {IFile} gedilFile the GEdIL specification package.
    */
-  async importGEdILArchive(input: GameInput, gedilStream: Readable): Promise<Game | undefined> {
+  async importGEdILArchive(input: GameInput, gedilFile: IFile): Promise<Game | undefined> {
     let game: Game;
 
     const entries = { challenges: {}, leaderboards: {}, rewards: {}, rules: {} };
 
-    const zip = gedilStream.pipe(Parse({ forceStream: true }));
+    const zip = gedilFile.content.pipe(Parse({ forceStream: true }));
     for await (const entry of zip) {
       const fileName = entry.path;
       const buffer = await entry.buffer();

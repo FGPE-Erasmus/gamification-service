@@ -2,6 +2,7 @@ import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
 import { Result } from './result.enum';
+import { EvaluationEngine } from './evaluation-engine.enum';
 
 @Schema()
 export class Submission extends Document {
@@ -13,6 +14,15 @@ export class Submission extends Document {
 
   @Prop()
   exerciseId: string;
+
+  @Prop({ type: () => String, enum: EvaluationEngine })
+  evaluationEngine?: EvaluationEngine;
+
+  @Prop()
+  evaluationEngineId?: string;
+
+  @Prop()
+  language?: string;
 
   @Prop(raw({ type: Types.Map, of: String, default: () => ({}) }))
   metrics?: Map<string, any>;
