@@ -1,5 +1,5 @@
 import { LoggerService } from '@nestjs/common';
-import { Document, FilterQuery } from 'mongoose';
+import { Document, FilterQuery, UpdateQuery } from 'mongoose';
 
 import { IService } from '../interfaces/service.interface';
 import { IRepository } from '../interfaces/repository.interface';
@@ -31,10 +31,10 @@ export abstract class BaseService<E extends Document> implements IService<E> {
 
   async findOneAndUpdate(
     conditions: FilterQuery<E>,
-    projection: string | Record<string, unknown>,
+    updates: UpdateQuery<E>,
     options?: Record<string, unknown>,
   ): Promise<E> {
-    return await this.repository.findOneAndUpdate(conditions, projection, options);
+    return await this.repository.findOneAndUpdate(conditions, updates, options);
   }
 
   async findById(
@@ -74,11 +74,7 @@ export abstract class BaseService<E extends Document> implements IService<E> {
     return await this.repository.deleteById(id);
   }
 
-  async deleteOne(
-    conditions: FilterQuery<E>,
-    projection?: string | Record<string, unknown>,
-    options?: Record<string, unknown>,
-  ): Promise<E> {
-    return await this.repository.deleteOne(conditions, projection, options);
+  async deleteOne(conditions: FilterQuery<E>, options?: Record<string, unknown>): Promise<E> {
+    return await this.repository.deleteOne(conditions, options);
   }
 }

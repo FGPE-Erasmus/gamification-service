@@ -2,6 +2,7 @@ import { forwardRef, Module } from '@nestjs/common';
 import { BullModule } from '@nestjs/bull';
 
 import { appConfig } from '../app.config';
+import { ChallengeStatusModule } from '../challenge-status/challenge-status.module';
 import { HookModule } from '../hook/hook.module';
 import { PlayerModule } from '../player/player.module';
 import { RewardModule } from '../reward/reward.module';
@@ -10,6 +11,7 @@ import { EventService } from './event.service';
 import { EventProcessor } from './event.processor';
 import { EventListener } from './event.listener';
 import { SubmissionProcessor } from './processors/submission.processor';
+import { PlayerRewardModule } from '../player-reward/player-reward.module';
 
 @Module({
   imports: [
@@ -23,9 +25,11 @@ import { SubmissionProcessor } from './processors/submission.processor';
         defaultJobOptions: { ...appConfig.queue.event.jobOptions },
       }),
     }),
+    forwardRef(() => ChallengeStatusModule),
     forwardRef(() => HookModule),
     forwardRef(() => PlayerModule),
     forwardRef(() => RewardModule),
+    forwardRef(() => PlayerRewardModule),
     forwardRef(() => SubmissionModule),
   ],
   providers: [

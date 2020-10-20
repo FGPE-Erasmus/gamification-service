@@ -1,6 +1,6 @@
 import { registerEnumType } from '@nestjs/graphql';
 
-export enum State {
+export enum StateEnum {
   AVAILABLE = 'AVAILABLE',
   LOCKED = 'LOCKED',
   HIDDEN = 'HIDDEN',
@@ -10,4 +10,4 @@ export enum State {
   REJECTED = 'REJECTED',
 }
 
-registerEnumType(State, { name: 'State' });
+registerEnumType(StateEnum, { name: 'State' });

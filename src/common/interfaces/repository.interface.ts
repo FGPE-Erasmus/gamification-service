@@ -1,4 +1,4 @@
-import { Document, FilterQuery } from 'mongoose';
+import { Document, FilterQuery, UpdateQuery } from 'mongoose';
 
 export interface IRepository<E extends Document> {
   /**
@@ -49,12 +49,12 @@ export interface IRepository<E extends Document> {
    * Find a document in the database and update.
    *
    * @param conditions the conditions to test.
-   * @param projection the projections to apply in the query.
+   * @param updates the updates to apply in the results.
    * @param options the query options.
    */
   findOneAndUpdate(
     conditions: FilterQuery<E>,
-    projection: string | Record<string, unknown>,
+    updates?: UpdateQuery<any>,
     options?: Record<string, unknown>,
   ): Promise<E>;
 
@@ -90,14 +90,9 @@ export interface IRepository<E extends Document> {
    * Delete a document with particular field's values from the database.
    *
    * @param conditions the conditions to test.
-   * @param projection the projections to apply in the query.
    * @param options the query options.
    */
-  deleteOne(
-    conditions: FilterQuery<E>,
-    projection?: string | Record<string, unknown>,
-    options?: Record<string, unknown>,
-  ): Promise<E>;
+  deleteOne(conditions: FilterQuery<E>, options?: Record<string, unknown>): Promise<E>;
 
   /**
    * Delete a document by ID from the database.

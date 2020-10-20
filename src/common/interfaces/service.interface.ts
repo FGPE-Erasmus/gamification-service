@@ -1,4 +1,4 @@
-import { Document, FilterQuery } from 'mongoose';
+import { Document, FilterQuery, UpdateQuery } from 'mongoose';
 
 export interface IService<E extends Document> {
   create(input: Omit<E, keyof Document>): Promise<E>;
@@ -15,6 +15,12 @@ export interface IService<E extends Document> {
     options?: Record<string, unknown>,
   ): Promise<E>;
 
+  findOneAndUpdate(
+    conditions: FilterQuery<E>,
+    updates?: UpdateQuery<any>,
+    options?: Record<string, unknown>,
+  ): Promise<E>;
+
   findAll(
     conditions?: FilterQuery<E>,
     projection?: string | Record<string, unknown>,
@@ -22,4 +28,6 @@ export interface IService<E extends Document> {
   ): Promise<E[]>;
 
   delete(id: string): Promise<E>;
+
+  deleteOne(conditions: FilterQuery<E>, options?: Record<string, unknown>): Promise<E>;
 }

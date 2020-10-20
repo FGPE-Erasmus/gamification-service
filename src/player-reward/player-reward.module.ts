@@ -1,8 +1,6 @@
 import { forwardRef, Module } from '@nestjs/common';
-import { BullModule } from '@nestjs/bull';
 import { MongooseModule } from '@nestjs/mongoose';
 
-import { QueueConfigService } from '../queue.config';
 import { ChallengeModule } from '../challenge/challenge.module';
 import { GameModule } from '../game/game.module';
 import { HookModule } from '../hook/hook.module';
@@ -21,10 +19,6 @@ import { PlayerRewardToDtoMapper } from './mappers/player-reward-to-dto.mapper';
         schema: PlayerRewardSchema,
       },
     ]),
-    BullModule.registerQueueAsync({
-      name: 'hooksQueue',
-      useClass: QueueConfigService,
-    }),
     forwardRef(() => GameModule),
     forwardRef(() => ChallengeModule),
     forwardRef(() => PlayerModule),

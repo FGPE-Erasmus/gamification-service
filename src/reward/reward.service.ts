@@ -137,7 +137,7 @@ export class RewardService extends BaseService<Reward> {
         } */
         break;
     }
-    const job = await this.hooksQueue.add(TriggerEvent.REWARD_GRANTED, {
+    const job = await this.eventService.fireEvent(TriggerEvent.REWARD_GRANTED, {
       rewardId: reward.id,
       playerId: player.id,
     });
@@ -160,14 +160,14 @@ export class RewardService extends BaseService<Reward> {
 
   async substractPoints(amount: string[], player: Player) {
     //substract points from the player, adding a field 'point' to Player entity?
-    const job = await this.hooksQueue.add(TriggerEvent.POINTS_UPDATED, {
+    const job = await this.eventService.fireEvent(TriggerEvent.POINTS_UPDATED, {
       playerId: player.id,
     });
   }
 
   async updatePlayer(params: string[], player: Player) {
     //updating user's properties (updated points? does this trigger concern update regarding all other rewards or smth more/else?)
-    const job = await this.hooksQueue.add(TriggerEvent.PLAYER_UPDATED, {
+    const job = await this.eventService.fireEvent(TriggerEvent.PLAYER_UPDATED, {
       playerId: player.id,
     });
   }

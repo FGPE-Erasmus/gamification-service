@@ -2,7 +2,7 @@ import { Field, ID, ObjectType } from '@nestjs/graphql';
 
 import { ChallengeDto } from '../../challenge/dto/challenge.dto';
 import { PlayerDto } from '../../player/dto/player.dto';
-import { State } from '../models/state.enum';
+import { StateEnum } from '../models/state.enum';
 
 @ObjectType('ChallengeStatus')
 export class ChallengeStatusDto {
@@ -24,6 +24,6 @@ export class ChallengeStatusDto {
   @Field({ nullable: true })
   endedAt?: Date;
 
-  @Field(() => State)
-  state?: State;
+  @Field(() => StateEnum)
+  state?: StateEnum;
 }

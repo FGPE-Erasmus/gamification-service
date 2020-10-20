@@ -3,7 +3,7 @@ import { Document, Types } from 'mongoose';
 
 import { Challenge } from '../../challenge/models/challenge.model';
 import { Player } from '../../player/models/player.model';
-import { State } from './state.enum';
+import { StateEnum as State } from './state.enum';
 
 @Schema()
 export class ChallengeStatus extends Document {

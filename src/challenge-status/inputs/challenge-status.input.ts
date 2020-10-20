@@ -1,6 +1,6 @@
 import { Field, InputType } from '@nestjs/graphql';
 
-import { State } from '../models/state.enum';
+import { StateEnum } from '../models/state.enum';
 
 @InputType()
 export class ChallengeStatusInput {
@@ -19,6 +19,6 @@ export class ChallengeStatusInput {
   @Field({ nullable: true })
   endedAt?: Date;
 
-  @Field(() => State)
-  state: State;
+  @Field(() => StateEnum)
+  state: StateEnum;
 }

@@ -1,9 +1,8 @@
 import { LoggerService } from '@nestjs/common';
-import { Document, FilterQuery, Model } from 'mongoose';
+import { Document, FilterQuery, Model, UpdateQuery } from 'mongoose';
 
 import { IRepository } from '../interfaces/repository.interface';
 import { toMongoId } from '../utils/mongo.utils';
-import { pick } from '../utils/object.utils';
 
 export class BaseRepository<E extends Document> implements IRepository<E> {
   protected constructor(protected readonly logger: LoggerService, protected readonly model: Model<E>) {}
@@ -24,7 +23,7 @@ export class BaseRepository<E extends Document> implements IRepository<E> {
     projection: string | Record<string, unknown> = {},
     options: Record<string, unknown> = {},
   ): Promise<E> {
-    return this.model.findById(id, projection, options);
+    return this.model.findById(id, projection, options).exec();
   }
 
   async getAll(projection: string | Record<string, unknown> = {}, options: Record<string, unknown> = {}): Promise<E[]> {
@@ -37,6 +36,14 @@ export class BaseRepository<E extends Document> implements IRepository<E> {
     options: Record<string, unknown> = {},
   ): Promise<E> {
     return this.model.findOne(conditions, projection, options).exec();
+  }
+
+  async findOneAndUpdate(
+    conditions: FilterQuery<E>,
+    updates?: UpdateQuery<E>,
+    options?: Record<string, unknown>,
+  ): Promise<E> {
+    return this.model.findOneAndUpdate(conditions, updates, options).exec();
   }
 
   async findAll(
@@ -53,26 +60,35 @@ export class BaseRepository<E extends Document> implements IRepository<E> {
       return new this.model(doc).save();
     } else {
       if (!overwrite) {
-        return this.model.findByIdAndUpdate(
-          doc._id,
-          { ...doc },
-          {
-            new: true,
-            omitUndefined: true,
-            useFindAndModify: false,
-          },
-        );
+        return this.model
+          .findByIdAndUpdate(
+            doc._id,
+            { ...doc },
+            {
+              new: true,
+              omitUndefined: true,
+              useFindAndModify: false,
+            },
+          )
+          .exec();
       } else {
-        return this.model.replaceOne({ _id: doc._id }, new this.model(doc)).setOptions({ upsert: true });
+        return this.model
+          .replaceOne({ _id: doc._id }, new this.model(doc))
+          .setOptions({ upsert: true })
+          .exec();
       }
     }
   }
 
   async delete(doc: Partial<E>): Promise<E> {
-    return this.model.findByIdAndRemove(doc._id);
+    return this.model.findByIdAndRemove(doc._id).exec();
+  }
+
+  async deleteOne(conditions: FilterQuery<E>, options: Record<string, unknown> = {}): Promise<E> {
+    return this.model.findOneAndRemove(conditions, options).exec();
   }
 
   async deleteById(id: string): Promise<E> {
-    return this.model.findByIdAndRemove(id);
+    return this.model.findByIdAndRemove(id).exec();
   }
 }

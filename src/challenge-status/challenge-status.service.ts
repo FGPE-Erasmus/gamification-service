@@ -1,13 +1,11 @@
-import { Queue } from 'bull';
-import { InjectQueue } from '@nestjs/bull';
 import { Injectable, Logger } from '@nestjs/common';
 
 import { BaseService } from '../common/services/base.service';
+import { EventService } from '../event/event.service';
 import { TriggerEventEnum as TriggerEvent } from '../hook/enums/trigger-event.enum';
 import { ChallengeStatus } from './models/challenge-status.model';
-import { State } from './models/state.enum';
+import { StateEnum } from './models/state.enum';
 import { ChallengeStatusRepository } from './repositories/challenge-status.repository';
-import { EventService } from '../event/event.service';
 
 @Injectable()
 export class ChallengeStatusService extends BaseService<ChallengeStatus> {
@@ -39,7 +37,7 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus> {
    */
   async markAsOpen(challengeId: string, playerId: string, date: Date): Promise<ChallengeStatus> {
     const temp: ChallengeStatus = await this.findByChallengeIdAndPlayerId(challengeId, playerId);
-    const result: ChallengeStatus = await this.patch(temp.id, { state: State.OPENED, openedAt: date });
+    const result: ChallengeStatus = await this.patch(temp.id, { state: StateEnum.OPENED, openedAt: date });
 
     // send CHALLENGE_OPENED message to execute attached hooks
     await this.eventService.fireEvent(TriggerEvent.CHALLENGE_OPENED, {
@@ -58,9 +56,9 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus> {
    * @param {Date} date the date at which the player failed it
    * @returns {ChallengeStatus} the challenge status
    */
-  async markAsFailed(challengeId: string, playerId: string): Promise<ChallengeStatus> {
+  async markAsFailed(challengeId: string, playerId: string, date: Date): Promise<ChallengeStatus> {
     const temp: ChallengeStatus = await this.findByChallengeIdAndPlayerId(challengeId, playerId);
-    const result: ChallengeStatus = await this.patch(temp.id, { state: State.FAILED, endedAt: date });
+    const result: ChallengeStatus = await this.patch(temp.id, { state: StateEnum.FAILED, endedAt: date });
 
     // send CHALLENGE_FAILED message to execute attached hooks
     await this.eventService.fireEvent(TriggerEvent.CHALLENGE_FAILED, {
@@ -81,14 +79,14 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus> {
    */
   async markAsCompleted(challengeId: string, playerId: string, date: Date): Promise<ChallengeStatus> {
     const temp: ChallengeStatus = await this.findByChallengeIdAndPlayerId(challengeId, playerId);
-    const result: ChallengeStatus = await this.patch(temp.id, { state: State.COMPLETED, endedAt: date });
+    const result: ChallengeStatus = await this.patch(temp.id, { state: StateEnum.COMPLETED, endedAt: date });
 
     // send CHALLENGE_COMPLETED message to execute attached hooks
     await this.eventService.fireEvent(TriggerEvent.CHALLENGE_COMPLETED, {
       challengeId: challengeId,
       playerId: playerId,
     });
-    
+
     return result;
   }
 
@@ -102,8 +100,8 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus> {
    */
   async markAsRejected(challengeId: string, playerId: string): Promise<ChallengeStatus> {
     const temp: ChallengeStatus = await this.findByChallengeIdAndPlayerId(challengeId, playerId);
-    const result: ChallengeStatus = await this.patch(temp.id, { state: State.REJECTED });
-    
+    const result: ChallengeStatus = await this.patch(temp.id, { state: StateEnum.REJECTED });
+
     // send CHALLENGE_REJECTED message to execute attached hooks
     await this.eventService.fireEvent(TriggerEvent.CHALLENGE_REJECTED, {
       challengeId: challengeId,
@@ -123,8 +121,8 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus> {
    */
   async markAsAvailable(challengeId: string, playerId: string): Promise<ChallengeStatus> {
     const temp: ChallengeStatus = await this.findByChallengeIdAndPlayerId(challengeId, playerId);
-    const result: ChallengeStatus = await this.patch(temp.id, { state: State.AVAILABLE });
-    
+    const result: ChallengeStatus = await this.patch(temp.id, { state: StateEnum.AVAILABLE });
+
     // send CHALLENGE_AVAILABLE message to execute attached hooks
     await this.eventService.fireEvent(TriggerEvent.CHALLENGE_AVAILABLE, {
       challengeId: challengeId,
@@ -144,14 +142,14 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus> {
    */
   async markAsHidden(challengeId: string, playerId: string): Promise<ChallengeStatus> {
     const temp: ChallengeStatus = await this.findByChallengeIdAndPlayerId(challengeId, playerId);
-    const result: ChallengeStatus = await this.patch(temp.id, { state: State.HIDDEN });
+    const result: ChallengeStatus = await this.patch(temp.id, { state: StateEnum.HIDDEN });
 
     // send CHALLENGE_REJECTED message to execute attached hooks
     await this.eventService.fireEvent(TriggerEvent.CHALLENGE_REJECTED, {
       challengeId: challengeId,
       playerId: playerId,
     });
-    
+
     return result;
   }
 
@@ -165,7 +163,7 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus> {
    */
   async markAsLocked(challengeId: string, playerId: string): Promise<ChallengeStatus> {
     const temp: ChallengeStatus = await this.findByChallengeIdAndPlayerId(challengeId, playerId);
-    const result: ChallengeStatus = await this.patch(temp.id, { state: State.LOCKED });
+    const result: ChallengeStatus = await this.patch(temp.id, { state: StateEnum.LOCKED });
 
     // send CHALLENGE_LOCKED message to execute attached hooks
     await this.eventService.fireEvent(TriggerEvent.CHALLENGE_LOCKED, {

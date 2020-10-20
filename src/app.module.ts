@@ -2,7 +2,6 @@ import { join } from 'path';
 import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { MongooseModule } from '@nestjs/mongoose';
-import { BullModule } from '@nestjs/bull';
 import { GraphQLJSON } from 'graphql-type-json';
 
 import { appConfig } from './app.config';
@@ -19,8 +18,8 @@ import { LeaderboardModule } from './leaderboard/leaderboard.module';
 import { PlayerModule } from './player/player.module';
 import { HookModule } from './hook/hook.module';
 import { RewardModule } from './reward/reward.module';
-import { QueueConfigService } from './queue.config';
 import { EventModule } from './event/event.module';
+import { EvaluationEngineModule } from './evaluation-engine/evaluation-engine.module';
 
 @Module({
   imports: [
@@ -49,13 +48,10 @@ import { EventModule } from './event/event.module';
       installSubscriptionHandlers: true,
       resolvers: { JSON: GraphQLJSON },
     }),
-    BullModule.registerQueueAsync({
-      name: 'hooksQueue',
-      useClass: QueueConfigService,
-    }),
-    // ProcessorModule,
+
     HealthModule,
     EventModule,
+    EvaluationEngineModule,
     AuthModule,
     UsersModule,
     GameModule,
