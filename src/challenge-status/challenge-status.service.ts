@@ -39,7 +39,15 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus> {
    */
   async markAsOpen(challengeId: string, playerId: string, date: Date): Promise<ChallengeStatus> {
     const temp: ChallengeStatus = await this.findByChallengeIdAndPlayerId(challengeId, playerId);
-    return this.patch(temp.id, { state: State.OPENED, openedAt: date });
+    const result: ChallengeStatus = await this.patch(temp.id, { state: State.OPENED, openedAt: date });
+
+    // send CHALLENGE_OPENED message to execute attached hooks
+    await this.eventService.fireEvent(TriggerEvent.CHALLENGE_OPENED, {
+      challengeId: challengeId,
+      playerId: playerId,
+    });
+
+    return result;
   }
 
   /**
@@ -50,7 +58,7 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus> {
    * @param {Date} date the date at which the player failed it
    * @returns {ChallengeStatus} the challenge status
    */
-  async markAsFailed(challengeId: string, playerId: string, date: Date): Promise<ChallengeStatus> {
+  async markAsFailed(challengeId: string, playerId: string): Promise<ChallengeStatus> {
     const temp: ChallengeStatus = await this.findByChallengeIdAndPlayerId(challengeId, playerId);
     const result: ChallengeStatus = await this.patch(temp.id, { state: State.FAILED, endedAt: date });
 
@@ -71,7 +79,7 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus> {
    * @param {Date} date the date at which the player completed it
    * @returns {ChallengeStatus} the challenge status
    */
-  async markAsCompleted(playerId: string, challengeId: string, date: Date): Promise<ChallengeStatus> {
+  async markAsCompleted(challengeId: string, playerId: string, date: Date): Promise<ChallengeStatus> {
     const temp: ChallengeStatus = await this.findByChallengeIdAndPlayerId(challengeId, playerId);
     const result: ChallengeStatus = await this.patch(temp.id, { state: State.COMPLETED, endedAt: date });
 
@@ -80,7 +88,7 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus> {
       challengeId: challengeId,
       playerId: playerId,
     });
-
+    
     return result;
   }
 
@@ -92,12 +100,75 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus> {
    * @param {Date} date the date at which the player rejected it
    * @returns {ChallengeStatus} the challenge status
    */
-  async markAsRejected(playerId: string, challengeId: string, date: Date): Promise<ChallengeStatus> {
+  async markAsRejected(challengeId: string, playerId: string): Promise<ChallengeStatus> {
     const temp: ChallengeStatus = await this.findByChallengeIdAndPlayerId(challengeId, playerId);
-    const result: ChallengeStatus = await this.patch(temp.id, { state: State.REJECTED, endedAt: date });
+    const result: ChallengeStatus = await this.patch(temp.id, { state: State.REJECTED });
+    
+    // send CHALLENGE_REJECTED message to execute attached hooks
+    await this.eventService.fireEvent(TriggerEvent.CHALLENGE_REJECTED, {
+      challengeId: challengeId,
+      playerId: playerId,
+    });
+
+    return result;
+  }
+
+  /**
+   * Mark a challenge as available by a certain player.
+   *
+   * @param {string} playerId the ID of the player
+   * @param {string} challengeId the ID of the challenge
+   * @param {Date} date the date at which the player made it available
+   * @returns {ChallengeStatus} the challenge status
+   */
+  async markAsAvailable(challengeId: string, playerId: string): Promise<ChallengeStatus> {
+    const temp: ChallengeStatus = await this.findByChallengeIdAndPlayerId(challengeId, playerId);
+    const result: ChallengeStatus = await this.patch(temp.id, { state: State.AVAILABLE });
+    
+    // send CHALLENGE_AVAILABLE message to execute attached hooks
+    await this.eventService.fireEvent(TriggerEvent.CHALLENGE_AVAILABLE, {
+      challengeId: challengeId,
+      playerId: playerId,
+    });
+
+    return result;
+  }
+
+  /**
+   * Mark a challenge as hidden by a certain player.
+   *
+   * @param {string} playerId the ID of the player
+   * @param {string} challengeId the ID of the challenge
+   * @param {Date} date the date at which the player made it hidden
+   * @returns {ChallengeStatus} the challenge status
+   */
+  async markAsHidden(challengeId: string, playerId: string): Promise<ChallengeStatus> {
+    const temp: ChallengeStatus = await this.findByChallengeIdAndPlayerId(challengeId, playerId);
+    const result: ChallengeStatus = await this.patch(temp.id, { state: State.HIDDEN });
 
     // send CHALLENGE_REJECTED message to execute attached hooks
     await this.eventService.fireEvent(TriggerEvent.CHALLENGE_REJECTED, {
+      challengeId: challengeId,
+      playerId: playerId,
+    });
+    
+    return result;
+  }
+
+  /**
+   * Mark a challenge as locked by a certain player.
+   *
+   * @param {string} playerId the ID of the player
+   * @param {string} challengeId the ID of the challenge
+   * @param {Date} date the date at which the player made it locked
+   * @returns {ChallengeStatus} the challenge status
+   */
+  async markAsLocked(challengeId: string, playerId: string): Promise<ChallengeStatus> {
+    const temp: ChallengeStatus = await this.findByChallengeIdAndPlayerId(challengeId, playerId);
+    const result: ChallengeStatus = await this.patch(temp.id, { state: State.LOCKED });
+
+    // send CHALLENGE_LOCKED message to execute attached hooks
+    await this.eventService.fireEvent(TriggerEvent.CHALLENGE_LOCKED, {
       challengeId: challengeId,
       playerId: playerId,
     });

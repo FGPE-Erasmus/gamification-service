@@ -46,6 +46,19 @@ export interface IRepository<E extends Document> {
   ): Promise<E>;
 
   /**
+   * Find a document in the database and update.
+   *
+   * @param conditions the conditions to test.
+   * @param projection the projections to apply in the query.
+   * @param options the query options.
+   */
+  findOneAndUpdate(
+    conditions: FilterQuery<E>,
+    projection: string | Record<string, unknown>,
+    options?: Record<string, unknown>,
+  ): Promise<E>;
+
+  /**
    * Find all documents matching the given criteria.
    *
    * @param conditions the conditions to test.
@@ -72,6 +85,19 @@ export interface IRepository<E extends Document> {
    * @param {Partial<E>} doc the document to delete.
    */
   delete(doc: Partial<E>): Promise<E>;
+
+  /**
+   * Delete a document with particular field's values from the database.
+   *
+   * @param conditions the conditions to test.
+   * @param projection the projections to apply in the query.
+   * @param options the query options.
+   */
+  deleteOne(
+    conditions: FilterQuery<E>,
+    projection?: string | Record<string, unknown>,
+    options?: Record<string, unknown>,
+  ): Promise<E>;
 
   /**
    * Delete a document by ID from the database.
