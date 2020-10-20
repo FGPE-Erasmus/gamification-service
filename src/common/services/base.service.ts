@@ -29,6 +29,14 @@ export abstract class BaseService<E extends Document> implements IService<E> {
     );
   }
 
+  async findOneAndUpdate(
+    conditions: FilterQuery<E>,
+    projection: string | Record<string, unknown>,
+    options?: Record<string, unknown>,
+  ): Promise<E> {
+    return await this.repository.findOneAndUpdate(conditions, projection, options);
+  }
+
   async findById(
     id: string,
     projection?: string | Record<string, unknown>,
@@ -64,5 +72,13 @@ export abstract class BaseService<E extends Document> implements IService<E> {
       return this.patch(id, { active: false } as any);
     }
     return await this.repository.deleteById(id);
+  }
+
+  async deleteOne(
+    conditions: FilterQuery<E>,
+    projection?: string | Record<string, unknown>,
+    options?: Record<string, unknown>,
+  ): Promise<E> {
+    return await this.repository.deleteOne(conditions, projection, options);
   }
 }
