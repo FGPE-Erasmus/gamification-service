@@ -34,11 +34,16 @@ export class JobProcessor {
     } else {
       hook = job.data['hook'] as ScheduledHook;
     }
-    const meet = checkCriteria(hook.criteria, job.data['params'], {
-      player: (id: string) => this.playerService.findById(id),
-      submissions: () => this.submissionService.findAll({ game: { $eq: hook.game } }),
-      players: () => this.playerService.findAll({ game: { $eq: hook.game } }),
-    });
+    const meet = checkCriteria(
+      hook.criteria,
+      job.data['params'],
+      {},
+      {
+        player: (id: string) => this.playerService.findById(id),
+        submissions: () => this.submissionService.findAll({ game: { $eq: hook.game } }),
+        players: () => this.playerService.findAll({ game: { $eq: hook.game } }),
+      },
+    );
     if (meet) {
       this.runActions(hook.actions, job.data['params']);
     }

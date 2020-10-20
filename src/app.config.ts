@@ -1,4 +1,5 @@
 import { LoggerService, LogLevel } from '@nestjs/common';
+import { JobOptions } from 'bull';
 
 interface IAppConfig {
   version: string;
@@ -20,14 +21,37 @@ interface IAppConfig {
     useNewUrlParser: boolean;
     useUnifiedTopology: boolean;
   };
-  evaluationEngine: string;
-  queueHost: string;
-  queuePort: number;
+  messageBroker: {
+    host: string;
+    port: number;
+  };
+  evaluationEngine: {
+    protocol: string;
+    host: string;
+    port: number;
+    urlPrefix: string;
+    username: string;
+    password: string;
+  };
   port: number;
   host: string;
   jwt: {
     secret: string;
     expirationTime: number;
+  };
+  http: {
+    timeout: number;
+    maxRedirects: number;
+  };
+  queue: {
+    event: {
+      name: string;
+      jobOptions: JobOptions;
+    };
+    evaluation: {
+      name: string;
+      jobOptions: JobOptions;
+    };
   };
   logger: LoggerService | LogLevel[] | boolean;
 }
@@ -40,13 +64,10 @@ export const appConfig: IAppConfig = {
   isDevelopment: process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'dev',
   isTesting: process.env.NODE_ENV === 'test',
   assetsPath: `${__dirname}/../assets`,
-  evaluationEngine: process.env.EVALUATION_ENGINE,
-  queueHost: process.env.REDIS_HOST,
-  queuePort: parseInt(process.env.REDIS_PORT, 10),
   database: {
     protocol: 'mongodb',
     host: process.env.DB_HOST,
-    port: parseInt(process.env.DB_PORT, 10),
+    port: +process.env.DB_PORT,
     username: process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
@@ -55,11 +76,46 @@ export const appConfig: IAppConfig = {
     useNewUrlParser: true,
     loggerLevel: process.env.DB_LOGGER_LEVEL,
   },
-  port: parseInt(process.env.APP_PORT, 10),
+  messageBroker: {
+    host: process.env.REDIS_HOST,
+    port: +process.env.REDIS_PORT,
+  },
+  evaluationEngine: {
+    protocol: process.env.EE_PROTOCOL,
+    host: process.env.EE_HOST,
+    port: +process.env.EE_PORT,
+    urlPrefix: process.env.EE_URL_PREFIX,
+    username: process.env.EE_USERNAME,
+    password: process.env.EE_PASSWORD,
+  },
+  port: +process.env.APP_PORT,
   host: process.env.APP_HOST,
   jwt: {
     secret: process.env.JWT_SECRET,
-    expirationTime: parseInt(process.env.JWT_EXPIRATION_TIME, 10),
+    expirationTime: +process.env.JWT_EXPIRATION_TIME,
+  },
+  http: {
+    timeout: +process.env.HTTP_TIMEOUT || 5000,
+    maxRedirects: +process.env.HTTP_MAX_REDIRECTS || 5,
+  },
+  queue: {
+    event: {
+      name: 'EVENT_QUEUE',
+      jobOptions: {
+        attempts: 5,
+        backoff: 2000,
+      },
+    },
+    evaluation: {
+      name: 'EVALUATION_QUEUE',
+      jobOptions: {
+        attempts: 10,
+        backoff: {
+          type: 'exponential',
+          delay: 2000,
+        },
+      },
+    },
   },
   logger: (process.env.APP_LOGGER_LEVELS?.split(',') as LogLevel[]) || ['error', 'warn'],
 };

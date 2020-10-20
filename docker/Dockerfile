@@ -4,7 +4,7 @@ RUN apk update && apk add bash
 
 RUN mkdir -p /home/node/app/node_modules
 
-ARG PORT
+ARG PORT=3000
 ARG NODE_ENV
 
 ENV NODE_ENV=$NODE_ENV

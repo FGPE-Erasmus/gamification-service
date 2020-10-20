@@ -1,25 +1,10 @@
-import { Field, ObjectType, ID } from '@nestjs/graphql';
+import { Field } from '@nestjs/graphql';
 import graphqlTypeJson from 'graphql-type-json';
 
-import { GameDto } from '../../game/dto/game.dto';
-import { PlayerDto } from '../../player/dto/player.dto';
-import { Result } from '../models/result.enum';
-import { EvaluationEngine } from '../models/evaluation-engine.enum';
+import { EvaluationEngine } from '../../submission/models/evaluation-engine.enum';
+import { Result } from '../../submission/models/result.enum';
 
-@ObjectType('Submission')
-export class SubmissionDto {
-  @Field(() => ID)
-  id?: string;
-
-  @Field(() => GameDto)
-  game?: string;
-
-  @Field(() => PlayerDto)
-  player?: string;
-
-  @Field()
-  exerciseId?: string;
-
+export class EvaluationDto {
   @Field(() => EvaluationEngine, { nullable: true })
   evaluationEngine?: EvaluationEngine;
 
@@ -40,9 +25,6 @@ export class SubmissionDto {
 
   @Field({ nullable: true })
   feedback?: string;
-
-  @Field()
-  submittedAt?: Date;
 
   @Field({ nullable: true })
   evaluatedAt?: Date;

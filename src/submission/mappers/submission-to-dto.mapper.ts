@@ -12,7 +12,20 @@ export class SubmissionToDtoMapper implements IMapper<Submission, SubmissionDto>
       return undefined;
     }
     return pick(
-      ['id', 'game', 'player', 'exerciseId', 'result', 'grade', 'feedback', 'metrics', 'submittedAt', 'evaluatedAt'],
+      [
+        'id',
+        'game',
+        'player',
+        'exerciseId',
+        'evaluationEngine',
+        'evaluationEngineId',
+        'result',
+        'grade',
+        'feedback',
+        'metrics',
+        'submittedAt',
+        'evaluatedAt',
+      ],
       obj,
     );
   }

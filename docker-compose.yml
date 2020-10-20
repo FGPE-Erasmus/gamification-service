@@ -20,6 +20,7 @@ services:
     depends_on:
       - mongodb
       - redis
+      - mooshak-mock
     networks:
       - fgpe-gs-nw
     command: "npm run start:dev"
@@ -31,8 +32,6 @@ services:
       - MONGO_INITDB_DATABASE=${DB_NAME}
       - MONGO_INITDB_ROOT_USERNAME=${DB_USERNAME}
       - MONGO_INITDB_ROOT_PASSWORD=${DB_PASSWORD}
-    ports:
-      - ${DB_PORT}:${DB_PORT}
     volumes:
       #- ./docker/init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh
       - fgpe-gs-db:/data/db
@@ -42,19 +41,26 @@ services:
   redis:
     container_name: ${REDIS_HOST}
     image: redis:latest
-    environment: 
+    environment:
       - ALLOW_EMPTY_PASSWORD=${ALLOW_EMPTY_PASSWORD}
       - REDIS_PASSWORD=${REDIS_PASSWORD}
-    ports:
-      - ${REDIS_PORT}:${REDIS_PORT}
     volumes:
       - fgpe-gs-redis:/data/redis
+    networks:
+      - fgpe-gs-nw
+
+  mooshak-mock:
+    container_name: ${EE_HOST}
+    image: jcpaiva/mooshak-fgpe
+    volumes:
+      - fgpe-gs-mooshak-mock:/home/mooshak/data
     networks:
       - fgpe-gs-nw
 
 volumes:
   fgpe-gs-db: {}
   fgpe-gs-redis: {}
+  fgpe-gs-mooshak-mock: {}
 
 networks:
   fgpe-gs-nw:

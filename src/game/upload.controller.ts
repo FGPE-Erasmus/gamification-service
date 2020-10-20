@@ -17,6 +17,11 @@ export class GameUploadController {
   @UseInterceptors(FileInterceptor('file'))
   @UseGuards(RestJwtGuard, RestAdminGuard)
   async importGEdILArchive(@Body() gameDto: GameInput, @UploadedFile() file: Express.Multer.File): Promise<GameDto> {
-    return this.gameService.importGEdILArchive(gameDto, Readable.from(file.buffer));
+    return this.gameService.importGEdILArchive(gameDto, {
+      filename: file.filename,
+      encoding: file.encoding as BufferEncoding,
+      mimetype: file.mimetype,
+      content: Readable.from(file.buffer),
+    });
   }
 }

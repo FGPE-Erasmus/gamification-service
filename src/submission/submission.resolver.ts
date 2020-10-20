@@ -4,9 +4,6 @@ import { Resolver, Args, Mutation, Query, ResolveField, Parent } from '@nestjs/g
 import { GqlUser } from '../common/decorators/gql-user.decorator';
 import { GqlJwtAuthGuard } from '../common/guards/gql-jwt-auth.guard';
 import { Role } from '../users/models/role.enum';
-import { SubmissionService } from './submission.service';
-import { SendSubmissionInput } from './inputs/send-submission.input';
-import { SubmissionDto } from './dto/submission.dto';
 import { GameDto } from '../game/dto/game.dto';
 import { SubmissionToDtoMapper } from './mappers/submission-to-dto.mapper';
 import { GameService } from '../game/game.service';
@@ -17,6 +14,11 @@ import { PlayerDto } from '../player/dto/player.dto';
 import { Game } from '../game/models/game.model';
 import { Player } from '../player/models/player.model';
 import { GqlPlayer } from '../common/decorators/gql-player.decorator';
+import { EvaluateArgs } from './args/evaluate.args';
+import { SubmissionDto } from './dto/submission.dto';
+import { SubmissionService } from './submission.service';
+import { Submission } from './models/submission.model';
+import { GqlEnrolledInGame } from '../common/guards/gql-game-enrollment.guard';
 
 @Resolver(() => SubmissionDto)
 export class SubmissionResolver {
@@ -32,17 +34,17 @@ export class SubmissionResolver {
   @Query(() => SubmissionDto)
   @UseGuards(GqlJwtAuthGuard)
   async submission(
-    @Args('submissionId') id: string,
     @GqlPlayer('id') playerId: string,
     @GqlUser('roles') roles: Role[],
+    @Args('submissionId') submissionId: string,
   ): Promise<SubmissionDto> {
-    const submission = await this.submissionService.findById(id);
+    const submission = await this.submissionService.findById(submissionId);
     if (!submission) {
       throw new NotFoundException();
     } else if (playerId !== submission.player.id && !roles.includes(Role.ADMIN)) {
       throw new ForbiddenException();
     }
-    return submission;
+    return this.submissionToDtoMapper.transform(submission);
   }
 
   @Query(() => [SubmissionDto])
@@ -52,13 +54,22 @@ export class SubmissionResolver {
     @Args('gameId') gameId: string,
     @Args('exerciseId') exerciseId?: string,
   ): Promise<SubmissionDto[]> {
-    return await this.submissionService.findByUser(gameId, userId, exerciseId);
+    const submissions: Submission[] = await this.submissionService.findByUser(gameId, userId, exerciseId);
+    return Promise.all(submissions.map(async submission => this.submissionToDtoMapper.transform(submission)));
   }
 
   @Mutation(() => SubmissionDto)
-  @UseGuards(GqlJwtAuthGuard)
-  async createSubmission(@Args('submissionData') input: SendSubmissionInput): Promise<SubmissionDto> {
-    return await this.submissionService.sendSubmission(input);
+  @UseGuards(GqlJwtAuthGuard, GqlEnrolledInGame)
+  async evaluate(@GqlPlayer('id') playerId: string, @Args() args: EvaluateArgs): Promise<SubmissionDto> {
+    const { gameId, exerciseId, file } = args;
+    const { filename, encoding, mimetype, createReadStream } = await file;
+    const submission: Submission = await this.submissionService.sendSubmission(gameId, exerciseId, playerId, {
+      filename,
+      encoding: encoding as BufferEncoding,
+      mimetype,
+      content: await createReadStream(),
+    });
+    return this.submissionToDtoMapper.transform(submission);
   }
 
   @ResolveField('game', () => GameDto)
