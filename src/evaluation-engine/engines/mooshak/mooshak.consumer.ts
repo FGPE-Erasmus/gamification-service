@@ -53,8 +53,6 @@ export class MooshakConsumer {
 
     this.logger.error('evaluate ... ' + JSON.stringify(result));
 
-    console.log('xdxdxdxd');
-
     if (result.result) {
       await this.evaluationQueue.add(FINISH_EVALUATION_JOB, { submissionId, result });
       return;

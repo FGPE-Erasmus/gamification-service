@@ -192,8 +192,6 @@ export async function updatePlayer(
     case 'points':
       await this.updatePlayerPoints(services, param, playerId);
       break;
-    default:
-      break;
   }
 
   // fire PLAYER_UPDATED event
