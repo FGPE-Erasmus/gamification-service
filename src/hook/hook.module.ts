@@ -14,6 +14,11 @@ import { ActionHookRepository } from './repositories/action-hook.repository';
 import { ScheduledHookRepository } from './repositories/scheduled-hook.repository';
 import { ScheduledHookService } from './scheduled-hook.service';
 import { ScheduledHookResolver } from './scheduled-hook.resolver';
+import { PlayerModule } from 'src/player/player.module';
+import { PlayerRewardModule } from 'src/player-reward/player-reward.module';
+import { RewardModule } from 'src/reward/reward.module';
+import { EventModule } from 'src/event/event.module';
+import { SubmissionModule } from 'src/submission/submission.module';
 
 @Module({
   imports: [
@@ -29,6 +34,11 @@ import { ScheduledHookResolver } from './scheduled-hook.resolver';
     ]),
     forwardRef(() => GameModule),
     forwardRef(() => ChallengeModule),
+    forwardRef(() => PlayerModule),
+    forwardRef(() => RewardModule),
+    forwardRef(() => PlayerRewardModule),
+    forwardRef(() => SubmissionModule),
+    forwardRef(() => EventModule),
   ],
   providers: [
     ActionHookToDtoMapper,

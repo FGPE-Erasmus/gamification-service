@@ -8,7 +8,6 @@ import { PlayerModule } from '../player/player.module';
 import { RewardModule } from '../reward/reward.module';
 import { SubmissionModule } from '../submission/submission.module';
 import { EventService } from './event.service';
-import { EventProcessor } from './event.processor';
 import { EventListener } from './event.listener';
 import { SubmissionProcessor } from './processors/submission.processor';
 import { PlayerRewardModule } from '../player-reward/player-reward.module';
@@ -34,7 +33,6 @@ import { PlayerRewardModule } from '../player-reward/player-reward.module';
   ],
   providers: [
     EventListener,
-    EventProcessor,
     EventService,
 
     // domain processors

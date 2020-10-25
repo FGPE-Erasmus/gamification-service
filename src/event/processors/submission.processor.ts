@@ -8,7 +8,7 @@ import { TriggerEventEnum as TriggerEvent } from '../../hook/enums/trigger-event
 import { Result } from '../../submission/models/result.enum';
 import { Submission } from '../../submission/models/submission.model';
 import { SubmissionService } from '../../submission/submission.service';
-import { EventProcessor } from '../event.processor';
+import { HookService } from 'src/hook/hook.service';
 
 @Processor(appConfig.queue.event.name)
 export class SubmissionProcessor {
@@ -16,7 +16,7 @@ export class SubmissionProcessor {
     protected readonly submissionService: SubmissionService,
     protected readonly eventService: EventService,
     protected readonly actionHookService: ActionHookService,
-    protected readonly eventProcessor: EventProcessor,
+    protected readonly hookService: HookService,
   ) {}
 
   @Process(`${TriggerEvent.SUBMISSION_RECEIVED}_JOB`)
@@ -30,7 +30,7 @@ export class SubmissionProcessor {
     });
 
     for (const actionHook of actionHooks) {
-      this.eventProcessor.executeHook(actionHook, { exerciseId: exerciseId }, job.data);
+      this.hookService.executeHook(actionHook, { exerciseId: exerciseId }, job.data);
     }
   }
 
@@ -45,7 +45,7 @@ export class SubmissionProcessor {
     });
 
     for (const actionHook of actionHooks) {
-      this.eventProcessor.executeHook(actionHook, { exerciseId: exerciseId }, job.data);
+      this.hookService.executeHook(actionHook, { exerciseId: exerciseId }, job.data);
     }
 
     // send notification to trigger further processing
@@ -71,7 +71,7 @@ export class SubmissionProcessor {
     });
 
     for (const actionHook of actionHooks) {
-      this.eventProcessor.executeHook(actionHook, { exerciseId: exerciseId }, job.data);
+      this.hookService.executeHook(actionHook, { exerciseId: exerciseId }, job.data);
     }
   }
 
@@ -86,7 +86,7 @@ export class SubmissionProcessor {
     });
 
     for (const actionHook of actionHooks) {
-      this.eventProcessor.executeHook(actionHook, { exerciseId: exerciseId }, job.data);
+      this.hookService.executeHook(actionHook, { exerciseId: exerciseId }, job.data);
     }
   }
 }

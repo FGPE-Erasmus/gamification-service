@@ -276,27 +276,6 @@ type ScheduledHook {
   updatedAt: Date
 }
 
-type Ranking {
-  player: Player!
-  score: JSON!
-}
-
-type Leaderboard {
-  id: ID
-  game: Game
-  parentChallenge: Challenge
-  name: String
-  metrics: [String!]
-  sortingOrders: [SortingOrder!]
-  createdAt: Date!
-  updatedAt: Date
-}
-
-enum SortingOrder {
-  ASC
-  DESC
-}
-
 type Badge {
   id: ID!
   game: Game!
@@ -414,13 +393,32 @@ type Reveal {
   updatedAt: Date
 }
 
+type Ranking {
+  player: Player!
+  score: JSON!
+}
+
+type Leaderboard {
+  id: ID
+  game: Game
+  parentChallenge: Challenge
+  name: String
+  metrics: [String!]
+  sortingOrders: [SortingOrder!]
+  createdAt: Date!
+  updatedAt: Date
+}
+
+enum SortingOrder {
+  ASC
+  DESC
+}
+
 type Query {
   user(id: String!): User!
   users: [User!]!
   actionHooks: [ActionHook!]!
   scheduledHooks: [ScheduledHook!]!
-  leaderboards: [Leaderboard!]!
-  playerRankings(leaderboardId: String!): [Ranking!]!
   submission(submissionId: String!): Submission!
   submissions(exerciseId: String!, gameId: String!): [Submission!]!
   rewards: [Reward!]!
@@ -432,6 +430,8 @@ type Query {
   virtualItems: [VirtualItem!]!
   unlocks: [Unlock!]!
   reveals: [Reveal!]!
+  leaderboards: [Leaderboard!]!
+  playerRankings(leaderboardId: String!): [Ranking!]!
   games: [Game!]!
   game(id: String!): Game!
   challenges: [Challenge!]!
