@@ -33,7 +33,7 @@ import { RewardToPersistenceMapper } from './mappers/reward-to-persistence.mappe
     forwardRef(() => GameModule),
     forwardRef(() => ChallengeModule),
     forwardRef(() => PlayerModule),
-    HookModule,
+    forwardRef(() => HookModule),
   ],
   providers: [
     RewardToDtoMapper,
