@@ -5,6 +5,7 @@ import { JunctorEnum as Junctor } from '../../hook/enums/junctor.enum';
 import { CriteriaEmbed } from '../../hook/models/embedded/criteria.embed';
 import { Submission } from '../../submission/models/submission.model';
 import { Player } from '../../player/models/player.model';
+import { parseArray } from '../utils/array.utils';
 
 export async function checkCriteria(
   criteria: CriteriaEmbed,
@@ -46,7 +47,7 @@ export async function checkCriteria(
     } else {
       result = result || partial;
     }
-  } while (i++ < criteria.conditions.length);
+  } while (++i < criteria.conditions.length);
 
   return result;
 }
@@ -69,22 +70,25 @@ export async function inferCriteriaEntityValue(
     case 'EVENT': //JSON object with all event parameters
       const event = {
         ...params,
-        player: resolvers.player(params.playerId),
+        player: await resolvers.player(params.playerId),
       };
       return JSONPath({ path: property, json: event });
 
     case 'PLAYER': //property is the JSONPath to be applied to the player inside the trigger
-      return JSONPath({ path: property, json: resolvers.player(params.playerId) });
+      return JSONPath({
+        path: property,
+        json: await resolvers.player(params.playerId),
+      });
 
     case 'ENVIRONMENT': //JSON object with current time, submissions, and players
       let environment;
       if (property.startsWith('$.submissions')) {
         environment = {
-          submissions: resolvers.submissions(),
+          submissions: await resolvers.submissions(),
         };
       } else if (property.startsWith('$.players')) {
         environment = {
-          players: resolvers.players(),
+          players: await resolvers.players(),
         };
       } else {
         environment = {
@@ -116,12 +120,30 @@ export function evaluateCondition(left: any | any[], right: any | any[], compari
     case ComparingFunction.NOT_MATCHES:
       return !left.match(right);
     case ComparingFunction.IS_EMPTY:
-      return left.length === 0 || left.includes('');
+      return left.length === 0;
     case ComparingFunction.NOT_EMPTY:
-      return left.length !== 0 && !left.includes('');
+      return left.length !== 0;
     case ComparingFunction.IN:
-      return [...right].includes(left);
+      return checkContains(right, left);
     case ComparingFunction.NOT_IN:
-      return ![...right].includes(left);
+      return !checkContains(right, left);
   }
+}
+
+export function checkContains(a: string | any[], b: string | any[]): boolean {
+  if (Array.isArray(a) && Array.isArray(b)) {
+    return checkArrayContains(a, b);
+  } else if (Array.isArray(a)) {
+    return checkArrayContains(a, parseArray(b as string));
+  } else if (Array.isArray(b)) {
+    return checkArrayContains(parseArray(a as string), b);
+  }
+  return a.indexOf(b) != 0;
+}
+
+export function checkArrayContains(arr1: any[], arr2: any[]): boolean {
+  console.log(`[${arr1.join(', ')}] contains [${arr2.join(', ')}]`);
+  const result = arr2.every(r => arr1.includes(r));
+  console.log(result);
+  return result;
 }

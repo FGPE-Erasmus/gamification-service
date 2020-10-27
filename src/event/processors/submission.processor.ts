@@ -2,21 +2,21 @@ import { Process, Processor } from '@nestjs/bull';
 import { Job } from 'bull';
 
 import { appConfig } from '../../app.config';
-import { EventService } from '../event.service';
 import { ActionHookService } from '../../hook/action-hook.service';
 import { TriggerEventEnum as TriggerEvent } from '../../hook/enums/trigger-event.enum';
 import { Result } from '../../submission/models/result.enum';
 import { Submission } from '../../submission/models/submission.model';
 import { SubmissionService } from '../../submission/submission.service';
-import { HookService } from 'src/hook/hook.service';
+import { HookService } from '../../hook/hook.service';
+import { EventService } from '../event.service';
 
 @Processor(appConfig.queue.event.name)
 export class SubmissionProcessor {
   constructor(
     protected readonly submissionService: SubmissionService,
     protected readonly eventService: EventService,
-    protected readonly actionHookService: ActionHookService,
     protected readonly hookService: HookService,
+    protected readonly actionHookService: ActionHookService,
   ) {}
 
   @Process(`${TriggerEvent.SUBMISSION_RECEIVED}_JOB`)
@@ -30,7 +30,7 @@ export class SubmissionProcessor {
     });
 
     for (const actionHook of actionHooks) {
-      this.hookService.executeHook(actionHook, { exerciseId: exerciseId }, job.data);
+      await this.hookService.executeHook(actionHook, job.data, { exerciseId: exerciseId });
     }
   }
 
@@ -45,7 +45,7 @@ export class SubmissionProcessor {
     });
 
     for (const actionHook of actionHooks) {
-      this.hookService.executeHook(actionHook, { exerciseId: exerciseId }, job.data);
+      await this.hookService.executeHook(actionHook, job.data, { exerciseId: exerciseId });
     }
 
     // send notification to trigger further processing
@@ -71,7 +71,7 @@ export class SubmissionProcessor {
     });
 
     for (const actionHook of actionHooks) {
-      this.hookService.executeHook(actionHook, { exerciseId: exerciseId }, job.data);
+      await this.hookService.executeHook(actionHook, job.data, { exerciseId: exerciseId });
     }
   }
 
@@ -86,7 +86,7 @@ export class SubmissionProcessor {
     });
 
     for (const actionHook of actionHooks) {
-      this.hookService.executeHook(actionHook, { exerciseId: exerciseId }, job.data);
+      await this.hookService.executeHook(actionHook, job.data, { exerciseId: exerciseId });
     }
   }
 }

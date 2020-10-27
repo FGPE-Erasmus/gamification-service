@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
+import { Submission } from '../../submission/models/submission.model';
 
 @Schema()
 export class Player extends Document {
@@ -12,13 +13,13 @@ export class Player extends Document {
   @Prop({ default: () => 0 })
   points?: number;
 
-  @Prop({ type: [Types.ObjectId], ref: 'Submission' })
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'Submission' }] })
   submissions?: any[];
 
-  @Prop({ type: [Types.ObjectId], ref: 'ChallengeStatus' })
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'ChallengeStatus' }] })
   learningPath?: any[];
 
-  @Prop({ type: [Types.ObjectId], ref: 'PlayerReward' })
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'PlayerReward' }] })
   rewards?: any[];
 
   /* Timestamps */

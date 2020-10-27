@@ -2,14 +2,23 @@ import { Injectable, Logger } from '@nestjs/common';
 
 import { BaseService } from '../common/services/base.service';
 import { extractToJson } from '../common/utils/extraction.utils';
+import { StateEnum as State } from '../challenge-status/models/state.enum';
 import { Game } from '../game/models/game.model';
+import { ActionHookService } from '../hook/action-hook.service';
+import { ComparingFunctionEnum as ComparingFunction } from '../hook/enums/comparing-function.enum';
+import { TriggerEventEnum as TriggerEvent } from '../hook/enums/trigger-event.enum';
+import { EntityEnum } from '../hook/enums/entity.enum';
+import { JunctorEnum as Junctor } from '../hook/enums/junctor.enum';
 import { HookService } from '../hook/hook.service';
+import { CategoryEnum } from '../hook/enums/category.enum';
 import { LeaderboardService } from '../leaderboard/leaderboard.service';
 import { RewardService } from '../reward/reward.service';
+import { Result } from '../submission/models/result.enum';
 
-import { ChallengeRepository } from './repositories/challenge.repository';
 import { Challenge } from './models/challenge.model';
 import { Mode } from './models/mode.enum';
+import { ChallengeRepository } from './repositories/challenge.repository';
+import { createTree } from '../common/utils/array.utils';
 
 @Injectable()
 export class ChallengeService extends BaseService<Challenge> {
@@ -18,6 +27,7 @@ export class ChallengeService extends BaseService<Challenge> {
     protected readonly leaderboardService: LeaderboardService,
     protected readonly rewardService: RewardService,
     protected readonly hookService: HookService,
+    protected readonly actionHookService: ActionHookService,
   ) {
     super(new Logger(ChallengeService.name), repository);
   }
@@ -98,6 +108,45 @@ export class ChallengeService extends BaseService<Challenge> {
       );
     }
 
+    // add logic hooks of the challenge
+    for (const exerciseId of challenge.refs) {
+      await this.actionHookService.create({
+        game: game.id,
+        parentChallenge: challenge.id,
+        sourceId: exerciseId,
+        trigger: TriggerEvent.SUBMISSION_ACCEPTED,
+        criteria: {
+          conditions: [
+            {
+              order: 0,
+              leftEntity: EntityEnum.FIXED,
+              leftProperty: challenge.refs.join(', '),
+              comparingFunction: ComparingFunction.IN,
+              rightEntity: EntityEnum.PLAYER,
+              rightProperty: `$.submissions[?(@.result==\'${Result.ACCEPT}\')].exerciseId`,
+            },
+            {
+              order: 1,
+              leftEntity: EntityEnum.FIXED,
+              leftProperty: Object.values(subObjects.challenges).join(', '),
+              comparingFunction: ComparingFunction.IN,
+              rightEntity: EntityEnum.PLAYER,
+              rightProperty: `$.learningPath[?(@.state==\'${State.COMPLETED}\')].challenge`,
+            },
+          ],
+          junctors: [Junctor.AND],
+        },
+        actions: [
+          {
+            type: CategoryEnum.UPDATE,
+            parameters: ['CHALLENGE', challenge.id as string, 'STATE', State.COMPLETED],
+          },
+        ],
+        recurrent: true,
+        active: true,
+      });
+    }
+
     return challenge;
   }
 
@@ -109,8 +158,24 @@ export class ChallengeService extends BaseService<Challenge> {
    */
   async findByGameId(gameId: string): Promise<Challenge[]> {
     return await this.findAll({
-      game: { eq: gameId },
+      game: { $eq: gameId },
     });
+  }
+
+  /**
+   * Get the challenge tree of a game.
+   *
+   * @param gameId the ID of the game.
+   * @returns {Promise<Challenge[]>} the challenges.
+   */
+  async challengeTree(gameId: string): Promise<(Challenge & { children: any })[]> {
+    const challenges = await this.findByGameId(gameId);
+    return createTree(
+      challenges.map(challenge => challenge.toObject({ virtuals: true })),
+      'id',
+      'parentChallenge',
+      'children',
+    );
   }
 
   /**
@@ -120,7 +185,7 @@ export class ChallengeService extends BaseService<Challenge> {
    */
   async findChildren(parentId: string): Promise<Challenge[]> {
     return await this.findAll({
-      parentChallenge: { eq: parentId },
+      parentChallenge: { $eq: parentId },
     });
   }
 

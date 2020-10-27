@@ -1,6 +1,7 @@
 import { UseGuards } from '@nestjs/common';
-import { Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
+import { Args, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 
+import { GqlAdminGuard } from '../common/guards/gql-admin.guard';
 import { GqlJwtAuthGuard } from '../common/guards/gql-jwt-auth.guard';
 import { GameDto } from '../game/dto/game.dto';
 import { GameToDtoMapper } from '../game/mappers/game-to-dto.mapper';
@@ -20,20 +21,20 @@ export class ChallengeResolver {
   ) {}
 
   @Query(() => [ChallengeDto])
-  @UseGuards(GqlJwtAuthGuard)
-  async challenges(): Promise<ChallengeDto[]> {
-    const challenges: Challenge[] = await this.challengeService.findAll();
+  @UseGuards(GqlJwtAuthGuard, GqlAdminGuard)
+  async challenges(@Args('gameId') gameId: string): Promise<ChallengeDto[]> {
+    const challenges: Challenge[] = await this.challengeService.findByGameId(gameId);
     return Promise.all(challenges.map(async challenge => this.challengeToDtoMapper.transform(challenge)));
   }
 
-  @ResolveField()
+  @ResolveField('game', () => GameDto)
   async game(@Parent() root: ChallengeDto): Promise<GameDto> {
     const { game: gameId } = root;
     const game = await this.gameService.findById(gameId);
     return this.gameToDtoMapper.transform(game);
   }
 
-  @ResolveField()
+  @ResolveField('parentChallenge', () => ChallengeDto)
   async parentChallenge(@Parent() root: ChallengeDto): Promise<ChallengeDto | undefined> {
     const { parentChallenge: parentChallengeId } = root;
     if (!parentChallengeId) {

@@ -4,6 +4,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ServiceHelper } from '../common/helpers/service.helper';
 import { ChallengeStatusModule } from '../challenge-status/challenge-status.module';
 import { GameModule } from '../game/game.module';
+import { EventModule } from '../event/event.module';
 import { PlayerRewardModule } from '../player-reward/player-reward.module';
 import { SubmissionModule } from '../submission/submission.module';
 import { UsersModule } from '../users/users.module';
@@ -22,6 +23,7 @@ import { PlayerResolver } from './player.resolver';
         schema: PlayerSchema,
       },
     ]),
+    forwardRef(() => EventModule),
     forwardRef(() => GameModule),
     forwardRef(() => UsersModule),
     forwardRef(() => ChallengeStatusModule),
@@ -36,6 +38,6 @@ import { PlayerResolver } from './player.resolver';
     PlayerService,
     PlayerResolver,
   ],
-  exports: [PlayerToDtoMapper, PlayerToPersistenceMapper, PlayerService],
+  exports: [PlayerToDtoMapper, PlayerToPersistenceMapper, PlayerRepository, PlayerService],
 })
 export class PlayerModule {}

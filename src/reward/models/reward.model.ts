@@ -35,10 +35,10 @@ export class Reward extends Document {
   @Prop({ nullable: true })
   message?: string;
 
-  @Prop({ type: [Types.ObjectId], ref: 'Challenge', nullable: true })
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'Challenge' }], nullable: true })
   challenges?: any[];
 
-  @Prop({ type: [Types.ObjectId], ref: 'PlayerReward' })
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'PlayerReward' }] })
   players?: any[];
 
   /* Timestamps */

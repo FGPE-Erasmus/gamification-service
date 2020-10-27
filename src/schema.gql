@@ -178,104 +178,6 @@ enum Role {
   ADMIN
 }
 
-type Condition {
-  order: Float!
-  leftEntity: String!
-  leftProperty: String!
-  comparingFunction: ComparingFunction!
-  rightEntity: String!
-  rightProperty: String!
-}
-
-enum ComparingFunction {
-  LESS_THAN
-  GREATER_THAN
-  LESS_OR_EQUAL
-  GREAT_OR_EQUAL
-  EQUAL
-  NOT_EQUAL
-  STARTS_WITH
-  MATCHES
-  NOT_MATCHES
-  IS_EMPTY
-  NOT_EMPTY
-  IN
-  NOT_IN
-}
-
-type Criteria {
-  conditions: [Condition!]!
-  junctors: [Junctor!]!
-}
-
-enum Junctor {
-  AND
-  OR
-}
-
-type Action {
-  type: Category!
-  parameters: [String!]!
-}
-
-enum Category {
-  GIVE
-  TAKE
-  UPDATE
-}
-
-type ActionHook {
-  id: ID!
-  game: Game!
-  parentChallenge: Challenge
-  trigger: TriggerEvent!
-  sourceId: String
-  criteria: Criteria
-  actions: [Action!]!
-  recurrent: Boolean!
-  active: Boolean!
-  lastRun: Date
-  createdAt: Date!
-  updatedAt: Date
-}
-
-enum TriggerEvent {
-  SUBMISSION_EVALUATED
-  SUBMISSION_RECEIVED
-  SUBMISSION_ACCEPTED
-  SUBMISSION_REJECTED
-  CHALLENGE_REJECTED
-  CHALLENGE_COMPLETED
-  CHALLENGE_FAILED
-  CHALLENGE_OPENED
-  CHALLENGE_HIDDEN
-  CHALLENGE_AVAILABLE
-  CHALLENGE_LOCKED
-  REWARD_GRANTED
-  PLAYER_UPDATED
-  POINTS_UPDATED
-  DUEL_INVITATION_RECEIVED
-  DUEL_INITIATED
-  DUEL_ACCEPTED
-  DUEL_REJECTED
-  DUEL_COMPLETED
-}
-
-type ScheduledHook {
-  id: ID!
-  game: Game!
-  parentChallenge: Challenge
-  criteria: Criteria
-  actions: [Action!]!
-  recurrent: Boolean!
-  cron: String
-  interval: Float
-  active: Boolean!
-  lastRun: Date
-  createdAt: Date!
-  updatedAt: Date
-}
-
 type Badge {
   id: ID!
   game: Game!
@@ -393,6 +295,105 @@ type Reveal {
   updatedAt: Date
 }
 
+type Condition {
+  order: Float!
+  leftEntity: String!
+  leftProperty: String!
+  comparingFunction: ComparingFunction!
+  rightEntity: String!
+  rightProperty: String!
+}
+
+enum ComparingFunction {
+  LESS_THAN
+  GREATER_THAN
+  LESS_OR_EQUAL
+  GREAT_OR_EQUAL
+  EQUAL
+  NOT_EQUAL
+  STARTS_WITH
+  MATCHES
+  NOT_MATCHES
+  IS_EMPTY
+  NOT_EMPTY
+  IN
+  NOT_IN
+}
+
+type Criteria {
+  conditions: [Condition!]!
+  junctors: [Junctor!]!
+}
+
+enum Junctor {
+  AND
+  OR
+}
+
+type Action {
+  type: Category!
+  parameters: [String!]!
+}
+
+enum Category {
+  GIVE
+  TAKE
+  UPDATE
+}
+
+type ActionHook {
+  id: ID!
+  game: Game!
+  parentChallenge: Challenge
+  trigger: TriggerEvent!
+  sourceId: String
+  criteria: Criteria
+  actions: [Action!]!
+  recurrent: Boolean!
+  active: Boolean!
+  lastRun: Date
+  createdAt: Date!
+  updatedAt: Date
+}
+
+enum TriggerEvent {
+  SUBMISSION_EVALUATED
+  SUBMISSION_RECEIVED
+  SUBMISSION_ACCEPTED
+  SUBMISSION_REJECTED
+  PLAYER_ENROLLED
+  CHALLENGE_REJECTED
+  CHALLENGE_COMPLETED
+  CHALLENGE_FAILED
+  CHALLENGE_OPENED
+  CHALLENGE_HIDDEN
+  CHALLENGE_AVAILABLE
+  CHALLENGE_LOCKED
+  REWARD_GRANTED
+  PLAYER_UPDATED
+  POINTS_UPDATED
+  DUEL_INVITATION_RECEIVED
+  DUEL_INITIATED
+  DUEL_ACCEPTED
+  DUEL_REJECTED
+  DUEL_COMPLETED
+}
+
+type ScheduledHook {
+  id: ID!
+  game: Game!
+  parentChallenge: Challenge
+  criteria: Criteria
+  actions: [Action!]!
+  recurrent: Boolean!
+  cron: String
+  interval: Float
+  active: Boolean!
+  lastRun: Date
+  createdAt: Date!
+  updatedAt: Date
+}
+
 type Ranking {
   player: Player!
   score: JSON!
@@ -417,8 +418,6 @@ enum SortingOrder {
 type Query {
   user(id: String!): User!
   users: [User!]!
-  actionHooks: [ActionHook!]!
-  scheduledHooks: [ScheduledHook!]!
   submission(submissionId: String!): Submission!
   submissions(exerciseId: String!, gameId: String!): [Submission!]!
   rewards: [Reward!]!
@@ -430,11 +429,13 @@ type Query {
   virtualItems: [VirtualItem!]!
   unlocks: [Unlock!]!
   reveals: [Reveal!]!
+  actionHooks: [ActionHook!]!
+  scheduledHooks: [ScheduledHook!]!
   leaderboards: [Leaderboard!]!
   playerRankings(leaderboardId: String!): [Ranking!]!
   games: [Game!]!
   game(id: String!): Game!
-  challenges: [Challenge!]!
+  challenges(gameId: String!): [Challenge!]!
   get(challengeId: String!, playerId: String!): ChallengeStatus!
   players(gameId: String!): [Player!]!
   profileInGame(gameId: String!): Player!

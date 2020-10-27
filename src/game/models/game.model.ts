@@ -24,10 +24,10 @@ export class Game extends Document {
   @Prop({ nullable: true })
   endDate?: Date;
 
-  @Prop({ type: [Types.ObjectId], ref: 'Player' })
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'Player' }] })
   players?: any[];
 
-  @Prop({ type: [Types.ObjectId], ref: 'Submission' })
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'Submission' }] })
   submissions?: any[];
 
   /* Timestamps */

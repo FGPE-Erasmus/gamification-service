@@ -1,8 +1,8 @@
 import { Field, ID, ObjectType } from '@nestjs/graphql';
 
+import { GameDto } from '../../game/dto/game.dto';
 import { Difficulty } from '../models/difficulty.enum';
 import { Mode } from '../models/mode.enum';
-import { GameDto } from '../../game/dto/game.dto';
 
 @ObjectType('Challenge')
 export class ChallengeDto {

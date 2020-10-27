@@ -39,6 +39,7 @@ export class SubmissionService extends BaseService<Submission> {
       exerciseId: exerciseId,
     } as Submission);
 
+    // send SUBMISSION_RECEIVED event
     await this.eventService.fireEvent(TriggerEvent.SUBMISSION_RECEIVED, {
       gameId: gameId,
       playerId: playerId,
@@ -49,39 +50,4 @@ export class SubmissionService extends BaseService<Submission> {
 
     return submission;
   }
-
-  /*async onSubmissionReceived(exerciseId: string, playerId: string): Promise<any> {
-    const hooks: ActionHook[] = await this.actionHookService.findAll({
-      $and: [{ trigger: { $eq: TriggerEventEnum.SUBMISSION_RECEIVED } }, { sourceId: { $eq: exerciseId } }],
-    });
-    for (const hook of hooks) {
-      const job = await this.hooksQueue.add({
-        hook: hook,
-        params: {
-          exerciseId: exerciseId,
-          playerId: playerId,
-        },
-      });
-      this.logger.debug(`Job ${job.id} added to the queue (hook: ${hook.id})`);
-    }
-  }*/
-
-  /*async onSubmissionEvaluated(id: string, data: ReportInput): Promise<Submission> {
-    // save result
-    const submission: Submission = await this.patch(id, {
-      ...data,
-    });
-
-    // send notification to trigger further processing
-    await this.hooksQueue.add(
-      submission.result === Result.ACCEPT ? TriggerEvent.SUBMISSION_ACCEPTED : TriggerEventEnum.SUBMISSION_REJECTED,
-      {
-        submissionId: submission.id,
-        playerId: submission.player,
-        exerciseId: submission.exerciseId,
-      },
-    );
-
-    return submission;
-  }*/
 }

@@ -20,6 +20,6 @@ import { PlayerModule } from '../player/player.module';
     forwardRef(() => PlayerModule),
   ],
   providers: [UserToDtoMapper, UserToPersistenceMapper, UserRepository, UsersService, UsersResolver],
-  exports: [UserToDtoMapper, UserToPersistenceMapper, UsersService],
+  exports: [UserToDtoMapper, UserToPersistenceMapper, UserRepository, UsersService],
 })
 export class UsersModule {}

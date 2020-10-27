@@ -35,10 +35,7 @@ export class User extends Document {
   @Prop()
   lastActivityAt?: Date;
 
-  @Prop({
-    type: [Types.ObjectId],
-    ref: 'Player',
-  })
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'Player' }] })
   registrations?: any[];
 
   /* Timestamps */

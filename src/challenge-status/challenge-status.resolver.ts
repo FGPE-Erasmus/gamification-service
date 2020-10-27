@@ -14,6 +14,8 @@ import { ChallengeDto } from '../challenge/dto/challenge.dto';
 import { Challenge } from '../challenge/models/challenge.model';
 import { ChallengeService } from '../challenge/challenge.service';
 import { ChallengeToDtoMapper } from '../challenge/mappers/challenge-to-dto.mapper';
+import { GqlEnrolledInGame } from '../common/guards/gql-game-enrollment.guard';
+import { GqlAdminGuard } from '../common/guards/gql-admin.guard';
 
 @Resolver(() => ChallengeStatusDto)
 export class ChallengeStatusResolver {
@@ -27,7 +29,7 @@ export class ChallengeStatusResolver {
   ) {}
 
   @Query(() => ChallengeStatusDto)
-  @UseGuards(GqlJwtAuthGuard)
+  @UseGuards(GqlJwtAuthGuard, GqlAdminGuard)
   async get(@Args('playerId') playerId: string, @Args('challengeId') challengeId: string): Promise<ChallengeStatusDto> {
     const status: ChallengeStatus = await this.challengeStatusService.findByChallengeIdAndPlayerId(
       challengeId,

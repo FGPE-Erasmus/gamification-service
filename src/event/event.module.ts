@@ -11,6 +11,8 @@ import { EventService } from './event.service';
 import { EventListener } from './event.listener';
 import { SubmissionProcessor } from './processors/submission.processor';
 import { PlayerRewardModule } from '../player-reward/player-reward.module';
+import { PlayerProcessor } from './processors/player.processor';
+import { ChallengeModule } from '../challenge/challenge.module';
 
 @Module({
   imports: [
@@ -24,6 +26,7 @@ import { PlayerRewardModule } from '../player-reward/player-reward.module';
         defaultJobOptions: { ...appConfig.queue.event.jobOptions },
       }),
     }),
+    forwardRef(() => ChallengeModule),
     forwardRef(() => ChallengeStatusModule),
     forwardRef(() => HookModule),
     forwardRef(() => PlayerModule),
@@ -36,6 +39,7 @@ import { PlayerRewardModule } from '../player-reward/player-reward.module';
     EventService,
 
     // domain processors
+    PlayerProcessor,
     SubmissionProcessor,
   ],
   exports: [EventService],

@@ -9,6 +9,7 @@ import { ChallengeStatus, ChallengeStatusSchema } from './models/challenge-statu
 import { ChallengeStatusRepository } from './repositories/challenge-status.repository';
 import { ChallengeStatusToDtoMapper } from './mappers/challenge-status-to-dto.mapper';
 import { EventModule } from '../event/event.module';
+import { UsersModule } from '../users/users.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { EventModule } from '../event/event.module';
         schema: ChallengeStatusSchema,
       },
     ]),
+    forwardRef(() => UsersModule),
     forwardRef(() => EventModule),
     forwardRef(() => PlayerModule),
     forwardRef(() => ChallengeModule),

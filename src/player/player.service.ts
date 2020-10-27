@@ -3,10 +3,12 @@ import { Injectable, Logger } from '@nestjs/common';
 import { BaseService } from '../common/services/base.service';
 import { Player } from './models/player.model';
 import { PlayerRepository } from './repositories/player.repository';
+import { TriggerEventEnum as TriggerEvent } from '../hook/enums/trigger-event.enum';
+import { EventService } from '../event/event.service';
 
 @Injectable()
 export class PlayerService extends BaseService<Player> {
-  constructor(protected readonly repository: PlayerRepository) {
+  constructor(protected readonly repository: PlayerRepository, protected readonly eventService: EventService) {
     super(new Logger(PlayerService.name), repository);
   }
 
@@ -21,10 +23,21 @@ export class PlayerService extends BaseService<Player> {
   }
 
   async enroll(gameId: string, userId: string): Promise<Player> {
-    const player: Player = await this.findByGameAndUser(gameId, userId);
+    // is the player already enrolled?
+    let player: Player = await this.findByGameAndUser(gameId, userId);
     if (player) {
       return player;
     }
-    return await this.create({ game: gameId, user: userId });
+
+    // enroll
+    player = await this.create({ game: gameId, user: userId });
+
+    // send PLAYER_ENROLLED event
+    await this.eventService.fireEvent(TriggerEvent.PLAYER_ENROLLED, {
+      gameId: gameId,
+      playerId: player.id,
+    });
+
+    return player;
   }
 }

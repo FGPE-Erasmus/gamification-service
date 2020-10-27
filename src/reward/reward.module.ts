@@ -50,6 +50,6 @@ import { RewardToPersistenceMapper } from './mappers/reward-to-persistence.mappe
     VirtualItemResolver,
     UnlockResolver,
   ],
-  exports: [RewardToDtoMapper, RewardToPersistenceMapper, RewardService],
+  exports: [RewardToDtoMapper, RewardToPersistenceMapper, RewardRepository, RewardService],
 })
 export class RewardModule {}
