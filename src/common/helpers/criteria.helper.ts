@@ -18,38 +18,43 @@ export async function checkCriteria(
   },
 ): Promise<boolean> {
   let result = true;
-
-  const conditions = [...criteria.conditions].sort((a, b) => (a.order > b.order ? 1 : -1));
-
-  let i = 0;
-  do {
-    const condition = conditions[i];
-    const leftSide = await inferCriteriaEntityValue(
-      condition.leftEntity,
-      condition.leftProperty,
-      params,
-      actionObj,
-      resolvers,
-    );
-    let rightSide: any = null;
-    if (![ComparingFunction.IS_EMPTY, ComparingFunction.NOT_EMPTY].includes(condition.comparingFunction)) {
-      rightSide = await inferCriteriaEntityValue(
-        condition.rightEntity,
-        condition.rightProperty,
+  if (!criteria || criteria.conditions === null || criteria.conditions.length === 0) {
+    return result;
+  } else {
+    const conditions = [...criteria.conditions].sort((a, b) => (a.order > b.order ? 1 : -1));
+    console.log(criteria);
+    console.log(actionObj);
+    console.log(params);
+    let i = 0;
+    do {
+      const condition = conditions[i];
+      const leftSide = await inferCriteriaEntityValue(
+        condition.leftEntity,
+        condition.leftProperty,
         params,
         actionObj,
         resolvers,
       );
-    }
-    const partial: boolean = evaluateCondition(leftSide, rightSide, condition.comparingFunction);
-    if (i === 0 || criteria.junctors[i - 1] === Junctor.AND) {
-      result = result && partial;
-    } else {
-      result = result || partial;
-    }
-  } while (++i < criteria.conditions.length);
+      let rightSide: any = null;
+      if (![ComparingFunction.IS_EMPTY, ComparingFunction.NOT_EMPTY].includes(condition.comparingFunction)) {
+        rightSide = await inferCriteriaEntityValue(
+          condition.rightEntity,
+          condition.rightProperty,
+          params,
+          actionObj,
+          resolvers,
+        );
+      }
+      const partial: boolean = evaluateCondition(leftSide, rightSide, condition.comparingFunction);
+      if (i === 0 || criteria.junctors[i - 1] === Junctor.AND) {
+        result = result && partial;
+      } else {
+        result = result || partial;
+      }
+    } while (++i < criteria.conditions.length);
 
-  return result;
+    return result;
+  }
 }
 
 export async function inferCriteriaEntityValue(

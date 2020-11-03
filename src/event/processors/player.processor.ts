@@ -13,6 +13,7 @@ import { Challenge } from '../../challenge/models/challenge.model';
 import { StateEnum } from '../../challenge-status/models/state.enum';
 import { ChallengeStatus } from '../../challenge-status/models/challenge-status.model';
 import { ChallengeStatusService } from '../../challenge-status/challenge-status.service';
+import { RewardService } from 'src/reward/reward.service';
 
 @Processor(appConfig.queue.event.name)
 export class PlayerProcessor {
@@ -23,6 +24,7 @@ export class PlayerProcessor {
     protected readonly eventService: EventService,
     protected readonly hookService: HookService,
     protected readonly actionHookService: ActionHookService,
+    protected readonly rewardService: RewardService,
   ) {}
 
   @Process(`${TriggerEvent.PLAYER_ENROLLED}_JOB`)
@@ -45,6 +47,23 @@ export class PlayerProcessor {
 
     for (const actionHook of actionHooks) {
       await this.hookService.executeHook(actionHook, job.data, {});
+    }
+  }
+
+  @Process(`${TriggerEvent.REWARD_GRANTED}_JOB`)
+  async onRewardGranted(job: Job<{ rewardId: string; playerId: string }>): Promise<void> {
+    console.log(`Reward granted... ${job.data.rewardId}`);
+    const { rewardId, playerId } = job.data;
+    const reward = await this.rewardService.findById(rewardId);
+
+    const actionHooks = await this.actionHookService.findAll({
+      trigger: TriggerEvent.REWARD_GRANTED,
+      sourceId: rewardId,
+    });
+
+    for (const actionHook of actionHooks) {
+      console.log(actionHook.actions);
+      await this.hookService.executeHook(actionHook, job.data, { ...reward });
     }
   }
 

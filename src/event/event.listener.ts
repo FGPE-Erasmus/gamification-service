@@ -13,13 +13,13 @@ export class EventListener {
   @OnGlobalQueueCompleted()
   async onGlobalCompleted(jobId: number, result: any): Promise<void> {
     const job = await this.eventQueue.getJob(jobId);
-    this.logger.debug(`(Global) on completed: job ${job.id} -> result: ${result}`);
+    this.logger.debug(`(Global) on completed: job ${job.id} - ${job.name} -> result: ${result}`);
   }
 
   @OnGlobalQueueFailed()
   async onGlobalQueueFailed(jobId: number, error: Error): Promise<void> {
     const job = await this.eventQueue.getJob(jobId);
-    this.logger.debug(`(Global) on queue failed: job ${job.id} -> error: ${error}`);
+    this.logger.debug(`(Global) on queue failed: job ${job.id} - ${job.name} -> error: ${error}`);
   }
 
   @OnGlobalQueueError()

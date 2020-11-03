@@ -52,6 +52,22 @@ export class HookService {
       const triggers = encodedContent.triggers;
       for (const trigger of triggers) {
         let hook: ScheduledHook | ActionHook;
+        let sourceIds;
+        if (trigger.parameters[0] && trigger.parameters[0] !== null) {
+          if (trigger.event.startsWith('CHALLENGE_')) {
+            sourceIds = trigger.parameters.map(gedilId => imported.challenges[gedilId]['_id'].toString());
+            trigger.parameters = sourceIds;
+          } else if (trigger.event.startsWith('REWARD_')) {
+            sourceIds = trigger.parameters.map(gedilId => imported.rewards[gedilId]['_id'].toString());
+            trigger.parameters = sourceIds;
+          }
+          if (encodedContent.actions[0].parameters && encodedContent.actions[0].parameters !== null) {
+            const mappedParameters = encodedContent.actions[0].parameters.map(gedilId =>
+              imported.rewards[gedilId]['_id'].toString(),
+            );
+            encodedContent.actions[0].parameters = mappedParameters;
+          }
+        }
 
         const data: { [key: string]: any } = {
           game: game.id?.toString(),
@@ -181,8 +197,10 @@ export class HookService {
           await this.challengeStatusService.markAsAvailable(challenge, playerId);
         }
       } else if (reward.kind === RewardType.UNLOCK) {
+        console.log('unlock');
         for (const challenge of reward.challenges) {
-          await this.challengeStatusService.markAsOpen(challenge, playerId, new Date());
+          console.log(challenge);
+          await this.challengeStatusService.markAsOpen(challenge.toString(), playerId, new Date());
         }
       }
 
