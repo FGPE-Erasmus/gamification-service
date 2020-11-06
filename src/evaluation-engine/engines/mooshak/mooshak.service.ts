@@ -11,6 +11,7 @@ import { EvaluationDto } from '../../dto/evaluation.dto';
 import { IEngineService } from '../engine-service.interface';
 import { MooshakEvaluationDto } from './mooshak-evaluation.dto';
 import { MooshakExceptionDto } from './mooshak-exception.dto';
+import { MooshakSubmissionDto } from './mooshak-submission.dto';
 
 @Injectable()
 export class MooshakService implements IEngineService {
@@ -43,11 +44,8 @@ export class MooshakService implements IEngineService {
     const data: FormData = new FormData();
     data.append('program', Buffer.from(solution, 'utf-8'), filename);
 
-    this.logger.debug(filename);
-    this.logger.debug(solution);
-
-    const response: { id: string } | MooshakEvaluationDto = await this.httpService
-      .post<{ id: string } | MooshakEvaluationDto>(
+    const response: MooshakSubmissionDto = await this.httpService
+      .post<MooshakSubmissionDto>(
         // TODO use 'submission.game' variable below
         `/data/contests/${'proto_fgpe' || submission.game}/problems/${submission.exerciseId}/evaluate`,
         data,
@@ -61,26 +59,21 @@ export class MooshakService implements IEngineService {
       )
       .pipe(
         first(),
-        map<any, { id: string } | MooshakEvaluationDto>(res => res.data),
+        map<any, MooshakSubmissionDto>(res => res.data),
         MooshakService.catchMooshakError(),
       )
       .toPromise();
 
-    const result: MooshakEvaluationDto = response as MooshakEvaluationDto;
-    if (result.type === 'evaluation-summary') {
-      return MooshakService.mapMooshakEvaluationToEvaluation(result);
-    }
-    return {
-      evaluationEngine: EvaluationEngine.MOOSHAK,
-      evaluationEngineId: response.id,
-    };
+    return MooshakService.mapMooshakSubmissionToEvaluation(response);
   }
 
   async getEvaluationReport(submission: Submission, options: AxiosRequestConfig = {}): Promise<EvaluationDto> {
     const response: MooshakEvaluationDto = await this.httpService
       .get<MooshakEvaluationDto | MooshakExceptionDto>(
         // TODO use 'submission.game' variable below
-        `/data/contests/${'proto_fgpe' || submission.game}/submissions/${submission.id}/evaluation-summary`,
+        `/data/contests/${'proto_fgpe' || submission.game}/submissions/${
+          submission.evaluationEngineId
+        }/evaluation-summary`,
         options,
       )
       .pipe(
@@ -90,8 +83,7 @@ export class MooshakService implements IEngineService {
       )
       .toPromise();
 
-    const dto: MooshakEvaluationDto = response as MooshakEvaluationDto;
-    return MooshakService.mapMooshakEvaluationToEvaluation(dto);
+    return MooshakService.mapMooshakEvaluationToEvaluation(response as MooshakEvaluationDto);
   }
 
   private static catchMooshakError = <T>() =>
@@ -103,12 +95,21 @@ export class MooshakService implements IEngineService {
       return throwError(new Error(`${error.code} ${error.name} -  ${error.message}`));
     });
 
+  private static mapMooshakSubmissionToEvaluation(mooshakSubmission: MooshakSubmissionDto): EvaluationDto {
+    return {
+      result: MooshakService.mapMooshakResultToResult(mooshakSubmission.classify),
+      evaluationEngine: EvaluationEngine.MOOSHAK,
+      evaluationEngineId: mooshakSubmission.id,
+    };
+  }
+
   private static mapMooshakEvaluationToEvaluation(mooshakEval: MooshakEvaluationDto): EvaluationDto {
     return {
+      evaluatedAt: new Date(mooshakEval.evaluatedAt),
       language: mooshakEval.language,
       result: MooshakService.mapMooshakResultToResult(mooshakEval.status),
       grade: mooshakEval.mark,
-      feedback: mooshakEval.observations + '\n\n' + mooshakEval.feedback,
+      feedback: ((mooshakEval.observations && mooshakEval.observations + '\n\n') || '') + (mooshakEval.feedback || ''),
       metrics: mooshakEval.metrics,
       evaluationEngine: EvaluationEngine.MOOSHAK,
       evaluationEngineId: mooshakEval.id,

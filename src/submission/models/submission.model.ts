@@ -25,7 +25,7 @@ export class Submission extends Document {
   language?: string;
 
   @Prop(raw({ type: Types.Map, of: String, default: () => ({}) }))
-  metrics?: Map<string, any>;
+  metrics?: { [k: string]: any };
 
   @Prop({ type: () => String, enum: Result })
   result?: Result;

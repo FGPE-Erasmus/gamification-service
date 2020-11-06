@@ -3,6 +3,7 @@ import { InjectQueue, Process, Processor } from '@nestjs/bull';
 import { Job, Queue } from 'bull';
 
 import { appConfig } from '../../../app.config';
+import { Result } from '../../../submission/models/result.enum';
 import { EvaluationDto } from '../../dto/evaluation.dto';
 import {
   FINISH_EVALUATION_JOB,
@@ -42,21 +43,12 @@ export class MooshakConsumer {
       appConfig.evaluationEngine.password,
     );
 
-    this.logger.error('login ... ' + token);
-
     // evaluate the attempt
     const result: EvaluationDto = await this.mooshakService.evaluate(submission, filename, content, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-
-    this.logger.error('evaluate ... ' + JSON.stringify(result));
-
-    if (result.result) {
-      await this.evaluationQueue.add(FINISH_EVALUATION_JOB, { submissionId, result });
-      return;
-    }
 
     submission = await this.submissionService.patch(submissionId, {
       evaluationEngine: result.evaluationEngine,
@@ -96,7 +88,7 @@ export class MooshakConsumer {
       },
     });
 
-    if (result.result) {
+    if (result.result !== Result.PROCESSING) {
       await this.evaluationQueue.add(FINISH_EVALUATION_JOB, { submissionId, result });
       return;
     }
@@ -116,6 +108,8 @@ export class MooshakConsumer {
       feedback: result.feedback,
       evaluatedAt: result.evaluatedAt,
     });
+
+    this.logger.error(submission);
 
     await this.eventService.fireEvent(TriggerEvent.SUBMISSION_EVALUATED, {
       submissionId,

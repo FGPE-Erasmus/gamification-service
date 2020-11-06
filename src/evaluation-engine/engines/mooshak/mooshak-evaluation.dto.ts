@@ -3,15 +3,17 @@ export class MooshakEvaluationDto {
 
   id: string;
 
-  status: string;
-
   state: 'pending' | 'final';
+
+  evaluatedAt: number;
 
   language: string;
 
+  status: string;
+
   mark: number;
 
-  metrics: Map<string, any>;
+  metrics: { [k: string]: any };
 
   feedback: string;
 
