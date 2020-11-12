@@ -9,6 +9,13 @@ import { LeaderboardRepository } from './repositories/leaderboard.repository';
 import { LeaderboardToDtoMapper } from './mappers/leaderboard-to-dto.mapper';
 import { LeaderboardToPersistenceMapper } from './mappers/leaderboard-to-persistence.mapper';
 import { PlayerRankingDto } from './dto/player-ranking.dto';
+import { PlayerService } from 'src/player/player.service';
+import { SubmissionService } from 'src/submission/submission.service';
+import { Player } from 'src/player/models/player.model';
+import { SortingOrder } from './models/sorting.enum';
+import { PlayerToDtoMapper } from 'src/player/mappers/player-to-dto.mapper';
+import { JSONPath } from 'jsonpath-plus';
+import { PlayerSubmissionsDto } from './dto/player-submissions.dto';
 
 @Injectable()
 export class LeaderboardService extends BaseService<Leaderboard> {
@@ -16,6 +23,9 @@ export class LeaderboardService extends BaseService<Leaderboard> {
     protected readonly repository: LeaderboardRepository,
     protected readonly toDtoMapper: LeaderboardToDtoMapper,
     protected readonly toPersistenceMapper: LeaderboardToPersistenceMapper,
+    protected readonly playerService: PlayerService,
+    protected readonly submissionService: SubmissionService,
+    protected readonly playertoDtoMapper: PlayerToDtoMapper,
   ) {
     super(new Logger(LeaderboardService.name), repository);
   }
@@ -55,9 +65,47 @@ export class LeaderboardService extends BaseService<Leaderboard> {
 
   // TODO instead of maintaining & updating scores in a collection,
   // calculate rankings on-demand
-
   async getRankings(leaderboardId: string): Promise<PlayerRankingDto[]> {
-    return [];
+    const leaderboard: Leaderboard = await this.findById(leaderboardId);
+    const metrics: string[] = leaderboard.metrics;
+    const rankingPlayers: PlayerRankingDto[] = [];
+    const players: Player[] = await this.playerService.findAll({ game: leaderboard.game });
+
+    players.forEach(async player => {
+      const playersSubmissions: PlayerSubmissionsDto = {
+        player: await player,
+        submissions: await this.submissionService.findAll({
+          $and: [{ player: { $eq: player.id } }, { game: { $eq: leaderboard.game } }],
+        }),
+      };
+
+      const rankedPlayer: PlayerRankingDto = {
+        player: player,
+        score: new Map(),
+      };
+
+      metrics.forEach(metric => {
+        rankedPlayer.score.set(metric, JSONPath({ path: metric, json: { ...playersSubmissions } })[2]);
+      });
+      rankingPlayers.push(rankedPlayer);
+    });
+    return this.sortPlayers(rankingPlayers, leaderboard);
+  }
+
+  sortPlayers(rankingPlayers: PlayerRankingDto[], leaderboard: Leaderboard): PlayerRankingDto[] {
+    rankingPlayers = rankingPlayers.sort((a, b) => {
+      for (let i = 0; i < leaderboard.metrics.length; i++) {
+        const metric = leaderboard.metrics[i];
+        const sortingOrder = leaderboard.sortingOrders[i];
+        const reverse = sortingOrder === SortingOrder.DESC ? -1 : 1;
+        if (a.score[metric] < b.score[metric]) {
+          return reverse * -1;
+        } else if (a.score[metric] > b.score[metric]) {
+          return reverse * 1;
+        }
+      }
+    });
+    return rankingPlayers;
   }
 
   /*async sortLeaderboard(leaderboardId: string): Promise<any> {
@@ -81,22 +129,5 @@ export class LeaderboardService extends BaseService<Leaderboard> {
       return 0;
     });
     return list;
-  }*/
-
-  /*async sortPlayers(players: PlayerDto[], metrics: string[]): Promise<PlayerDto[]> {
-    const submissionss = players.
-    players.sort((a, b) => {
-      for (let i = 0; i < leaderboard.metrics.length; i++) {
-        const metric = leaderboard.metrics[i];
-        const sortingOrder = leaderboard.sortingOrders[i];
-        const reverse = sortingOrder === SortingOrder.DESC ? -1 : 1;
-        if (a.score[metric] < b.score[metric]) {
-          return reverse * -1;
-        } else if (a.score[metric] > b.score[metric]) {
-          return reverse * 1;
-        }
-      }
-      return 0;
-    });
   }*/
 }

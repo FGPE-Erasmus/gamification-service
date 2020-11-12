@@ -9,6 +9,8 @@ import { LeaderboardRepository } from './repositories/leaderboard.repository';
 import { LeaderboardResolver } from './leaderboard.resolver';
 import { LeaderboardToDtoMapper } from './mappers/leaderboard-to-dto.mapper';
 import { LeaderboardToPersistenceMapper } from './mappers/leaderboard-to-persistence.mapper';
+import { PlayerModule } from 'src/player/player.module';
+import { SubmissionModule } from 'src/submission/submission.module';
 
 @Module({
   imports: [
@@ -20,6 +22,8 @@ import { LeaderboardToPersistenceMapper } from './mappers/leaderboard-to-persist
     ]),
     forwardRef(() => GameModule),
     forwardRef(() => ChallengeModule),
+    forwardRef(() => PlayerModule),
+    forwardRef(() => SubmissionModule),
   ],
   providers: [
     LeaderboardToDtoMapper,

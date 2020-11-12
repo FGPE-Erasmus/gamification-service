@@ -433,6 +433,7 @@ type Query {
   scheduledHooks: [ScheduledHook!]!
   leaderboards: [Leaderboard!]!
   playerRankings(leaderboardId: String!): [Ranking!]!
+  lol(leaderboardId: String!): Leaderboard!
   games: [Game!]!
   game(id: String!): Game!
   challenges(gameId: String!): [Challenge!]!
