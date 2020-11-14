@@ -1,4 +1,4 @@
-import { Resolver, Args, Query, ResolveField, Parent } from '@nestjs/graphql';
+import { Resolver, Query, ResolveField, Parent } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 
 import { GqlJwtAuthGuard } from '../common/guards/gql-jwt-auth.guard';
@@ -9,7 +9,6 @@ import { ChallengeToDtoMapper } from '../challenge/mappers/challenge-to-dto.mapp
 import { GameService } from '../game/game.service';
 import { GameToDtoMapper } from '../game/mappers/game-to-dto.mapper';
 import { LeaderboardService } from './leaderboard.service';
-import { PlayerRankingDto } from './dto/player-ranking.dto';
 import { LeaderboardDto } from './dto/leaderboard.dto';
 import { Leaderboard } from './models/leaderboard.model';
 import { LeaderboardToDtoMapper } from './mappers/leaderboard-to-dto.mapper';
@@ -30,12 +29,6 @@ export class LeaderboardResolver {
   async leaderboards(): Promise<LeaderboardDto[]> {
     const leaderboards: Leaderboard[] = await this.leaderboardService.findAll();
     return Promise.all(leaderboards.map(async leaderboard => this.leaderboardToDtoMapper.transform(leaderboard)));
-  }
-
-  @Query(() => [PlayerRankingDto])
-  @UseGuards(GqlJwtAuthGuard)
-  async playerRankings(@Args('leaderboardId') leaderboardId: string): Promise<PlayerRankingDto[]> {
-    return this.leaderboardService.getRankings(leaderboardId);
   }
 
   @ResolveField()

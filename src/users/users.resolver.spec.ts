@@ -1,7 +1,6 @@
 import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { ServiceHelper } from '../common/helpers/service.helper';
 import { UsersService } from './users.service';
 import { UsersResolver } from './users.resolver';
 import { UserRepository } from './repositories/user.repository';
@@ -27,7 +26,6 @@ describe('UsersResolver', () => {
         UserToDtoMapper,
         UsersService,
         UserRepository,
-        ServiceHelper,
         UsersResolver,
       ],
     }).compile();

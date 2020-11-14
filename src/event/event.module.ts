@@ -14,6 +14,7 @@ import { PlayerRewardModule } from '../player-reward/player-reward.module';
 import { PlayerProcessor } from './processors/player.processor';
 import { ChallengeModule } from '../challenge/challenge.module';
 import { ChallengeProcessor } from './processors/challenge.processor';
+import { RewardProcessor } from './processors/reward.processor';
 
 @Module({
   imports: [
@@ -40,9 +41,10 @@ import { ChallengeProcessor } from './processors/challenge.processor';
     EventService,
 
     // domain processors
+    ChallengeProcessor,
     PlayerProcessor,
     SubmissionProcessor,
-    ChallengeProcessor,
+    RewardProcessor,
   ],
   exports: [EventService],
 })

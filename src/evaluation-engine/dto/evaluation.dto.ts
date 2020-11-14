@@ -15,7 +15,7 @@ export class EvaluationDto {
   language?: string;
 
   @Field(() => graphqlTypeJson, { nullable: true })
-  metrics?: { [k: string]: any };
+  metrics?: Map<string, number>;
 
   @Field(() => Result, { nullable: true })
   result?: Result;

@@ -1,7 +1,6 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
-import { ServiceHelper } from '../common/helpers/service.helper';
 import { ChallengeStatusModule } from '../challenge-status/challenge-status.module';
 import { GameModule } from '../game/game.module';
 import { EventModule } from '../event/event.module';
@@ -30,14 +29,7 @@ import { PlayerResolver } from './player.resolver';
     forwardRef(() => PlayerRewardModule),
     forwardRef(() => SubmissionModule),
   ],
-  providers: [
-    PlayerToDtoMapper,
-    PlayerToPersistenceMapper,
-    ServiceHelper,
-    PlayerRepository,
-    PlayerService,
-    PlayerResolver,
-  ],
+  providers: [PlayerToDtoMapper, PlayerToPersistenceMapper, PlayerRepository, PlayerService, PlayerResolver],
   exports: [PlayerToDtoMapper, PlayerToPersistenceMapper, PlayerRepository, PlayerService],
 })
 export class PlayerModule {}

@@ -13,7 +13,7 @@ export class MooshakEvaluationDto {
 
   mark: number;
 
-  metrics: { [k: string]: any };
+  metrics: Map<string, number>;
 
   feedback: string;
 

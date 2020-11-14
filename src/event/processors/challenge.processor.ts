@@ -17,12 +17,13 @@ export class ChallengeProcessor {
   ) {}
 
   @Process(`${TriggerEvent.CHALLENGE_COMPLETED}_JOB`)
-  async onChallengeCompleted(job: Job<{ challengeId: string; playerId: string }>): Promise<void> {
-    const { challengeId, playerId } = job.data;
+  async onChallengeCompleted(job: Job<{ gameId: string; challengeId: string; playerId: string }>): Promise<void> {
+    const { gameId, challengeId, playerId } = job.data;
     const challenge: Challenge = await this.challengeService.findById(challengeId);
 
     //process hooks
     const actionHooks = await this.actionHookService.findAll({
+      game: { $eq: gameId },
       trigger: TriggerEvent.CHALLENGE_COMPLETED,
       sourceId: challengeId,
     });

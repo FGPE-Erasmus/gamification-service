@@ -9,17 +9,17 @@ import { LeaderboardRepository } from './repositories/leaderboard.repository';
 import { LeaderboardResolver } from './leaderboard.resolver';
 import { LeaderboardToDtoMapper } from './mappers/leaderboard-to-dto.mapper';
 import { LeaderboardToPersistenceMapper } from './mappers/leaderboard-to-persistence.mapper';
+import { PlayerModule } from 'src/player/player.module';
+import { SubmissionModule } from 'src/submission/submission.module';
+import { RankingResolver } from './ranking.resolver';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([
-      {
-        name: Leaderboard.name,
-        schema: LeaderboardSchema,
-      },
-    ]),
+    MongooseModule.forFeature([{ name: Leaderboard.name, schema: LeaderboardSchema }]),
     forwardRef(() => GameModule),
     forwardRef(() => ChallengeModule),
+    forwardRef(() => PlayerModule),
+    forwardRef(() => SubmissionModule),
   ],
   providers: [
     LeaderboardToDtoMapper,
@@ -27,6 +27,7 @@ import { LeaderboardToPersistenceMapper } from './mappers/leaderboard-to-persist
     LeaderboardRepository,
     LeaderboardService,
     LeaderboardResolver,
+    RankingResolver,
   ],
   exports: [LeaderboardToDtoMapper, LeaderboardToPersistenceMapper, LeaderboardService],
 })

@@ -13,7 +13,7 @@ import { Challenge } from '../../challenge/models/challenge.model';
 import { StateEnum } from '../../challenge-status/models/state.enum';
 import { ChallengeStatus } from '../../challenge-status/models/challenge-status.model';
 import { ChallengeStatusService } from '../../challenge-status/challenge-status.service';
-import { RewardService } from 'src/reward/reward.service';
+import { RewardService } from '../../reward/reward.service';
 
 @Processor(appConfig.queue.event.name)
 export class PlayerProcessor {
@@ -41,7 +41,7 @@ export class PlayerProcessor {
 
     // process hooks
     const actionHooks = await this.actionHookService.findAll({
-      game: gameId,
+      game: { $eq: gameId },
       trigger: TriggerEvent.PLAYER_ENROLLED,
     });
 
@@ -50,20 +50,18 @@ export class PlayerProcessor {
     }
   }
 
-  @Process(`${TriggerEvent.REWARD_GRANTED}_JOB`)
-  async onRewardGranted(job: Job<{ rewardId: string; playerId: string }>): Promise<void> {
-    console.log(`Reward granted... ${job.data.rewardId}`);
-    const { rewardId, playerId } = job.data;
-    const reward = await this.rewardService.findById(rewardId);
+  @Process(`${TriggerEvent.PLAYER_UPDATED}_JOB`)
+  async onPlayerUpdated(job: Job<{ gameId: string; playerId: string }>): Promise<void> {
+    const { gameId } = job.data;
 
+    // process hooks
     const actionHooks = await this.actionHookService.findAll({
-      trigger: TriggerEvent.REWARD_GRANTED,
-      sourceId: rewardId,
+      game: { $eq: gameId },
+      trigger: TriggerEvent.PLAYER_UPDATED,
     });
 
     for (const actionHook of actionHooks) {
-      console.log(actionHook.actions);
-      await this.hookService.executeHook(actionHook, job.data, { ...reward });
+      await this.hookService.executeHook(actionHook, job.data, {});
     }
   }
 
@@ -73,7 +71,7 @@ export class PlayerProcessor {
     state = StateEnum.AVAILABLE,
   ): Promise<ChallengeStatus> {
     // infer state for current challenge
-    let challengeState: StateEnum = StateEnum.AVAILABLE;
+    let challengeState: StateEnum;
     if (challenge.hidden) {
       challengeState = StateEnum.HIDDEN;
     } else if (challenge.locked && state === StateEnum.AVAILABLE) {

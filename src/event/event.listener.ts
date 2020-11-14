@@ -19,7 +19,9 @@ export class EventListener {
   @OnGlobalQueueFailed()
   async onGlobalQueueFailed(jobId: number, error: Error): Promise<void> {
     const job = await this.eventQueue.getJob(jobId);
-    this.logger.debug(`(Global) on queue failed: job ${job.id} - ${job.name} -> error: ${error}`);
+    this.logger.debug(
+      `(Global) on queue failed: job ${job.id} - ${job.name} -> error: ${error}, stack: ${error.stack}`,
+    );
   }
 
   @OnGlobalQueueError()

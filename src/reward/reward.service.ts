@@ -6,9 +6,6 @@ import { Challenge } from '../challenge/models/challenge.model';
 import { Game } from '../game/models/game.model';
 import { EventService } from '../event/event.service';
 import { ActionHookService } from '../hook/action-hook.service';
-import { CategoryEnum } from '../hook/enums/category.enum';
-import { TriggerEventEnum as TriggerEvent } from '../hook/enums/trigger-event.enum';
-import { Player } from '../player/models/player.model';
 import { PlayerService } from '../player/player.service';
 import { RewardType } from './models/reward-type.enum';
 import { Reward } from './models/reward.model';
@@ -48,33 +45,12 @@ export class RewardService extends BaseService<Reward> {
     const encodedContent = extractToJson(entries['metadata.json']);
 
     // create reward
-    const reward: Reward = await this.create({
+    return await this.create({
       ...encodedContent,
-      challenges: encodedContent.challenges?.map(gedilId => importTracker.challenges[gedilId]),
       game: game.id,
       parentChallenge: challenge?.id,
+      challenges: encodedContent.challenges?.map(gedilId => importTracker.challenges[gedilId]),
     });
-
-    // if reward is appended to a challenge, set up a hook to give it when
-    // challenge is complete
-    if (challenge) {
-      await this.actionHookService.create({
-        game: game.id.toString(),
-        parentChallenge: challenge?.id?.toString(),
-        trigger: TriggerEvent.CHALLENGE_COMPLETED,
-        sourceId: challenge?.id?.toString(),
-        actions: [
-          {
-            type: CategoryEnum.GIVE,
-            parameters: [reward.id.toString()],
-          },
-        ],
-        recurrent: false,
-        active: true,
-      });
-    }
-
-    return reward;
   }
 
   /**
