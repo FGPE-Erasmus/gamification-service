@@ -5,9 +5,9 @@ import { PlayerDto } from '../../player/dto/player.dto';
 
 @ObjectType('Ranking')
 export class PlayerRankingDto {
-  @Field(() => PlayerDto)
-  player?: PlayerDto;
+  @Field(() => PlayerDto, { nullable: true })
+  player?: string;
 
   @Field(() => graphqlTypeJson, { defaultValue: () => ({}) })
-  score?: Map<string, number>;
+  score?: { [key: string]: any };
 }

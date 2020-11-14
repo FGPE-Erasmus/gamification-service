@@ -2,12 +2,10 @@ import { ObjectID } from 'mongodb';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as bcrypt from 'bcryptjs';
 
-import { ServiceHelper } from '../common/helpers/service.helper';
 import { UsersService } from './users.service';
 import { UserRepository } from './repositories/user.repository';
 import { UserInput } from './inputs/user.input';
 import { Role } from './models/role.enum';
-import { UserDto } from './dto/user.dto';
 import { User } from './models/user.model';
 import { getModelToken } from '@nestjs/mongoose';
 
@@ -30,7 +28,6 @@ describe('UsersService', () => {
         },
         UsersService,
         UserRepository,
-        ServiceHelper,
       ],
     }).compile();
 

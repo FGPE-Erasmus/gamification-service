@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 
 import { BaseService } from '../common/services/base.service';
 import { extractToJson } from '../common/utils/extraction.utils';
+import { collectFromTree, createTree, findSubtree } from '../common/utils/tree.utils';
 import { StateEnum as State } from '../challenge-status/models/state.enum';
 import { Game } from '../game/models/game.model';
 import { ActionHookService } from '../hook/action-hook.service';
@@ -18,7 +19,7 @@ import { Result } from '../submission/models/result.enum';
 import { Challenge } from './models/challenge.model';
 import { Mode } from './models/mode.enum';
 import { ChallengeRepository } from './repositories/challenge.repository';
-import { createTree } from '../common/utils/array.utils';
+import { flatten } from '../common/utils/array.utils';
 
 @Injectable()
 export class ChallengeService extends BaseService<Challenge> {
@@ -151,7 +152,7 @@ export class ChallengeService extends BaseService<Challenge> {
   }
 
   /**
-   * Find all challenges within a specific game or generally.
+   * Find all challenges within a specific game.
    *
    * @param gameId the ID of the game
    * @returns {Promise<Challenge[]>} the challenges.
@@ -163,30 +164,50 @@ export class ChallengeService extends BaseService<Challenge> {
   }
 
   /**
+   * Find all challenges within a specific parent challenge.
+   *
+   * @param gameId the ID of the game
+   * @param parentChallengeId the ID of the par
+   * @returns {Promise<Challenge[]>} the challenges.
+   */
+  async findByParentChallengeId(gameId: string, parentChallengeId: string): Promise<Challenge[]> {
+    return await this.findAll({
+      game: { $eq: gameId },
+      parentChallenge: { $eq: parentChallengeId },
+    });
+  }
+
+  /**
    * Get the challenge tree of a game.
    *
    * @param gameId the ID of the game.
+   * @param challengeId the ID of the challenge to return a sub-tree.
    * @returns {Promise<Challenge[]>} the challenges.
    */
-  async challengeTree(gameId: string): Promise<(Challenge & { children: any })[]> {
+  async challengeTree(gameId: string, challengeId?: string): Promise<(Challenge & { children: any })[]> {
     const challenges = await this.findByGameId(gameId);
-    return createTree(
+    const tree: (Challenge & { children: any })[] = createTree(
       challenges.map(challenge => challenge.toObject({ virtuals: true })),
       'id',
       'parentChallenge',
       'children',
     );
+    if (challengeId) {
+      return findSubtree(tree, challengeId, 'id', 'children');
+    }
+    return tree;
   }
 
   /**
-   * Find all children-challenges of a specified parent-challenge.
+   * Get the challenge tree of a game.
    *
-   * @returns {Promise<Challenge[]>} the children-challenges.
+   * @param gameId the ID of the game.
+   * @param challengeId the ID of the challenge (to return a sub-tree).
+   * @returns {Promise<Challenge[]>} the challenges.
    */
-  async findChildren(parentId: string): Promise<Challenge[]> {
-    return await this.findAll({
-      parentChallenge: { $eq: parentId },
-    });
+  async getExercises(gameId: string, challengeId?: string): Promise<string[]> {
+    const tree = await this.challengeTree(gameId, challengeId);
+    return flatten(collectFromTree(tree, 'refs'));
   }
 
   /**

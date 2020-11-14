@@ -14,7 +14,6 @@ import { TriggerKindEnum as TriggerKind } from './enums/trigger-kind.enum';
 import { PlayerRewardService } from '../player-reward/player-reward.service';
 import { PlayerService } from '../player/player.service';
 import { PlayerReward } from '../player-reward/models/player-reward.model';
-import { RewardType } from '../reward/models/reward-type.enum';
 import { Reward } from '../reward/models/reward.model';
 import { RewardService } from '../reward/reward.service';
 import { SubmissionService } from '../submission/submission.service';
@@ -24,6 +23,7 @@ import { ConditionInput } from './inputs/condition.input';
 import { ScheduledHook } from './models/scheduled-hook.model';
 import { ActionHook } from './models/action-hook.model';
 import { ActionEmbed } from './models/embedded/action.embed';
+import { toString } from '../common/utils/mongo.utils';
 
 @Injectable()
 export class HookService {
@@ -150,24 +150,32 @@ export class HookService {
         }),
     });
     console.log('meets criteria? ' + meet);
+    console.log('meets criteria? ' + hook);
     if (meet) {
-      await this.runActions(hook.actions, eventParams);
+      await this.runActions(hook.game, hook.actions, eventParams);
     }
   }
 
   /** Helpers **/
 
-  private async runActions(actions: ActionEmbed[], eventParams: { [key: string]: any }): Promise<any> {
+  /**
+   * Run actions of an hook.
+   *
+   * @param {string} gameId ID of the game
+   * @param {ActionEmbed[]} actions Actions of the hook
+   * @param {[key: string]: any} eventParams Parameters of the event
+   */
+  private async runActions(gameId: string, actions: ActionEmbed[], eventParams: { [key: string]: any }): Promise<any> {
     for (const action of actions) {
       switch (action.type) {
         case Category.GIVE:
-          await this.runGiveActions(action.parameters, eventParams.playerId);
+          await this.runGiveActions(gameId, eventParams.playerId?.toString(), action.parameters);
           break;
         case Category.TAKE:
-          await this.runTakeActions(action.parameters, eventParams.playerId);
+          await this.runTakeActions(gameId, eventParams.playerId?.toString(), action.parameters);
           break;
         case Category.UPDATE:
-          await this.runUpdateActions(action.parameters, eventParams.playerId);
+          await this.runUpdateActions(gameId, eventParams.playerId?.toString(), action.parameters);
           break;
       }
     }
@@ -177,37 +185,39 @@ export class HookService {
    * Runs actions with type "GIVE", parameters are string arrays with two
    * strings inside. If quantity is not provided, default (1) is applied.
    *
-   * @param {string[]} parameters Parameters of the event.
+   * @param {string} gameId ID of the game
    * @param {string} playerId ID of the player
+   * @param {string[]} parameters Parameters of the event
    */
-  private async runGiveActions(parameters: string[], playerId: string) {
+  private async runGiveActions(gameId: string, playerId: string, parameters: string[]): Promise<void> {
     if (parameters[0].toUpperCase() !== 'POINTS') {
       const reward: Reward = await this.rewardService.findById(parameters[0]);
-      const quantity: number = parameters[1] ? +parameters[1] : 1;
-      await this.playerRewardService.findOneAndUpdate(
-        {
+      const playerReward: PlayerReward = await this.playerRewardService.findOne({
+        player: playerId,
+        reward: reward._id,
+      });
+
+      if (playerReward && !reward.recurrent) {
+        // player already has the reward and it is not accumulative
+        //return;
+      } else if (playerReward) {
+        // player already has the reward and it is accumulative
+        const quantity: number = playerReward.count + (parameters[1] ? +parameters[1] : 1);
+        await this.playerRewardService.patch(playerReward._id, { count: quantity });
+      } else {
+        // player does not have the reward
+        await this.playerRewardService.create({
           player: playerId,
-          reward: parameters[0],
-        },
-        { $inc: { count: quantity } },
-        { upsert: true, setDefaultsOnInsert: true },
-      );
-      if (reward.kind === RewardType.REVEAL) {
-        for (const challenge of reward.challenges) {
-          await this.challengeStatusService.markAsAvailable(challenge, playerId);
-        }
-      } else if (reward.kind === RewardType.UNLOCK) {
-        console.log('unlock');
-        for (const challenge of reward.challenges) {
-          console.log(challenge);
-          await this.challengeStatusService.markAsOpen(challenge.toString(), playerId, new Date());
-        }
+          reward: reward._id,
+          count: reward.recurrent && parameters[1] ? +parameters[1] : 1,
+        });
       }
 
       // send REWARD_GRANTED event
       await this.eventService.fireEvent(TriggerEvent.REWARD_GRANTED, {
-        rewardId: parameters[0],
-        playerId: playerId,
+        gameId,
+        playerId,
+        rewardId: reward._id,
       });
     } else {
       const quantity: number = parameters[1] ? +parameters[1] : 1;
@@ -215,7 +225,8 @@ export class HookService {
 
       // send POINTS_UPDATED event
       await this.eventService.fireEvent(TriggerEvent.POINTS_UPDATED, {
-        playerId: playerId,
+        gameId,
+        playerId,
       });
     }
   }
@@ -224,10 +235,12 @@ export class HookService {
    * Runs actions with type "TAKE", parameters are string arrays with two strings inside.
    * Parameter is structured as ["rewardId/points_nr", quantity].
    * If quantity is not provided - default (1) is applied.
-   * @param parameters - string array
-   * @param playerId - id of the player
+   *
+   * @param {string} gameId ID of the game
+   * @param {string} playerId ID of the player
+   * @param {string[]} parameters Parameters of the event
    */
-  private async runTakeActions(parameters: { [key: string]: any } | string, playerId: string) {
+  private async runTakeActions(gameId: string, playerId: string, parameters: { [key: string]: any } | string) {
     if (parameters[0] !== 'points') {
       const quantity: number = parameters[1] ? +parameters[1] : 1;
       const x: PlayerReward = await this.playerRewardService.findOneAndUpdate(
@@ -251,27 +264,30 @@ export class HookService {
    * Runs actions with type "UPDATE", parameters are string arrays with either
    * 3 or 4 arguments.
    *
-   * @param parameters - string array
-   * @param playerId - id of the player
+   * @param {string} gameId ID of the game
+   * @param {string} playerId ID of the player
+   * @param {string[]} parameters Parameters of the event
    */
-  private async runUpdateActions(parameters: string[], playerId: string) {
+  private async runUpdateActions(gameId: string, playerId: string, parameters: string[]) {
     if (parameters[0].toUpperCase() === 'PLAYER') {
-      await this.updatePlayer(playerId, parameters[1], parameters[2]);
+      await this.updatePlayer(gameId, playerId, parameters[1], parameters[2]);
     } else if (parameters[0].toUpperCase() === 'CHALLENGE') {
-      await this.updateChallenge(parameters[1], playerId, parameters[2], parameters[3]);
+      await this.updateChallenge(gameId, parameters[1], playerId, parameters[2], parameters[3]);
     }
   }
 
   /**
    * Update a property of the challenge.
    *
-   * @param challengeId ID of the challenge.
-   * @param playerId ID of the player.
-   * @param property Property of the challenge to update.
-   * @param value New value for the property.
+   * @param {string} gameId ID of the game
+   * @param {string} challengeId ID of the challenge.
+   * @param {string} playerId ID of the player.
+   * @param {string} property Property of the challenge to update.
+   * @param {string} value New value for the property.
    * @returns {Promise<ChallengeStatus>}
    */
   private async updateChallenge(
+    gameId: string,
     challengeId: string,
     playerId: string,
     property: string,
@@ -279,54 +295,62 @@ export class HookService {
   ): Promise<ChallengeStatus> {
     switch (property.toUpperCase()) {
       case 'STATE':
-        return this.updateChallengeState(challengeId, playerId, State[value.toUpperCase()]);
+        return this.updateChallengeState(gameId, challengeId, playerId, State[value.toUpperCase()]);
     }
   }
 
   /**
    * Updates the status of the challenge
    *
+   * @param {string} gameId ID of the game
    * @param {string} challengeId ID of the challenge.
    * @param {string} playerId ID of the player.
    * @param {State} state New state.
    */
-  private async updateChallengeState(challengeId: string, playerId: string, state: State): Promise<ChallengeStatus> {
+  private async updateChallengeState(
+    gameId: string,
+    challengeId: string,
+    playerId: string,
+    state: State,
+  ): Promise<ChallengeStatus> {
     switch (state) {
       case State.AVAILABLE:
-        return await this.challengeStatusService.markAsAvailable(challengeId, playerId);
+        return await this.challengeStatusService.markAsAvailable(gameId, challengeId, playerId);
       case State.LOCKED:
-        return await this.challengeStatusService.markAsLocked(challengeId, playerId);
+        return await this.challengeStatusService.markAsLocked(gameId, challengeId, playerId);
       case State.HIDDEN:
-        return await this.challengeStatusService.markAsHidden(challengeId, playerId);
+        return await this.challengeStatusService.markAsHidden(gameId, challengeId, playerId);
       case State.OPENED:
-        return await this.challengeStatusService.markAsOpen(challengeId, playerId, new Date());
+        return await this.challengeStatusService.markAsOpen(gameId, challengeId, playerId, new Date());
       case State.FAILED:
-        return await this.challengeStatusService.markAsFailed(challengeId, playerId, new Date());
+        return await this.challengeStatusService.markAsFailed(gameId, challengeId, playerId, new Date());
       case State.COMPLETED:
         console.log(challengeId + ' ' + playerId);
-        return await this.challengeStatusService.markAsCompleted(challengeId, playerId, new Date());
+        return await this.challengeStatusService.markAsCompleted(gameId, challengeId, playerId, new Date());
       case State.REJECTED:
-        return await this.challengeStatusService.markAsRejected(challengeId, playerId, new Date());
+        return await this.challengeStatusService.markAsRejected(gameId, challengeId, playerId, new Date());
     }
   }
 
   /**
    * Updates player properties.
    *
+   * @param {string} gameId ID of the game
    * @param {string} playerId ID of the player.
    * @param {string} property Property of the challenge to update.
    * @param {string} value New value for the property.
    */
-  private async updatePlayer(playerId: string, property: string, value: string) {
+  private async updatePlayer(gameId: string, playerId: string, property: string, value: string) {
     switch (property) {
       // more cases can be later added if needed
       case 'POINTS':
-        await this.updatePlayerPoints(playerId, value);
+        await this.updatePlayerPoints(gameId, playerId, value);
         break;
     }
 
     // send PLAYER_UPDATED event
     await this.eventService.fireEvent(TriggerEvent.PLAYER_UPDATED, {
+      gameId,
       playerId: playerId,
     });
   }
@@ -334,10 +358,11 @@ export class HookService {
   /**
    * Update player's points.
    *
+   * @param {string} gameId ID of the game
    * @param {string} playerId ID of the player.
    * @param {string} points Amount of points to update as a change string.
    */
-  private async updatePlayerPoints(playerId: string, points: string): Promise<void> {
+  private async updatePlayerPoints(gameId: string, playerId: string, points: string): Promise<void> {
     if (points.startsWith('+')) {
       await this.playerService.findOneAndUpdate({ _id: playerId }, { $inc: { points: +points.substring(1) } });
     } else if (points.startsWith('-')) {
@@ -348,6 +373,7 @@ export class HookService {
 
     // send POINTS_UPDATED event
     await this.eventService.fireEvent(TriggerEvent.POINTS_UPDATED, {
+      gameId,
       playerId: playerId,
     });
   }

@@ -5,5 +5,5 @@ export function toMongoId(id: string): any {
 }
 
 export function toString(id: Types.ObjectId): string {
-  return id.toHexString();
+  return id?.toHexString();
 }

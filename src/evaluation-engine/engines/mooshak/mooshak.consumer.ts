@@ -3,7 +3,11 @@ import { InjectQueue, Process, Processor } from '@nestjs/bull';
 import { Job, Queue } from 'bull';
 
 import { appConfig } from '../../../app.config';
+import { EventService } from '../../../event/event.service';
+import { TriggerEventEnum as TriggerEvent } from '../../../hook/enums/trigger-event.enum';
+import { Submission } from '../../../submission/models/submission.model';
 import { Result } from '../../../submission/models/result.enum';
+import { SubmissionService } from '../../../submission/submission.service';
 import { EvaluationDto } from '../../dto/evaluation.dto';
 import {
   FINISH_EVALUATION_JOB,
@@ -13,10 +17,6 @@ import {
   WAIT_EVALUATION_RESULT_JOB_BACKOFF,
   WAIT_EVALUATION_RESULT_JOB_TIMEOUT,
 } from '../../evaluation-engine.constants';
-import { EventService } from '../../../event/event.service';
-import { TriggerEventEnum as TriggerEvent } from '../../../hook/enums/trigger-event.enum';
-import { Submission } from '../../../submission/models/submission.model';
-import { SubmissionService } from '../../../submission/submission.service';
 import { IRequestEvaluationJobData } from '../../interfaces/request-evaluation-job-data.interface';
 import { MooshakService } from './mooshak.service';
 
@@ -112,6 +112,7 @@ export class MooshakConsumer {
     this.logger.error(submission);
 
     await this.eventService.fireEvent(TriggerEvent.SUBMISSION_EVALUATED, {
+      gameId: submission.game,
       submissionId,
       exerciseId: submission.exerciseId,
       playerId: submission.player as string,

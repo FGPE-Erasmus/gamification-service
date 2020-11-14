@@ -10,7 +10,6 @@ import { UsersModule } from '../users/users.module';
 import { ChallengeService } from './challenge.service';
 import { ChallengeResolver } from './challenge.resolver';
 import { ChallengeToDtoMapper } from './mappers/challenge-to-dto.mapper';
-import { ChallengeToPersistenceMapper } from './mappers/challenge-to-persistence.mapper';
 import { Challenge, ChallengeSchema } from './models/challenge.model';
 import { ChallengeRepository } from './repositories/challenge.repository';
 
@@ -23,13 +22,7 @@ import { ChallengeRepository } from './repositories/challenge.repository';
     forwardRef(() => LeaderboardModule),
     forwardRef(() => RewardModule),
   ],
-  providers: [
-    ChallengeToDtoMapper,
-    ChallengeToPersistenceMapper,
-    ChallengeRepository,
-    ChallengeService,
-    ChallengeResolver,
-  ],
-  exports: [ChallengeToDtoMapper, ChallengeToPersistenceMapper, ChallengeRepository, ChallengeService],
+  providers: [ChallengeToDtoMapper, ChallengeRepository, ChallengeService, ChallengeResolver],
+  exports: [ChallengeToDtoMapper, ChallengeRepository, ChallengeService],
 })
 export class ChallengeModule {}

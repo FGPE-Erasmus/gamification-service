@@ -394,11 +394,6 @@ type ScheduledHook {
   updatedAt: Date
 }
 
-type Ranking {
-  player: Player!
-  score: JSON!
-}
-
 type Leaderboard {
   id: ID
   game: Game
@@ -413,6 +408,11 @@ type Leaderboard {
 enum SortingOrder {
   ASC
   DESC
+}
+
+type Ranking {
+  player: Player
+  score: JSON!
 }
 
 type Query {
@@ -432,8 +432,7 @@ type Query {
   actionHooks: [ActionHook!]!
   scheduledHooks: [ScheduledHook!]!
   leaderboards: [Leaderboard!]!
-  playerRankings(leaderboardId: String!): [Ranking!]!
-  lol(leaderboardId: String!): Leaderboard!
+  rankings(leaderboardId: String!): [Ranking!]!
   games: [Game!]!
   game(id: String!): Game!
   challenges(gameId: String!): [Challenge!]!
