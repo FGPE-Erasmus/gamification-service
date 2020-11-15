@@ -85,6 +85,10 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus> {
    */
   async markAsCompleted(gameId: string, challengeId: string, playerId: string, date: Date): Promise<ChallengeStatus> {
     const temp: ChallengeStatus = await this.findByChallengeIdAndPlayerId(challengeId, playerId);
+    if (temp.state === StateEnum.COMPLETED) {
+      console.log('challenge already completed');
+      return;
+    }
     const result: ChallengeStatus = await this.patch(temp.id, { state: StateEnum.COMPLETED, endedAt: date });
 
     // send CHALLENGE_COMPLETED message to execute attached hooks

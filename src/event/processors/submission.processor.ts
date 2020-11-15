@@ -22,13 +22,17 @@ export class SubmissionProcessor {
   @Process(`${TriggerEvent.SUBMISSION_RECEIVED}_JOB`)
   async onSubmissionReceived(job: Job<{ gameId: string; exerciseId: string; playerId: string }>): Promise<void> {
     const { gameId, exerciseId, playerId } = job.data;
-
+    console.log('SUB RECEIVED');
     // process hooks
     const actionHooks = await this.actionHookService.findAll({
-      game: { $eq: gameId },
-      trigger: TriggerEvent.SUBMISSION_RECEIVED,
-      sourceId: exerciseId,
+      $and: [
+        { game: { $eq: gameId } },
+        { trigger: TriggerEvent.SUBMISSION_RECEIVED },
+        { $or: [{ sourceId: { $eq: exerciseId } }, { sourceId: { $eq: null } }] },
+      ],
     });
+
+    console.log(actionHooks);
 
     for (const actionHook of actionHooks) {
       await this.hookService.executeHook(actionHook, job.data, { exerciseId: exerciseId });
