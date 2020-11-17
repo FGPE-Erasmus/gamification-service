@@ -8,6 +8,8 @@ import { IPageQueryResult } from '../interfaces/page-query-result.interface copy
 import { IPage } from '../interfaces/page.interface';
 import { isNumber } from '../utils/type-checking.utils';
 
+/* eslint-disable */
+
 /**
  * Retrieve the Sort Order.
  *

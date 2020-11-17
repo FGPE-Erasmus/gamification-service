@@ -5,7 +5,10 @@ import * as cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 import { appConfig } from './app.config';
 
+const EventEmitter = require('events'); /* eslint-disable-line */
+
 async function bootstrap() {
+  EventEmitter.defaultMaxListeners = 30;
   const app = await NestFactory.create(AppModule, { logger: appConfig.logger });
   app.use(helmet());
   app.use(cookieParser());

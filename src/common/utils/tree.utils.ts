@@ -12,6 +12,7 @@ export function createTree(array: any[], key = 'id', parentKey = 'parentId', chi
   return tree;
 }
 
+/* eslint-disable-next-line */
 export function findSubtree(tree: any[], lookup: any, key = 'id', childrenProp = 'children'): any {
   if (!tree || tree.length === 0) {
     return undefined;

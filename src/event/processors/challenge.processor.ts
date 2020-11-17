@@ -3,13 +3,11 @@ import { Job } from 'bull';
 
 import { appConfig } from 'src/app.config';
 import { ChallengeStatusService } from 'src/challenge-status/challenge-status.service';
-import { ChallengeStatus } from 'src/challenge-status/models/challenge-status.model';
 import { ChallengeService } from 'src/challenge/challenge.service';
 import { Challenge } from 'src/challenge/models/challenge.model';
 import { ActionHookService } from 'src/hook/action-hook.service';
 import { TriggerEventEnum as TriggerEvent } from 'src/hook/enums/trigger-event.enum';
 import { HookService } from 'src/hook/hook.service';
-import { StateEnum as State } from '../../challenge-status/models/state.enum';
 
 @Processor(appConfig.queue.event.name)
 export class ChallengeProcessor {
@@ -45,6 +43,74 @@ export class ChallengeProcessor {
     const actionHooks = await this.actionHookService.findAll({
       game: { $eq: gameId },
       trigger: TriggerEvent.CHALLENGE_OPENED,
+      sourceId: challengeId,
+    });
+
+    for (const actionHook of actionHooks) {
+      await this.hookService.executeHook(actionHook, job.data, { ...challenge });
+    }
+  }
+
+  @Process(`${TriggerEvent.CHALLENGE_REJECTED}_JOB`)
+  async onChallengeRejected(job: Job<{ gameId: string; challengeId: string; playerId: string }>): Promise<void> {
+    const { gameId, challengeId, playerId } = job.data;
+    const challenge: Challenge = await this.challengeService.findById(challengeId);
+
+    //process hooks
+    const actionHooks = await this.actionHookService.findAll({
+      game: { $eq: gameId },
+      trigger: TriggerEvent.CHALLENGE_REJECTED,
+      sourceId: challengeId,
+    });
+
+    for (const actionHook of actionHooks) {
+      await this.hookService.executeHook(actionHook, job.data, { ...challenge });
+    }
+  }
+
+  @Process(`${TriggerEvent.CHALLENGE_FAILED}_JOB`)
+  async onChallengeFailed(job: Job<{ gameId: string; challengeId: string; playerId: string }>): Promise<void> {
+    const { gameId, challengeId, playerId } = job.data;
+    const challenge: Challenge = await this.challengeService.findById(challengeId);
+
+    //process hooks
+    const actionHooks = await this.actionHookService.findAll({
+      game: { $eq: gameId },
+      trigger: TriggerEvent.CHALLENGE_FAILED,
+      sourceId: challengeId,
+    });
+
+    for (const actionHook of actionHooks) {
+      await this.hookService.executeHook(actionHook, job.data, { ...challenge });
+    }
+  }
+
+  @Process(`${TriggerEvent.CHALLENGE_HIDDEN}_JOB`)
+  async onChallengeHidden(job: Job<{ gameId: string; challengeId: string; playerId: string }>): Promise<void> {
+    const { gameId, challengeId, playerId } = job.data;
+    const challenge: Challenge = await this.challengeService.findById(challengeId);
+
+    //process hooks
+    const actionHooks = await this.actionHookService.findAll({
+      game: { $eq: gameId },
+      trigger: TriggerEvent.CHALLENGE_HIDDEN,
+      sourceId: challengeId,
+    });
+
+    for (const actionHook of actionHooks) {
+      await this.hookService.executeHook(actionHook, job.data, { ...challenge });
+    }
+  }
+
+  @Process(`${TriggerEvent.CHALLENGE_AVAILABLE}_JOB`)
+  async onChallengeAvailable(job: Job<{ gameId: string; challengeId: string; playerId: string }>): Promise<void> {
+    const { gameId, challengeId, playerId } = job.data;
+    const challenge: Challenge = await this.challengeService.findById(challengeId);
+
+    //process hooks
+    const actionHooks = await this.actionHookService.findAll({
+      game: { $eq: gameId },
+      trigger: TriggerEvent.CHALLENGE_AVAILABLE,
       sourceId: challengeId,
     });
 

@@ -11,6 +11,7 @@ import { SubmissionResolver } from './submission.resolver';
 import { SubmissionRepository } from './repositories/submission.repository';
 import { Submission, SubmissionSchema } from './models/submission.model';
 import { SubmissionToDtoMapper } from './mappers/submission-to-dto.mapper';
+import { ChallengeStatusModule } from 'src/challenge-status/challenge-status.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { SubmissionToDtoMapper } from './mappers/submission-to-dto.mapper';
     forwardRef(() => GameModule),
     forwardRef(() => PlayerModule),
     forwardRef(() => HookModule),
+    forwardRef(() => ChallengeStatusModule),
   ],
   providers: [SubmissionToDtoMapper, SubmissionRepository, SubmissionService, SubmissionResolver],
   exports: [SubmissionToDtoMapper, SubmissionService],

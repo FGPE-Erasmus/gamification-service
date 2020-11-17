@@ -23,7 +23,6 @@ import { ConditionInput } from './inputs/condition.input';
 import { ScheduledHook } from './models/scheduled-hook.model';
 import { ActionHook } from './models/action-hook.model';
 import { ActionEmbed } from './models/embedded/action.embed';
-import { toString } from '../common/utils/mongo.utils';
 
 @Injectable()
 export class HookService {

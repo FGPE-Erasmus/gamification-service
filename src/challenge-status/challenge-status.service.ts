@@ -6,7 +6,6 @@ import { TriggerEventEnum as TriggerEvent } from '../hook/enums/trigger-event.en
 import { ChallengeStatus } from './models/challenge-status.model';
 import { StateEnum } from './models/state.enum';
 import { ChallengeStatusRepository } from './repositories/challenge-status.repository';
-import { toString } from '../common/utils/mongo.utils';
 
 @Injectable()
 export class ChallengeStatusService extends BaseService<ChallengeStatus> {

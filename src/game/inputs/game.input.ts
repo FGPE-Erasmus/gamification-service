@@ -1,6 +1,6 @@
 import { Field, InputType } from '@nestjs/graphql';
 import { Type } from 'class-transformer';
-import { MinLength, MaxLength, IsString, IsOptional, IsArray, IsDate, IsUUID } from 'class-validator';
+import { MinLength, MaxLength, IsString, IsOptional, IsDate, IsUUID } from 'class-validator';
 
 @InputType()
 export class GameInput {

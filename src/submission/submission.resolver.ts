@@ -58,17 +58,23 @@ export class SubmissionResolver {
     return Promise.all(submissions.map(async submission => this.submissionToDtoMapper.transform(submission)));
   }
 
-  @Mutation(() => SubmissionDto)
+  @Mutation(() => SubmissionDto, { nullable: true })
   @UseGuards(GqlJwtAuthGuard, GqlEnrolledInGame)
-  async evaluate(@GqlPlayer('id') playerId: string, @Args() args: EvaluateArgs): Promise<SubmissionDto> {
-    const { gameId, exerciseId, file } = args;
+  async evaluate(@GqlPlayer('id') playerId: string, @Args() args: EvaluateArgs): Promise<SubmissionDto> | null {
+    const { gameId, exerciseId, challengeId, file } = args;
     const { filename, encoding, mimetype, createReadStream } = await file;
-    const submission: Submission = await this.submissionService.sendSubmission(gameId, exerciseId, playerId, {
-      filename,
-      encoding: encoding as BufferEncoding,
-      mimetype,
-      content: await createReadStream(),
-    });
+    const submission: Submission = await this.submissionService.sendSubmission(
+      gameId,
+      exerciseId,
+      challengeId,
+      playerId,
+      {
+        filename,
+        encoding: encoding as BufferEncoding,
+        mimetype,
+        content: await createReadStream(),
+      },
+    );
     return this.submissionToDtoMapper.transform(submission);
   }
 
