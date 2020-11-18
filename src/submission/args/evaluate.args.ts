@@ -11,9 +11,6 @@ export class EvaluateArgs {
   @Field()
   exerciseId: string;
 
-  @Field()
-  challengeId: string;
-
   @Field(() => GraphQLUpload)
   @IsDefined()
   file: Promise<FileUpload>;

@@ -35,34 +35,22 @@ export class SubmissionService extends BaseService<Submission> {
     return this.findAll(query);
   }
 
-  async sendSubmission(
-    gameId: string,
-    exerciseId: string,
-    challengeId: string,
-    playerId: string,
-    file: IFile,
-  ): Promise<Submission> {
-    const challengeStatus = await this.challengeStatusService.findByChallengeIdAndPlayerId(challengeId, playerId);
-    if (challengeStatus.state === State.LOCKED || challengeStatus.state === State.HIDDEN) {
-      console.log('Player did not unlock the challenge or its hidden...');
-      return;
-    } else {
-      const submission: Submission = await super.create({
-        game: gameId,
-        player: playerId,
-        exerciseId: exerciseId,
-      } as Submission);
+  async sendSubmission(gameId: string, exerciseId: string, playerId: string, file: IFile): Promise<Submission> {
+    const submission: Submission = await super.create({
+      game: gameId,
+      player: playerId,
+      exerciseId: exerciseId,
+    } as Submission);
 
-      // send SUBMISSION_RECEIVED event
-      await this.eventService.fireEvent(TriggerEvent.SUBMISSION_RECEIVED, {
-        gameId: gameId,
-        playerId: playerId,
-        exerciseId: exerciseId,
-      });
+    // send SUBMISSION_RECEIVED event
+    await this.eventService.fireEvent(TriggerEvent.SUBMISSION_RECEIVED, {
+      gameId: gameId,
+      playerId: playerId,
+      exerciseId: exerciseId,
+    });
 
-      await this.evaluationEngineService.evaluate(submission.id, file);
+    await this.evaluationEngineService.evaluate(submission.id, file);
 
-      return submission;
-    }
+    return submission;
   }
 }

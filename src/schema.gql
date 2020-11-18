@@ -446,7 +446,7 @@ type Query {
 type Mutation {
   saveUser(id: ID, userInput: UserInput!): User!
   deleteUser(id: ID!): User!
-  evaluate(gameId: String!, exerciseId: String!, challengeId: String!, file: Upload!): Submission
+  evaluate(gameId: String!, exerciseId: String!, file: Upload!): Submission
   importGEdILArchive(gameInput: GameInput!, file: Upload!): Game!
   enroll(gameId: String!): Player!
   login(login: String!, password: String!): User!
