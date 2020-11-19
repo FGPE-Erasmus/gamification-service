@@ -10,6 +10,7 @@ import { PlayerRewardService } from './player-reward.service';
 import { PlayerRewardRepository } from './repositories/player-reward.repository';
 import { PlayerReward, PlayerRewardSchema } from './models/player-reward.model';
 import { PlayerRewardToDtoMapper } from './mappers/player-reward-to-dto.mapper';
+import { PlayerRewardResolver } from './player-reward.resolver';
 
 @Module({
   imports: [
@@ -25,7 +26,7 @@ import { PlayerRewardToDtoMapper } from './mappers/player-reward-to-dto.mapper';
     forwardRef(() => RewardModule),
     forwardRef(() => HookModule),
   ],
-  providers: [PlayerRewardToDtoMapper, PlayerRewardRepository, PlayerRewardService],
-  exports: [PlayerRewardToDtoMapper, PlayerRewardService],
+  providers: [PlayerRewardToDtoMapper, PlayerRewardRepository, PlayerRewardResolver, PlayerRewardService],
+  exports: [PlayerRewardToDtoMapper, PlayerRewardResolver, PlayerRewardService],
 })
 export class PlayerRewardModule {}

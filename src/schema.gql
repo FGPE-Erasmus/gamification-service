@@ -468,6 +468,7 @@ type Mutation {
   saveGroup(id: ID, groupInput: GroupInput!): Group!
   autoAssignGroups(gameId: String!): [Group!]!
   enroll(gameId: String!): Player!
+  addToGame(gameId: String!, userId: String!): Player!
   setGroup(groupId: String!, playerId: String!, gameId: String!): Player!
   login(login: String!, password: String!): User!
   signup(name: String!, username: String!, email: Email!, password: String!): User!
