@@ -29,7 +29,10 @@ export class ChallengeStatusResolver {
 
   @Query(() => ChallengeStatusDto)
   @UseGuards(GqlJwtAuthGuard, GqlAdminGuard)
-  async get(@Args('playerId') playerId: string, @Args('challengeId') challengeId: string): Promise<ChallengeStatusDto> {
+  async challengeStatus(
+    @Args('playerId') playerId: string,
+    @Args('challengeId') challengeId: string,
+  ): Promise<ChallengeStatusDto> {
     const status: ChallengeStatus = await this.challengeStatusService.findByChallengeIdAndPlayerId(
       challengeId,
       playerId,
