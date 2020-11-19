@@ -1,9 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
-import { Player } from '../../player/models/player.model';
-import { Submission } from '../../submission/models/submission.model';
-
 @Schema()
 export class Game extends Document {
   @Prop()

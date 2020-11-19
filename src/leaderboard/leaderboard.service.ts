@@ -19,6 +19,7 @@ import { Leaderboard } from './models/leaderboard.model';
 import { SortingOrder } from './models/sorting.enum';
 import { LeaderboardRepository } from './repositories/leaderboard.repository';
 import { toString } from '../common/utils/mongo.utils';
+import { MongooseFilterQuery } from 'mongoose';
 
 @Injectable()
 export class LeaderboardService extends BaseService<Leaderboard> {
@@ -64,7 +65,7 @@ export class LeaderboardService extends BaseService<Leaderboard> {
     });
   }
 
-  async getRankings(leaderboardId: string): Promise<PlayerRankingDto[]> {
+  async getRankings(leaderboardId: string, groupId?: string): Promise<PlayerRankingDto[]> {
     const leaderboard: Leaderboard = await this.findById(leaderboardId);
 
     const exerciseIds: string[] = await this.challengeService.getExercises(
@@ -72,7 +73,12 @@ export class LeaderboardService extends BaseService<Leaderboard> {
       leaderboard.parentChallenge,
     );
 
-    const players: Player[] = await this.playerService.findAll({ game: { $eq: leaderboard.game } }, undefined, {
+    const queryPlayer: MongooseFilterQuery<Player> = { game: { $eq: leaderboard.game } };
+    if (leaderboard.groups && groupId) {
+      queryPlayer.group = { $eq: groupId };
+    }
+
+    const players: Player[] = await this.playerService.findAll(queryPlayer, undefined, {
       lean: true,
       populate: 'learningPath rewards',
     });
@@ -120,6 +126,7 @@ export class LeaderboardService extends BaseService<Leaderboard> {
         }
         if (Array.isArray(match)) {
           for (const submatch of match) {
+            console.log(submatch);
             if (rankedPlayer.score.hasOwnProperty(submatch.parentProperty)) {
               if (!rankedPlayer.score[submatch.parentProperty].hasOwnProperty(submatch.pointer)) {
                 rankedPlayer.score[submatch.parentProperty][submatch.pointer] = submatch.value;
@@ -174,6 +181,11 @@ export class LeaderboardService extends BaseService<Leaderboard> {
   private static compareComposites(a: any, b: any, desc: boolean): number {
     let aw = 0;
     let bw = 0;
+    if (!a) {
+      return desc ? -1 : 1;
+    } else if (!b) {
+      return desc ? 1 : -1;
+    }
     const props = [...new Set([...Object.keys(a), ...Object.keys(b)])];
     for (const prop of props) {
       if ((a[prop] === undefined || a[prop] == null) && (b[prop] === undefined || b[prop] == null)) {

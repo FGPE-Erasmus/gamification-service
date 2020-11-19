@@ -2,8 +2,6 @@ import { Injectable } from '@nestjs/common';
 
 import { IWhereName } from '../interfaces/where-name.interface';
 import { IWhereIds } from '../interfaces/where-ids.interface';
-import { findOrder } from '../types/find-order.type';
-import { FindNameDto } from '../dto/find-name.dto';
 import { toMongoId } from '../utils/mongo.utils';
 import { IRepository } from '../interfaces/repository.interface';
 

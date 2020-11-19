@@ -58,7 +58,7 @@ export class SubmissionResolver {
     return Promise.all(submissions.map(async submission => this.submissionToDtoMapper.transform(submission)));
   }
 
-  @Mutation(() => SubmissionDto)
+  @Mutation(() => SubmissionDto, { nullable: true })
   @UseGuards(GqlJwtAuthGuard, GqlEnrolledInGame)
   async evaluate(@GqlPlayer('id') playerId: string, @Args() args: EvaluateArgs): Promise<SubmissionDto> {
     const { gameId, exerciseId, file } = args;

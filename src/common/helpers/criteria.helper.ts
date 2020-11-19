@@ -22,9 +22,6 @@ export async function checkCriteria(
     return result;
   } else {
     const conditions = [...criteria.conditions].sort((a, b) => (a.order > b.order ? 1 : -1));
-    console.log(criteria);
-    console.log(actionObj);
-    console.log(params);
     let i = 0;
     do {
       const condition = conditions[i];

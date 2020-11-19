@@ -11,6 +11,7 @@ export class EventListener {
   constructor(@InjectQueue(appConfig.queue.event.name) protected readonly eventQueue: Queue) {}
 
   @OnGlobalQueueCompleted()
+  /* eslint-disable-next-line */
   async onGlobalCompleted(jobId: number, result: any): Promise<void> {
     const job = await this.eventQueue.getJob(jobId);
     this.logger.debug(`(Global) on completed: job ${job.id} - ${job.name} -> result: ${result}`);

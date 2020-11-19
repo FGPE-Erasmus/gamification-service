@@ -5,6 +5,7 @@ import { PlayerRewardDto } from '../../player-reward/dto/player-reward.dto';
 import { UserDto } from '../../users/dto/user.dto';
 import { SubmissionDto } from '../../submission/dto/submission.dto';
 import { ChallengeStatusDto } from '../../challenge-status/dto/challenge-status.dto';
+import { GroupDto } from '../../group/dto/group.dto';
 
 @ObjectType('Player')
 export class PlayerDto {
@@ -16,6 +17,9 @@ export class PlayerDto {
 
   @Field(() => UserDto)
   user?: string;
+
+  @Field(() => GroupDto, { nullable: true })
+  group?: string;
 
   @Field()
   points?: number;

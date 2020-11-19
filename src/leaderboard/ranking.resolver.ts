@@ -8,6 +8,10 @@ import { PlayerToDtoMapper } from '../player/mappers/player-to-dto.mapper';
 import { LeaderboardService } from './leaderboard.service';
 import { PlayerRankingDto } from './dto/player-ranking.dto';
 import { LeaderboardToDtoMapper } from './mappers/leaderboard-to-dto.mapper';
+import { GqlAdminGuard } from '../common/guards/gql-admin.guard';
+import { GqlEnrolledInGame } from '../common/guards/gql-game-enrollment.guard';
+import { GqlPlayer } from '../common/decorators/gql-player.decorator';
+import { Player } from '../player/models/player.model';
 
 @Resolver(() => PlayerRankingDto)
 export class RankingResolver {
@@ -19,9 +23,22 @@ export class RankingResolver {
   ) {}
 
   @Query(() => [PlayerRankingDto])
-  @UseGuards(GqlJwtAuthGuard)
-  async rankings(@Args('leaderboardId') leaderboardId: string): Promise<PlayerRankingDto[]> {
+  @UseGuards(GqlJwtAuthGuard, GqlAdminGuard)
+  async rankings(
+    @Args('gameId') gameId: string,
+    @Args('leaderboardId') leaderboardId: string,
+  ): Promise<PlayerRankingDto[]> {
     return this.leaderboardService.getRankings(leaderboardId);
+  }
+
+  @Query(() => [PlayerRankingDto])
+  @UseGuards(GqlJwtAuthGuard, GqlEnrolledInGame)
+  async groupRankings(
+    @GqlPlayer() player: Player,
+    @Args('gameId') gameId: string,
+    @Args('leaderboardId') leaderboardId: string,
+  ): Promise<PlayerRankingDto[]> {
+    return this.leaderboardService.getRankings(leaderboardId, player.group);
   }
 
   @ResolveField()

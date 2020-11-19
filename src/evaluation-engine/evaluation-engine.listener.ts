@@ -11,6 +11,7 @@ export class EvaluationEngineListener {
   constructor(@InjectQueue(appConfig.queue.evaluation.name) protected readonly evaluationQueue: Queue) {}
 
   @OnGlobalQueueCompleted()
+  /* eslint-disable-next-line */
   async onGlobalCompleted(jobId: number, result: any): Promise<void> {
     const job = await this.evaluationQueue.getJob(jobId);
     this.logger.debug(`(Global) on completed: job ${job.id} -> result: ${result}`);

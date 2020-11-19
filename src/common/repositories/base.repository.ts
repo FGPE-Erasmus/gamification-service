@@ -72,10 +72,8 @@ export class BaseRepository<E extends Document> implements IRepository<E> {
           )
           .exec();
       } else {
-        return this.model
-          .replaceOne({ _id: doc._id }, new this.model(doc))
-          .setOptions({ upsert: true })
-          .exec();
+        await this.model.updateOne({ _id: doc._id }, doc, { upsert: true }).exec();
+        return this.getById(doc._id);
       }
     }
   }

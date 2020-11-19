@@ -18,6 +18,9 @@ export class LeaderboardDto {
   @Field({ nullable: true })
   name?: string;
 
+  @Field({ nullable: true })
+  groups?: boolean;
+
   @Field(() => [String], { nullable: true })
   metrics?: string[];
 
