@@ -12,6 +12,9 @@ export class LeaderboardInput {
   @Field()
   name: string;
 
+  @Field()
+  groups: boolean;
+
   @Field(() => [String])
   metrics: string[];
 

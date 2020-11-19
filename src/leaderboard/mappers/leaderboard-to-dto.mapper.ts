@@ -11,6 +11,9 @@ export class LeaderboardToDtoMapper implements IMapper<Leaderboard, LeaderboardD
     if (!obj) {
       return undefined;
     }
-    return pick(['id', 'game', 'parentChallenge', 'name', 'metrics', 'sortingOrders', 'createdAt', 'updatedAt'], obj);
+    return pick(
+      ['id', 'game', 'parentChallenge', 'name', 'groups', 'metrics', 'sortingOrders', 'createdAt', 'updatedAt'],
+      obj,
+    );
   }
 }

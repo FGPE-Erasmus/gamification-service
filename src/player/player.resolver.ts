@@ -2,34 +2,37 @@ import { Resolver, Args, Query, ResolveField, Parent, Mutation } from '@nestjs/g
 import { NotFoundException, UseGuards } from '@nestjs/common';
 
 import { GqlUser } from '../common/decorators/gql-user.decorator';
+import { GqlPlayer } from '../common/decorators/gql-player.decorator';
 import { GqlAdminGuard } from '../common/guards/gql-admin.guard';
+import { GqlEnrolledInGame } from '../common/guards/gql-game-enrollment.guard';
 import { GqlJwtAuthGuard } from '../common/guards/gql-jwt-auth.guard';
+import { ChallengeStatusService } from '../challenge-status/challenge-status.service';
+import { ChallengeStatusDto } from '../challenge-status/dto/challenge-status.dto';
+import { ChallengeStatusToDtoMapper } from '../challenge-status/mappers/challenge-status-to-dto.mapper';
+import { ChallengeStatus } from '../challenge-status/models/challenge-status.model';
 import { GameDto } from '../game/dto/game.dto';
 import { GameService } from '../game/game.service';
 import { GameToDtoMapper } from '../game/mappers/game-to-dto.mapper';
 import { Game } from '../game/models/game.model';
-import { SubmissionDto } from '../submission/dto/submission.dto';
-import { SubmissionService } from '../submission/submission.service';
-import { SubmissionToDtoMapper } from '../submission/mappers/submission-to-dto.mapper';
 import { UserDto } from '../users/dto/user.dto';
 import { User } from '../users/models/user.model';
 import { UsersService } from '../users/users.service';
 import { UserToDtoMapper } from '../users/mappers/user-to-dto.mapper';
+import { PlayerRewardDto } from '../player-reward/dto/player-reward.dto';
+import { PlayerReward } from '../player-reward/models/player-reward.model';
+import { PlayerRewardToDtoMapper } from '../player-reward/mappers/player-reward-to-dto.mapper';
+import { PlayerRewardService } from '../player-reward/player-reward.service';
+import { SubmissionDto } from '../submission/dto/submission.dto';
+import { SubmissionService } from '../submission/submission.service';
+import { Submission } from '../submission/models/submission.model';
+import { SubmissionToDtoMapper } from '../submission/mappers/submission-to-dto.mapper';
 import { PlayerDto } from './dto/player.dto';
 import { PlayerService } from './player.service';
 import { PlayerToDtoMapper } from './mappers/player-to-dto.mapper';
 import { Player } from './models/player.model';
-import { ChallengeStatusService } from '../challenge-status/challenge-status.service';
-import { ChallengeStatusToDtoMapper } from '../challenge-status/mappers/challenge-status-to-dto.mapper';
-import { PlayerRewardService } from '../player-reward/player-reward.service';
-import { PlayerRewardToDtoMapper } from '../player-reward/mappers/player-reward-to-dto.mapper';
-import { Submission } from '../submission/models/submission.model';
-import { ChallengeStatusDto } from '../challenge-status/dto/challenge-status.dto';
-import { ChallengeStatus } from '../challenge-status/models/challenge-status.model';
-import { PlayerRewardDto } from '../player-reward/dto/player-reward.dto';
-import { PlayerReward } from '../player-reward/models/player-reward.model';
-import { GqlPlayer } from '../common/decorators/gql-player.decorator';
-import { GqlEnrolledInGame } from '../common/guards/gql-game-enrollment.guard';
+import { Group } from '../group/models/group.model';
+import { GroupService } from '../group/group.service';
+import { GroupToDtoMapper } from '../group/mappers/group-to-dto.mapper';
 
 @Resolver(() => PlayerDto)
 export class PlayerResolver {
@@ -40,6 +43,8 @@ export class PlayerResolver {
     protected readonly gameToDtoMapper: GameToDtoMapper,
     protected readonly userService: UsersService,
     protected readonly userToDtoMapper: UserToDtoMapper,
+    protected readonly groupService: GroupService,
+    protected readonly groupToDtoMapper: GroupToDtoMapper,
     protected readonly submissionService: SubmissionService,
     protected readonly submissionToDtoMapper: SubmissionToDtoMapper,
     protected readonly challengeStatusService: ChallengeStatusService,
@@ -50,14 +55,14 @@ export class PlayerResolver {
 
   @Mutation(() => PlayerDto)
   @UseGuards(GqlJwtAuthGuard)
-  async enroll(
-    @GqlUser('id') userId: string,
-    @GqlPlayer() playerDto: PlayerDto,
-    @Args('gameId') gameId: string,
-  ): Promise<PlayerDto> {
-    if (playerDto) {
-      return playerDto;
-    }
+  async enroll(@GqlUser('id') userId: string, @Args('gameId') gameId: string): Promise<PlayerDto> {
+    const player: Player = await this.playerService.enroll(gameId, userId);
+    return this.playerToDtoMapper.transform(player);
+  }
+
+  @Mutation(() => PlayerDto)
+  @UseGuards(GqlJwtAuthGuard, GqlAdminGuard)
+  async addToGame(@Args('userId') userId: string, @Args('gameId') gameId: string): Promise<PlayerDto> {
     const player: Player = await this.playerService.enroll(gameId, userId);
     return this.playerToDtoMapper.transform(player);
   }
@@ -73,17 +78,17 @@ export class PlayerResolver {
   @UseGuards(GqlJwtAuthGuard, GqlEnrolledInGame)
   async profileInGame(
     @GqlUser('id') userId: string,
-    @GqlPlayer() playerDto: PlayerDto,
+    @GqlPlayer() player: Player,
     @Args('gameId') gameId: string,
   ): Promise<PlayerDto> {
-    if (playerDto) {
-      return playerDto;
+    if (player) {
+      return this.playerToDtoMapper.transform(player);
     }
-    const player: Player = await this.playerService.findByGameAndUser(gameId, userId);
-    if (!player) {
+    const newPlayer: Player = await this.playerService.findByGameAndUser(gameId, userId);
+    if (!newPlayer) {
       throw new NotFoundException();
     }
-    return this.playerToDtoMapper.transform(player);
+    return this.playerToDtoMapper.transform(newPlayer);
   }
 
   @Query(() => PlayerDto)
@@ -93,6 +98,17 @@ export class PlayerResolver {
     if (!player) {
       throw new NotFoundException();
     }
+    return this.playerToDtoMapper.transform(player);
+  }
+
+  @Mutation(() => PlayerDto)
+  @UseGuards(GqlJwtAuthGuard, GqlAdminGuard)
+  async setGroup(
+    @Args('gameId') gameId: string,
+    @Args('playerId') playerId: string,
+    @Args('groupId') groupId: string,
+  ): Promise<PlayerDto> {
+    const player: Player = await this.playerService.setGroup(gameId, playerId, groupId);
     return this.playerToDtoMapper.transform(player);
   }
 
@@ -108,6 +124,16 @@ export class PlayerResolver {
     const { user: userId } = root;
     const user: User = await this.userService.findById(userId);
     return this.userToDtoMapper.transform(user);
+  }
+
+  @ResolveField()
+  async group(@Parent() root: PlayerDto): Promise<UserDto | undefined> {
+    const { group: groupId } = root;
+    if (!groupId) {
+      return undefined;
+    }
+    const group: Group = await this.groupService.findById(groupId);
+    return this.groupToDtoMapper.transform(group);
   }
 
   @ResolveField()

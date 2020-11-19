@@ -9,6 +9,9 @@ export class Player extends Document {
   @Prop({ type: Types.ObjectId, ref: 'Game' })
   game: any;
 
+  @Prop({ type: Types.ObjectId, ref: 'Group' })
+  group?: any;
+
   @Prop({ default: () => 0 })
   points?: number;
 

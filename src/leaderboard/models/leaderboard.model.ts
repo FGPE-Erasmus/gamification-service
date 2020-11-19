@@ -14,6 +14,9 @@ export class Leaderboard extends Document {
   @Prop()
   name: string;
 
+  @Prop()
+  groups: boolean;
+
   @Prop({ type: () => [String], default: () => [] })
   metrics: string[];
 

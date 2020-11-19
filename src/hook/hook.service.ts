@@ -322,7 +322,6 @@ export class HookService {
       case State.FAILED:
         return await this.challengeStatusService.markAsFailed(gameId, challengeId, playerId, new Date());
       case State.COMPLETED:
-        console.log(challengeId + ' ' + playerId);
         return await this.challengeStatusService.markAsCompleted(gameId, challengeId, playerId, new Date());
       case State.REJECTED:
         return await this.challengeStatusService.markAsRejected(gameId, challengeId, playerId, new Date());
