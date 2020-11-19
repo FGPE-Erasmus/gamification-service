@@ -60,6 +60,13 @@ export class PlayerResolver {
     return this.playerToDtoMapper.transform(player);
   }
 
+  @Mutation(() => PlayerDto)
+  @UseGuards(GqlJwtAuthGuard, GqlAdminGuard)
+  async addToGame(@Args('userId') userId: string, @Args('gameId') gameId: string): Promise<PlayerDto> {
+    const player: Player = await this.playerService.enroll(gameId, userId);
+    return this.playerToDtoMapper.transform(player);
+  }
+
   @Query(() => [PlayerDto])
   @UseGuards(GqlJwtAuthGuard)
   async players(@Args('gameId') gameId: string): Promise<PlayerDto[]> {
