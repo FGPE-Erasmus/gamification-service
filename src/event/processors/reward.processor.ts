@@ -2,9 +2,6 @@ import { Process, Processor } from '@nestjs/bull';
 import { Job } from 'bull';
 
 import { appConfig } from '../../app.config';
-import { PlayerService } from '../../player/player.service';
-import { ChallengeService } from '../../challenge/challenge.service';
-import { EventService } from '../event.service';
 import { HookService } from '../../hook/hook.service';
 import { ActionHookService } from '../../hook/action-hook.service';
 import { RewardService } from '../../reward/reward.service';

@@ -8,7 +8,6 @@ import { AuthResolver } from './auth.resolver';
 import { UserRepository } from '../users/repositories/user.repository';
 import { UsersService } from '../users/users.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
-import { UsersModule } from '../users/users.module';
 import { getModelToken } from '@nestjs/mongoose';
 
 describe('AuthResolver', () => {

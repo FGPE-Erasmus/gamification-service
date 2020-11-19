@@ -1,4 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { ChallengeStatusService } from 'src/challenge-status/challenge-status.service';
+import { StateEnum as State } from 'src/challenge-status/models/state.enum';
 
 import { IFile } from '../common/interfaces/file.interface';
 import { BaseService } from '../common/services/base.service';
@@ -17,6 +19,7 @@ export class SubmissionService extends BaseService<Submission> {
     protected readonly eventService: EventService,
     protected readonly evaluationEngineService: EvaluationEngineService,
     protected readonly playerService: PlayerService,
+    protected readonly challengeStatusService: ChallengeStatusService,
   ) {
     super(new Logger(SubmissionService.name), repository);
   }

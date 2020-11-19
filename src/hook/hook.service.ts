@@ -23,7 +23,6 @@ import { ConditionInput } from './inputs/condition.input';
 import { ScheduledHook } from './models/scheduled-hook.model';
 import { ActionHook } from './models/action-hook.model';
 import { ActionEmbed } from './models/embedded/action.embed';
-import { toString } from '../common/utils/mongo.utils';
 
 @Injectable()
 export class HookService {
@@ -53,20 +52,18 @@ export class HookService {
       for (const trigger of triggers) {
         let hook: ScheduledHook | ActionHook;
         let sourceIds;
-        if (trigger.parameters[0] && trigger.parameters[0] !== null) {
-          if (trigger.event.startsWith('CHALLENGE_')) {
-            sourceIds = trigger.parameters.map(gedilId => imported.challenges[gedilId]['_id'].toString());
-            trigger.parameters = sourceIds;
-          } else if (trigger.event.startsWith('REWARD_')) {
-            sourceIds = trigger.parameters.map(gedilId => imported.rewards[gedilId]['_id'].toString());
-            trigger.parameters = sourceIds;
-          }
-          if (encodedContent.actions[0].parameters && encodedContent.actions[0].parameters !== null) {
-            const mappedParameters = encodedContent.actions[0].parameters.map(gedilId =>
-              imported.rewards[gedilId]['_id'].toString(),
-            );
-            encodedContent.actions[0].parameters = mappedParameters;
-          }
+        if (trigger.event.startsWith('CHALLENGE_')) {
+          sourceIds = trigger.parameters.map(gedilId => imported.challenges[gedilId]['_id'].toString());
+          trigger.parameters = sourceIds;
+        } else if (trigger.event.startsWith('REWARD_')) {
+          sourceIds = trigger.parameters.map(gedilId => imported.rewards[gedilId]['_id'].toString());
+          trigger.parameters = sourceIds;
+        }
+        if (encodedContent.actions[0].parameters && encodedContent.actions[0].parameters !== null) {
+          const mappedParameters = encodedContent.actions[0].parameters.map(gedilId =>
+            imported.rewards[gedilId]['_id'].toString(),
+          );
+          encodedContent.actions[0].parameters = mappedParameters;
         }
 
         const data: { [key: string]: any } = {
@@ -199,7 +196,7 @@ export class HookService {
 
       if (playerReward && !reward.recurrent) {
         // player already has the reward and it is not accumulative
-        //return;
+        return;
       } else if (playerReward) {
         // player already has the reward and it is accumulative
         const quantity: number = playerReward.count + (parameters[1] ? +parameters[1] : 1);
