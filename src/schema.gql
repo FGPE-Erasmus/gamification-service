@@ -142,10 +142,22 @@ enum State {
   REJECTED
 }
 
+type Group {
+  id: ID!
+  game: Game!
+  name: String!
+  displayName: String
+  imageUrl: String
+  players: [Player!]!
+  createdAt: Date!
+  updatedAt: Date
+}
+
 type Player {
   id: ID!
   game: Game!
   user: User!
+  group: Group
   points: Float!
   submissions: [Submission!]!
   learningPath: [ChallengeStatus!]!
@@ -362,13 +374,13 @@ enum TriggerEvent {
   SUBMISSION_ACCEPTED
   SUBMISSION_REJECTED
   PLAYER_ENROLLED
+  CHALLENGE_AVAILABLE
+  CHALLENGE_OPENED
+  CHALLENGE_HIDDEN
+  CHALLENGE_LOCKED
   CHALLENGE_REJECTED
   CHALLENGE_COMPLETED
   CHALLENGE_FAILED
-  CHALLENGE_OPENED
-  CHALLENGE_HIDDEN
-  CHALLENGE_AVAILABLE
-  CHALLENGE_LOCKED
   REWARD_GRANTED
   PLAYER_UPDATED
   POINTS_UPDATED
@@ -399,6 +411,7 @@ type Leaderboard {
   game: Game
   parentChallenge: Challenge
   name: String
+  groups: Boolean
   metrics: [String!]
   sortingOrders: [SortingOrder!]
   createdAt: Date!
@@ -432,11 +445,15 @@ type Query {
   actionHooks: [ActionHook!]!
   scheduledHooks: [ScheduledHook!]!
   leaderboards: [Leaderboard!]!
-  rankings(leaderboardId: String!): [Ranking!]!
+  rankings(leaderboardId: String!, gameId: String!): [Ranking!]!
+  groupRankings(leaderboardId: String!, gameId: String!): [Ranking!]!
   games: [Game!]!
   game(id: String!): Game!
   challenges(gameId: String!): [Challenge!]!
   get(challengeId: String!, playerId: String!): ChallengeStatus!
+  groups(gameId: String!): [Group!]!
+  group(id: String!): Group!
+  groupInGame(gameId: String!): Group!
   players(gameId: String!): [Player!]!
   profileInGame(gameId: String!): Player!
   player(userId: String!, gameId: String!): Player!
@@ -448,7 +465,10 @@ type Mutation {
   deleteUser(id: ID!): User!
   evaluate(gameId: String!, exerciseId: String!, file: Upload!): Submission!
   importGEdILArchive(gameInput: GameInput!, file: Upload!): Game!
+  saveGroup(id: ID, groupInput: GroupInput!): Group!
+  autoAssignGroups(gameId: String!): [Group!]!
   enroll(gameId: String!): Player!
+  setGroup(groupId: String!, playerId: String!, gameId: String!): Player!
   login(login: String!, password: String!): User!
   signup(name: String!, username: String!, email: Email!, password: String!): User!
   mutationCheck: String!
@@ -476,4 +496,11 @@ input GameInput {
   gedilLayerDescription: String
   startDate: Date
   endDate: Date
+}
+
+input GroupInput {
+  game: String!
+  name: String!
+  displayName: String
+  imageUrl: String
 }

@@ -3,6 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 
 import { ChallengeStatusModule } from '../challenge-status/challenge-status.module';
 import { GameModule } from '../game/game.module';
+import { GroupModule } from '../group/group.module';
 import { EventModule } from '../event/event.module';
 import { PlayerRewardModule } from '../player-reward/player-reward.module';
 import { SubmissionModule } from '../submission/submission.module';
@@ -25,6 +26,7 @@ import { PlayerResolver } from './player.resolver';
     forwardRef(() => EventModule),
     forwardRef(() => GameModule),
     forwardRef(() => UsersModule),
+    forwardRef(() => GroupModule),
     forwardRef(() => ChallengeStatusModule),
     forwardRef(() => PlayerRewardModule),
     forwardRef(() => SubmissionModule),

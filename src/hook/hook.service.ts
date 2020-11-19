@@ -23,7 +23,6 @@ import { ConditionInput } from './inputs/condition.input';
 import { ScheduledHook } from './models/scheduled-hook.model';
 import { ActionHook } from './models/action-hook.model';
 import { ActionEmbed } from './models/embedded/action.embed';
-import { toString } from '../common/utils/mongo.utils';
 
 @Injectable()
 export class HookService {
@@ -325,7 +324,6 @@ export class HookService {
       case State.FAILED:
         return await this.challengeStatusService.markAsFailed(gameId, challengeId, playerId, new Date());
       case State.COMPLETED:
-        console.log(challengeId + ' ' + playerId);
         return await this.challengeStatusService.markAsCompleted(gameId, challengeId, playerId, new Date());
       case State.REJECTED:
         return await this.challengeStatusService.markAsRejected(gameId, challengeId, playerId, new Date());

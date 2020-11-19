@@ -1,6 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
-import { Submission } from '../../submission/models/submission.model';
 
 @Schema()
 export class Player extends Document {
@@ -9,6 +8,9 @@ export class Player extends Document {
 
   @Prop({ type: Types.ObjectId, ref: 'Game' })
   game: any;
+
+  @Prop({ type: Types.ObjectId, ref: 'Group' })
+  group?: any;
 
   @Prop({ default: () => 0 })
   points?: number;
