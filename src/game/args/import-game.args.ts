@@ -1,5 +1,5 @@
 import { Field, ArgsType } from '@nestjs/graphql';
-import { GraphQLUpload } from 'apollo-server-core';
+import { GraphQLUpload } from 'apollo-server-express';
 import { IsDefined, ValidateNested } from 'class-validator';
 import { FileUpload } from 'graphql-upload';
 

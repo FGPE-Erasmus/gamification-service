@@ -3,6 +3,7 @@ FROM node:lts-alpine
 RUN apk update && apk add bash
 
 RUN mkdir -p /home/node/app/node_modules
+RUN mkdir -p /home/node/.npm-global
 
 ARG PORT=3000
 ARG NODE_ENV
@@ -14,7 +15,10 @@ ENV PATH=$PATH:/home/node/.npm-global/bin
 WORKDIR /home/node/app
 
 COPY package*.json ./
+
+RUN npm set unsafe-perm true
 RUN npm install
+
 RUN chown -R node:node /home/node/.npm-global
 
 COPY tsconfig*.json ./
