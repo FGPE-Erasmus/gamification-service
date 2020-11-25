@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 
 import { checkCriteria } from '../common/helpers/criteria.helper';
 import { extractToJson } from '../common/utils/extraction.utils';
@@ -23,10 +23,12 @@ import { ConditionInput } from './inputs/condition.input';
 import { ScheduledHook } from './models/scheduled-hook.model';
 import { ActionHook } from './models/action-hook.model';
 import { ActionEmbed } from './models/embedded/action.embed';
+import { PubSub } from 'graphql-subscriptions';
 
 @Injectable()
 export class HookService {
   constructor(
+    @Inject('PUB_SUB') protected readonly pubSub: PubSub,
     protected readonly actionHookService: ActionHookService,
     protected readonly scheduledHookService: ScheduledHookService,
     protected readonly challengeStatusService: ChallengeStatusService,
@@ -195,11 +197,15 @@ export class HookService {
       });
 
       if (playerReward && !reward.recurrent) {
+        this.pubSub.publish('message', { message: `Player already has the reward ${reward.id}` });
         // player already has the reward and it is not accumulative
         return;
       } else if (playerReward) {
         // player already has the reward and it is accumulative
         const quantity: number = playerReward.count + (parameters[1] ? +parameters[1] : 1);
+        this.pubSub.publish('message', {
+          message: `Reward ${reward.id} added, player has ${quantity} of them in total.`,
+        });
         await this.playerRewardService.patch(playerReward._id, { count: quantity });
       } else {
         // player does not have the reward
@@ -208,6 +214,7 @@ export class HookService {
           reward: reward._id,
           count: reward.recurrent && parameters[1] ? +parameters[1] : 1,
         });
+        this.pubSub.publish('message', { message: `Reward ${reward.id} added!` });
       }
 
       // send REWARD_GRANTED event
@@ -219,7 +226,7 @@ export class HookService {
     } else {
       const quantity: number = parameters[1] ? +parameters[1] : 1;
       await this.playerService.findOneAndUpdate({ _id: playerId }, { $inc: { points: quantity } });
-
+      this.pubSub.publish('message', { message: `${quantity} points added!` });
       // send POINTS_UPDATED event
       await this.eventService.fireEvent(TriggerEvent.POINTS_UPDATED, {
         gameId,
@@ -245,15 +252,20 @@ export class HookService {
         { $inc: { count: -quantity } },
         { new: true },
       );
+      this.pubSub.publish('message', {
+        message: `${quantity} rewards of type ${parameters[0]} have been substracted.`,
+      });
       if (x.count <= 0) {
         await this.playerRewardService.deleteOne({
           player: playerId,
           reward: parameters,
         });
+        this.pubSub.publish('message', { message: `Reward ${parameters[0]} has been substracted.` });
       }
     } else {
       const quantity: number = parameters[1] ? +parameters[1] : 1;
       await this.playerService.findOneAndUpdate({ _id: playerId }, { $inc: { points: -quantity } }, { new: true });
+      this.pubSub.publish('message', { message: `${quantity} points have been substracted.` });
     }
   }
 
@@ -340,6 +352,7 @@ export class HookService {
     switch (property) {
       // more cases can be later added if needed
       case 'POINTS':
+        this.pubSub.publish('message', { message: `Player's points have been updated!` });
         await this.updatePlayerPoints(gameId, playerId, value);
         break;
     }

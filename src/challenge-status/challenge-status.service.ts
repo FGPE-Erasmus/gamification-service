@@ -1,4 +1,5 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Inject } from '@nestjs/common';
+import { PubSub } from 'graphql-subscriptions';
 
 import { BaseService } from '../common/services/base.service';
 import { EventService } from '../event/event.service';
@@ -9,7 +10,11 @@ import { ChallengeStatusRepository } from './repositories/challenge-status.repos
 
 @Injectable()
 export class ChallengeStatusService extends BaseService<ChallengeStatus> {
-  constructor(protected readonly repository: ChallengeStatusRepository, protected readonly eventService: EventService) {
+  constructor(
+    @Inject('PUB_SUB') protected readonly pubSub: PubSub,
+    protected readonly repository: ChallengeStatusRepository,
+    protected readonly eventService: EventService,
+  ) {
     super(new Logger(ChallengeStatusService.name), repository);
   }
 
@@ -46,7 +51,7 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus> {
       playerId,
       challengeId,
     });
-
+    this.pubSub.publish('message', { message: `Challenge ${challengeId} is has been marked as opened!` });
     return result;
   }
 
@@ -70,6 +75,7 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus> {
       challengeId,
     });
 
+    this.pubSub.publish('message', { message: `Challenge ${challengeId} has been marked as failed!` });
     return result;
   }
 
@@ -97,6 +103,7 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus> {
       challengeId,
     });
 
+    this.pubSub.publish('message', { message: `Challenge ${challengeId} has been marked as completed!` });
     return result;
   }
 
@@ -120,6 +127,7 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus> {
       challengeId,
     });
 
+    this.pubSub.publish('message', { message: `Challenge ${challengeId} has been marked as rejected!` });
     return result;
   }
 
@@ -142,6 +150,7 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus> {
       challengeId,
     });
 
+    this.pubSub.publish('message', { message: `Challenge ${challengeId} has been marked as available!` });
     return result;
   }
 
@@ -164,6 +173,7 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus> {
       challengeId,
     });
 
+    this.pubSub.publish('message', { message: `Challenge ${challengeId} has been marked as hidden!` });
     return result;
   }
 
@@ -186,6 +196,7 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus> {
       challengeId,
     });
 
+    this.pubSub.publish('message', { message: `Challenge ${challengeId} has been marked as locked!` });
     return result;
   }
 }

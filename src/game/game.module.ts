@@ -16,6 +16,7 @@ import { GameToPersistenceMapper } from './mappers/game-to-persistence.mapper';
 import { Game, GameSchema } from './models/game.model';
 import { GameRepository } from './repositories/game.repository';
 import { GameUploadController } from './upload.controller';
+import { SubscriptionsModule } from 'src/common/subscriptions/subscriptions.module';
 
 @Module({
   imports: [
@@ -29,9 +30,9 @@ import { GameUploadController } from './upload.controller';
     forwardRef(() => UsersModule),
     forwardRef(() => PlayerModule),
     forwardRef(() => ChallengeModule),
-    LeaderboardModule,
-    HookModule,
-    RewardModule,
+    forwardRef(() => LeaderboardModule),
+    forwardRef(() => HookModule),
+    forwardRef(() => RewardModule),
     forwardRef(() => SubmissionModule),
   ],
   controllers: [GameUploadController],

@@ -1,5 +1,5 @@
 import { Args, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
-import { NotFoundException, UseGuards } from '@nestjs/common';
+import { NotFoundException, UseGuards, Inject } from '@nestjs/common';
 
 import { GqlAdminGuard } from '../common/guards/gql-admin.guard';
 import { GqlJwtAuthGuard } from '../common/guards/gql-jwt-auth.guard';
@@ -19,10 +19,12 @@ import { GroupInput } from './inputs/group.input';
 import { GroupService } from './group.service';
 import { GroupToDtoMapper } from './mappers/group-to-dto.mapper';
 import { Group } from './models/group.model';
+import { PubSub } from 'graphql-subscriptions';
 
 @Resolver(() => GroupDto)
 export class GroupResolver {
   constructor(
+    @Inject('PUB_SUB') protected readonly pubSub: PubSub,
     protected readonly service: GroupService,
     protected readonly groupToDtoMapper: GroupToDtoMapper,
     protected readonly playerService: PlayerService,
@@ -58,6 +60,7 @@ export class GroupResolver {
     } else {
       group = await this.service.create(groupInput);
     }
+    this.pubSub.publish('message', { message: `Group ${group.id} saved!` });
     return this.groupToDtoMapper.transform(group);
   }
 
@@ -75,6 +78,7 @@ export class GroupResolver {
   @UseGuards(GqlJwtAuthGuard, GqlAdminGuard)
   async autoAssignGroups(@Args('gameId') gameId: string): Promise<GroupDto[]> {
     const groups: Group[] = await this.service.autoAssignPlayers(gameId);
+    this.pubSub.publish('message', { message: `Groups in game ${gameId} have been automatically assigned` });
     return Promise.all(groups.map(async group => this.groupToDtoMapper.transform(group)));
   }
 

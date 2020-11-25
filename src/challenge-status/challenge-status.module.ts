@@ -10,6 +10,7 @@ import { ChallengeStatusRepository } from './repositories/challenge-status.repos
 import { ChallengeStatusToDtoMapper } from './mappers/challenge-status-to-dto.mapper';
 import { EventModule } from '../event/event.module';
 import { UsersModule } from '../users/users.module';
+import { SubscriptionsModule } from 'src/common/subscriptions/subscriptions.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { UsersModule } from '../users/users.module';
     forwardRef(() => EventModule),
     forwardRef(() => PlayerModule),
     forwardRef(() => ChallengeModule),
+    forwardRef(() => SubscriptionsModule),
   ],
   providers: [ChallengeStatusToDtoMapper, ChallengeStatusRepository, ChallengeStatusService, ChallengeStatusResolver],
   exports: [ChallengeStatusToDtoMapper, ChallengeStatusService],

@@ -8,6 +8,7 @@ import { UserRepository } from './repositories/user.repository';
 import { UserToDtoMapper } from './mappers/user-to-dto.mapper';
 import { UserToPersistenceMapper } from './mappers/user-to-persistence.mapper';
 import { PlayerModule } from '../player/player.module';
+import { SubscriptionsModule } from 'src/common/subscriptions/subscriptions.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { PlayerModule } from '../player/player.module';
       },
     ]),
     forwardRef(() => PlayerModule),
+    forwardRef(() => SubscriptionsModule),
   ],
   providers: [UserToDtoMapper, UserToPersistenceMapper, UserRepository, UsersService, UsersResolver],
   exports: [UserToDtoMapper, UserToPersistenceMapper, UserRepository, UsersService],

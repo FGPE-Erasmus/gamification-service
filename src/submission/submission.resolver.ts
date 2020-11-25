@@ -1,4 +1,4 @@
-import { UseGuards, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { UseGuards, NotFoundException, ForbiddenException, Inject } from '@nestjs/common';
 import { Resolver, Args, Mutation, Query, ResolveField, Parent } from '@nestjs/graphql';
 
 import { GqlUser } from '../common/decorators/gql-user.decorator';
@@ -19,10 +19,12 @@ import { SubmissionDto } from './dto/submission.dto';
 import { SubmissionService } from './submission.service';
 import { Submission } from './models/submission.model';
 import { GqlEnrolledInGame } from '../common/guards/gql-game-enrollment.guard';
+import { PubSub } from 'graphql-subscriptions';
 
 @Resolver(() => SubmissionDto)
 export class SubmissionResolver {
   constructor(
+    @Inject('PUB_SUB') protected readonly pubSub: PubSub,
     protected readonly submissionService: SubmissionService,
     protected readonly submissionToDtoMapper: SubmissionToDtoMapper,
     protected readonly gameService: GameService,
@@ -69,6 +71,7 @@ export class SubmissionResolver {
       mimetype,
       content: await createReadStream(),
     });
+    this.pubSub.publish('message', { message: `Submission for exercise ${exerciseId} is being evaluated...` });
     return this.submissionToDtoMapper.transform(submission);
   }
 

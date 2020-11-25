@@ -1,5 +1,5 @@
-import { NotFoundException, UseGuards } from '@nestjs/common';
-import { Query, Mutation, Args, Resolver, ID } from '@nestjs/graphql';
+import { NotFoundException, UseGuards, Inject } from '@nestjs/common';
+import { Query, Mutation, Subscription, Args, Resolver, ID } from '@nestjs/graphql';
 
 import { GqlAdminGuard } from '../common/guards/gql-admin.guard';
 import { GqlJwtAuthGuard } from '../common/guards/gql-jwt-auth.guard';
@@ -8,10 +8,20 @@ import { UpsertUserArgs } from './args/upsert-user.args';
 import { UsersService } from './users.service';
 import { UserDto } from './dto/user.dto';
 import { UserToDtoMapper } from './mappers/user-to-dto.mapper';
+import { PubSub } from 'graphql-subscriptions';
 
 @Resolver(() => UserDto)
 export class UsersResolver {
-  constructor(protected readonly usersService: UsersService, protected readonly toDtoMapper: UserToDtoMapper) {}
+  constructor(
+    @Inject('PUB_SUB') protected readonly pubSub: PubSub,
+    protected readonly usersService: UsersService,
+    protected readonly toDtoMapper: UserToDtoMapper,
+  ) {}
+
+  @Subscription(returns => String)
+  message() {
+    return this.pubSub.asyncIterator('message');
+  }
 
   @Query(() => UserDto)
   @UseGuards(GqlJwtAuthGuard)

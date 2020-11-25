@@ -1,5 +1,5 @@
 import { Resolver, Args, Query, ResolveField, Parent, Mutation } from '@nestjs/graphql';
-import { NotFoundException, UseGuards } from '@nestjs/common';
+import { NotFoundException, UseGuards, Inject } from '@nestjs/common';
 
 import { GqlUser } from '../common/decorators/gql-user.decorator';
 import { GqlPlayer } from '../common/decorators/gql-player.decorator';
@@ -33,10 +33,12 @@ import { Player } from './models/player.model';
 import { Group } from '../group/models/group.model';
 import { GroupService } from '../group/group.service';
 import { GroupToDtoMapper } from '../group/mappers/group-to-dto.mapper';
+import { PubSub } from 'graphql-subscriptions';
 
 @Resolver(() => PlayerDto)
 export class PlayerResolver {
   constructor(
+    @Inject('PUB_SUB') protected readonly pubSub: PubSub,
     protected readonly playerService: PlayerService,
     protected readonly playerToDtoMapper: PlayerToDtoMapper,
     protected readonly gameService: GameService,
@@ -57,13 +59,16 @@ export class PlayerResolver {
   @UseGuards(GqlJwtAuthGuard)
   async enroll(@GqlUser('id') userId: string, @Args('gameId') gameId: string): Promise<PlayerDto> {
     const player: Player = await this.playerService.enroll(gameId, userId);
+    this.pubSub.publish('message', { message: `Player ${player.id} has enrolled the game: ${gameId}.` });
     return this.playerToDtoMapper.transform(player);
   }
 
+  //how did we end up with two identical mutation endpoints?
   @Mutation(() => PlayerDto)
   @UseGuards(GqlJwtAuthGuard, GqlAdminGuard)
   async addToGame(@Args('userId') userId: string, @Args('gameId') gameId: string): Promise<PlayerDto> {
     const player: Player = await this.playerService.enroll(gameId, userId);
+    this.pubSub.publish('message', { message: `Player ${player.id} has enrolled the game: ${gameId}.` });
     return this.playerToDtoMapper.transform(player);
   }
 
@@ -109,6 +114,7 @@ export class PlayerResolver {
     @Args('groupId') groupId: string,
   ): Promise<PlayerDto> {
     const player: Player = await this.playerService.setGroup(gameId, playerId, groupId);
+    this.pubSub.publish('message', { message: `Player ${player.id} has been assigned to a group: ${groupId}.` });
     return this.playerToDtoMapper.transform(player);
   }
 
