@@ -506,5 +506,13 @@ input GroupInput {
 }
 
 type Subscription {
-  message: String!
+  rewardReceived: Reward!
+  rewardRemoved: Reward!
+  rewardSubstracted: Reward!
+  submissionUpdated: Submission!
+  submissionEvaluated: Submission!
+  submissionSent: Submission!
+  challengeStatusUpdated: ChallengeStatus!
+  playerEnrolled: Player!
+  pointsUpdated: Float!
 }

@@ -34,6 +34,7 @@ import { Group } from '../group/models/group.model';
 import { GroupService } from '../group/group.service';
 import { GroupToDtoMapper } from '../group/mappers/group-to-dto.mapper';
 import { PubSub } from 'graphql-subscriptions';
+import { NotificationEnum } from 'src/common/enums/notifications.enum';
 
 @Resolver(() => PlayerDto)
 export class PlayerResolver {
@@ -59,7 +60,7 @@ export class PlayerResolver {
   @UseGuards(GqlJwtAuthGuard)
   async enroll(@GqlUser('id') userId: string, @Args('gameId') gameId: string): Promise<PlayerDto> {
     const player: Player = await this.playerService.enroll(gameId, userId);
-    this.pubSub.publish('message', { message: `Player ${player.id} has enrolled the game: ${gameId}.` });
+    this.pubSub.publish(NotificationEnum.PLAYER_ENROLLED, { playerEnrolled: this.playerToDtoMapper.transform(player) });
     return this.playerToDtoMapper.transform(player);
   }
 
@@ -68,7 +69,7 @@ export class PlayerResolver {
   @UseGuards(GqlJwtAuthGuard, GqlAdminGuard)
   async addToGame(@Args('userId') userId: string, @Args('gameId') gameId: string): Promise<PlayerDto> {
     const player: Player = await this.playerService.enroll(gameId, userId);
-    this.pubSub.publish('message', { message: `Player ${player.id} has enrolled the game: ${gameId}.` });
+    this.pubSub.publish(NotificationEnum.PLAYER_ENROLLED, { playerEnrolled: this.playerToDtoMapper.transform(player) });
     return this.playerToDtoMapper.transform(player);
   }
 

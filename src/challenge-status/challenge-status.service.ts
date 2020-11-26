@@ -1,9 +1,11 @@
 import { Injectable, Logger, Inject } from '@nestjs/common';
 import { PubSub } from 'graphql-subscriptions';
+import { NotificationEnum } from 'src/common/enums/notifications.enum';
 
 import { BaseService } from '../common/services/base.service';
 import { EventService } from '../event/event.service';
 import { TriggerEventEnum as TriggerEvent } from '../hook/enums/trigger-event.enum';
+import { ChallengeStatusToDtoMapper } from './mappers/challenge-status-to-dto.mapper';
 import { ChallengeStatus } from './models/challenge-status.model';
 import { StateEnum } from './models/state.enum';
 import { ChallengeStatusRepository } from './repositories/challenge-status.repository';
@@ -12,6 +14,7 @@ import { ChallengeStatusRepository } from './repositories/challenge-status.repos
 export class ChallengeStatusService extends BaseService<ChallengeStatus> {
   constructor(
     @Inject('PUB_SUB') protected readonly pubSub: PubSub,
+    protected readonly challengeStatustoDtoMapper: ChallengeStatusToDtoMapper,
     protected readonly repository: ChallengeStatusRepository,
     protected readonly eventService: EventService,
   ) {
@@ -51,7 +54,9 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus> {
       playerId,
       challengeId,
     });
-    this.pubSub.publish('message', { message: `Challenge ${challengeId} is has been marked as opened!` });
+    this.pubSub.publish(NotificationEnum.CHALLENGE_STATUS_UPDATED, {
+      challengeStatusUpdated: this.challengeStatustoDtoMapper.transform(result),
+    });
     return result;
   }
 
@@ -75,7 +80,9 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus> {
       challengeId,
     });
 
-    this.pubSub.publish('message', { message: `Challenge ${challengeId} has been marked as failed!` });
+    this.pubSub.publish(NotificationEnum.CHALLENGE_STATUS_UPDATED, {
+      challengeStatusUpdated: this.challengeStatustoDtoMapper.transform(result),
+    });
     return result;
   }
 
@@ -103,7 +110,9 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus> {
       challengeId,
     });
 
-    this.pubSub.publish('message', { message: `Challenge ${challengeId} has been marked as completed!` });
+    this.pubSub.publish(NotificationEnum.CHALLENGE_STATUS_UPDATED, {
+      challengeStatusUpdated: this.challengeStatustoDtoMapper.transform(result),
+    });
     return result;
   }
 
@@ -127,7 +136,9 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus> {
       challengeId,
     });
 
-    this.pubSub.publish('message', { message: `Challenge ${challengeId} has been marked as rejected!` });
+    this.pubSub.publish(NotificationEnum.CHALLENGE_STATUS_UPDATED, {
+      challengeStatusUpdated: this.challengeStatustoDtoMapper.transform(result),
+    });
     return result;
   }
 
@@ -150,7 +161,9 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus> {
       challengeId,
     });
 
-    this.pubSub.publish('message', { message: `Challenge ${challengeId} has been marked as available!` });
+    this.pubSub.publish(NotificationEnum.CHALLENGE_STATUS_UPDATED, {
+      challengeStatusUpdated: this.challengeStatustoDtoMapper.transform(result),
+    });
     return result;
   }
 
@@ -173,7 +186,9 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus> {
       challengeId,
     });
 
-    this.pubSub.publish('message', { message: `Challenge ${challengeId} has been marked as hidden!` });
+    this.pubSub.publish(NotificationEnum.CHALLENGE_STATUS_UPDATED, {
+      challengeStatusUpdated: this.challengeStatustoDtoMapper.transform(result),
+    });
     return result;
   }
 
@@ -196,7 +211,9 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus> {
       challengeId,
     });
 
-    this.pubSub.publish('message', { message: `Challenge ${challengeId} has been marked as locked!` });
+    this.pubSub.publish(NotificationEnum.CHALLENGE_STATUS_UPDATED, {
+      challengeStatusUpdated: this.challengeStatustoDtoMapper.transform(result),
+    });
     return result;
   }
 }

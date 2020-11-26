@@ -10,7 +10,6 @@ import { Group, GroupSchema } from './models/group.model';
 import { GroupRepository } from './repositories/group.repository';
 import { GroupService } from './group.service';
 import { GroupResolver } from './group.resolver';
-import { SubscriptionsModule } from 'src/common/subscriptions/subscriptions.module';
 
 @Module({
   imports: [
@@ -24,7 +23,6 @@ import { SubscriptionsModule } from 'src/common/subscriptions/subscriptions.modu
     forwardRef(() => UsersModule),
     forwardRef(() => GameModule),
     forwardRef(() => PlayerModule),
-    forwardRef(() => SubscriptionsModule),
   ],
   providers: [GroupToDtoMapper, GroupRepository, GroupService, GroupResolver],
   exports: [GroupToDtoMapper, GroupRepository, GroupService],

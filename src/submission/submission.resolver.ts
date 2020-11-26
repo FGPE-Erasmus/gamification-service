@@ -20,6 +20,7 @@ import { SubmissionService } from './submission.service';
 import { Submission } from './models/submission.model';
 import { GqlEnrolledInGame } from '../common/guards/gql-game-enrollment.guard';
 import { PubSub } from 'graphql-subscriptions';
+import { NotificationEnum } from 'src/common/enums/notifications.enum';
 
 @Resolver(() => SubmissionDto)
 export class SubmissionResolver {
@@ -71,8 +72,11 @@ export class SubmissionResolver {
       mimetype,
       content: await createReadStream(),
     });
-    this.pubSub.publish('message', { message: `Submission for exercise ${exerciseId} is being evaluated...` });
-    return this.submissionToDtoMapper.transform(submission);
+    const submissionDto = this.submissionToDtoMapper.transform(submission);
+    this.pubSub.publish(NotificationEnum.SUBMISSION_SENT, {
+      submissionSent: this.submissionToDtoMapper.transform(submission),
+    });
+    return submissionDto;
   }
 
   @ResolveField('game', () => GameDto)
