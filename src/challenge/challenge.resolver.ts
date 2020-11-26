@@ -1,6 +1,5 @@
-import { UseGuards, Inject } from '@nestjs/common';
-import { Args, Parent, Query, ResolveField, Resolver, Subscription } from '@nestjs/graphql';
-import { PubSub } from 'graphql-subscriptions';
+import { UseGuards } from '@nestjs/common';
+import { Args, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 
 import { GqlAdminGuard } from '../common/guards/gql-admin.guard';
 import { GqlJwtAuthGuard } from '../common/guards/gql-jwt-auth.guard';
@@ -11,13 +10,10 @@ import { ChallengeService } from './challenge.service';
 import { ChallengeDto } from './dto/challenge.dto';
 import { ChallengeToDtoMapper } from './mappers/challenge-to-dto.mapper';
 import { Challenge } from './models/challenge.model';
-import { NotificationEnum } from 'src/common/enums/notifications.enum';
-import { SubmissionDto } from 'src/submission/dto/submission.dto';
 
 @Resolver(() => ChallengeDto)
 export class ChallengeResolver {
   constructor(
-    @Inject('PUB_SUB') protected readonly pubSub: PubSub,
     protected readonly challengeService: ChallengeService,
     protected readonly challengeToDtoMapper: ChallengeToDtoMapper,
     protected readonly gameService: GameService,
@@ -46,20 +42,5 @@ export class ChallengeResolver {
     }
     const parentChallenge = await this.challengeService.findById(parentChallengeId);
     return this.challengeToDtoMapper.transform(parentChallenge);
-  }
-
-  @Subscription(returns => SubmissionDto)
-  submissionUpdated() {
-    return this.pubSub.asyncIterator(NotificationEnum.SUBMISSION_UPDATED);
-  }
-
-  @Subscription(returns => SubmissionDto)
-  submissionEvaluated() {
-    return this.pubSub.asyncIterator(NotificationEnum.SUBMISSION_EVALUATED);
-  }
-
-  @Subscription(returns => SubmissionDto)
-  submissionSent() {
-    return this.pubSub.asyncIterator(NotificationEnum.SUBMISSION_SENT);
   }
 }

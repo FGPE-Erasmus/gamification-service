@@ -1,5 +1,5 @@
 import { UseGuards, NotFoundException, ForbiddenException, Inject } from '@nestjs/common';
-import { Resolver, Args, Mutation, Query, ResolveField, Parent } from '@nestjs/graphql';
+import { Resolver, Args, Mutation, Query, ResolveField, Parent, Subscription } from '@nestjs/graphql';
 import { PubSub } from 'graphql-subscriptions';
 
 import { GqlUser } from '../common/decorators/gql-user.decorator';
@@ -91,5 +91,15 @@ export class SubmissionResolver {
     const { player: playerId } = root;
     const player: Player = await this.playerService.findById(playerId);
     return this.playerToDtoMapper.transform(player);
+  }
+
+  @Subscription(returns => SubmissionDto)
+  submissionEvaluated() {
+    return this.pubSub.asyncIterator(NotificationEnum.SUBMISSION_EVALUATED);
+  }
+
+  @Subscription(returns => SubmissionDto)
+  submissionSent() {
+    return this.pubSub.asyncIterator(NotificationEnum.SUBMISSION_SENT);
   }
 }
