@@ -1,5 +1,5 @@
 import { Args, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
-import { NotFoundException, UseGuards, Inject } from '@nestjs/common';
+import { NotFoundException, UseGuards } from '@nestjs/common';
 
 import { GqlAdminGuard } from '../common/guards/gql-admin.guard';
 import { GqlJwtAuthGuard } from '../common/guards/gql-jwt-auth.guard';

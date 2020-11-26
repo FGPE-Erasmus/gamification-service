@@ -1,4 +1,5 @@
 import { Injectable, Inject } from '@nestjs/common';
+import { PubSub } from 'graphql-subscriptions';
 
 import { checkCriteria } from '../common/helpers/criteria.helper';
 import { extractToJson } from '../common/utils/extraction.utils';
@@ -23,7 +24,6 @@ import { ConditionInput } from './inputs/condition.input';
 import { ScheduledHook } from './models/scheduled-hook.model';
 import { ActionHook } from './models/action-hook.model';
 import { ActionEmbed } from './models/embedded/action.embed';
-import { PubSub } from 'graphql-subscriptions';
 import { NotificationEnum } from 'src/common/enums/notifications.enum';
 import { RewardToDtoMapper } from 'src/reward/mappers/reward-to-dto.mapper';
 import { PlayerRewardToDtoMapper } from 'src/player-reward/mappers/player-reward-to-dto.mapper';

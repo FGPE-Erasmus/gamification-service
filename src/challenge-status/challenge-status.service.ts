@@ -1,7 +1,7 @@
 import { Injectable, Logger, Inject } from '@nestjs/common';
 import { PubSub } from 'graphql-subscriptions';
-import { NotificationEnum } from 'src/common/enums/notifications.enum';
 
+import { NotificationEnum } from 'src/common/enums/notifications.enum';
 import { BaseService } from '../common/services/base.service';
 import { EventService } from '../event/event.service';
 import { TriggerEventEnum as TriggerEvent } from '../hook/enums/trigger-event.enum';

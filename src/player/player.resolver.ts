@@ -1,5 +1,6 @@
-import { Resolver, Args, Query, ResolveField, Parent, Mutation } from '@nestjs/graphql';
+import { Resolver, Args, Query, ResolveField, Parent, Mutation, Subscription } from '@nestjs/graphql';
 import { NotFoundException, UseGuards, Inject } from '@nestjs/common';
+import { PubSub } from 'graphql-subscriptions';
 
 import { GqlUser } from '../common/decorators/gql-user.decorator';
 import { GqlPlayer } from '../common/decorators/gql-player.decorator';
@@ -33,7 +34,6 @@ import { Player } from './models/player.model';
 import { Group } from '../group/models/group.model';
 import { GroupService } from '../group/group.service';
 import { GroupToDtoMapper } from '../group/mappers/group-to-dto.mapper';
-import { PubSub } from 'graphql-subscriptions';
 import { NotificationEnum } from 'src/common/enums/notifications.enum';
 
 @Resolver(() => PlayerDto)
@@ -164,5 +164,15 @@ export class PlayerResolver {
     const { id: playerId } = root;
     const rewards: PlayerReward[] = await this.playerRewardService.findAll({ player: { $eq: playerId } });
     return Promise.all(rewards.map(async reward => this.playerRewardToDtoMapper.transform(reward)));
+  }
+
+  @Subscription(returns => PlayerDto)
+  playerEnrolled() {
+    return this.pubSub.asyncIterator(NotificationEnum.PLAYER_ENROLLED);
+  }
+
+  @Subscription(returns => Number)
+  pointsUpdated() {
+    return this.pubSub.asyncIterator(NotificationEnum.POINTS_UPDATED);
   }
 }
