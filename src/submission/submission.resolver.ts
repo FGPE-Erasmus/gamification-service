@@ -1,5 +1,6 @@
-import { UseGuards, NotFoundException, ForbiddenException } from '@nestjs/common';
-import { Resolver, Args, Mutation, Query, ResolveField, Parent } from '@nestjs/graphql';
+import { UseGuards, NotFoundException, ForbiddenException, Inject } from '@nestjs/common';
+import { Resolver, Args, Mutation, Query, ResolveField, Parent, Subscription } from '@nestjs/graphql';
+import { PubSub } from 'graphql-subscriptions';
 
 import { GqlUser } from '../common/decorators/gql-user.decorator';
 import { GqlJwtAuthGuard } from '../common/guards/gql-jwt-auth.guard';
@@ -19,10 +20,12 @@ import { SubmissionDto } from './dto/submission.dto';
 import { SubmissionService } from './submission.service';
 import { Submission } from './models/submission.model';
 import { GqlEnrolledInGame } from '../common/guards/gql-game-enrollment.guard';
+import { NotificationEnum } from 'src/common/enums/notifications.enum';
 
 @Resolver(() => SubmissionDto)
 export class SubmissionResolver {
   constructor(
+    @Inject('PUB_SUB') protected readonly pubSub: PubSub,
     protected readonly submissionService: SubmissionService,
     protected readonly submissionToDtoMapper: SubmissionToDtoMapper,
     protected readonly gameService: GameService,
@@ -69,7 +72,11 @@ export class SubmissionResolver {
       mimetype,
       content: await createReadStream(),
     });
-    return this.submissionToDtoMapper.transform(submission);
+    const submissionDto = this.submissionToDtoMapper.transform(submission);
+    this.pubSub.publish(NotificationEnum.SUBMISSION_SENT, {
+      submissionSent: this.submissionToDtoMapper.transform(submission),
+    });
+    return submissionDto;
   }
 
   @ResolveField('game', () => GameDto)
@@ -84,5 +91,15 @@ export class SubmissionResolver {
     const { player: playerId } = root;
     const player: Player = await this.playerService.findById(playerId);
     return this.playerToDtoMapper.transform(player);
+  }
+
+  @Subscription(returns => SubmissionDto)
+  submissionEvaluated() {
+    return this.pubSub.asyncIterator(NotificationEnum.SUBMISSION_EVALUATED);
+  }
+
+  @Subscription(returns => SubmissionDto)
+  submissionSent() {
+    return this.pubSub.asyncIterator(NotificationEnum.SUBMISSION_SENT);
   }
 }

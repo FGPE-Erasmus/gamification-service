@@ -20,6 +20,7 @@ import { Reward, RewardSchema } from './models/reward.model';
 import { RewardRepository } from './repositories/reward.repository';
 import { RewardToDtoMapper } from './mappers/reward-to-dto.mapper';
 import { RewardToPersistenceMapper } from './mappers/reward-to-persistence.mapper';
+import { SubscriptionsModule } from 'src/common/subscriptions/subscriptions.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { RewardToPersistenceMapper } from './mappers/reward-to-persistence.mappe
     forwardRef(() => ChallengeModule),
     forwardRef(() => PlayerModule),
     forwardRef(() => HookModule),
+    forwardRef(() => SubscriptionsModule),
   ],
   providers: [
     RewardToDtoMapper,

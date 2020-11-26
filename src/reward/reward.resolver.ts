@@ -1,5 +1,6 @@
-import { UseGuards } from '@nestjs/common';
-import { Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
+import { UseGuards, Inject } from '@nestjs/common';
+import { Parent, Query, ResolveField, Resolver, Subscription } from '@nestjs/graphql';
+import { PubSub } from 'graphql-subscriptions';
 
 import { GqlJwtAuthGuard } from '../common/guards/gql-jwt-auth.guard';
 import { ChallengeService } from '../challenge/challenge.service';
@@ -16,10 +17,12 @@ import { PlayerDto } from '../player/dto/player.dto';
 import { Player } from '../player/models/player.model';
 import { PlayerService } from '../player/player.service';
 import { PlayerToDtoMapper } from '../player/mappers/player-to-dto.mapper';
+import { NotificationEnum } from 'src/common/enums/notifications.enum';
 
 @Resolver(() => RewardDto, { isAbstract: true })
 export class RewardResolver {
   constructor(
+    @Inject('PUB_SUB') protected readonly pubSub: PubSub,
     protected readonly rewardService: RewardService,
     protected readonly rewardToDtoMapper: RewardToDtoMapper,
     protected readonly gameService: GameService,
@@ -64,5 +67,20 @@ export class RewardResolver {
       _id: { $in: playerIds },
     });
     return Promise.all(players.map(async player => this.playerToDtoMapper.transform(player)));
+  }
+
+  @Subscription(returns => RewardDto)
+  rewardReceived() {
+    return this.pubSub.asyncIterator(NotificationEnum.REWARD_RECEIVED);
+  }
+
+  @Subscription(returns => RewardDto)
+  rewardRemoved() {
+    return this.pubSub.asyncIterator(NotificationEnum.REWARD_REMOVED);
+  }
+
+  @Subscription(returns => RewardDto)
+  rewardSubstracted() {
+    return this.pubSub.asyncIterator(NotificationEnum.REWARD_SUBSTRACTED);
   }
 }

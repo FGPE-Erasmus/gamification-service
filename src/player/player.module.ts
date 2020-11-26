@@ -14,6 +14,7 @@ import { PlayerRepository } from './repositories/player.repository';
 import { PlayerToDtoMapper } from './mappers/player-to-dto.mapper';
 import { PlayerToPersistenceMapper } from './mappers/player-to-persistence.mapper';
 import { PlayerResolver } from './player.resolver';
+import { SubscriptionsModule } from 'src/common/subscriptions/subscriptions.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { PlayerResolver } from './player.resolver';
     forwardRef(() => ChallengeStatusModule),
     forwardRef(() => PlayerRewardModule),
     forwardRef(() => SubmissionModule),
+    forwardRef(() => SubscriptionsModule),
   ],
   providers: [PlayerToDtoMapper, PlayerToPersistenceMapper, PlayerRepository, PlayerService, PlayerResolver],
   exports: [PlayerToDtoMapper, PlayerToPersistenceMapper, PlayerRepository, PlayerService],

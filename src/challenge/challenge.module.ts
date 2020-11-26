@@ -12,6 +12,7 @@ import { ChallengeResolver } from './challenge.resolver';
 import { ChallengeToDtoMapper } from './mappers/challenge-to-dto.mapper';
 import { Challenge, ChallengeSchema } from './models/challenge.model';
 import { ChallengeRepository } from './repositories/challenge.repository';
+import { SubscriptionsModule } from 'src/common/subscriptions/subscriptions.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { ChallengeRepository } from './repositories/challenge.repository';
     forwardRef(() => HookModule),
     forwardRef(() => LeaderboardModule),
     forwardRef(() => RewardModule),
+    forwardRef(() => SubscriptionsModule),
   ],
   providers: [ChallengeToDtoMapper, ChallengeRepository, ChallengeService, ChallengeResolver],
   exports: [ChallengeToDtoMapper, ChallengeRepository, ChallengeService],

@@ -1,5 +1,6 @@
-import { Resolver, Args, Query, ResolveField, Parent } from '@nestjs/graphql';
-import { NotFoundException, UseGuards } from '@nestjs/common';
+import { Resolver, Args, Query, ResolveField, Parent, Subscription } from '@nestjs/graphql';
+import { NotFoundException, UseGuards, Inject } from '@nestjs/common';
+import { PubSub } from 'graphql-subscriptions';
 
 import { GqlJwtAuthGuard } from '../common/guards/gql-jwt-auth.guard';
 import { ChallengeStatusService } from './challenge-status.service';
@@ -15,10 +16,12 @@ import { Challenge } from '../challenge/models/challenge.model';
 import { ChallengeService } from '../challenge/challenge.service';
 import { ChallengeToDtoMapper } from '../challenge/mappers/challenge-to-dto.mapper';
 import { GqlAdminGuard } from '../common/guards/gql-admin.guard';
+import { NotificationEnum } from 'src/common/enums/notifications.enum';
 
 @Resolver(() => ChallengeStatusDto)
 export class ChallengeStatusResolver {
   constructor(
+    @Inject('PUB_SUB') protected readonly pubSub: PubSub,
     protected readonly challengeStatusService: ChallengeStatusService,
     protected readonly challengeStatusToDtoMapper: ChallengeStatusToDtoMapper,
     protected readonly playerService: PlayerService,
@@ -55,5 +58,10 @@ export class ChallengeStatusResolver {
     const { player: playerId } = root;
     const player: Player = await this.playerService.findById(playerId);
     return this.playerToDtoMapper.transform(player);
+  }
+
+  @Subscription(returns => ChallengeStatusDto)
+  challengeStatusUpdated() {
+    return this.pubSub.asyncIterator(NotificationEnum.CHALLENGE_STATUS_UPDATED);
   }
 }

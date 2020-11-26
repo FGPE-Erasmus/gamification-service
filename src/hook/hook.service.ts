@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
+import { PubSub } from 'graphql-subscriptions';
 
 import { checkCriteria } from '../common/helpers/criteria.helper';
 import { extractToJson } from '../common/utils/extraction.utils';
@@ -23,10 +24,14 @@ import { ConditionInput } from './inputs/condition.input';
 import { ScheduledHook } from './models/scheduled-hook.model';
 import { ActionHook } from './models/action-hook.model';
 import { ActionEmbed } from './models/embedded/action.embed';
+import { NotificationEnum } from 'src/common/enums/notifications.enum';
+import { RewardToDtoMapper } from 'src/reward/mappers/reward-to-dto.mapper';
+import { PlayerRewardToDtoMapper } from 'src/player-reward/mappers/player-reward-to-dto.mapper';
 
 @Injectable()
 export class HookService {
   constructor(
+    @Inject('PUB_SUB') protected readonly pubSub: PubSub,
     protected readonly actionHookService: ActionHookService,
     protected readonly scheduledHookService: ScheduledHookService,
     protected readonly challengeStatusService: ChallengeStatusService,
@@ -35,6 +40,8 @@ export class HookService {
     protected readonly playerRewardService: PlayerRewardService,
     protected readonly submissionService: SubmissionService,
     protected readonly eventService: EventService,
+    protected readonly rewardToDtoMapper: RewardToDtoMapper,
+    protected readonly playerRewardToDtoMapper: PlayerRewardToDtoMapper,
   ) {}
 
   async importGEdIL(
@@ -200,6 +207,9 @@ export class HookService {
       } else if (playerReward) {
         // player already has the reward and it is accumulative
         const quantity: number = playerReward.count + (parameters[1] ? +parameters[1] : 1);
+        this.pubSub.publish(NotificationEnum.REWARD_RECEIVED, {
+          rewardReceived: this.rewardToDtoMapper.transform(reward),
+        });
         await this.playerRewardService.patch(playerReward._id, { count: quantity });
       } else {
         // player does not have the reward
@@ -207,6 +217,9 @@ export class HookService {
           player: playerId,
           reward: reward._id,
           count: reward.recurrent && parameters[1] ? +parameters[1] : 1,
+        });
+        this.pubSub.publish(NotificationEnum.REWARD_RECEIVED, {
+          rewardReceived: this.rewardToDtoMapper.transform(reward),
         });
       }
 
@@ -219,7 +232,7 @@ export class HookService {
     } else {
       const quantity: number = parameters[1] ? +parameters[1] : 1;
       await this.playerService.findOneAndUpdate({ _id: playerId }, { $inc: { points: quantity } });
-
+      this.pubSub.publish(NotificationEnum.POINTS_UPDATED, { pointsUpdated: quantity });
       // send POINTS_UPDATED event
       await this.eventService.fireEvent(TriggerEvent.POINTS_UPDATED, {
         gameId,
@@ -245,15 +258,22 @@ export class HookService {
         { $inc: { count: -quantity } },
         { new: true },
       );
+      this.pubSub.publish(NotificationEnum.REWARD_SUBSTRACTED, {
+        rewardSubstracted: this.playerRewardToDtoMapper.transform(x),
+      });
       if (x.count <= 0) {
         await this.playerRewardService.deleteOne({
           player: playerId,
           reward: parameters,
         });
+        this.pubSub.publish(NotificationEnum.REWARD_REMOVED, {
+          rewardRemoved: this.playerRewardToDtoMapper.transform(x),
+        });
       }
     } else {
       const quantity: number = parameters[1] ? +parameters[1] : 1;
       await this.playerService.findOneAndUpdate({ _id: playerId }, { $inc: { points: -quantity } }, { new: true });
+      this.pubSub.publish(NotificationEnum.POINTS_UPDATED, { pointsUpdated: quantity });
     }
   }
 
@@ -367,6 +387,7 @@ export class HookService {
       await this.playerService.findOneAndUpdate({ _id: playerId }, { points: +points });
     }
 
+    this.pubSub.publish(NotificationEnum.POINTS_UPDATED, { pointsUpdated: points });
     // send POINTS_UPDATED event
     await this.eventService.fireEvent(TriggerEvent.POINTS_UPDATED, {
       gameId,

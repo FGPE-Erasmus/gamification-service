@@ -102,6 +102,15 @@ export async function inferCriteriaEntityValue(
 }
 
 export function evaluateCondition(left: any | any[], right: any | any[], comparingFunction: string): boolean {
+  if (
+    comparingFunction !== ComparingFunction.IS_EMPTY &&
+    comparingFunction !== ComparingFunction.NOT_EMPTY &&
+    comparingFunction !== ComparingFunction.IN &&
+    comparingFunction !== ComparingFunction.NOT_IN
+  ) {
+    if (Array.isArray(left)) left = left[0];
+    if (Array.isArray(right)) right = right[0];
+  }
   switch (comparingFunction) {
     case ComparingFunction.LESS_THAN:
       return left < right;

@@ -504,3 +504,14 @@ input GroupInput {
   displayName: String
   imageUrl: String
 }
+
+type Subscription {
+  submissionEvaluated: Submission!
+  submissionSent: Submission!
+  rewardReceived: Reward!
+  rewardRemoved: Reward!
+  rewardSubstracted: Reward!
+  challengeStatusUpdated: ChallengeStatus!
+  playerEnrolled: Player!
+  pointsUpdated: Float!
+}

@@ -20,6 +20,7 @@ import { ActionHookRepository } from './repositories/action-hook.repository';
 import { ScheduledHookRepository } from './repositories/scheduled-hook.repository';
 import { ScheduledHookService } from './scheduled-hook.service';
 import { ScheduledHookResolver } from './scheduled-hook.resolver';
+import { SubscriptionsModule } from 'src/common/subscriptions/subscriptions.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { ScheduledHookResolver } from './scheduled-hook.resolver';
     forwardRef(() => PlayerRewardModule),
     forwardRef(() => SubmissionModule),
     forwardRef(() => EventModule),
+    forwardRef(() => SubscriptionsModule),
   ],
   providers: [
     ActionHookToDtoMapper,
