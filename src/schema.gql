@@ -16,6 +16,8 @@ type Submission {
   feedback: String
   submittedAt: Date!
   evaluatedAt: Date
+  createdAt: Date!
+  updatedAt: Date
 }
 
 enum EvaluationEngine {
@@ -52,6 +54,8 @@ type Game {
   endDate: Date
   players: [Player!]!
   submissions: [Submission!]!
+  createdAt: Date!
+  updatedAt: Date
 }
 
 type Challenge {
@@ -66,6 +70,8 @@ type Challenge {
   refs: [String!]!
   locked: Boolean!
   hidden: Boolean!
+  createdAt: Date!
+  updatedAt: Date
 }
 
 enum Difficulty {
@@ -433,18 +439,18 @@ type Query {
   users: [User!]!
   submission(submissionId: String!): Submission!
   submissions(exerciseId: String!, gameId: String!): [Submission!]!
-  rewards: [Reward!]!
-  badges: [Badge!]!
-  coupons: [Coupon!]!
-  hints: [Hint!]!
-  messages: [Message!]!
-  points: [Point!]!
-  virtualItems: [VirtualItem!]!
-  unlocks: [Unlock!]!
-  reveals: [Reveal!]!
-  actionHooks: [ActionHook!]!
-  scheduledHooks: [ScheduledHook!]!
-  leaderboards: [Leaderboard!]!
+  rewards(gameId: String!): [Reward!]!
+  badges(gameId: String!): [Badge!]!
+  coupons(gameId: String!): [Coupon!]!
+  hints(gameId: String!): [Hint!]!
+  messages(gameId: String!): [Message!]!
+  points(gameId: String!): [Point!]!
+  virtualItems(gameId: String!): [VirtualItem!]!
+  unlocks(gameId: String!): [Unlock!]!
+  reveals(gameId: String!): [Reveal!]!
+  actionHooks(gameId: String!): [ActionHook!]!
+  scheduledHooks(gameId: String!): [ScheduledHook!]!
+  leaderboards(gameId: String!): [Leaderboard!]!
   rankings(leaderboardId: String!, gameId: String!): [Ranking!]!
   groupRankings(leaderboardId: String!, gameId: String!): [Ranking!]!
   games: [Game!]!

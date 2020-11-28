@@ -1,5 +1,5 @@
 import { UseGuards } from '@nestjs/common';
-import { Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
+import { Args, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 
 import { GqlJwtAuthGuard } from '../common/guards/gql-jwt-auth.guard';
 import { GameService } from '../game/game.service';
@@ -26,8 +26,8 @@ export class ScheduledHookResolver {
 
   @Query(() => [ScheduledHookDto])
   @UseGuards(GqlJwtAuthGuard)
-  async scheduledHooks(): Promise<ScheduledHookDto[]> {
-    const hooks: ScheduledHook[] = await this.scheduledHookService.findAll();
+  async scheduledHooks(@Args('gameId') gameId: string): Promise<ScheduledHookDto[]> {
+    const hooks: ScheduledHook[] = await this.scheduledHookService.findByGameId(gameId);
     return Promise.all(hooks.map(async hook => this.scheduledHookToDtoMapper.transform(hook)));
   }
 

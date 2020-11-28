@@ -2,9 +2,25 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
 import { RewardType } from './reward-type.enum';
+import { IBaseEntity } from '../../common/interfaces/base-entity.interface';
 
-@Schema()
-export class Reward extends Document {
+export interface Reward extends IBaseEntity {
+  game: any;
+  parentChallenge?: any;
+  kind: RewardType;
+  name: string;
+  description?: string;
+  image?: string;
+  recurrent: boolean;
+  cost?: number;
+  amount?: number;
+  message?: string;
+  challenges?: any[];
+  players?: any[];
+}
+
+@Schema({ collection: 'Reward' })
+export class RewardDocument extends Document implements Reward {
   @Prop({ type: Types.ObjectId, ref: 'Game', required: true })
   game: any;
 
@@ -40,11 +56,6 @@ export class Reward extends Document {
 
   @Prop({ type: [{ type: Types.ObjectId, ref: 'PlayerReward' }] })
   players?: any[];
-
-  /* Timestamps */
-
-  createdAt?: Date;
-  updatedAt?: Date;
 }
 
-export const RewardSchema = SchemaFactory.createForClass(Reward);
+export const RewardSchema = SchemaFactory.createForClass(RewardDocument);

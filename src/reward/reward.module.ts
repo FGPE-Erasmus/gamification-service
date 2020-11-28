@@ -16,16 +16,15 @@ import { PointResolver } from './point.resolver';
 import { VirtualItemResolver } from './virtual-item.resolver';
 import { UnlockResolver } from './unlock.resolver';
 import { RevealResolver } from './reveal.resolver';
-import { Reward, RewardSchema } from './models/reward.model';
+import { RewardSchema } from './models/reward.model';
 import { RewardRepository } from './repositories/reward.repository';
 import { RewardToDtoMapper } from './mappers/reward-to-dto.mapper';
-import { RewardToPersistenceMapper } from './mappers/reward-to-persistence.mapper';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       {
-        name: Reward.name,
+        name: 'Reward',
         schema: RewardSchema,
       },
     ]),
@@ -37,7 +36,6 @@ import { RewardToPersistenceMapper } from './mappers/reward-to-persistence.mappe
   ],
   providers: [
     RewardToDtoMapper,
-    RewardToPersistenceMapper,
     RewardRepository,
     RewardService,
     RewardResolver,
@@ -50,6 +48,6 @@ import { RewardToPersistenceMapper } from './mappers/reward-to-persistence.mappe
     VirtualItemResolver,
     UnlockResolver,
   ],
-  exports: [RewardToDtoMapper, RewardToPersistenceMapper, RewardRepository, RewardService],
+  exports: [RewardToDtoMapper, RewardRepository, RewardService],
 })
 export class RewardModule {}

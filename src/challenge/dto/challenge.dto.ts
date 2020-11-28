@@ -38,4 +38,10 @@ export class ChallengeDto {
 
   @Field()
   hidden?: boolean;
+
+  @Field(() => Date)
+  createdAt?: Date;
+
+  @Field(() => Date, { nullable: true })
+  updatedAt?: Date;
 }

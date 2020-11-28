@@ -1,16 +1,16 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, Model, Types } from 'mongoose';
+import { FilterQuery, Model } from 'mongoose';
 
 import { BaseRepository } from '../../common/repositories/base.repository';
 import { GroupRepository } from '../../group/repositories/group.repository';
 import { UserRepository } from '../../users/repositories/user.repository';
-import { Player } from '../models/player.model';
+import { Player, PlayerDocument } from '../models/player.model';
 
 @Injectable()
-export class PlayerRepository extends BaseRepository<Player> {
+export class PlayerRepository extends BaseRepository<Player, PlayerDocument> {
   constructor(
-    @InjectModel(Player.name) protected readonly model: Model<Player>,
+    @InjectModel('Player') protected readonly model: Model<PlayerDocument>,
     protected readonly userRepository: UserRepository,
     protected readonly groupRepository: GroupRepository,
   ) {
@@ -18,17 +18,17 @@ export class PlayerRepository extends BaseRepository<Player> {
   }
 
   async save(doc: Partial<Player>, overwrite = true): Promise<any> {
-    if (doc._id) {
-      const old = await this.getById(doc._id);
+    if (doc.id) {
+      const old = await this.getById(doc.id);
 
       // if user changed, remove from previous user's collection
       if (doc.user && old.user) {
-        await this.userRepository.removePlayer(old.user, { _id: doc._id });
+        await this.userRepository.removePlayer(old.user, { id: doc.id });
       }
 
       // if group changed, remove from previous group's collection
       if (doc.group && old.group) {
-        await this.groupRepository.removePlayer(old.group, { _id: doc._id });
+        await this.groupRepository.removePlayer(old.group, { id: doc.id });
       }
     }
 
@@ -37,12 +37,12 @@ export class PlayerRepository extends BaseRepository<Player> {
 
     // add to user's collection
     if (doc.user) {
-      await this.userRepository.upsertPlayer(doc.user, result);
+      await this.userRepository.upsertPlayer(doc.user, { id: result.id });
     }
 
     // add to group's collection
     if (doc.group) {
-      await this.groupRepository.upsertPlayer(doc.group, result);
+      await this.groupRepository.upsertPlayer(doc.group, { id: result.id });
     }
 
     return result;
@@ -66,38 +66,38 @@ export class PlayerRepository extends BaseRepository<Player> {
     return player;
   }
 
-  async upsertSubmission(id: string, submission: { _id: Types.ObjectId }): Promise<Player> {
-    return await this.findOneAndUpdate({ _id: id }, { $addToSet: { submissions: submission._id } });
+  async upsertSubmission(id: string, submission: { id: string }): Promise<Player> {
+    return await this.findOneAndUpdate({ _id: id }, { $addToSet: { submissions: submission.id } });
   }
 
-  async removeSubmission(id: string, submission: { _id: Types.ObjectId }): Promise<Player> {
-    return await this.findOneAndUpdate({ _id: id }, { $pull: { submissions: submission._id } });
+  async removeSubmission(id: string, submission: { id: string }): Promise<Player> {
+    return await this.findOneAndUpdate({ _id: id }, { $pull: { submissions: { _id: submission.id } } });
   }
 
-  async upsertChallengeStatus(id: string, challengeStatus: { _id: Types.ObjectId }): Promise<Player> {
-    return await this.findOneAndUpdate({ _id: id }, { $addToSet: { learningPath: challengeStatus._id } });
+  async upsertChallengeStatus(id: string, challengeStatus: { id: string }): Promise<Player> {
+    return await this.findOneAndUpdate({ _id: id }, { $addToSet: { learningPath: challengeStatus.id } });
   }
 
-  async removeChallengeStatus(id: string, challengeStatus: { _id: Types.ObjectId }): Promise<Player> {
-    return await this.findOneAndUpdate({ _id: id }, { $pull: { learningPath: challengeStatus._id } });
+  async removeChallengeStatus(id: string, challengeStatus: { id: string }): Promise<Player> {
+    return await this.findOneAndUpdate({ _id: id }, { $pull: { learningPath: { _id: challengeStatus.id } } });
   }
 
-  async upsertPlayerReward(id: string, playerReward: { _id: Types.ObjectId }): Promise<Player> {
-    return await this.findOneAndUpdate({ _id: id }, { $addToSet: { rewards: playerReward._id } });
+  async upsertPlayerReward(id: string, playerReward: { id: string }): Promise<Player> {
+    return await this.findOneAndUpdate({ _id: id }, { $addToSet: { rewards: playerReward.id } });
   }
 
-  async removePlayerReward(id: string, playerReward: { _id: Types.ObjectId }): Promise<Player> {
-    return await this.findOneAndUpdate({ _id: id }, { $pull: { rewards: playerReward._id } });
+  async removePlayerReward(id: string, playerReward: { id: string }): Promise<Player> {
+    return await this.findOneAndUpdate({ _id: id }, { $pull: { rewards: { _id: playerReward.id } } });
   }
 
   private async removeRelationsOnDelete(player: Player): Promise<void> {
     // remove from user's collection
     if (player.user) {
-      await this.userRepository.removePlayer(player.user, { _id: player._id });
+      await this.userRepository.removePlayer(player.user, { id: player.id });
     }
     // remove from group's collection
     if (player.group) {
-      await this.groupRepository.removePlayer(player.group, { _id: player._id });
+      await this.groupRepository.removePlayer(player.group, { id: player.id });
     }
   }
 }

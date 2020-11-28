@@ -10,12 +10,12 @@ import { UsersModule } from '../users/users.module';
 import { ChallengeService } from './challenge.service';
 import { ChallengeResolver } from './challenge.resolver';
 import { ChallengeToDtoMapper } from './mappers/challenge-to-dto.mapper';
-import { Challenge, ChallengeSchema } from './models/challenge.model';
+import { ChallengeSchema } from './models/challenge.model';
 import { ChallengeRepository } from './repositories/challenge.repository';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Challenge.name, schema: ChallengeSchema }]),
+    MongooseModule.forFeature([{ name: 'Challenge', schema: ChallengeSchema }]),
     forwardRef(() => UsersModule),
     forwardRef(() => GameModule),
     forwardRef(() => HookModule),

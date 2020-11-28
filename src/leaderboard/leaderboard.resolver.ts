@@ -1,4 +1,4 @@
-import { Resolver, Query, ResolveField, Parent } from '@nestjs/graphql';
+import { Resolver, Query, ResolveField, Parent, Args } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 
 import { GqlJwtAuthGuard } from '../common/guards/gql-jwt-auth.guard';
@@ -26,8 +26,8 @@ export class LeaderboardResolver {
 
   @Query(() => [LeaderboardDto])
   @UseGuards(GqlJwtAuthGuard)
-  async leaderboards(): Promise<LeaderboardDto[]> {
-    const leaderboards: Leaderboard[] = await this.leaderboardService.findAll();
+  async leaderboards(@Args('gameId') gameId: string): Promise<LeaderboardDto[]> {
+    const leaderboards: Leaderboard[] = await this.leaderboardService.findByGameId(gameId);
     return Promise.all(leaderboards.map(async leaderboard => this.leaderboardToDtoMapper.transform(leaderboard)));
   }
 

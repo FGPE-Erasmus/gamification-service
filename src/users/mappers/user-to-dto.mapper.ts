@@ -11,7 +11,7 @@ export class UserToDtoMapper implements IMapper<User, UserDto> {
       return undefined;
     }
     return {
-      id: obj._id,
+      id: obj.id,
       username: obj.username,
       email: obj.email,
       password: obj.password,

@@ -12,8 +12,7 @@ import { UsersModule } from '../users/users.module';
 import { GameResolver } from './game.resolver';
 import { GameService } from './game.service';
 import { GameToDtoMapper } from './mappers/game-to-dto.mapper';
-import { GameToPersistenceMapper } from './mappers/game-to-persistence.mapper';
-import { Game, GameSchema } from './models/game.model';
+import { GameSchema } from './models/game.model';
 import { GameRepository } from './repositories/game.repository';
 import { GameUploadController } from './upload.controller';
 
@@ -21,7 +20,7 @@ import { GameUploadController } from './upload.controller';
   imports: [
     MongooseModule.forFeature([
       {
-        name: Game.name,
+        name: 'Game',
         schema: GameSchema,
       },
     ]),
@@ -35,7 +34,7 @@ import { GameUploadController } from './upload.controller';
     forwardRef(() => SubmissionModule),
   ],
   controllers: [GameUploadController],
-  providers: [GameToDtoMapper, GameToPersistenceMapper, GameRepository, GameService, GameResolver],
-  exports: [GameToDtoMapper, GameToPersistenceMapper, GameRepository, GameService],
+  providers: [GameToDtoMapper, GameRepository, GameService, GameResolver],
+  exports: [GameToDtoMapper, GameRepository, GameService],
 })
 export class GameModule {}

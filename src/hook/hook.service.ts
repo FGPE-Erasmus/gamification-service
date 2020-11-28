@@ -47,6 +47,7 @@ export class HookService {
 
     for (const path of Object.keys(entries)) {
       const encodedContent = extractToJson(entries[path]);
+      delete encodedContent.id;
 
       const triggers = encodedContent.triggers;
       for (const trigger of triggers) {
@@ -60,18 +61,17 @@ export class HookService {
           trigger.parameters = sourceIds;
         }
         if (encodedContent.actions[0].parameters && encodedContent.actions[0].parameters !== null) {
-          const mappedParameters = encodedContent.actions[0].parameters.map(gedilId =>
+          encodedContent.actions[0].parameters = encodedContent.actions[0].parameters.map(gedilId =>
             imported.rewards[gedilId]['_id'].toString(),
           );
-          encodedContent.actions[0].parameters = mappedParameters;
         }
 
         const data: { [key: string]: any } = {
           game: game.id?.toString(),
           parentChallenge: parentChallenge?.id?.toString(),
           criteria: {
-            ...encodedContent.criteria,
             conditions: HookService.transformConditions(encodedContent.criteria.conditions),
+            junctors: encodedContent.criteria.junctors || [],
           },
           actions: encodedContent.actions,
           recurrent: trigger.recurrent,
@@ -101,12 +101,16 @@ export class HookService {
   }
 
   /**
-   * Find all hooks.
+   * Find all hooks within a specific game.
    *
-   * @returns {Promise<(ActionHook | ScheduledHook)[]>} the hooks.
+   * @param gameId the ID of the game
+   * @returns {Promise<Challenge[]>} the challenges.
    */
-  async findAll(): Promise<(ActionHook | ScheduledHook)[]> {
-    return [...(await this.actionHookService.findAll()), ...(await this.scheduledHookService.findAll())];
+  async findByGameId(gameId: string): Promise<(ActionHook | ScheduledHook)[]> {
+    return [
+      ...(await this.actionHookService.findByGameId(gameId)),
+      ...(await this.scheduledHookService.findByGameId(gameId)),
+    ];
   }
 
   /**
@@ -191,7 +195,7 @@ export class HookService {
       const reward: Reward = await this.rewardService.findById(parameters[0]);
       const playerReward: PlayerReward = await this.playerRewardService.findOne({
         player: playerId,
-        reward: reward._id,
+        reward: reward.id,
       });
 
       if (playerReward && !reward.recurrent) {
@@ -200,12 +204,12 @@ export class HookService {
       } else if (playerReward) {
         // player already has the reward and it is accumulative
         const quantity: number = playerReward.count + (parameters[1] ? +parameters[1] : 1);
-        await this.playerRewardService.patch(playerReward._id, { count: quantity });
+        await this.playerRewardService.patch(playerReward.id, { count: quantity });
       } else {
         // player does not have the reward
         await this.playerRewardService.create({
           player: playerId,
-          reward: reward._id,
+          reward: reward.id,
           count: reward.recurrent && parameters[1] ? +parameters[1] : 1,
         });
       }
@@ -214,7 +218,7 @@ export class HookService {
       await this.eventService.fireEvent(TriggerEvent.REWARD_GRANTED, {
         gameId,
         playerId,
-        rewardId: reward._id,
+        rewardId: reward.id,
       });
     } else {
       const quantity: number = parameters[1] ? +parameters[1] : 1;

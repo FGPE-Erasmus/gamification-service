@@ -12,8 +12,8 @@ import { SubmissionModule } from '../submission/submission.module';
 import { ActionHookResolver } from './action-hook.resolver';
 import { ActionHookService } from './action-hook.service';
 import { HookService } from './hook.service';
-import { ActionHook, ActionHookSchema } from './models/action-hook.model';
-import { ScheduledHook, ScheduledHookSchema } from './models/scheduled-hook.model';
+import { ActionHookSchema } from './models/action-hook.model';
+import { ScheduledHookSchema } from './models/scheduled-hook.model';
 import { ActionHookToDtoMapper } from './mappers/action-hook-to-dto.mapper';
 import { ScheduledHookToDtoMapper } from './mappers/scheduled-hook-to-dto.mapper';
 import { ActionHookRepository } from './repositories/action-hook.repository';
@@ -25,11 +25,11 @@ import { ScheduledHookResolver } from './scheduled-hook.resolver';
   imports: [
     MongooseModule.forFeature([
       {
-        name: ActionHook.name,
+        name: 'ActionHook',
         schema: ActionHookSchema,
       },
       {
-        name: ScheduledHook.name,
+        name: 'ScheduledHook',
         schema: ScheduledHookSchema,
       },
     ]),

@@ -8,7 +8,7 @@ import { PlayerModule } from '../player/player.module';
 import { RewardModule } from '../reward/reward.module';
 import { PlayerRewardService } from './player-reward.service';
 import { PlayerRewardRepository } from './repositories/player-reward.repository';
-import { PlayerReward, PlayerRewardSchema } from './models/player-reward.model';
+import { PlayerRewardSchema } from './models/player-reward.model';
 import { PlayerRewardToDtoMapper } from './mappers/player-reward-to-dto.mapper';
 import { PlayerRewardResolver } from './player-reward.resolver';
 
@@ -16,7 +16,7 @@ import { PlayerRewardResolver } from './player-reward.resolver';
   imports: [
     MongooseModule.forFeature([
       {
-        name: PlayerReward.name,
+        name: 'PlayerReward',
         schema: PlayerRewardSchema,
       },
     ]),

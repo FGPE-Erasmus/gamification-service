@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 
 import { BaseService } from '../common/services/base.service';
+import { flatten } from '../common/utils/array.utils';
 import { extractToJson } from '../common/utils/extraction.utils';
 import { collectFromTree, createTree, findSubtree } from '../common/utils/tree.utils';
 import { StateEnum as State } from '../challenge-status/models/state.enum';
@@ -16,13 +17,12 @@ import { LeaderboardService } from '../leaderboard/leaderboard.service';
 import { RewardService } from '../reward/reward.service';
 import { Result } from '../submission/models/result.enum';
 
-import { Challenge } from './models/challenge.model';
+import { Challenge, ChallengeDocument } from './models/challenge.model';
 import { Mode } from './models/mode.enum';
 import { ChallengeRepository } from './repositories/challenge.repository';
-import { flatten } from '../common/utils/array.utils';
 
 @Injectable()
-export class ChallengeService extends BaseService<Challenge> {
+export class ChallengeService extends BaseService<Challenge, ChallengeDocument> {
   constructor(
     protected readonly repository: ChallengeRepository,
     protected readonly leaderboardService: LeaderboardService,
@@ -46,6 +46,7 @@ export class ChallengeService extends BaseService<Challenge> {
     for (const path of Object.keys(entries)) {
       if (path === 'metadata.json') {
         const encodedContent = extractToJson(entries[path]);
+        delete encodedContent.id;
         challenge = await this.create({
           ...encodedContent,
           modeParameters: encodedContent.mode_parameters,
@@ -186,12 +187,7 @@ export class ChallengeService extends BaseService<Challenge> {
    */
   async challengeTree(gameId: string, challengeId?: string): Promise<(Challenge & { children: any })[]> {
     const challenges = await this.findByGameId(gameId);
-    const tree: (Challenge & { children: any })[] = createTree(
-      challenges.map(challenge => challenge.toObject({ virtuals: true })),
-      'id',
-      'parentChallenge',
-      'children',
-    );
+    const tree: (Challenge & { children: any })[] = createTree(challenges, 'id', 'parentChallenge', 'children');
     if (challengeId) {
       return findSubtree(tree, challengeId, 'id', 'children');
     }

@@ -3,9 +3,25 @@ import { Document, Types } from 'mongoose';
 
 import { Result } from './result.enum';
 import { EvaluationEngine } from './evaluation-engine.enum';
+import { IBaseEntity } from '../../common/interfaces/base-entity.interface';
 
-@Schema()
-export class Submission extends Document {
+export interface Submission extends IBaseEntity {
+  game: any;
+  player: any;
+  exerciseId: string;
+  evaluationEngine?: EvaluationEngine;
+  evaluationEngineId?: string;
+  language?: string;
+  metrics?: Map<string, number>;
+  result?: Result;
+  grade?: number;
+  feedback?: string;
+  submittedAt?: Date;
+  evaluatedAt?: Date;
+}
+
+@Schema({ collection: 'Submission' })
+export class SubmissionDocument extends Document implements Submission {
   @Prop({ type: Types.ObjectId, ref: 'Game' })
   game: any;
 
@@ -43,4 +59,4 @@ export class Submission extends Document {
   evaluatedAt?: Date;
 }
 
-export const SubmissionSchema = SchemaFactory.createForClass(Submission);
+export const SubmissionSchema = SchemaFactory.createForClass(SubmissionDocument);

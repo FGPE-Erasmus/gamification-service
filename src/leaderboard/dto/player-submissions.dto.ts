@@ -1,13 +1,13 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { Submission } from 'src/submission/models/submission.model';
 
 import { PlayerDto } from '../../player/dto/player.dto';
+import { SubmissionDto } from '../../submission/dto/submission.dto';
 
 @ObjectType('PlayerSubmissions')
 export class PlayerSubmissionsDto {
   @Field(() => PlayerDto)
-  player?: PlayerDto;
+  player?: string;
 
-  @Field(() => [Submission], { defaultValue: () => ({}) })
-  submissions?: Submission[];
+  @Field(() => [SubmissionDto], { defaultValue: () => ({}) })
+  submissions?: string[];
 }

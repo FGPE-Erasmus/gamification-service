@@ -1,16 +1,24 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
-import { Challenge } from '../../challenge/models/challenge.model';
-import { Player } from '../../player/models/player.model';
 import { StateEnum as State } from './state.enum';
+import { IBaseEntity } from '../../common/interfaces/base-entity.interface';
 
-@Schema()
-export class ChallengeStatus extends Document {
-  @Prop({ type: Types.ObjectId, ref: Player.name, required: true })
+export interface ChallengeStatus extends IBaseEntity {
+  player: any;
+  challenge: any;
+  startedAt?: Date;
+  openedAt?: Date;
+  endedAt?: Date;
+  state: State;
+}
+
+@Schema({ collection: 'ChallengeStatus' })
+export class ChallengeStatusDocument extends Document implements ChallengeStatus {
+  @Prop({ type: Types.ObjectId, ref: 'Player', required: true })
   player: any;
 
-  @Prop({ type: Types.ObjectId, ref: Challenge.name, required: true })
+  @Prop({ type: Types.ObjectId, ref: 'Challenge', required: true })
   challenge: any;
 
   @Prop({ nullable: true })
@@ -26,4 +34,4 @@ export class ChallengeStatus extends Document {
   state: State;
 }
 
-export const ChallengeStatusSchema = SchemaFactory.createForClass(ChallengeStatus);
+export const ChallengeStatusSchema = SchemaFactory.createForClass(ChallengeStatusDocument);

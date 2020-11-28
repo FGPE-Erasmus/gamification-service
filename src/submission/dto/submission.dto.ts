@@ -46,4 +46,10 @@ export class SubmissionDto {
 
   @Field({ nullable: true })
   evaluatedAt?: Date;
+
+  @Field(() => Date)
+  createdAt?: Date;
+
+  @Field(() => Date, { nullable: true })
+  updatedAt?: Date;
 }

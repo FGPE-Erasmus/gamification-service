@@ -20,6 +20,7 @@ interface IAppConfig {
     loggerLevel: string;
     useNewUrlParser: boolean;
     useUnifiedTopology: boolean;
+    useCreateIndex: boolean;
   };
   messageBroker: {
     host: string;
@@ -74,6 +75,7 @@ export const appConfig: IAppConfig = {
     authSource: process.env.DB_AUTH,
     useUnifiedTopology: true,
     useNewUrlParser: true,
+    useCreateIndex: true,
     loggerLevel: process.env.DB_LOGGER_LEVEL,
   },
   messageBroker: {

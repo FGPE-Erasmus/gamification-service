@@ -24,6 +24,8 @@ export class ChallengeToDtoMapper implements IMapper<Challenge, ChallengeDto> {
         'refs',
         'locked',
         'hidden',
+        'createdAt',
+        'updatedAt',
       ],
       obj,
     ) as ChallengeDto;

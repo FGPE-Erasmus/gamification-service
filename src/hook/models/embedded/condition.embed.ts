@@ -3,7 +3,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ComparingFunctionEnum as ComparingFunction } from '../../enums/comparing-function.enum';
 import { EntityEnum as Entity } from '../../enums/entity.enum';
 
-@Schema()
+@Schema({ timestamps: true })
 export class ConditionEmbed {
   @Prop()
   order: number;

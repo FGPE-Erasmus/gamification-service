@@ -1,5 +1,5 @@
 import { UseGuards } from '@nestjs/common';
-import { Query, Resolver } from '@nestjs/graphql';
+import { Args, Query, Resolver } from '@nestjs/graphql';
 
 import { GqlJwtAuthGuard } from '../common/guards/gql-jwt-auth.guard';
 import { VirtualItemDto } from './dto/virtual-item.dto';
@@ -11,8 +11,8 @@ import { Reward } from './models/reward.model';
 export class VirtualItemResolver extends RewardResolver {
   @Query(() => [VirtualItemDto])
   @UseGuards(GqlJwtAuthGuard)
-  async virtualItems(): Promise<VirtualItemDto[]> {
-    const rewards: Reward[] = await this.rewardService.findByKind(RewardType.VIRTUAL_ITEM);
+  async virtualItems(@Args('gameId') gameId: string): Promise<VirtualItemDto[]> {
+    const rewards: Reward[] = await this.rewardService.findByGameId(gameId, RewardType.VIRTUAL_ITEM);
     return Promise.all(rewards.map(async reward => this.rewardToDtoMapper.transform(reward)));
   }
 }

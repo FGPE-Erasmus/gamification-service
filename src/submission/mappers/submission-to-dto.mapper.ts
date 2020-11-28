@@ -25,6 +25,8 @@ export class SubmissionToDtoMapper implements IMapper<Submission, SubmissionDto>
         'metrics',
         'submittedAt',
         'evaluatedAt',
+        'createdAt',
+        'updatedAt',
       ],
       obj,
     );

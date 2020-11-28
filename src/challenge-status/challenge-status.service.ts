@@ -3,12 +3,12 @@ import { Injectable, Logger } from '@nestjs/common';
 import { BaseService } from '../common/services/base.service';
 import { EventService } from '../event/event.service';
 import { TriggerEventEnum as TriggerEvent } from '../hook/enums/trigger-event.enum';
-import { ChallengeStatus } from './models/challenge-status.model';
+import { ChallengeStatus, ChallengeStatusDocument } from './models/challenge-status.model';
 import { StateEnum } from './models/state.enum';
 import { ChallengeStatusRepository } from './repositories/challenge-status.repository';
 
 @Injectable()
-export class ChallengeStatusService extends BaseService<ChallengeStatus> {
+export class ChallengeStatusService extends BaseService<ChallengeStatus, ChallengeStatusDocument> {
   constructor(protected readonly repository: ChallengeStatusRepository, protected readonly eventService: EventService) {
     super(new Logger(ChallengeStatusService.name), repository);
   }
@@ -85,7 +85,6 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus> {
   async markAsCompleted(gameId: string, challengeId: string, playerId: string, date: Date): Promise<ChallengeStatus> {
     const temp: ChallengeStatus = await this.findByChallengeIdAndPlayerId(challengeId, playerId);
     if (temp.state === StateEnum.COMPLETED || temp.state === StateEnum.HIDDEN || temp.state === StateEnum.LOCKED) {
-      console.log('challenge already completed or locked');
       return;
     }
     const result: ChallengeStatus = await this.patch(temp.id, { state: StateEnum.COMPLETED, endedAt: date });

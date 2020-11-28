@@ -6,8 +6,6 @@ import { ReportInput } from '../inputs/report.input';
 export class SubmissionReportArgs {
   @Field(() => ID)
   @IsMongoId()
-  id: string;
-
   @Field()
   @ValidateNested()
   reportInput: ReportInput;

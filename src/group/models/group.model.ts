@@ -1,8 +1,18 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
-@Schema()
-export class Group extends Document {
+import { IBaseEntity } from '../../common/interfaces/base-entity.interface';
+
+export interface Group extends IBaseEntity {
+  game: any;
+  name: string;
+  displayName?: string;
+  imageUrl?: string;
+  players?: any[];
+}
+
+@Schema({ collection: 'Group' })
+export class GroupDocument extends Document {
   @Prop({ type: Types.ObjectId, ref: 'Game' })
   game: any;
 
@@ -17,11 +27,6 @@ export class Group extends Document {
 
   @Prop({ type: [{ type: Types.ObjectId, ref: 'Player' }] })
   players?: any[];
-
-  /* Timestamps */
-
-  createdAt?: Date;
-  updatedAt?: Date;
 }
 
-export const GroupSchema = SchemaFactory.createForClass(Group);
+export const GroupSchema = SchemaFactory.createForClass(GroupDocument);

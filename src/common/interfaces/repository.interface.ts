@@ -1,12 +1,13 @@
 import { Document, FilterQuery, UpdateQuery } from 'mongoose';
+import { IBaseEntity } from './base-entity.interface';
 
-export interface IRepository<E extends Document> {
+export interface IRepository<I extends IBaseEntity, E extends I & Document> {
   /**
    * Check if the document is already saved in the database.
    *
    * @param {E} doc the document to check for existence.
    */
-  exists(doc: Partial<E>): Promise<boolean>;
+  exists(doc: Partial<I>): Promise<boolean>;
 
   /**
    * Check if the document with given ID is already saved in the database.
@@ -22,7 +23,7 @@ export interface IRepository<E extends Document> {
    * @param projection the projections to apply in the query.
    * @param options the query options.
    */
-  getById(id: string, projection?: string | Record<string, unknown>, options?: Record<string, unknown>): Promise<E>;
+  getById(id: string, projection?: string | Record<string, unknown>, options?: Record<string, unknown>): Promise<I>;
 
   /**
    * Get all documents in collection.
@@ -30,7 +31,7 @@ export interface IRepository<E extends Document> {
    * @param projection the projections to apply in the query.
    * @param options the query options.
    */
-  getAll(projection?: string | Record<string, unknown>, options?: Record<string, unknown>): Promise<E[]>;
+  getAll(projection?: string | Record<string, unknown>, options?: Record<string, unknown>): Promise<I[]>;
 
   /**
    * Find a document matching the given criteria.
@@ -43,7 +44,7 @@ export interface IRepository<E extends Document> {
     conditions: FilterQuery<E>,
     projection?: string | Record<string, unknown>,
     options?: Record<string, unknown>,
-  ): Promise<E>;
+  ): Promise<I>;
 
   /**
    * Find a document in the database and update.
@@ -56,7 +57,7 @@ export interface IRepository<E extends Document> {
     conditions: FilterQuery<E>,
     updates?: UpdateQuery<any>,
     options?: Record<string, unknown>,
-  ): Promise<E>;
+  ): Promise<I>;
 
   /**
    * Find all documents matching the given criteria.
@@ -69,7 +70,7 @@ export interface IRepository<E extends Document> {
     conditions?: FilterQuery<E>,
     projection?: string | Record<string, unknown>,
     options?: Record<string, unknown>,
-  ): Promise<E[]>;
+  ): Promise<I[]>;
 
   /**
    * Save a document into the database.
@@ -77,14 +78,14 @@ export interface IRepository<E extends Document> {
    * @param {Partial<E>} doc the document to save.
    * @param {boolean} overwrite replace the current?
    */
-  save(doc: Partial<E>, overwrite?: boolean): Promise<E>;
+  save(doc: Partial<I>, overwrite?: boolean): Promise<I>;
 
   /**
    * Delete a document from the database.
    *
    * @param {Partial<E>} doc the document to delete.
    */
-  delete(doc: Partial<E>): Promise<E>;
+  delete(doc: Partial<I>): Promise<I>;
 
   /**
    * Delete a document with particular field's values from the database.
@@ -92,12 +93,12 @@ export interface IRepository<E extends Document> {
    * @param conditions the conditions to test.
    * @param options the query options.
    */
-  deleteOne(conditions: FilterQuery<E>, options?: Record<string, unknown>): Promise<E>;
+  deleteOne(conditions: FilterQuery<E>, options?: Record<string, unknown>): Promise<I>;
 
   /**
    * Delete a document by ID from the database.
    *
    * @param {string} id ID of the document to delete.
    */
-  deleteById(id: string): Promise<E>;
+  deleteById(id: string): Promise<I>;
 }
