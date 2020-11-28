@@ -20,6 +20,7 @@ import { HookModule } from './hook/hook.module';
 import { RewardModule } from './reward/reward.module';
 import { EventModule } from './event/event.module';
 import { EvaluationEngineModule } from './evaluation-engine/evaluation-engine.module';
+import { SubscriptionsModule } from './common/subscriptions/subscriptions.module';
 
 @Module({
   imports: [
@@ -67,6 +68,7 @@ import { EvaluationEngineModule } from './evaluation-engine/evaluation-engine.mo
     ChallengeStatusModule,
     LeaderboardModule,
     RewardModule,
+    SubscriptionsModule,
   ],
   providers: [DateScalar, EmailScalar],
 })

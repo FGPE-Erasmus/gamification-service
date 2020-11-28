@@ -1,15 +1,23 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Inject } from '@nestjs/common';
+import { PubSub } from 'graphql-subscriptions';
 
+import { NotificationEnum } from 'src/common/enums/notifications.enum';
 import { BaseService } from '../common/services/base.service';
 import { EventService } from '../event/event.service';
 import { TriggerEventEnum as TriggerEvent } from '../hook/enums/trigger-event.enum';
+import { ChallengeStatusToDtoMapper } from './mappers/challenge-status-to-dto.mapper';
 import { ChallengeStatus, ChallengeStatusDocument } from './models/challenge-status.model';
 import { StateEnum } from './models/state.enum';
 import { ChallengeStatusRepository } from './repositories/challenge-status.repository';
 
 @Injectable()
 export class ChallengeStatusService extends BaseService<ChallengeStatus, ChallengeStatusDocument> {
-  constructor(protected readonly repository: ChallengeStatusRepository, protected readonly eventService: EventService) {
+  constructor(
+    @Inject('PUB_SUB') protected readonly pubSub: PubSub,
+    protected readonly challengeStatustoDtoMapper: ChallengeStatusToDtoMapper,
+    protected readonly repository: ChallengeStatusRepository,
+    protected readonly eventService: EventService,
+  ) {
     super(new Logger(ChallengeStatusService.name), repository);
   }
 
@@ -46,7 +54,9 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
       playerId,
       challengeId,
     });
-
+    this.pubSub.publish(NotificationEnum.CHALLENGE_STATUS_UPDATED, {
+      challengeStatusUpdated: this.challengeStatustoDtoMapper.transform(result),
+    });
     return result;
   }
 
@@ -70,6 +80,9 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
       challengeId,
     });
 
+    this.pubSub.publish(NotificationEnum.CHALLENGE_STATUS_UPDATED, {
+      challengeStatusUpdated: this.challengeStatustoDtoMapper.transform(result),
+    });
     return result;
   }
 
@@ -96,6 +109,9 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
       challengeId,
     });
 
+    this.pubSub.publish(NotificationEnum.CHALLENGE_STATUS_UPDATED, {
+      challengeStatusUpdated: this.challengeStatustoDtoMapper.transform(result),
+    });
     return result;
   }
 
@@ -119,6 +135,9 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
       challengeId,
     });
 
+    this.pubSub.publish(NotificationEnum.CHALLENGE_STATUS_UPDATED, {
+      challengeStatusUpdated: this.challengeStatustoDtoMapper.transform(result),
+    });
     return result;
   }
 
@@ -141,6 +160,9 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
       challengeId,
     });
 
+    this.pubSub.publish(NotificationEnum.CHALLENGE_STATUS_UPDATED, {
+      challengeStatusUpdated: this.challengeStatustoDtoMapper.transform(result),
+    });
     return result;
   }
 
@@ -163,6 +185,9 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
       challengeId,
     });
 
+    this.pubSub.publish(NotificationEnum.CHALLENGE_STATUS_UPDATED, {
+      challengeStatusUpdated: this.challengeStatustoDtoMapper.transform(result),
+    });
     return result;
   }
 
@@ -185,6 +210,9 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
       challengeId,
     });
 
+    this.pubSub.publish(NotificationEnum.CHALLENGE_STATUS_UPDATED, {
+      challengeStatusUpdated: this.challengeStatustoDtoMapper.transform(result),
+    });
     return result;
   }
 }

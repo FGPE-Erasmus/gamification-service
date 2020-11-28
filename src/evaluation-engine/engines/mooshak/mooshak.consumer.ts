@@ -1,4 +1,4 @@
-import { Logger } from '@nestjs/common';
+import { Logger, Inject } from '@nestjs/common';
 import { InjectQueue, Process, Processor } from '@nestjs/bull';
 import { Job, Queue } from 'bull';
 
@@ -19,6 +19,9 @@ import {
 } from '../../evaluation-engine.constants';
 import { IRequestEvaluationJobData } from '../../interfaces/request-evaluation-job-data.interface';
 import { MooshakService } from './mooshak.service';
+import { PubSub } from 'graphql-subscriptions';
+import { NotificationEnum } from 'src/common/enums/notifications.enum';
+import { SubmissionToDtoMapper } from 'src/submission/mappers/submission-to-dto.mapper';
 
 @Processor(appConfig.queue.evaluation.name)
 export class MooshakConsumer {
@@ -26,9 +29,11 @@ export class MooshakConsumer {
 
   constructor(
     @InjectQueue(appConfig.queue.evaluation.name) protected readonly evaluationQueue: Queue,
+    @Inject('PUB_SUB') protected readonly pubSub: PubSub,
     protected readonly mooshakService: MooshakService,
     protected readonly eventService: EventService,
     protected readonly submissionService: SubmissionService,
+    protected readonly submissionToDtoMapper: SubmissionToDtoMapper,
   ) {}
 
   @Process(REQUEST_EVALUATION_JOB)
@@ -110,6 +115,10 @@ export class MooshakConsumer {
     });
 
     this.logger.error(submission);
+
+    this.pubSub.publish(NotificationEnum.SUBMISSION_EVALUATED, {
+      submissionEvaluated: this.submissionToDtoMapper.transform(submission),
+    });
 
     await this.eventService.fireEvent(TriggerEvent.SUBMISSION_EVALUATED, {
       gameId: submission.game,

@@ -1,6 +1,7 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
+import { SubscriptionsModule } from '../common/subscriptions/subscriptions.module';
 import { ChallengeModule } from '../challenge/challenge.module';
 import { EventModule } from '../event/event.module';
 import { GameModule } from '../game/game.module';
@@ -33,6 +34,7 @@ import { RewardToDtoMapper } from './mappers/reward-to-dto.mapper';
     forwardRef(() => ChallengeModule),
     forwardRef(() => PlayerModule),
     forwardRef(() => HookModule),
+    forwardRef(() => SubscriptionsModule),
   ],
   providers: [
     RewardToDtoMapper,
