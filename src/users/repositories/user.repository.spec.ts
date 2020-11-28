@@ -1,30 +1,32 @@
+import { getConnectionToken, MongooseModule } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 
+import DbTestModule, { cleanupMongo, closeMongoConnection } from '../../../test/utils/db-test.module';
 import { UserRepository } from './user.repository';
-import { getModelToken } from '@nestjs/mongoose';
+import { UserSchema } from '../models/user.model';
+import { Connection } from 'mongoose';
 
 describe('UserRepository', () => {
+  let connection: Connection;
   let repo: UserRepository;
 
-  function mockUserModel(dto: any) {
-    this.data = dto;
-    this.save = () => {
-      return this.data;
-    };
-  }
-
-  beforeEach(async () => {
+  beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        {
-          provide: getModelToken('User'),
-          useValue: mockUserModel,
-        },
-        UserRepository,
-      ],
+      imports: [DbTestModule({}), MongooseModule.forFeature([{ name: 'User', schema: UserSchema }])],
+      providers: [UserRepository],
     }).compile();
 
+    connection = module.get<Connection>(await getConnectionToken());
     repo = module.get<UserRepository>(UserRepository);
+  });
+
+  beforeEach(async () => {
+    await cleanupMongo('User');
+  });
+
+  afterAll(async () => {
+    // await closeMongoConnection();
+    await connection.close();
   });
 
   it('should be defined', () => {

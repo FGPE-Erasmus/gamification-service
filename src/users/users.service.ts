@@ -3,14 +3,14 @@ import * as bcrypt from 'bcryptjs';
 
 import { BaseService } from '../common/services/base.service';
 import { generatePassword } from '../common/utils/password-generator.util';
-import { User } from './models/user.model';
+import { User, UserDocument } from './models/user.model';
 import { UserInput } from './inputs/user.input';
 import { Role } from './models/role.enum';
 import { UserDto } from './dto/user.dto';
 import { UserRepository } from './repositories/user.repository';
 
 @Injectable()
-export class UsersService extends BaseService<User> implements OnModuleInit {
+export class UsersService extends BaseService<User, UserDocument> implements OnModuleInit {
   constructor(protected readonly repository: UserRepository) {
     super(new Logger(UsersService.name), repository);
   }
@@ -88,13 +88,13 @@ export class UsersService extends BaseService<User> implements OnModuleInit {
   async upsert(id: string | undefined, data: UserInput): Promise<User> {
     const { email, username } = data;
 
-    let userExists: User;
+    let userExists;
     if (email) {
       // check if there are other users with this email
       userExists = await this.repository.findOne({
         email,
       });
-      if (userExists && id !== userExists._id.toHexString()) {
+      if (userExists && id !== userExists.id) {
         throw new Error(`E-mail ${email} is already in use.`);
       }
     } else if (!id) {
@@ -106,7 +106,7 @@ export class UsersService extends BaseService<User> implements OnModuleInit {
       userExists = await this.repository.findOne({
         username,
       });
-      if (userExists && id !== userExists._id.toHexString()) {
+      if (userExists && id !== userExists.id) {
         throw new Error(`Username ${username} is already in use.`);
       }
     } else if (!id) {

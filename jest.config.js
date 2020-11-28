@@ -11,5 +11,7 @@ module.exports = {
   testRegex: '.spec.ts$',
   coverageDirectory: '../coverage',
   testEnvironment: 'node',
+  setupFiles: ['dotenv/config'],
   setupFilesAfterEnv: ['../jest.setup.js'],
+  preset: '@shelf/jest-mongodb'
 };

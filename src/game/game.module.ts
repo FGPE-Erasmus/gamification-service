@@ -12,8 +12,7 @@ import { UsersModule } from '../users/users.module';
 import { GameResolver } from './game.resolver';
 import { GameService } from './game.service';
 import { GameToDtoMapper } from './mappers/game-to-dto.mapper';
-import { GameToPersistenceMapper } from './mappers/game-to-persistence.mapper';
-import { Game, GameSchema } from './models/game.model';
+import { GameSchema } from './models/game.model';
 import { GameRepository } from './repositories/game.repository';
 import { GameUploadController } from './upload.controller';
 import { SubscriptionsModule } from 'src/common/subscriptions/subscriptions.module';
@@ -22,7 +21,7 @@ import { SubscriptionsModule } from 'src/common/subscriptions/subscriptions.modu
   imports: [
     MongooseModule.forFeature([
       {
-        name: Game.name,
+        name: 'Game',
         schema: GameSchema,
       },
     ]),
@@ -36,7 +35,7 @@ import { SubscriptionsModule } from 'src/common/subscriptions/subscriptions.modu
     forwardRef(() => SubmissionModule),
   ],
   controllers: [GameUploadController],
-  providers: [GameToDtoMapper, GameToPersistenceMapper, GameRepository, GameService, GameResolver],
-  exports: [GameToDtoMapper, GameToPersistenceMapper, GameRepository, GameService],
+  providers: [GameToDtoMapper, GameRepository, GameService, GameResolver],
+  exports: [GameToDtoMapper, GameRepository, GameService],
 })
 export class GameModule {}

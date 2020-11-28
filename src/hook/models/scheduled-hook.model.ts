@@ -1,11 +1,24 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
+import { IBaseEntity } from '../../common/interfaces/base-entity.interface';
 import { ActionEmbed as Action } from './embedded/action.embed';
 import { CriteriaEmbed as Criteria } from './embedded/criteria.embed';
 
-@Schema()
-export class ScheduledHook extends Document {
+export interface ScheduledHook extends IBaseEntity {
+  game: any;
+  parentChallenge?: any;
+  criteria?: Criteria;
+  actions: Action[];
+  recurrent: boolean;
+  cron?: string;
+  interval?: number;
+  active: boolean;
+  lastRun?: Date;
+}
+
+@Schema({ collection: 'ScheduledHook' })
+export class ScheduledHookDocument extends Document implements ScheduledHook {
   @Prop({ type: Types.ObjectId, ref: 'Game', required: true })
   game: any;
 
@@ -32,11 +45,6 @@ export class ScheduledHook extends Document {
 
   @Prop({ nullable: true })
   lastRun?: Date;
-
-  /* Timestamps */
-
-  createdAt?: Date;
-  updatedAt?: Date;
 }
 
-export const ScheduledHookSchema = SchemaFactory.createForClass(ScheduledHook);
+export const ScheduledHookSchema = SchemaFactory.createForClass(ScheduledHookDocument);

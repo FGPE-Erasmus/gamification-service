@@ -1,6 +1,7 @@
 import { Controller, Get, Res } from '@nestjs/common';
 import { Response } from 'express';
-import { appConfig } from 'src/app.config';
+
+import { appConfig } from '../app.config';
 
 @Controller('healthcheck')
 export class HealthcheckController {

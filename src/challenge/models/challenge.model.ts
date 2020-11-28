@@ -3,9 +3,23 @@ import { Document, Types } from 'mongoose';
 
 import { Difficulty } from './difficulty.enum';
 import { Mode } from './mode.enum';
+import { IBaseEntity } from '../../common/interfaces/base-entity.interface';
 
-@Schema()
-export class Challenge extends Document {
+export interface Challenge extends IBaseEntity {
+  game: any;
+  parentChallenge?: any;
+  name: string;
+  description: string;
+  difficulty: Difficulty;
+  mode: Mode;
+  modeParameters: string[];
+  refs: string[];
+  locked: boolean;
+  hidden: boolean;
+}
+
+@Schema({ collection: 'Challenge' })
+export class ChallengeDocument extends Document implements Challenge {
   @Prop({ type: Types.ObjectId, ref: 'Game', required: true })
   game: any;
 
@@ -37,4 +51,4 @@ export class Challenge extends Document {
   hidden: boolean;
 }
 
-export const ChallengeSchema = SchemaFactory.createForClass(Challenge);
+export const ChallengeSchema = SchemaFactory.createForClass(ChallengeDocument);

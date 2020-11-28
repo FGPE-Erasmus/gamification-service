@@ -9,10 +9,9 @@ import { PlayerRewardModule } from '../player-reward/player-reward.module';
 import { SubmissionModule } from '../submission/submission.module';
 import { UsersModule } from '../users/users.module';
 import { PlayerService } from './player.service';
-import { Player, PlayerSchema } from './models/player.model';
+import { PlayerSchema } from './models/player.model';
 import { PlayerRepository } from './repositories/player.repository';
 import { PlayerToDtoMapper } from './mappers/player-to-dto.mapper';
-import { PlayerToPersistenceMapper } from './mappers/player-to-persistence.mapper';
 import { PlayerResolver } from './player.resolver';
 import { SubscriptionsModule } from 'src/common/subscriptions/subscriptions.module';
 
@@ -20,7 +19,7 @@ import { SubscriptionsModule } from 'src/common/subscriptions/subscriptions.modu
   imports: [
     MongooseModule.forFeature([
       {
-        name: Player.name,
+        name: 'Player',
         schema: PlayerSchema,
       },
     ]),
@@ -33,7 +32,7 @@ import { SubscriptionsModule } from 'src/common/subscriptions/subscriptions.modu
     forwardRef(() => SubmissionModule),
     forwardRef(() => SubscriptionsModule),
   ],
-  providers: [PlayerToDtoMapper, PlayerToPersistenceMapper, PlayerRepository, PlayerService, PlayerResolver],
-  exports: [PlayerToDtoMapper, PlayerToPersistenceMapper, PlayerRepository, PlayerService],
+  providers: [PlayerToDtoMapper, PlayerRepository, PlayerService, PlayerResolver],
+  exports: [PlayerToDtoMapper, PlayerRepository, PlayerService],
 })
 export class PlayerModule {}

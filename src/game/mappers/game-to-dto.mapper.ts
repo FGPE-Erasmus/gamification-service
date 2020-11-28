@@ -7,24 +7,7 @@ import { pick } from '../../common/utils/object.utils';
 
 @Injectable()
 export class GameToDtoMapper implements IMapper<Game, GameDto> {
-  /*constructor(
-    protected readonly playerToDtoMapper: PlayerToDtoMapper,
-    protected readonly playerService: PlayerService,
-    protected readonly submissionToDtoMapper: Submi,
-    protected readonly submissionService: PlayerService,
-  ) {
-  }*/
-
   async transform(obj: Game): Promise<GameDto> {
-    /*return {
-      ...obj,
-      players: resolve.includes('players')
-        ? await this.resolvePlayers(obj.players)
-        : obj.players,
-      submissions: resolve.includes('submissions')
-        ? await this.resolvePlayers(obj.submissions)
-        : obj.submissions
-    } as GameDto;*/
     if (!obj) {
       return undefined;
     }
@@ -39,6 +22,8 @@ export class GameToDtoMapper implements IMapper<Game, GameDto> {
         'endDate',
         'players',
         'submissions',
+        'createdAt',
+        'updatedAt',
       ],
       obj,
     ) as GameDto;

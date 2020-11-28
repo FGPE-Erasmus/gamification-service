@@ -1,6 +1,7 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
+import { SubscriptionsModule } from '../common/subscriptions/subscriptions.module';
 import { ChallengeModule } from '../challenge/challenge.module';
 import { EventModule } from '../event/event.module';
 import { GameModule } from '../game/game.module';
@@ -16,17 +17,15 @@ import { PointResolver } from './point.resolver';
 import { VirtualItemResolver } from './virtual-item.resolver';
 import { UnlockResolver } from './unlock.resolver';
 import { RevealResolver } from './reveal.resolver';
-import { Reward, RewardSchema } from './models/reward.model';
+import { RewardSchema } from './models/reward.model';
 import { RewardRepository } from './repositories/reward.repository';
 import { RewardToDtoMapper } from './mappers/reward-to-dto.mapper';
-import { RewardToPersistenceMapper } from './mappers/reward-to-persistence.mapper';
-import { SubscriptionsModule } from 'src/common/subscriptions/subscriptions.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       {
-        name: Reward.name,
+        name: 'Reward',
         schema: RewardSchema,
       },
     ]),
@@ -39,7 +38,6 @@ import { SubscriptionsModule } from 'src/common/subscriptions/subscriptions.modu
   ],
   providers: [
     RewardToDtoMapper,
-    RewardToPersistenceMapper,
     RewardRepository,
     RewardService,
     RewardResolver,
@@ -52,6 +50,6 @@ import { SubscriptionsModule } from 'src/common/subscriptions/subscriptions.modu
     VirtualItemResolver,
     UnlockResolver,
   ],
-  exports: [RewardToDtoMapper, RewardToPersistenceMapper, RewardRepository, RewardService],
+  exports: [RewardToDtoMapper, RewardRepository, RewardService],
 })
 export class RewardModule {}

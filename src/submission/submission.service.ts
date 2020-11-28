@@ -1,19 +1,18 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { ChallengeStatusService } from 'src/challenge-status/challenge-status.service';
-import { StateEnum as State } from 'src/challenge-status/models/state.enum';
 
 import { IFile } from '../common/interfaces/file.interface';
 import { BaseService } from '../common/services/base.service';
+import { ChallengeStatusService } from '../challenge-status/challenge-status.service';
 import { EvaluationEngineService } from '../evaluation-engine/evaluation-engine.service';
 import { EventService } from '../event/event.service';
 import { TriggerEventEnum as TriggerEvent } from '../hook/enums/trigger-event.enum';
 import { Player } from '../player/models/player.model';
 import { PlayerService } from '../player/player.service';
-import { Submission } from './models/submission.model';
+import { Submission, SubmissionDocument } from './models/submission.model';
 import { SubmissionRepository } from './repositories/submission.repository';
 
 @Injectable()
-export class SubmissionService extends BaseService<Submission> {
+export class SubmissionService extends BaseService<Submission, SubmissionDocument> {
   constructor(
     protected readonly repository: SubmissionRepository,
     protected readonly eventService: EventService,

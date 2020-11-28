@@ -1,8 +1,19 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
+import { IBaseEntity } from '../../common/interfaces/base-entity.interface';
 
-@Schema()
-export class Player extends Document {
+export interface Player extends IBaseEntity {
+  user: any;
+  game: any;
+  group?: any;
+  points?: number;
+  submissions?: any[];
+  learningPath?: any[];
+  rewards?: any[];
+}
+
+@Schema({ collection: 'Player' })
+export class PlayerDocument extends Document implements Player {
   @Prop({ type: Types.ObjectId, ref: 'User' })
   user: any;
 
@@ -23,11 +34,6 @@ export class Player extends Document {
 
   @Prop({ type: [{ type: Types.ObjectId, ref: 'PlayerReward' }] })
   rewards?: any[];
-
-  /* Timestamps */
-
-  createdAt?: Date;
-  updatedAt?: Date;
 }
 
-export const PlayerSchema = SchemaFactory.createForClass(Player);
+export const PlayerSchema = SchemaFactory.createForClass(PlayerDocument);

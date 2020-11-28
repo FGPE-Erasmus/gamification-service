@@ -1,8 +1,20 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
+import { IBaseEntity } from '../../common/interfaces/base-entity.interface';
 
-@Schema()
-export class Game extends Document {
+export interface Game extends IBaseEntity {
+  name: string;
+  description?: string;
+  gedilLayerId?: string;
+  gedilLayerDescription?: string;
+  startDate?: Date;
+  endDate?: Date;
+  players?: any[];
+  submissions?: any[];
+}
+
+@Schema({ collection: 'Game' })
+export class GameDocument extends Document implements Game {
   @Prop()
   name: string;
 
@@ -26,11 +38,6 @@ export class Game extends Document {
 
   @Prop({ type: [{ type: Types.ObjectId, ref: 'Submission' }] })
   submissions?: any[];
-
-  /* Timestamps */
-
-  createdAt?: Date;
-  updatedAt?: Date;
 }
 
-export const GameSchema = SchemaFactory.createForClass(Game);
+export const GameSchema = SchemaFactory.createForClass(GameDocument);

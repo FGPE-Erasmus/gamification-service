@@ -3,7 +3,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { JunctorEnum as Junctor } from '../../enums/junctor.enum';
 import { ConditionEmbed } from './condition.embed';
 
-@Schema()
+@Schema({ timestamps: true })
 export class CriteriaEmbed {
   @Prop({ type: () => [ConditionEmbed], default: () => [] })
   conditions: ConditionEmbed[];

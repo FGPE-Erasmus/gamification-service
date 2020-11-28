@@ -6,7 +6,7 @@ import { EventModule } from '../event/event.module';
 import { PlayerModule } from '../player/player.module';
 import { UsersModule } from '../users/users.module';
 import { GroupToDtoMapper } from './mappers/group-to-dto.mapper';
-import { Group, GroupSchema } from './models/group.model';
+import { GroupSchema } from './models/group.model';
 import { GroupRepository } from './repositories/group.repository';
 import { GroupService } from './group.service';
 import { GroupResolver } from './group.resolver';
@@ -15,7 +15,7 @@ import { GroupResolver } from './group.resolver';
   imports: [
     MongooseModule.forFeature([
       {
-        name: Group.name,
+        name: 'Group',
         schema: GroupSchema,
       },
     ]),

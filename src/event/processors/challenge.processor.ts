@@ -1,13 +1,13 @@
 import { Process, Processor } from '@nestjs/bull';
 import { Job } from 'bull';
 
-import { appConfig } from 'src/app.config';
-import { ChallengeStatusService } from 'src/challenge-status/challenge-status.service';
-import { ChallengeService } from 'src/challenge/challenge.service';
-import { Challenge } from 'src/challenge/models/challenge.model';
-import { ActionHookService } from 'src/hook/action-hook.service';
-import { TriggerEventEnum as TriggerEvent } from 'src/hook/enums/trigger-event.enum';
-import { HookService } from 'src/hook/hook.service';
+import { appConfig } from '../../app.config';
+import { ChallengeStatusService } from '../../challenge-status/challenge-status.service';
+import { ChallengeService } from '../../challenge/challenge.service';
+import { Challenge } from '../../challenge/models/challenge.model';
+import { ActionHookService } from '../../hook/action-hook.service';
+import { TriggerEventEnum as TriggerEvent } from '../../hook/enums/trigger-event.enum';
+import { HookService } from '../../hook/hook.service';
 
 @Processor(appConfig.queue.event.name)
 export class ChallengeProcessor {

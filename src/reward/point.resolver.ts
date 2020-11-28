@@ -1,5 +1,5 @@
 import { UseGuards } from '@nestjs/common';
-import { Query, Resolver } from '@nestjs/graphql';
+import { Args, Query, Resolver } from '@nestjs/graphql';
 
 import { GqlJwtAuthGuard } from '../common/guards/gql-jwt-auth.guard';
 import { PointDto } from './dto/point.dto';
@@ -11,8 +11,8 @@ import { Reward } from './models/reward.model';
 export class PointResolver extends RewardResolver {
   @Query(() => [PointDto])
   @UseGuards(GqlJwtAuthGuard)
-  async points(): Promise<PointDto[]> {
-    const rewards: Reward[] = await this.rewardService.findByKind(RewardType.POINT);
+  async points(@Args('gameId') gameId: string): Promise<PointDto[]> {
+    const rewards: Reward[] = await this.rewardService.findByGameId(gameId, RewardType.POINT);
     return Promise.all(rewards.map(async reward => this.rewardToDtoMapper.transform(reward)));
   }
 }

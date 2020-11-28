@@ -1,7 +1,7 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 
 import { BaseService } from '../common/services/base.service';
-import { Player } from './models/player.model';
+import { Player, PlayerDocument } from './models/player.model';
 import { PlayerRepository } from './repositories/player.repository';
 import { TriggerEventEnum as TriggerEvent } from '../hook/enums/trigger-event.enum';
 import { EventService } from '../event/event.service';
@@ -9,7 +9,7 @@ import { Group } from '../group/models/group.model';
 import { GroupService } from '../group/group.service';
 
 @Injectable()
-export class PlayerService extends BaseService<Player> {
+export class PlayerService extends BaseService<Player, PlayerDocument> {
   constructor(
     protected readonly repository: PlayerRepository,
     protected readonly eventService: EventService,

@@ -5,7 +5,7 @@ import { ChallengeModule } from '../challenge/challenge.module';
 import { PlayerModule } from '../player/player.module';
 import { ChallengeStatusService } from './challenge-status.service';
 import { ChallengeStatusResolver } from './challenge-status.resolver';
-import { ChallengeStatus, ChallengeStatusSchema } from './models/challenge-status.model';
+import { ChallengeStatusSchema } from './models/challenge-status.model';
 import { ChallengeStatusRepository } from './repositories/challenge-status.repository';
 import { ChallengeStatusToDtoMapper } from './mappers/challenge-status-to-dto.mapper';
 import { EventModule } from '../event/event.module';
@@ -16,7 +16,7 @@ import { SubscriptionsModule } from 'src/common/subscriptions/subscriptions.modu
   imports: [
     MongooseModule.forFeature([
       {
-        name: ChallengeStatus.name,
+        name: 'ChallengeStatus',
         schema: ChallengeStatusSchema,
       },
     ]),

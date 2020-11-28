@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 import { CategoryEnum as Category } from '../../enums/category.enum';
 
-@Schema()
+@Schema({ timestamps: true })
 export class ActionEmbed {
   @Prop({ type: () => String, enum: Category })
   type: Category;

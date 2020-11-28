@@ -3,14 +3,14 @@ import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model } from 'mongoose';
 
 import { BaseRepository } from '../../common/repositories/base.repository';
-import { ChallengeStatus } from '../models/challenge-status.model';
+import { ChallengeStatus, ChallengeStatusDocument } from '../models/challenge-status.model';
 import { PlayerRepository } from '../../player/repositories/player.repository';
 import { ChallengeRepository } from '../../challenge/repositories/challenge.repository';
 
 @Injectable()
-export class ChallengeStatusRepository extends BaseRepository<ChallengeStatus> {
+export class ChallengeStatusRepository extends BaseRepository<ChallengeStatus, ChallengeStatusDocument> {
   constructor(
-    @InjectModel(ChallengeStatus.name) protected readonly model: Model<ChallengeStatus>,
+    @InjectModel('ChallengeStatus') protected readonly model: Model<ChallengeStatusDocument>,
     protected readonly challengeRepository: ChallengeRepository,
     protected readonly playerRepository: PlayerRepository,
   ) {
@@ -19,22 +19,22 @@ export class ChallengeStatusRepository extends BaseRepository<ChallengeStatus> {
 
   async save(doc: Partial<ChallengeStatus>, overwrite = true): Promise<any> {
     // if challenge changed, remove from previous challenge's collection
-    if (doc._id && doc.challenge) {
-      await this.challengeRepository.removeChallengeStatus(doc.challenge, { _id: doc._id });
+    if (doc.id && doc.challenge) {
+      await this.challengeRepository.removeChallengeStatus(doc.challenge, { id: doc.id });
     }
     // if player changed, remove from previous player's collection
-    if (doc._id && doc.player) {
-      await this.playerRepository.removeChallengeStatus(doc.player, { _id: doc._id });
+    if (doc.id && doc.player) {
+      await this.playerRepository.removeChallengeStatus(doc.player, { id: doc.id });
     }
 
     // save the entity as requested
     const result = await super.save(doc, overwrite);
 
     // add to challenge's collection
-    await this.challengeRepository.upsertChallengeStatus(result.challenge, result);
+    await this.challengeRepository.upsertChallengeStatus(result.challenge, { id: result.id });
 
     // add to player's collection
-    await this.playerRepository.upsertChallengeStatus(result.player, result);
+    await this.playerRepository.upsertChallengeStatus(result.player, { id: result.id });
 
     return result;
   }
@@ -63,11 +63,11 @@ export class ChallengeStatusRepository extends BaseRepository<ChallengeStatus> {
   private async removeRelationsOnDelete(challengeStatus: ChallengeStatus): Promise<void> {
     // remove from challenge's collection
     if (challengeStatus.challenge) {
-      await this.challengeRepository.removeChallengeStatus(challengeStatus.challenge, { _id: challengeStatus._id });
+      await this.challengeRepository.removeChallengeStatus(challengeStatus.challenge, { id: challengeStatus.id });
     }
     // remove from player's collection
     if (challengeStatus.player) {
-      await this.playerRepository.removeChallengeStatus(challengeStatus.player, { _id: challengeStatus._id });
+      await this.playerRepository.removeChallengeStatus(challengeStatus.player, { id: challengeStatus.id });
     }
   }
 }

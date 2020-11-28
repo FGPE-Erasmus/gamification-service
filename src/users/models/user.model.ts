@@ -2,9 +2,24 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
 import { Role } from './role.enum';
+import { IBaseEntity } from '../../common/interfaces/base-entity.interface';
 
-@Schema()
-export class User extends Document {
+export interface User extends IBaseEntity {
+  name: string;
+  username: string;
+  email: string;
+  password?: string;
+  roles?: Role[];
+  photo?: string;
+  telephone?: string;
+  birthDate?: Date;
+  active?: boolean;
+  lastActivityAt?: Date;
+  registrations?: any[];
+}
+
+@Schema({ collection: 'User' })
+export class UserDocument extends Document implements User {
   @Prop()
   name: string;
 
@@ -29,19 +44,14 @@ export class User extends Document {
   @Prop()
   birthDate?: Date;
 
-  @Prop()
-  active: boolean;
+  @Prop({ default: true })
+  active?: boolean;
 
   @Prop()
   lastActivityAt?: Date;
 
   @Prop({ type: [{ type: Types.ObjectId, ref: 'Player' }] })
   registrations?: any[];
-
-  /* Timestamps */
-
-  createdAt?: Date;
-  updatedAt?: Date;
 }
 
-export const UserSchema = SchemaFactory.createForClass(User);
+export const UserSchema = SchemaFactory.createForClass(UserDocument);

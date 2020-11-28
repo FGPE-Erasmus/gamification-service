@@ -30,4 +30,10 @@ export class GameDto {
 
   @Field(() => [SubmissionDto])
   submissions?: SubmissionDto[];
+
+  @Field(() => Date)
+  createdAt?: Date;
+
+  @Field(() => Date, { nullable: true })
+  updatedAt?: Date;
 }

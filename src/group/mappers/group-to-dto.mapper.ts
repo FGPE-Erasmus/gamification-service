@@ -11,7 +11,7 @@ export class GroupToDtoMapper implements IMapper<Group, GroupDto> {
       return undefined;
     }
     return {
-      id: obj._id || obj.id,
+      id: obj.id,
       game: obj.game,
       name: obj.name,
       displayName: obj.displayName,

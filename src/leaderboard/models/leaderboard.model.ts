@@ -2,9 +2,19 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
 import { SortingOrder } from './sorting.enum';
+import { IBaseEntity } from '../../common/interfaces/base-entity.interface';
 
-@Schema()
-export class Leaderboard extends Document {
+export interface Leaderboard extends IBaseEntity {
+  game: any;
+  parentChallenge?: any;
+  name: string;
+  groups: boolean;
+  metrics: string[];
+  sortingOrders: SortingOrder[];
+}
+
+@Schema({ collection: 'Leaderboard' })
+export class LeaderboardDocument extends Document implements Leaderboard {
   @Prop({ type: Types.ObjectId, ref: 'Game', required: true })
   game: any;
 
@@ -22,11 +32,6 @@ export class Leaderboard extends Document {
 
   @Prop({ type: () => [String], enum: SortingOrder, default: () => [] })
   sortingOrders: SortingOrder[];
-
-  /* Timestamps */
-
-  createdAt?: Date;
-  updatedAt?: Date;
 }
 
-export const LeaderboardSchema = SchemaFactory.createForClass(Leaderboard);
+export const LeaderboardSchema = SchemaFactory.createForClass(LeaderboardDocument);

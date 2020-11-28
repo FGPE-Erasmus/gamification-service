@@ -15,14 +15,13 @@ import { bestSubmission } from '../common/helpers/submission.helper';
 import { ChallengeService } from '../challenge/challenge.service';
 import { Submission } from '../submission/models/submission.model';
 import { LeaderboardToDtoMapper } from './mappers/leaderboard-to-dto.mapper';
-import { Leaderboard } from './models/leaderboard.model';
+import { Leaderboard, LeaderboardDocument } from './models/leaderboard.model';
 import { SortingOrder } from './models/sorting.enum';
 import { LeaderboardRepository } from './repositories/leaderboard.repository';
-import { toString } from '../common/utils/mongo.utils';
 import { MongooseFilterQuery } from 'mongoose';
 
 @Injectable()
-export class LeaderboardService extends BaseService<Leaderboard> {
+export class LeaderboardService extends BaseService<Leaderboard, LeaderboardDocument> {
   constructor(
     protected readonly repository: LeaderboardRepository,
     protected readonly toDtoMapper: LeaderboardToDtoMapper,
@@ -55,6 +54,7 @@ export class LeaderboardService extends BaseService<Leaderboard> {
     }
 
     const encodedContent = extractToJson(entries['metadata.json']);
+    delete encodedContent.id;
 
     // create leaderboard
     return await this.create({
@@ -62,6 +62,18 @@ export class LeaderboardService extends BaseService<Leaderboard> {
       sortingOrders: encodedContent.sorting_orders,
       game: game.id,
       parentChallenge: challenge?.id,
+    });
+  }
+
+  /**
+   * Find all leaderboards within a specific game.
+   *
+   * @param gameId the ID of the game
+   * @returns {Promise<Leaderboard[]>} the leaderboards.
+   */
+  async findByGameId(gameId: string): Promise<Leaderboard[]> {
+    return await this.findAll({
+      game: { $eq: gameId },
     });
   }
 
@@ -87,7 +99,7 @@ export class LeaderboardService extends BaseService<Leaderboard> {
     const rankingPlayers: PlayerRankingDto[] = [];
     for (const player of players) {
       const rankedPlayer: PlayerRankingDto = {
-        player: player._id,
+        player: player.id,
         score: {},
       };
 
@@ -96,7 +108,7 @@ export class LeaderboardService extends BaseService<Leaderboard> {
         {
           $and: [
             { game: { $eq: leaderboard.game } },
-            { player: { $eq: toString(player._id) } },
+            { player: { $eq: player.id } },
             { exerciseId: { $in: exerciseIds } },
           ],
         },
@@ -126,7 +138,6 @@ export class LeaderboardService extends BaseService<Leaderboard> {
         }
         if (Array.isArray(match)) {
           for (const submatch of match) {
-            console.log(submatch);
             if (rankedPlayer.score.hasOwnProperty(submatch.parentProperty)) {
               if (!rankedPlayer.score[submatch.parentProperty].hasOwnProperty(submatch.pointer)) {
                 rankedPlayer.score[submatch.parentProperty][submatch.pointer] = submatch.value;
@@ -211,27 +222,4 @@ export class LeaderboardService extends BaseService<Leaderboard> {
     }
     return aw === bw ? 0 : aw > bw ? 1 : -1;
   }
-
-  /*async sortLeaderboard(leaderboardId: string): Promise<any> {
-    const leaderboard: Leaderboard = await this.findById(leaderboardId);
-    const list = await this.playerLeaderboardRepository.find({
-      where: {
-        leaderboardId: leaderboardId,
-      },
-    });
-    list.sort((a, b) => {
-      for (let i = 0; i < leaderboard.metrics.length; i++) {
-        const metric = leaderboard.metrics[i];
-        const sortingOrder = leaderboard.sortingOrders[i];
-        const reverse = sortingOrder === SortingOrder.DESC ? -1 : 1;
-        if (a.score[metric] < b.score[metric]) {
-          return reverse * -1;
-        } else if (a.score[metric] > b.score[metric]) {
-          return reverse * 1;
-        }
-      }
-      return 0;
-    });
-    return list;
-  }*/
 }

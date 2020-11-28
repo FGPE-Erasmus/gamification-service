@@ -30,12 +30,17 @@ import { SubscriptionsModule } from './common/subscriptions/subscriptions.module
         authSource: appConfig.database.authSource,
         useUnifiedTopology: appConfig.database.useUnifiedTopology,
         useNewUrlParser: appConfig.database.useNewUrlParser,
+        useCreateIndex: appConfig.database.useCreateIndex,
         loggerLevel: appConfig.database.loggerLevel,
         connectionFactory: connection => {
           // eslint-disable-next-line @typescript-eslint/no-var-requires
           connection.plugin(require('mongoose-autopopulate'));
           // eslint-disable-next-line @typescript-eslint/no-var-requires
           connection.plugin(require('mongoose-timestamp'));
+          // eslint-disable-next-line @typescript-eslint/no-var-requires
+          connection.plugin(require('mongoose-lean-virtuals'));
+          // eslint-disable-next-line @typescript-eslint/no-var-requires
+          connection.plugin(require('mongoose-lean-id'));
           return connection;
         },
         useFindAndModify: false,

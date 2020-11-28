@@ -1,19 +1,19 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Parse } from 'unzipper';
 
-import { extractToJson } from '../common/utils/extraction.utils';
+import { IFile } from '../common/interfaces/file.interface';
 import { BaseService } from '../common/services/base.service';
+import { extractToJson } from '../common/utils/extraction.utils';
 import { ChallengeService } from '../challenge/challenge.service';
 import { HookService } from '../hook/hook.service';
 import { LeaderboardService } from '../leaderboard/leaderboard.service';
 import { RewardService } from '../reward/reward.service';
 import { GameInput } from './inputs/game.input';
-import { Game } from './models/game.model';
+import { Game, GameDocument } from './models/game.model';
 import { GameRepository } from './repositories/game.repository';
-import { IFile } from '../common/interfaces/file.interface';
 
 @Injectable()
-export class GameService extends BaseService<Game> {
+export class GameService extends BaseService<Game, GameDocument> {
   constructor(
     protected readonly repository: GameRepository,
     protected readonly challengeService: ChallengeService,

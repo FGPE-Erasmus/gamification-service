@@ -5,12 +5,12 @@ import { FilterQuery, Model } from 'mongoose';
 import { BaseRepository } from '../../common/repositories/base.repository';
 import { GameRepository } from '../../game/repositories/game.repository';
 import { PlayerRepository } from '../../player/repositories/player.repository';
-import { Submission } from '../models/submission.model';
+import { Submission, SubmissionDocument } from '../models/submission.model';
 
 @Injectable()
-export class SubmissionRepository extends BaseRepository<Submission> {
+export class SubmissionRepository extends BaseRepository<Submission, SubmissionDocument> {
   constructor(
-    @InjectModel(Submission.name) protected readonly model: Model<Submission>,
+    @InjectModel('Submission') protected readonly model: Model<SubmissionDocument>,
     protected readonly gameRepository: GameRepository,
     protected readonly playerRepository: PlayerRepository,
   ) {
@@ -19,22 +19,22 @@ export class SubmissionRepository extends BaseRepository<Submission> {
 
   async save(doc: Partial<Submission>, overwrite = true): Promise<any> {
     // if game changed, remove from previous game's collection
-    if (doc._id && doc.game) {
-      await this.gameRepository.removeSubmission(doc.game, { _id: doc._id });
+    if (doc.id && doc.game) {
+      await this.gameRepository.removeSubmission(doc.game, { id: doc.id });
     }
     // if player changed, remove from previous player's collection
-    if (doc._id && doc.player) {
-      await this.playerRepository.removeSubmission(doc.player, { _id: doc._id });
+    if (doc.id && doc.player) {
+      await this.playerRepository.removeSubmission(doc.player, { id: doc.id });
     }
 
     // save the entity as requested
     const result = await super.save(doc, overwrite);
 
     // add to game's collection
-    await this.gameRepository.upsertSubmission(result.game, result);
+    await this.gameRepository.upsertSubmission(result.game, { id: result.id });
 
     // add to player's collection
-    await this.playerRepository.upsertSubmission(result.player, result);
+    await this.playerRepository.upsertSubmission(result.player, { id: result.id });
 
     return result;
   }
@@ -60,11 +60,11 @@ export class SubmissionRepository extends BaseRepository<Submission> {
   private async removeRelationsOnDelete(submission: Submission): Promise<void> {
     // remove from game's collection
     if (submission.game) {
-      await this.gameRepository.removeSubmission(submission.game, { _id: submission._id });
+      await this.gameRepository.removeSubmission(submission.game, { id: submission.id });
     }
     // remove from player's collection
     if (submission.player) {
-      await this.playerRepository.removeSubmission(submission.player, { _id: submission._id });
+      await this.playerRepository.removeSubmission(submission.player, { id: submission.id });
     }
   }
 }

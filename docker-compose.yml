@@ -11,10 +11,9 @@ services:
         - NODE_ENV=${NODE_ENV}
     user: node
     working_dir: /home/node/app
-    env_file:
-      - ./.env
     volumes:
       - ./src:/home/node/app/src
+      - ./.env:/home/node/app/.env
     ports:
       - ${APP_PORT}:${APP_PORT}
     depends_on:
