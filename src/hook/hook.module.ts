@@ -9,6 +9,7 @@ import { PlayerRewardModule } from '../player-reward/player-reward.module';
 import { RewardModule } from '../reward/reward.module';
 import { EventModule } from '../event/event.module';
 import { SubmissionModule } from '../submission/submission.module';
+import { SubscriptionsModule } from '../common/subscriptions/subscriptions.module';
 import { ActionHookResolver } from './action-hook.resolver';
 import { ActionHookService } from './action-hook.service';
 import { HookService } from './hook.service';
@@ -20,7 +21,6 @@ import { ActionHookRepository } from './repositories/action-hook.repository';
 import { ScheduledHookRepository } from './repositories/scheduled-hook.repository';
 import { ScheduledHookService } from './scheduled-hook.service';
 import { ScheduledHookResolver } from './scheduled-hook.resolver';
-import { SubscriptionsModule } from 'src/common/subscriptions/subscriptions.module';
 
 @Module({
   imports: [

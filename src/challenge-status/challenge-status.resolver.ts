@@ -3,6 +3,8 @@ import { NotFoundException, UseGuards, Inject } from '@nestjs/common';
 import { PubSub } from 'graphql-subscriptions';
 
 import { GqlJwtAuthGuard } from '../common/guards/gql-jwt-auth.guard';
+import { GqlAdminGuard } from '../common/guards/gql-admin.guard';
+import { NotificationEnum } from '../common/enums/notifications.enum';
 import { ChallengeStatusService } from './challenge-status.service';
 import { ChallengeStatusDto } from './dto/challenge-status.dto';
 import { ChallengeStatusToDtoMapper } from './mappers/challenge-status-to-dto.mapper';
@@ -15,8 +17,6 @@ import { ChallengeDto } from '../challenge/dto/challenge.dto';
 import { Challenge } from '../challenge/models/challenge.model';
 import { ChallengeService } from '../challenge/challenge.service';
 import { ChallengeToDtoMapper } from '../challenge/mappers/challenge-to-dto.mapper';
-import { GqlAdminGuard } from '../common/guards/gql-admin.guard';
-import { NotificationEnum } from 'src/common/enums/notifications.enum';
 
 @Resolver(() => ChallengeStatusDto)
 export class ChallengeStatusResolver {

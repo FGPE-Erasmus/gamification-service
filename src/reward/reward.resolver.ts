@@ -3,6 +3,7 @@ import { Args, Parent, Query, ResolveField, Resolver, Subscription } from '@nest
 import { PubSub } from 'graphql-subscriptions';
 
 import { GqlJwtAuthGuard } from '../common/guards/gql-jwt-auth.guard';
+import { NotificationEnum } from '../common/enums/notifications.enum';
 import { ChallengeService } from '../challenge/challenge.service';
 import { ChallengeDto } from '../challenge/dto/challenge.dto';
 import { GameDto } from '../game/dto/game.dto';
@@ -17,7 +18,6 @@ import { PlayerDto } from '../player/dto/player.dto';
 import { Player } from '../player/models/player.model';
 import { PlayerService } from '../player/player.service';
 import { PlayerToDtoMapper } from '../player/mappers/player-to-dto.mapper';
-import { NotificationEnum } from 'src/common/enums/notifications.enum';
 
 @Resolver(() => RewardDto, { isAbstract: true })
 export class RewardResolver {

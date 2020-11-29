@@ -1,13 +1,16 @@
 import { Logger, Inject } from '@nestjs/common';
 import { InjectQueue, Process, Processor } from '@nestjs/bull';
 import { Job, Queue } from 'bull';
+import { PubSub } from 'graphql-subscriptions';
 
 import { appConfig } from '../../../app.config';
+import { NotificationEnum } from '../../../common/enums/notifications.enum';
 import { EventService } from '../../../event/event.service';
 import { TriggerEventEnum as TriggerEvent } from '../../../hook/enums/trigger-event.enum';
 import { Submission } from '../../../submission/models/submission.model';
 import { Result } from '../../../submission/models/result.enum';
 import { SubmissionService } from '../../../submission/submission.service';
+import { SubmissionToDtoMapper } from '../../../submission/mappers/submission-to-dto.mapper';
 import { EvaluationDto } from '../../dto/evaluation.dto';
 import {
   FINISH_EVALUATION_JOB,
@@ -19,9 +22,6 @@ import {
 } from '../../evaluation-engine.constants';
 import { IRequestEvaluationJobData } from '../../interfaces/request-evaluation-job-data.interface';
 import { MooshakService } from './mooshak.service';
-import { PubSub } from 'graphql-subscriptions';
-import { NotificationEnum } from 'src/common/enums/notifications.enum';
-import { SubmissionToDtoMapper } from 'src/submission/mappers/submission-to-dto.mapper';
 
 @Processor(appConfig.queue.evaluation.name)
 export class MooshakConsumer {

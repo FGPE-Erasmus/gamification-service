@@ -2,6 +2,7 @@ import { forwardRef, HttpModule, Module } from '@nestjs/common';
 import { BullModule } from '@nestjs/bull';
 
 import { appConfig } from '../app.config';
+import { SubscriptionsModule } from '../common/subscriptions/subscriptions.module';
 import { HookModule } from '../hook/hook.module';
 import { EventModule } from '../event/event.module';
 import { SubmissionModule } from '../submission/submission.module';
@@ -9,7 +10,6 @@ import { MooshakService } from './engines/mooshak/mooshak.service';
 import { EvaluationEngineService } from './evaluation-engine.service';
 import { MooshakConsumer } from './engines/mooshak/mooshak.consumer';
 import { EvaluationEngineListener } from './evaluation-engine.listener';
-import { SubscriptionsModule } from 'src/common/subscriptions/subscriptions.module';
 
 @Module({
   imports: [

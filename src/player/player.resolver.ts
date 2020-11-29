@@ -7,6 +7,7 @@ import { GqlPlayer } from '../common/decorators/gql-player.decorator';
 import { GqlAdminGuard } from '../common/guards/gql-admin.guard';
 import { GqlEnrolledInGame } from '../common/guards/gql-game-enrollment.guard';
 import { GqlJwtAuthGuard } from '../common/guards/gql-jwt-auth.guard';
+import { NotificationEnum } from '../common/enums/notifications.enum';
 import { ChallengeStatusService } from '../challenge-status/challenge-status.service';
 import { ChallengeStatusDto } from '../challenge-status/dto/challenge-status.dto';
 import { ChallengeStatusToDtoMapper } from '../challenge-status/mappers/challenge-status-to-dto.mapper';
@@ -34,7 +35,6 @@ import { Player } from './models/player.model';
 import { Group } from '../group/models/group.model';
 import { GroupService } from '../group/group.service';
 import { GroupToDtoMapper } from '../group/mappers/group-to-dto.mapper';
-import { NotificationEnum } from 'src/common/enums/notifications.enum';
 
 @Resolver(() => PlayerDto)
 export class PlayerResolver {

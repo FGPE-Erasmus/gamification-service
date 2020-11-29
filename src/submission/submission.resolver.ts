@@ -4,6 +4,8 @@ import { PubSub } from 'graphql-subscriptions';
 
 import { GqlUser } from '../common/decorators/gql-user.decorator';
 import { GqlJwtAuthGuard } from '../common/guards/gql-jwt-auth.guard';
+import { GqlEnrolledInGame } from '../common/guards/gql-game-enrollment.guard';
+import { NotificationEnum } from '../common/enums/notifications.enum';
 import { Role } from '../users/models/role.enum';
 import { GameDto } from '../game/dto/game.dto';
 import { SubmissionToDtoMapper } from './mappers/submission-to-dto.mapper';
@@ -19,8 +21,6 @@ import { EvaluateArgs } from './args/evaluate.args';
 import { SubmissionDto } from './dto/submission.dto';
 import { SubmissionService } from './submission.service';
 import { Submission } from './models/submission.model';
-import { GqlEnrolledInGame } from '../common/guards/gql-game-enrollment.guard';
-import { NotificationEnum } from 'src/common/enums/notifications.enum';
 
 @Resolver(() => SubmissionDto)
 export class SubmissionResolver {

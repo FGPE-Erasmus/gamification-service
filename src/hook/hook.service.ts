@@ -3,12 +3,15 @@ import { PubSub } from 'graphql-subscriptions';
 
 import { checkCriteria } from '../common/helpers/criteria.helper';
 import { extractToJson } from '../common/utils/extraction.utils';
+import { NotificationEnum } from '../common/enums/notifications.enum';
+import { PlayerRewardToDtoMapper } from '../player-reward/mappers/player-reward-to-dto.mapper';
 import { ChallengeStatusService } from '../challenge-status/challenge-status.service';
 import { Challenge } from '../challenge/models/challenge.model';
 import { ChallengeStatus } from '../challenge-status/models/challenge-status.model';
 import { StateEnum as State } from '../challenge-status/models/state.enum';
 import { EventService } from '../event/event.service';
 import { Game } from '../game/models/game.model';
+import { RewardToDtoMapper } from '../reward/mappers/reward-to-dto.mapper';
 import { CategoryEnum as Category } from '../hook/enums/category.enum';
 import { TriggerEventEnum as TriggerEvent } from '../hook/enums/trigger-event.enum';
 import { TriggerKindEnum as TriggerKind } from './enums/trigger-kind.enum';
@@ -24,9 +27,6 @@ import { ConditionInput } from './inputs/condition.input';
 import { ScheduledHook } from './models/scheduled-hook.model';
 import { ActionHook } from './models/action-hook.model';
 import { ActionEmbed } from './models/embedded/action.embed';
-import { NotificationEnum } from 'src/common/enums/notifications.enum';
-import { RewardToDtoMapper } from 'src/reward/mappers/reward-to-dto.mapper';
-import { PlayerRewardToDtoMapper } from 'src/player-reward/mappers/player-reward-to-dto.mapper';
 
 @Injectable()
 export class HookService {

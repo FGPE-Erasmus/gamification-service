@@ -1,7 +1,6 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
-import { ChallengeStatusModule } from '../challenge-status/challenge-status.module';
 import { SubscriptionsModule } from '../common/subscriptions/subscriptions.module';
 import { ChallengeStatusModule } from '../challenge-status/challenge-status.module';
 import { EvaluationEngineModule } from '../evaluation-engine/evaluation-engine.module';
@@ -14,7 +13,6 @@ import { SubmissionResolver } from './submission.resolver';
 import { SubmissionRepository } from './repositories/submission.repository';
 import { SubmissionSchema } from './models/submission.model';
 import { SubmissionToDtoMapper } from './mappers/submission-to-dto.mapper';
-
 
 @Module({
   imports: [

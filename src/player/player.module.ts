@@ -1,6 +1,7 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
+import { SubscriptionsModule } from '../common/subscriptions/subscriptions.module';
 import { ChallengeStatusModule } from '../challenge-status/challenge-status.module';
 import { GameModule } from '../game/game.module';
 import { GroupModule } from '../group/group.module';
@@ -13,7 +14,6 @@ import { PlayerSchema } from './models/player.model';
 import { PlayerRepository } from './repositories/player.repository';
 import { PlayerToDtoMapper } from './mappers/player-to-dto.mapper';
 import { PlayerResolver } from './player.resolver';
-import { SubscriptionsModule } from 'src/common/subscriptions/subscriptions.module';
 
 @Module({
   imports: [
