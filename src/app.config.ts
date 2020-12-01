@@ -9,6 +9,19 @@ interface IAppConfig {
   isDevelopment: boolean;
   isTesting: boolean;
   assetsPath: string;
+  auth: {
+    keycloak: {
+      host: string;
+      port: number;
+      realm: string;
+      clientUniqueId: string;
+      clientId: string;
+      clientSecret: string;
+      adminUsername: string;
+      adminPassword: string;
+      cookieKey: string;
+    };
+  };
   database: {
     protocol: string;
     host: string;
@@ -36,10 +49,6 @@ interface IAppConfig {
   };
   port: number;
   host: string;
-  jwt: {
-    secret: string;
-    expirationTime: number;
-  };
   http: {
     timeout: number;
     maxRedirects: number;
@@ -65,6 +74,19 @@ export const appConfig: IAppConfig = {
   isDevelopment: process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'dev',
   isTesting: process.env.NODE_ENV === 'test',
   assetsPath: `${__dirname}/../assets`,
+  auth: {
+    keycloak: {
+      host: process.env.AUTH_KEYCLOAK_HOST || 'localhost',
+      port: +(process.env.AUTH_KEYCLOAK_PORT || 8080),
+      realm: process.env.AUTH_KEYCLOAK_REALM || 'master',
+      clientUniqueId: process.env.AUTH_KEYCLOAK_CLIENT_UNIQUE_ID || '00000000-0000-0000-0000-000000000000',
+      clientId: process.env.AUTH_KEYCLOAK_CLIENT_ID || 'client_id',
+      clientSecret: process.env.AUTH_KEYCLOAK_CLIENT_SECRET || 'client_secret',
+      adminUsername: process.env.AUTH_KEYCLOAK_ADMIN_USERNAME || 'admin',
+      adminPassword: process.env.AUTH_KEYCLOAK_ADMIN_PASSWORD || 'pass',
+      cookieKey: process.env.AUTH_KEYCLOAK_COOKIE_KEY || 'KEYCLOAK_JWT',
+    },
+  },
   database: {
     protocol: 'mongodb',
     host: process.env.DB_HOST,
@@ -92,10 +114,6 @@ export const appConfig: IAppConfig = {
   },
   port: +process.env.APP_PORT,
   host: process.env.APP_HOST,
-  jwt: {
-    secret: process.env.JWT_SECRET,
-    expirationTime: +process.env.JWT_EXPIRATION_TIME,
-  },
   http: {
     timeout: +process.env.HTTP_TIMEOUT || 5000,
     maxRedirects: +process.env.HTTP_MAX_REDIRECTS || 5,

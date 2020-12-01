@@ -14,8 +14,8 @@ export interface Player extends IBaseEntity {
 
 @Schema({ collection: 'Player' })
 export class PlayerDocument extends Document implements Player {
-  @Prop({ type: Types.ObjectId, ref: 'User' })
-  user: any;
+  @Prop()
+  user: string;
 
   @Prop({ type: Types.ObjectId, ref: 'Game' })
   game: any;

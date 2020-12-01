@@ -434,6 +434,29 @@ type Ranking {
   score: JSON!
 }
 
+type Auth {
+  accessToken: String
+  expiresIn: Int
+  message: String
+  refreshExpiresIn: Int
+  refreshToken: String
+  scope: String
+  tokenType: String
+}
+
+type LogoutResponse {
+  message: String
+}
+
+type Profile {
+  id: String
+  emailVerified: Boolean
+  username: String
+  email: String
+  firstName: String
+  lastName: String
+}
+
 type Query {
   user(id: String!): User!
   users: [User!]!
@@ -464,6 +487,7 @@ type Query {
   profileInGame(gameId: String!): Player!
   player(userId: String!, gameId: String!): Player!
   alive: String!
+  me: Profile!
 }
 
 type Mutation {
@@ -476,8 +500,8 @@ type Mutation {
   enroll(gameId: String!): Player!
   addToGame(gameId: String!, userId: String!): Player!
   setGroup(groupId: String!, playerId: String!, gameId: String!): Player!
-  login(login: String!, password: String!): User!
-  signup(name: String!, username: String!, email: Email!, password: String!): User!
+  login(username: String, password: String, scope: String, refreshToken: String, redirectUri: String): Auth!
+  logout(redirectUri: String): LogoutResponse!
 }
 
 input UserInput {

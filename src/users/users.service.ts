@@ -1,4 +1,4 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
 
 import { BaseService } from '../common/services/base.service';
@@ -6,28 +6,12 @@ import { generatePassword } from '../common/utils/password-generator.util';
 import { User, UserDocument } from './models/user.model';
 import { UserInput } from './inputs/user.input';
 import { Role } from './models/role.enum';
-import { UserDto } from './dto/user.dto';
 import { UserRepository } from './repositories/user.repository';
 
 @Injectable()
-export class UsersService extends BaseService<User, UserDocument> implements OnModuleInit {
+export class UsersService extends BaseService<User, UserDocument> {
   constructor(protected readonly repository: UserRepository) {
     super(new Logger(UsersService.name), repository);
-  }
-
-  async onModuleInit(): Promise<void> {
-    const admin: UserDto = await this.findOneByUsername('admin');
-    if (!admin) {
-      const saved = await this.repository.save({
-        name: 'Administrator',
-        username: 'admin',
-        email: 'admin@fgpe-gs.com',
-        password: await bcrypt.hash('4dm1nS.', 10),
-        roles: [Role.ADMIN],
-        active: true,
-      });
-      this.logger.error(saved);
-    }
   }
 
   /**

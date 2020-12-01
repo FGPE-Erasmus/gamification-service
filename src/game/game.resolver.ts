@@ -8,6 +8,7 @@ import { GameService } from './game.service';
 import { GameDto } from './dto/game.dto';
 import { GameToDtoMapper } from './mappers/game-to-dto.mapper';
 import { Game } from './models/game.model';
+import { Roles } from '../keycloak/decorators/roles.decorator';
 
 @Resolver(() => GameDto)
 export class GameResolver {
@@ -15,6 +16,7 @@ export class GameResolver {
 
   @Mutation(() => GameDto)
   @UseGuards(GqlJwtAuthGuard, GqlAdminGuard)
+  @Roles('author')
   async importGEdILArchive(@Args() importGameArgs: ImportGameArgs): Promise<GameDto> {
     const { file, gameInput } = importGameArgs;
     const { filename, mimetype, encoding, createReadStream } = await file;
@@ -30,6 +32,7 @@ export class GameResolver {
     return this.gameToDtoMapper.transform(game);
   }
 
+  @Roles()
   @Query(() => [GameDto])
   @UseGuards(GqlJwtAuthGuard, GqlAdminGuard)
   async games(): Promise<GameDto[]> {

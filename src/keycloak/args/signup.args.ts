@@ -8,7 +8,12 @@ export default class SignupArgs {
   @Field()
   @MinLength(4)
   @MaxLength(200)
-  name: string;
+  firstName: string;
+
+  @Field()
+  @MinLength(4)
+  @MaxLength(200)
+  lastName: string;
 
   @Field()
   @IsDefined()
