@@ -262,14 +262,14 @@ export class ChallengeService extends BaseService<Challenge, ChallengeDocument> 
    *
    * @returns {Promise<Challenge[]>} the challenges.
    */
-  async findHidden(hidden: boolean, gameId: string): Promise<Challenge[]> {
+  async findHidden(hidden: boolean, gameId?: string): Promise<Challenge[]> {
     if (!gameId) {
       return await this.findAll({
         hidden: { $eq: hidden },
       });
     } else {
       return await this.findAll({
-        $and: [{ locked: { $eq: hidden } }, { game: { $eq: gameId } }],
+        $and: [{ hidden: { $eq: hidden } }, { game: { $eq: gameId } }],
       });
     }
   }
