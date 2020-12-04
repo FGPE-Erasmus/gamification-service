@@ -56,7 +56,6 @@ describe('Group', () => {
         DbTestModule({}),
       ],
       providers: [GroupToDtoMapper, GroupRepository, GroupService, GroupResolver],
-      exports: [GroupService],
     }).compile();
     connection = module.get<Connection>(await getConnectionToken());
     service = module.get<GroupService>(GroupService);
@@ -77,7 +76,7 @@ describe('Group', () => {
   });
 
   it('should find groups by game', async () => {
-    const foundGroup = service.findByGame(gameId);
+    const foundGroup = await service.findByGame(gameId);
     expect(foundGroup).toEqual(expect.objectContaining([groupDark, groupLight]));
   });
 
@@ -87,7 +86,7 @@ describe('Group', () => {
   // });
 
   it('should return all groups', async () => {
-    const foundGroups = service.findAll();
+    const foundGroups = await service.findAll();
     expect(foundGroups).toEqual(expect.objectContaining([groupDark, groupLight]));
   });
 });
