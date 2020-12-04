@@ -16,6 +16,7 @@ import { ChallengeStatusToDtoMapper } from './mappers/challenge-status-to-dto.ma
 import { ChallengeStatus, ChallengeStatusSchema } from './models/challenge-status.model';
 import { StateEnum as State } from './models/state.enum';
 import { ChallengeStatusRepository } from './repositories/challenge-status.repository';
+import { EventService } from '../event/event.service';
 
 describe('ChallengeStatusService', () => {
   let connection: Connection;
@@ -87,6 +88,10 @@ describe('ChallengeStatusService', () => {
   });
 
   it('should update the status to open', async () => {
+    const mockFireEvent = jest.spyOn(EventService.prototype, 'fireEvent');
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    mockFireEvent.mockImplementation(async () => {});
+
     const changedChallengeStatus = await service.markAsOpen(
       gameId,
       challengeStatusAbnormal.challenge,
@@ -97,6 +102,10 @@ describe('ChallengeStatusService', () => {
   });
 
   it('should update the status to failed', async () => {
+    const mockFireEvent = jest.spyOn(EventService.prototype, 'fireEvent');
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    mockFireEvent.mockImplementation(async () => {});
+
     const changedChallengeStatus = await service.markAsFailed(
       gameId,
       challengeStatusAbnormal.challenge,
@@ -107,6 +116,10 @@ describe('ChallengeStatusService', () => {
   });
 
   it('should update the status to completed', async () => {
+    const mockFireEvent = jest.spyOn(EventService.prototype, 'fireEvent');
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    mockFireEvent.mockImplementation(async () => {});
+
     const changedChallengeStatus = await service.markAsCompleted(
       gameId,
       challengeStatusAbnormal.challenge,
@@ -117,6 +130,10 @@ describe('ChallengeStatusService', () => {
   });
 
   it('should update the status to rejected', async () => {
+    const mockFireEvent = jest.spyOn(EventService.prototype, 'fireEvent');
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    mockFireEvent.mockImplementation(async () => {});
+
     const changedChallengeStatus = await service.markAsRejected(
       gameId,
       challengeStatusAbnormal.challenge,
@@ -127,6 +144,10 @@ describe('ChallengeStatusService', () => {
   });
 
   it('should update the status to available', async () => {
+    const mockFireEvent = jest.spyOn(EventService.prototype, 'fireEvent');
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    mockFireEvent.mockImplementation(async () => {});
+
     const changedChallengeStatus = await service.markAsOpen(
       gameId,
       challengeStatusAbnormal.challenge,
@@ -137,6 +158,10 @@ describe('ChallengeStatusService', () => {
   });
 
   it('should update the status to hidden', async () => {
+    const mockFireEvent = jest.spyOn(EventService.prototype, 'fireEvent');
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    mockFireEvent.mockImplementation(async () => {});
+
     const changedChallengeStatus = await service.markAsHidden(
       gameId,
       challengeStatusAbnormal.challenge,
@@ -146,6 +171,10 @@ describe('ChallengeStatusService', () => {
   });
 
   it('should update the status to locked', async () => {
+    const mockFireEvent = jest.spyOn(EventService.prototype, 'fireEvent');
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    mockFireEvent.mockImplementation(async () => {});
+
     const changedChallengeStatus = await service.markAsLocked(
       gameId,
       challengeStatusAbnormal.challenge,

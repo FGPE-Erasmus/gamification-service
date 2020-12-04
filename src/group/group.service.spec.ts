@@ -56,6 +56,7 @@ describe('Group', () => {
         DbTestModule({}),
       ],
       providers: [GroupToDtoMapper, GroupRepository, GroupService, GroupResolver],
+      exports: [GroupService],
     }).compile();
     connection = module.get<Connection>(await getConnectionToken());
     service = module.get<GroupService>(GroupService);

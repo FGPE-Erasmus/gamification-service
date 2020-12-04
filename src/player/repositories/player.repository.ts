@@ -54,7 +54,7 @@ export class PlayerRepository extends BaseRepository<Player, PlayerDocument> {
     return player;
   }
 
-  async deleteOne(conditions: FilterQuery<Player>, options: Record<string, unknown> = {}): Promise<Player> {
+  async deleteOne(conditions: FilterQuery<PlayerDocument>, options: Record<string, unknown> = {}): Promise<Player> {
     const player: Player = await super.deleteOne(conditions, options);
     await this.removeRelationsOnDelete(player);
     return player;
