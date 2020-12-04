@@ -21,8 +21,11 @@ import { Mode } from './models/mode.enum';
 describe('ChallengeService', () => {
   let connection: Connection;
   let service: ChallengeService;
+  let challengeAbnormal: Challenge;
+  let challengeFenomenal: Challenge;
+  let challengeSophisticated: Challenge;
 
-  const testChallenge = {
+  const testChallengeAbnormal = {
     game: '6853e599-d0bc-4a96-a83c-14086ba22660',
     name: 'Abnormal challenge',
     description: 'Just an abnormal challenge.',
@@ -32,6 +35,30 @@ describe('ChallengeService', () => {
     refs: ['FirstRef', 'SecondRef', 'ThirdRef'],
     locked: true,
     hidden: false,
+  };
+
+  const testChallengeFenomenal = {
+    game: '6853e599-d0bc-4a96-a83c-14086ba22660',
+    name: 'Fenomenal challenge',
+    description: 'Just a fenomenal challenge.',
+    difficulty: Difficulty.BEGINNER,
+    mode: Mode.HACK_IT,
+    modeParameters: [],
+    refs: ['A', 'B', 'C'],
+    locked: false,
+    hidden: true,
+  };
+
+  const testChallengeSophisticated = {
+    game: '6853e599-d0bc-4a96-a83c-14086ba22661',
+    name: 'Sophisticated challenge',
+    description: 'Just a sophisticated challenge.',
+    difficulty: Difficulty.HARD,
+    mode: Mode.SHAPESHIFTER,
+    modeParameters: [],
+    refs: ['123', '456', '789'],
+    locked: false,
+    hidden: true,
   };
 
   beforeAll(async () => {
@@ -58,6 +85,9 @@ describe('ChallengeService', () => {
     await cleanupMongo('Leaderboard');
     await cleanupMongo('Reward');
     await cleanupMongo('ActionHook');
+    challengeAbnormal = await service.create(testChallengeAbnormal);
+    challengeFenomenal = await service.create(testChallengeFenomenal);
+    challengeSophisticated = await service.create(testChallengeSophisticated);
   });
 
   afterAll(async () => {
@@ -69,56 +99,43 @@ describe('ChallengeService', () => {
   });
 
   it('should add new challenge', async () => {
-    const challenge = await service.create(testChallenge);
-
-    expect(challenge).toEqual(expect.objectContaining(testChallenge));
+    expect(challengeAbnormal).toEqual(expect.objectContaining(challengeAbnormal));
   });
 
   it('should get entity inserted', async () => {
-    const challenge: Challenge = await service.create(testChallenge);
-
-    const foundChallenge: Challenge = await service.findById(challenge.id);
-
-    expect(foundChallenge).toEqual(expect.objectContaining(challenge));
+    const foundChallenge: Challenge = await service.findById(challengeAbnormal.id);
+    expect(foundChallenge).toEqual(expect.objectContaining(challengeAbnormal));
   });
 
   it('should find an entity by game id', async () => {
-    const challenge: Challenge = await service.create(testChallenge);
-
-    const foundChallenge: Challenge[] = await service.findByGameId(challenge.game);
-
-    expect(foundChallenge).toEqual(expect.objectContaining([challenge]));
+    const foundChallenges: Challenge[] = await service.findByGameId(challengeAbnormal.game);
+    expect(foundChallenges).toEqual(expect.objectContaining([challengeAbnormal, challengeFenomenal]));
   });
 
   it('should find an entity by game id', async () => {
-    const challenge: Challenge = await service.create(testChallenge);
-
-    const foundChallenge: Challenge[] = await service.findByGameId(challenge.game);
-
-    expect(foundChallenge).toEqual(expect.objectContaining([challenge]));
+    const foundChallenges: Challenge[] = await service.findByGameId(challengeAbnormal.game);
+    expect(foundChallenges).toEqual(expect.objectContaining([challengeAbnormal, challengeFenomenal]));
   });
 
-  it('should return locked challenge', async () => {
-    const challenge: Challenge = await service.create(testChallenge);
-
-    const lockedChallenges: Challenge[] = await service.findLocked(true, challenge.game);
-
-    expect(lockedChallenges).toEqual(expect.objectContaining([challenge]));
+  it('should return locked challenges', async () => {
+    const lockedChallenges: Challenge[] = await service.findLocked(true, challengeAbnormal.game);
+    expect(lockedChallenges).toEqual(expect.objectContaining([challengeAbnormal]));
   });
 
-  it('should return visible challenge', async () => {
-    const challenge: Challenge = await service.create(testChallenge);
-
-    const hiddenChallenges: Challenge[] = await service.findHidden(false, challenge.game);
-
-    expect(hiddenChallenges).toEqual(expect.objectContaining([challenge]));
+  it('should return visible challenges', async () => {
+    const hiddenChallenges: Challenge[] = await service.findHidden(true);
+    expect(hiddenChallenges).toEqual(expect.objectContaining([challengeFenomenal, challengeSophisticated]));
   });
 
   it('should return challenge found by name', async () => {
-    const challenge: Challenge = await service.create(testChallenge);
+    const foundChallenge: Challenge[] = await service.findByName(challengeAbnormal.name, challengeAbnormal.game);
+    expect(foundChallenge).toEqual(expect.objectContaining([challengeAbnormal]));
+  });
 
-    const foundChallenge: Challenge[] = await service.findByName(challenge.name, challenge.game);
-
-    expect(foundChallenge).toEqual(expect.objectContaining([challenge]));
+  it('should retrieve all challenges', async () => {
+    const foundChallenge: Challenge[] = await service.findAll();
+    expect(foundChallenge).toEqual(
+      expect.objectContaining([challengeAbnormal, challengeFenomenal, challengeSophisticated]),
+    );
   });
 });
