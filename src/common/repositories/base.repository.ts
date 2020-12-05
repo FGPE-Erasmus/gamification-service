@@ -1,9 +1,9 @@
 import { LoggerService } from '@nestjs/common';
-import { Document, FilterQuery, Model, UpdateQuery } from 'mongoose';
+import { Document, FilterQuery, Model, MongooseFilterQuery, Schema, UpdateQuery } from 'mongoose';
 
+import { IBaseEntity } from '../interfaces/base-entity.interface';
 import { IRepository } from '../interfaces/repository.interface';
 import { toMongoId } from '../utils/mongo.utils';
-import { IBaseEntity } from '../interfaces/base-entity.interface';
 import { omit } from '../utils/object.utils';
 
 export class BaseRepository<I extends IBaseEntity, E extends I & Document> implements IRepository<I, E> {
@@ -110,6 +110,12 @@ export class BaseRepository<I extends IBaseEntity, E extends I & Document> imple
       .findOneAndRemove(conditions, options)
       .lean<E>({ virtuals: true })
       .exec();
+  }
+
+  async deleteIf(conditions: FilterQuery<E>, options: Record<string, unknown> = {}): Promise<I[]> {
+    const toDelete = await this.findAll(conditions, null, options);
+    await this.model.deleteMany({ _id: { $in: toDelete.map(item => item.id) } } as MongooseFilterQuery<E>, options);
+    return toDelete;
   }
 
   async deleteById(id: string): Promise<I> {

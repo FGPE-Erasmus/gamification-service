@@ -1,7 +1,6 @@
 import { Resolver, Query, ResolveField, Parent, Args } from '@nestjs/graphql';
-import { UseGuards } from '@nestjs/common';
+import { NotFoundException, UseGuards } from '@nestjs/common';
 
-import { GqlJwtAuthGuard } from '../common/guards/gql-jwt-auth.guard';
 import { ChallengeDto } from '../challenge/dto/challenge.dto';
 import { GameDto } from '../game/dto/game.dto';
 import { ChallengeService } from '../challenge/challenge.service';
@@ -12,6 +11,10 @@ import { LeaderboardService } from './leaderboard.service';
 import { LeaderboardDto } from './dto/leaderboard.dto';
 import { Leaderboard } from './models/leaderboard.model';
 import { LeaderboardToDtoMapper } from './mappers/leaderboard-to-dto.mapper';
+import { Roles } from '../keycloak/decorators/roles.decorator';
+import { Role } from '../common/enums/role.enum';
+import { GqlInstructorAssignedGuard } from '../common/guards/gql-instructor-assigned.guard';
+import { GqlPlayerOfGuard } from '../common/guards/gql-player-of.guard';
 
 @Resolver(() => LeaderboardDto)
 export class LeaderboardResolver {
@@ -24,11 +27,23 @@ export class LeaderboardResolver {
     protected readonly challengeToDtoMapper: ChallengeToDtoMapper,
   ) {}
 
+  @Roles(Role.AUTHOR, Role.TEACHER, Role.STUDENT)
+  @UseGuards(GqlInstructorAssignedGuard, GqlPlayerOfGuard)
   @Query(() => [LeaderboardDto])
-  @UseGuards(GqlJwtAuthGuard)
   async leaderboards(@Args('gameId') gameId: string): Promise<LeaderboardDto[]> {
     const leaderboards: Leaderboard[] = await this.leaderboardService.findByGameId(gameId);
     return Promise.all(leaderboards.map(async leaderboard => this.leaderboardToDtoMapper.transform(leaderboard)));
+  }
+
+  @Roles(Role.AUTHOR, Role.TEACHER, Role.STUDENT)
+  @UseGuards(GqlInstructorAssignedGuard, GqlPlayerOfGuard)
+  @Query(() => LeaderboardDto)
+  async leaderboard(@Args('gameId') gameId: string, @Args('id') id: string): Promise<LeaderboardDto> {
+    const leaderboard: Leaderboard = await this.leaderboardService.findById(id);
+    if (!leaderboard || leaderboard.game !== gameId) {
+      throw new NotFoundException();
+    }
+    return this.leaderboardToDtoMapper.transform(leaderboard);
   }
 
   @ResolveField()

@@ -4,15 +4,21 @@ import { FilterQuery, Model } from 'mongoose';
 
 import { BaseRepository } from '../../common/repositories/base.repository';
 import { GroupRepository } from '../../group/repositories/group.repository';
-import { UserRepository } from '../../users/repositories/user.repository';
+import { GameRepository } from '../../game/repositories/game.repository';
+import { PlayerRewardRepository } from '../../player-reward/repositories/player-reward.repository';
+import { ChallengeStatusRepository } from '../../challenge-status/repositories/challenge-status.repository';
 import { Player, PlayerDocument } from '../models/player.model';
+import { SubmissionRepository } from '../../submission/repositories/submission.repository';
 
 @Injectable()
 export class PlayerRepository extends BaseRepository<Player, PlayerDocument> {
   constructor(
     @InjectModel('Player') protected readonly model: Model<PlayerDocument>,
-    protected readonly userRepository: UserRepository,
+    protected readonly gameRepository: GameRepository,
     protected readonly groupRepository: GroupRepository,
+    protected readonly playerRewardRepository: PlayerRewardRepository,
+    protected readonly challengeStatusRepository: ChallengeStatusRepository,
+    protected readonly submissionRepository: SubmissionRepository,
   ) {
     super(new Logger(PlayerRepository.name), model);
   }
@@ -21,13 +27,13 @@ export class PlayerRepository extends BaseRepository<Player, PlayerDocument> {
     if (doc.id) {
       const old = await this.getById(doc.id);
 
-      // if user changed, remove from previous user's collection
-      if (doc.user && old.user) {
-        await this.userRepository.removePlayer(old.user, { id: doc.id });
+      // if game changed, remove from previous game's collection
+      if (doc.game != old.game) {
+        await this.gameRepository.removePlayer(old.game, { id: doc.id });
       }
 
       // if group changed, remove from previous group's collection
-      if (doc.group && old.group) {
+      if (doc.group != old.group) {
         await this.groupRepository.removePlayer(old.group, { id: doc.id });
       }
     }
@@ -35,9 +41,9 @@ export class PlayerRepository extends BaseRepository<Player, PlayerDocument> {
     // save the entity as requested
     const result = await super.save(doc, overwrite);
 
-    // add to user's collection
-    if (doc.user) {
-      await this.userRepository.upsertPlayer(doc.user, { id: result.id });
+    // add to game's collection
+    if (doc.game) {
+      await this.gameRepository.upsertPlayer(doc.game, { id: result.id });
     }
 
     // add to group's collection
@@ -71,7 +77,7 @@ export class PlayerRepository extends BaseRepository<Player, PlayerDocument> {
   }
 
   async removeSubmission(id: string, submission: { id: string }): Promise<Player> {
-    return await this.findOneAndUpdate({ _id: id }, { $pull: { submissions: { _id: submission.id } } });
+    return await this.findOneAndUpdate({ _id: id }, { $pullAll: { submissions: [submission.id] } }, { multi: true });
   }
 
   async upsertChallengeStatus(id: string, challengeStatus: { id: string }): Promise<Player> {
@@ -79,7 +85,11 @@ export class PlayerRepository extends BaseRepository<Player, PlayerDocument> {
   }
 
   async removeChallengeStatus(id: string, challengeStatus: { id: string }): Promise<Player> {
-    return await this.findOneAndUpdate({ _id: id }, { $pull: { learningPath: { _id: challengeStatus.id } } });
+    return await this.findOneAndUpdate(
+      { _id: id },
+      { $pullAll: { learningPath: [challengeStatus.id] } },
+      { multi: true },
+    );
   }
 
   async upsertPlayerReward(id: string, playerReward: { id: string }): Promise<Player> {
@@ -87,17 +97,23 @@ export class PlayerRepository extends BaseRepository<Player, PlayerDocument> {
   }
 
   async removePlayerReward(id: string, playerReward: { id: string }): Promise<Player> {
-    return await this.findOneAndUpdate({ _id: id }, { $pull: { rewards: { _id: playerReward.id } } });
+    return await this.findOneAndUpdate({ _id: id }, { $pullAll: { rewards: [playerReward.id] } }, { multi: true });
   }
 
   private async removeRelationsOnDelete(player: Player): Promise<void> {
-    // remove from user's collection
-    if (player.user) {
-      await this.userRepository.removePlayer(player.user, { id: player.id });
+    // remove from game's collection
+    if (player.game) {
+      await this.gameRepository.removePlayer(player.game, { id: player.id });
     }
     // remove from group's collection
     if (player.group) {
       await this.groupRepository.removePlayer(player.group, { id: player.id });
     }
+    // remove from player reward's collection
+    await this.playerRewardRepository.deleteIf({ player: { $eq: player.id } });
+    // remove from challenge status' collection
+    await this.challengeStatusRepository.deleteIf({ player: { $eq: player.id } });
+    // remove from submissions' collection
+    await this.submissionRepository.deleteIf({ player: { $eq: player.id } });
   }
 }

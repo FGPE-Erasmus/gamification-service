@@ -14,7 +14,7 @@ import { ChallengeStatusRepository } from './repositories/challenge-status.repos
 export class ChallengeStatusService extends BaseService<ChallengeStatus, ChallengeStatusDocument> {
   constructor(
     @Inject('PUB_SUB') protected readonly pubSub: PubSub,
-    protected readonly challengeStatustoDtoMapper: ChallengeStatusToDtoMapper,
+    protected readonly challengeStatusToDtoMapper: ChallengeStatusToDtoMapper,
     protected readonly repository: ChallengeStatusRepository,
     protected readonly eventService: EventService,
   ) {
@@ -55,7 +55,7 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
       challengeId,
     });
     this.pubSub.publish(NotificationEnum.CHALLENGE_STATUS_UPDATED, {
-      challengeStatusUpdated: this.challengeStatustoDtoMapper.transform(result),
+      challengeStatusUpdated: this.challengeStatusToDtoMapper.transform(result),
     });
     return result;
   }
@@ -81,7 +81,7 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
     });
 
     this.pubSub.publish(NotificationEnum.CHALLENGE_STATUS_UPDATED, {
-      challengeStatusUpdated: this.challengeStatustoDtoMapper.transform(result),
+      challengeStatusUpdated: this.challengeStatusToDtoMapper.transform(result),
     });
     return result;
   }
@@ -110,7 +110,7 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
     });
 
     this.pubSub.publish(NotificationEnum.CHALLENGE_STATUS_UPDATED, {
-      challengeStatusUpdated: this.challengeStatustoDtoMapper.transform(result),
+      challengeStatusUpdated: this.challengeStatusToDtoMapper.transform(result),
     });
     return result;
   }
@@ -136,7 +136,7 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
     });
 
     this.pubSub.publish(NotificationEnum.CHALLENGE_STATUS_UPDATED, {
-      challengeStatusUpdated: this.challengeStatustoDtoMapper.transform(result),
+      challengeStatusUpdated: this.challengeStatusToDtoMapper.transform(result),
     });
     return result;
   }
@@ -161,7 +161,7 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
     });
 
     this.pubSub.publish(NotificationEnum.CHALLENGE_STATUS_UPDATED, {
-      challengeStatusUpdated: this.challengeStatustoDtoMapper.transform(result),
+      challengeStatusUpdated: this.challengeStatusToDtoMapper.transform(result),
     });
     return result;
   }
@@ -186,7 +186,7 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
     });
 
     this.pubSub.publish(NotificationEnum.CHALLENGE_STATUS_UPDATED, {
-      challengeStatusUpdated: this.challengeStatustoDtoMapper.transform(result),
+      challengeStatusUpdated: this.challengeStatusToDtoMapper.transform(result),
     });
     return result;
   }
@@ -211,7 +211,7 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
     });
 
     this.pubSub.publish(NotificationEnum.CHALLENGE_STATUS_UPDATED, {
-      challengeStatusUpdated: this.challengeStatustoDtoMapper.transform(result),
+      challengeStatusUpdated: this.challengeStatusToDtoMapper.transform(result),
     });
     return result;
   }

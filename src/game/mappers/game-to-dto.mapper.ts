@@ -22,29 +22,11 @@ export class GameToDtoMapper implements IMapper<Game, GameDto> {
         'endDate',
         'players',
         'submissions',
+        'instructors',
         'createdAt',
         'updatedAt',
       ],
       obj,
     ) as GameDto;
   }
-
-  /*async resolvePlayers(players: any[] = []): Promise<PlayerDto[]> {
-    return Promise.all<PlayerDto>(players.map(async player => {
-      if ( typeof player === 'string' || player instanceof Types.ObjectId ) {
-        return this.playerService.findById(player);
-      }
-      return this.playerToDtoMapper.transform(player);
-    }));
-  }
-
-  async resolveSubmissions(submissions: any[] = []): Promise<SubmissionDto[]> {
-    return Promise.all<SubmissionDto>(submissions.map(async submission => {
-      if ( typeof submission === 'string' || submission instanceof Types.ObjectId ) {
-        return this.s.findById(player);
-      }
-      return this.playerToDtoMapper.transform(player);
-    }));
-
-  }*/
 }

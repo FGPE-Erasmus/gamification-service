@@ -9,6 +9,7 @@ export interface Game extends IBaseEntity {
   gedilLayerDescription?: string;
   startDate?: Date;
   endDate?: Date;
+  instructors?: string[];
   players?: any[];
   submissions?: any[];
 }
@@ -32,6 +33,9 @@ export class GameDocument extends Document implements Game {
 
   @Prop({ nullable: true })
   endDate?: Date;
+
+  @Prop({ type: () => [String], default: () => [] })
+  instructors?: string[];
 
   @Prop({ type: [{ type: Types.ObjectId, ref: 'Player' }] })
   players?: any[];

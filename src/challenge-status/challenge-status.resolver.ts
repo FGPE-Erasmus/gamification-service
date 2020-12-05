@@ -2,8 +2,6 @@ import { Resolver, Args, Query, ResolveField, Parent, Subscription } from '@nest
 import { NotFoundException, UseGuards, Inject } from '@nestjs/common';
 import { PubSub } from 'graphql-subscriptions';
 
-import { GqlJwtAuthGuard } from '../common/guards/gql-jwt-auth.guard';
-import { GqlAdminGuard } from '../common/guards/gql-admin.guard';
 import { NotificationEnum } from '../common/enums/notifications.enum';
 import { ChallengeStatusService } from './challenge-status.service';
 import { ChallengeStatusDto } from './dto/challenge-status.dto';
@@ -17,6 +15,11 @@ import { ChallengeDto } from '../challenge/dto/challenge.dto';
 import { Challenge } from '../challenge/models/challenge.model';
 import { ChallengeService } from '../challenge/challenge.service';
 import { ChallengeToDtoMapper } from '../challenge/mappers/challenge-to-dto.mapper';
+import { Roles } from '../keycloak/decorators/roles.decorator';
+import { Role } from '../common/enums/role.enum';
+import { GqlPlayer } from '../common/decorators/gql-player.decorator';
+import { GqlInstructorAssignedGuard } from '../common/guards/gql-instructor-assigned.guard';
+import { GqlPlayerOfGuard } from '../common/guards/gql-player-of.guard';
 
 @Resolver(() => ChallengeStatusDto)
 export class ChallengeStatusResolver {
@@ -30,10 +33,28 @@ export class ChallengeStatusResolver {
     protected readonly challengeToDtoMapper: ChallengeToDtoMapper,
   ) {}
 
+  @Roles(Role.AUTHOR, Role.TEACHER)
+  @UseGuards(GqlInstructorAssignedGuard)
   @Query(() => ChallengeStatusDto)
-  @UseGuards(GqlJwtAuthGuard, GqlAdminGuard)
   async challengeStatus(
     @Args('playerId') playerId: string,
+    @Args('challengeId') challengeId: string,
+  ): Promise<ChallengeStatusDto> {
+    const status: ChallengeStatus = await this.challengeStatusService.findByChallengeIdAndPlayerId(
+      challengeId,
+      playerId,
+    );
+    if (!status) {
+      throw new NotFoundException();
+    }
+    return this.challengeStatusToDtoMapper.transform(status);
+  }
+
+  @Roles(Role.STUDENT)
+  @UseGuards(GqlPlayerOfGuard)
+  @Query(() => ChallengeStatusDto)
+  async myChallengeStatus(
+    @GqlPlayer('id') playerId: string,
     @Args('challengeId') challengeId: string,
   ): Promise<ChallengeStatusDto> {
     const status: ChallengeStatus = await this.challengeStatusService.findByChallengeIdAndPlayerId(
@@ -60,8 +81,8 @@ export class ChallengeStatusResolver {
     return this.playerToDtoMapper.transform(player);
   }
 
-  @Subscription(returns => ChallengeStatusDto)
-  challengeStatusUpdated() {
+  @Subscription(() => ChallengeStatusDto)
+  challengeStatusUpdated(): AsyncIterator<ChallengeStatusDto> {
     return this.pubSub.asyncIterator(NotificationEnum.CHALLENGE_STATUS_UPDATED);
   }
 }

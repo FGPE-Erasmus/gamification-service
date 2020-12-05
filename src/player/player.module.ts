@@ -8,7 +8,6 @@ import { GroupModule } from '../group/group.module';
 import { EventModule } from '../event/event.module';
 import { PlayerRewardModule } from '../player-reward/player-reward.module';
 import { SubmissionModule } from '../submission/submission.module';
-import { UsersModule } from '../users/users.module';
 import { PlayerService } from './player.service';
 import { PlayerSchema } from './models/player.model';
 import { PlayerRepository } from './repositories/player.repository';
@@ -25,7 +24,6 @@ import { PlayerResolver } from './player.resolver';
     ]),
     forwardRef(() => EventModule),
     forwardRef(() => GameModule),
-    forwardRef(() => UsersModule),
     forwardRef(() => GroupModule),
     forwardRef(() => ChallengeStatusModule),
     forwardRef(() => PlayerRewardModule),

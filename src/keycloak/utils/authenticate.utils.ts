@@ -2,12 +2,13 @@ import { KeycloakRequest } from '../types/keycloak-request.type';
 import { KeycloakOptions } from '../interfaces/keycloak-options.interface';
 import { HttpService } from '@nestjs/common';
 import * as qs from 'qs';
+
 import { LoginArgs } from '../args/login.args';
 import { AuthDto } from '../dto/auth.dto';
 import { LoginResponseDto } from '../dto/login-response.dto';
 
 export default async function authenticate(
-  req: KeycloakRequest<Request>,
+  req: KeycloakRequest,
   options: KeycloakOptions,
   httpService: HttpService,
   { password, refreshToken, scope, username }: LoginArgs,

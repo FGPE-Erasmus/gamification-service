@@ -10,7 +10,7 @@ import { ChallengeStatusSchema } from './models/challenge-status.model';
 import { ChallengeStatusRepository } from './repositories/challenge-status.repository';
 import { ChallengeStatusToDtoMapper } from './mappers/challenge-status-to-dto.mapper';
 import { EventModule } from '../event/event.module';
-import { UsersModule } from '../users/users.module';
+import { GameModule } from '../game/game.module';
 
 @Module({
   imports: [
@@ -20,13 +20,13 @@ import { UsersModule } from '../users/users.module';
         schema: ChallengeStatusSchema,
       },
     ]),
-    forwardRef(() => UsersModule),
+    forwardRef(() => GameModule),
     forwardRef(() => EventModule),
     forwardRef(() => PlayerModule),
     forwardRef(() => ChallengeModule),
     forwardRef(() => SubscriptionsModule),
   ],
   providers: [ChallengeStatusToDtoMapper, ChallengeStatusRepository, ChallengeStatusService, ChallengeStatusResolver],
-  exports: [ChallengeStatusToDtoMapper, ChallengeStatusService],
+  exports: [ChallengeStatusToDtoMapper, ChallengeStatusRepository, ChallengeStatusService],
 })
 export class ChallengeStatusModule {}

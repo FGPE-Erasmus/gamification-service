@@ -5,7 +5,6 @@ import { BaseService } from '../common/services/base.service';
 import { generatePassword } from '../common/utils/password-generator.util';
 import { User, UserDocument } from './models/user.model';
 import { UserInput } from './inputs/user.input';
-import { Role } from './models/role.enum';
 import { UserRepository } from './repositories/user.repository';
 
 @Injectable()
@@ -124,16 +123,5 @@ export class UsersService extends BaseService<User, UserDocument> {
 
   async delete(id: string): Promise<User> {
     return super.delete(id, true);
-  }
-
-  /**
-   * Returns if the user has admin set on the roles array
-   *
-   * @param {User} user to check for admin role
-   * @returns {boolean}
-   * @memberOf UsersService
-   */
-  isAdmin(user: User): boolean {
-    return user.roles.includes(Role.ADMIN);
   }
 }

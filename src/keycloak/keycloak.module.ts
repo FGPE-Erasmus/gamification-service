@@ -1,19 +1,19 @@
 import * as Keycloak from 'keycloak-connect';
 import { DynamicModule, HttpModule, HttpService, Module, Provider } from '@nestjs/common';
-import { DiscoveryModule, DiscoveryService, Reflector } from '@nestjs/core';
+import { Reflector } from '@nestjs/core';
 
-import { KeycloakOptions } from './interfaces/keycloak-options.interface';
-import { KeycloakService } from './keycloak.service';
 import { KEYCLOAK_INSTANCE, KEYCLOAK_OPTIONS, KEYCLOAK_REGISTER } from './keycloak.constants';
-import { KeycloakAsyncOptions } from './interfaces/keycloak-async-options.interface';
-import KeycloakRegister from './keycloak.register';
 import { KeycloakResolver } from './keycloak.resolver';
+import { KeycloakService } from './keycloak.service';
+import { KeycloakOptions } from './interfaces/keycloak-options.interface';
+import { KeycloakAsyncOptions } from './interfaces/keycloak-async-options.interface';
+import { UserResolver } from './user.resolver';
 
 @Module({
-  providers: [KeycloakResolver],
+  providers: [KeycloakResolver, UserResolver],
 })
 export class KeycloakModule {
-  public static imports = [HttpModule, DiscoveryModule];
+  public static imports = [HttpModule];
 
   public static register(options: KeycloakOptions): DynamicModule {
     return {
@@ -49,15 +49,10 @@ export class KeycloakModule {
   private static createKeycloakRegisterProvider() {
     return {
       provide: KEYCLOAK_REGISTER,
-      useFactory(
-        options: KeycloakOptions,
-        httpService: HttpService,
-        discoveryService: DiscoveryService,
-        reflector: Reflector,
-      ) {
-        KeycloakModule.setupKeycloak(options, httpService, discoveryService, reflector);
+      useFactory(options: KeycloakOptions) {
+        KeycloakModule.setupKeycloak(options);
       },
-      inject: [KEYCLOAK_OPTIONS, HttpService, DiscoveryService, Reflector],
+      inject: [KEYCLOAK_OPTIONS, HttpService, Reflector],
     };
   }
 
@@ -85,13 +80,8 @@ export class KeycloakModule {
     inject: [KEYCLOAK_OPTIONS],
   };
 
-  private static async setupKeycloak(
-    options: KeycloakOptions,
-    httpService: HttpService,
-    discoveryService: DiscoveryService,
-    reflector: Reflector,
-  ): Promise<void> {
-    const register = new KeycloakRegister(options, httpService, discoveryService, reflector);
-    await register.setup();
+  private static async setupKeycloak(options: KeycloakOptions): Promise<void> {
+    console.log(`registering keycloak ... ${JSON.stringify(options, null, 2)}`);
+    console.log('registered keycloak');
   }
 }

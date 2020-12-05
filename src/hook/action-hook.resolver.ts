@@ -1,7 +1,5 @@
-import { UseGuards } from '@nestjs/common';
 import { Args, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 
-import { GqlJwtAuthGuard } from '../common/guards/gql-jwt-auth.guard';
 import { ChallengeService } from '../challenge/challenge.service';
 import { GameService } from '../game/game.service';
 import { GameDto } from '../game/dto/game.dto';
@@ -12,6 +10,8 @@ import { ActionHookService } from './action-hook.service';
 import { ActionHookDto } from './dto/action-hook.dto';
 import { ActionHookToDtoMapper } from './mappers/action-hook-to-dto.mapper';
 import { ActionHook } from './models/action-hook.model';
+import { Roles } from '../keycloak/decorators/roles.decorator';
+import { Role } from '../common/enums/role.enum';
 
 @Resolver(() => ActionHookDto)
 export class ActionHookResolver {
@@ -24,8 +24,8 @@ export class ActionHookResolver {
     protected readonly challengeToDtoMapper: ChallengeToDtoMapper,
   ) {}
 
+  @Roles(Role.AUTHOR)
   @Query(() => [ActionHookDto])
-  @UseGuards(GqlJwtAuthGuard)
   async actionHooks(@Args('gameId') gameId: string): Promise<ActionHookDto[]> {
     const hooks: ActionHook[] = await this.actionHookService.findByGameId(gameId);
     return Promise.all(hooks.map(async hook => this.actionHookToDtoMapper.transform(hook)));

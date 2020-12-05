@@ -6,9 +6,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { GraphQLJSON } from 'graphql-type-json';
 
 import { appConfig } from './app.config';
-import { UsersModule } from './users/users.module';
 import { DateScalar } from './common/scalars/date.scalar';
-import { EmailScalar } from './common/scalars/email.scalar';
 import { HealthModule } from './healthcheck/healthcheck.module';
 import { GameModule } from './game/game.module';
 import { ChallengeModule } from './challenge/challenge.module';
@@ -76,7 +74,6 @@ import { ResourceGuard } from './keycloak/guards/resource.guard';
     HealthModule,
     EventModule,
     EvaluationEngineModule,
-    UsersModule,
     GameModule,
     PlayerModule,
     SubmissionModule,
@@ -89,25 +86,16 @@ import { ResourceGuard } from './keycloak/guards/resource.guard';
   ],
   providers: [
     DateScalar,
-    EmailScalar,
 
-    // This adds a global level authentication guard, you can also have it scoped
-    // if you like.
-    //
-    // Will return a 401 unauthorized when it is unable to
-    // verify the JWT token or Bearer header is missing.
     {
       provide: APP_GUARD,
       useClass: AuthGuard,
     },
-    // This adds a global level resource guard, which is permissive.
-    // Only controllers annotated with @Resource and methods with @Scopes
-    // are handled by this guard.
     {
       provide: APP_GUARD,
       useClass: ResourceGuard,
     },
   ],
-  exports: [KeycloakModule],
+  exports: [HttpModule, KeycloakModule],
 })
 export class AppModule {}

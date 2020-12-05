@@ -1,5 +1,6 @@
 import { Document, FilterQuery, UpdateQuery } from 'mongoose';
 import { IBaseEntity } from './base-entity.interface';
+import { Submission } from '../../submission/models/submission.model';
 
 export interface IRepository<I extends IBaseEntity, E extends I & Document> {
   /**
@@ -101,4 +102,12 @@ export interface IRepository<I extends IBaseEntity, E extends I & Document> {
    * @param {string} id ID of the document to delete.
    */
   deleteById(id: string): Promise<I>;
+
+  /**
+   * Delete all documents from the database matching criteria.
+   *
+   * @param conditions the conditions to test.
+   * @param options the query options.
+   */
+  deleteIf(conditions: FilterQuery<E>, options: Record<string, unknown>): Promise<I[]>;
 }

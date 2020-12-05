@@ -47,6 +47,25 @@ export class PlayerService extends BaseService<Player, PlayerDocument> {
     return player;
   }
 
+  async removeFromGame(gameId: string, userId: string): Promise<Player> {
+    // is the player enrolled?
+    let player: Player = await this.findByGameAndUser(gameId, userId);
+    if (!player) {
+      throw new NotFoundException();
+    }
+
+    // remove player
+    player = await this.delete(player.id);
+
+    // send PLAYER_LEFT event
+    await this.eventService.fireEvent(TriggerEvent.PLAYER_LEFT, {
+      gameId: gameId,
+      playerId: player.id,
+    });
+
+    return player;
+  }
+
   async setGroup(gameId: string, playerId: string, groupId: string): Promise<Player> {
     // is the player enrolled?
     const player: Player = await this.findOne({

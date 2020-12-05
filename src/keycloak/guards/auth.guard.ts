@@ -1,10 +1,12 @@
 import { CanActivate, ExecutionContext, HttpService, Inject, Injectable, Logger } from '@nestjs/common';
-import { Grant, Keycloak, Token } from 'keycloak-connect';
 import { Reflector } from '@nestjs/core';
+import { Grant, Keycloak, Token } from 'keycloak-connect';
+import { Request } from 'express';
 
+import { appConfig } from '../../app.config';
+import { getReq } from '../../common/utils/request.utils';
 import { KEYCLOAK_INSTANCE, KEYCLOAK_OPTIONS } from '../keycloak.constants';
 import { KeycloakOptions } from '../interfaces/keycloak-options.interface';
-import { extractJwt, getReq } from '../utils/request.utils';
 import { UserInfo } from '../interfaces/user-info.interface';
 import { KeycloakRequest } from '../types/keycloak-request.type';
 import authenticate from '../utils/authenticate.utils';
@@ -21,11 +23,12 @@ export class AuthGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const req = getReq(context);
+    this.logger.debug('running auth guard ...');
+    const req: KeycloakRequest = getReq(context);
     const isPublic = !!this.reflector.get<string>('public', context.getHandler());
     if (isPublic) return true;
     const roles = this.reflector.get<(string | string[])[]>('roles', context.getHandler());
-    const accessToken = extractJwt(req) || req.session?.token;
+    const accessToken = this.extractJwt(req) || req.session?.token;
     let grant: Grant | null = null;
     if (accessToken?.length) {
       grant = await this.getGrant(req, accessToken);
@@ -77,7 +80,7 @@ export class AuthGuard implements CanActivate {
     return userInfo;
   }
 
-  async getGrant(req: KeycloakRequest<Request>, accessToken?: string): Promise<Grant | null> {
+  async getGrant(req: KeycloakRequest, accessToken?: string): Promise<Grant | null> {
     const accessGrant = !!accessToken?.length;
     if (!accessToken && req.session?.refreshToken?.length) {
       try {
@@ -111,5 +114,17 @@ export class AuthGuard implements CanActivate {
       }
       return this.getGrant(req);
     }
+  }
+
+  extractJwt(req: Request): string | null {
+    if (req && req.cookies && req.cookies[appConfig.auth.keycloak.cookieKey]) {
+      return req.cookies[appConfig.auth.keycloak.cookieKey];
+    }
+    const { authorization } = req.headers;
+    if (typeof authorization === 'undefined') return null;
+    if (authorization?.indexOf(' ') <= -1) return authorization;
+    const auth = authorization?.split(' ');
+    if (auth && auth[0] && auth[0].toLowerCase() === 'bearer') return auth[1];
+    return null;
   }
 }

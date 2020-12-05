@@ -1,8 +1,7 @@
-import { UseGuards, Inject } from '@nestjs/common';
+import { Inject, UseGuards } from '@nestjs/common';
 import { Args, Parent, Query, ResolveField, Resolver, Subscription } from '@nestjs/graphql';
 import { PubSub } from 'graphql-subscriptions';
 
-import { GqlJwtAuthGuard } from '../common/guards/gql-jwt-auth.guard';
 import { NotificationEnum } from '../common/enums/notifications.enum';
 import { ChallengeService } from '../challenge/challenge.service';
 import { ChallengeDto } from '../challenge/dto/challenge.dto';
@@ -18,6 +17,10 @@ import { PlayerDto } from '../player/dto/player.dto';
 import { Player } from '../player/models/player.model';
 import { PlayerService } from '../player/player.service';
 import { PlayerToDtoMapper } from '../player/mappers/player-to-dto.mapper';
+import { Roles } from '../keycloak/decorators/roles.decorator';
+import { Role } from '../common/enums/role.enum';
+import { GqlInstructorAssignedGuard } from '../common/guards/gql-instructor-assigned.guard';
+import { GqlPlayerOfGuard } from '../common/guards/gql-player-of.guard';
 
 @Resolver(() => RewardDto, { isAbstract: true })
 export class RewardResolver {
@@ -33,8 +36,9 @@ export class RewardResolver {
     protected readonly challengeToDtoMapper: ChallengeToDtoMapper,
   ) {}
 
+  @Roles(Role.AUTHOR, Role.TEACHER, Role.STUDENT)
+  @UseGuards(GqlInstructorAssignedGuard, GqlPlayerOfGuard)
   @Query(() => [RewardDto])
-  @UseGuards(GqlJwtAuthGuard)
   async rewards(@Args('gameId') gameId: string): Promise<RewardDto[]> {
     const rewards: Reward[] = await this.rewardService.findByGameId(gameId);
     return Promise.all(rewards.map(async reward => this.rewardToDtoMapper.transform(reward)));
@@ -69,18 +73,18 @@ export class RewardResolver {
     return Promise.all(players.map(async player => this.playerToDtoMapper.transform(player)));
   }
 
-  @Subscription(returns => RewardDto)
-  rewardReceived() {
+  @Subscription(() => RewardDto)
+  rewardReceived(): AsyncIterator<Reward> {
     return this.pubSub.asyncIterator(NotificationEnum.REWARD_RECEIVED);
   }
 
-  @Subscription(returns => RewardDto)
-  rewardRemoved() {
+  @Subscription(() => RewardDto)
+  rewardRemoved(): AsyncIterator<Reward> {
     return this.pubSub.asyncIterator(NotificationEnum.REWARD_REMOVED);
   }
 
-  @Subscription(returns => RewardDto)
-  rewardSubstracted() {
+  @Subscription(() => RewardDto)
+  rewardSubtracted(): AsyncIterator<Reward> {
     return this.pubSub.asyncIterator(NotificationEnum.REWARD_SUBSTRACTED);
   }
 }

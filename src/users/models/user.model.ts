@@ -1,8 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
-import { Role } from './role.enum';
 import { IBaseEntity } from '../../common/interfaces/base-entity.interface';
+import { Role } from '../../common/enums/role.enum';
 
 export interface User extends IBaseEntity {
   name: string;
@@ -32,7 +32,7 @@ export class UserDocument extends Document implements User {
   @Prop({ required: true })
   password?: string;
 
-  @Prop({ type: () => [String], enum: Role, default: () => [Role.USER] })
+  @Prop({ type: () => [String], enum: Role, default: () => [Role.STUDENT] })
   roles?: Role[];
 
   @Prop()

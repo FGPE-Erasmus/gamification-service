@@ -9,8 +9,11 @@ import { AuthDto } from './dto/auth.dto';
 import { KeycloakService } from './keycloak.service';
 import { LogoutResponseDto } from './dto/logout-response.dto';
 import { ProfileDto } from './dto/profile.dto';
-import { GqlSession } from '../common/decorators/gql-session.decorator';
 import { GqlUserInfo } from '../common/decorators/gql-user-info.decorator';
+import { UserDto } from './dto/user.dto';
+import { UseGuards } from '@nestjs/common';
+import { AuthGuard } from './guards/auth.guard';
+import { Role } from '../common/enums/role.enum';
 
 @Resolver('Keycloak')
 export class KeycloakResolver {
@@ -27,8 +30,10 @@ export class KeycloakResolver {
     return result;
   }
 
+  @UseGuards(AuthGuard)
   @Query(() => ProfileDto)
   async me(@GqlUserInfo() userInfo: Record<string, any>): Promise<ProfileDto> {
+    console.log(this.keycloakService.grant?.access_token.hasRealmRole(Role.AUTHOR));
     return {
       id: userInfo.sub,
       username: userInfo.preferredUsername,
@@ -36,6 +41,11 @@ export class KeycloakResolver {
       lastName: userInfo.family_name,
       ...userInfo,
     };
+  }
+
+  @Query(() => UserDto)
+  async user(@Args('id') userId: string): Promise<UserDto> {
+    return this.keycloakService.getUser(userId);
   }
 
   @Public()

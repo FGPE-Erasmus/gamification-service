@@ -7,6 +7,6 @@ import { GqlExecutionContext } from '@nestjs/graphql';
 export const GqlUserInfo = createParamDecorator(
   (key: string, context: ExecutionContext): Record<string, any> => {
     const ctx = GqlExecutionContext.create(context).getContext();
-    return ctx.req && ctx.req.userInfo;
+    return key ? ctx.req && ctx.req.userInfo && ctx.req.userInfo[key] : ctx.req && ctx.req.userInfo;
   },
 );

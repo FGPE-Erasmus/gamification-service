@@ -12,7 +12,7 @@ import {
 } from 'class-validator';
 
 import { EmailScalar as Email } from '../../common/scalars/email.scalar';
-import { Role } from '../models/role.enum';
+import { Role } from '../../common/enums/role.enum';
 
 @InputType()
 export class UserInput {
@@ -44,7 +44,7 @@ export class UserInput {
   @IsOptional()
   photo?: string;
 
-  @Field(() => [Role], { nullable: true, defaultValue: [Role.USER] })
+  @Field(() => [Role], { nullable: true, defaultValue: [Role.STUDENT] })
   @IsOptional()
   @IsArray()
   @IsEnum(Role, { each: true })

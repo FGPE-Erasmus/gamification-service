@@ -4,6 +4,7 @@
   "description": "This is a Gamification Service for educational contexts. It consumes a JSON object adhering to GEdIL schema and uses it to provide the student with a gamified experience leveraging on the activities of the course.",
   "license": "GPL-3.0",
   "scripts": {
+    "preinstall": "npx npm-force-resolutions",
     "prebuild": "rimraf dist",
     "build": "nest build",
     "start:dev": "nest start --watch",

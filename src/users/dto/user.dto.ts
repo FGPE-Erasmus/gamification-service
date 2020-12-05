@@ -2,7 +2,7 @@ import { Field, HideField, ID, ObjectType } from '@nestjs/graphql';
 
 import { EmailScalar as Email } from '../../common/scalars/email.scalar';
 import { PlayerDto } from '../../player/dto/player.dto';
-import { Role } from '../models/role.enum';
+import { Role } from '../../common/enums/role.enum';
 
 @ObjectType('User')
 export class UserDto {

@@ -36,10 +36,4 @@ export class GameInput {
   @IsOptional()
   @IsDate()
   endDate?: Date;
-
-  /*@Field(() => [String], { nullable: true })
-  @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
-  enrolments?: string[];*/
 }

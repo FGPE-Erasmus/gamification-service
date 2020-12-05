@@ -1,10 +1,12 @@
+import { Reflector } from '@nestjs/core';
 import { CanActivate, ExecutionContext, Inject, Injectable, Logger } from '@nestjs/common';
 import { Keycloak } from 'keycloak-connect';
-import { Reflector } from '@nestjs/core';
+
 import { RESOURCE } from '../decorators/resource.decorator';
 import { SCOPES } from '../decorators/scopes.decorator';
 import { KEYCLOAK_INSTANCE } from '../keycloak.constants';
-import { getReq } from '../utils/request.utils';
+import { getReq } from '../../common/utils/request.utils';
+import { KeycloakRequest } from '../types/keycloak-request.type';
 
 declare module 'keycloak-connect' {
   interface Keycloak {
@@ -27,7 +29,7 @@ export class ResourceGuard implements CanActivate {
     if (!resource || !scopes.length) return true;
     this.logger.verbose(`Protecting resource '${resource}' with scopes: [ ${scopes} ]`);
     if (!scopes.length) return true;
-    const req = getReq(context);
+    const req: KeycloakRequest = getReq(context);
     if (!req.userInfo) return false;
     const permissions = scopes.map(scope => `${resource}:${scope}`);
     const res: Response = context.switchToHttp().getResponse();

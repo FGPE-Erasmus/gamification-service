@@ -2,6 +2,45 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Reward {
+  id: ID!
+  game: Game!
+  parentChallenge: Challenge
+  kind: RewardType!
+  name: String!
+  description: String
+  image: String
+  recurrent: Boolean!
+  cost: Float
+  amount: Float
+  message: String
+  challenges: [Challenge!]
+  players: [PlayerReward!]!
+  createdAt: Date!
+  updatedAt: Date
+}
+
+enum RewardType {
+  POINT
+  BADGE
+  VIRTUAL_ITEM
+  COUPON
+  REVEAL
+  UNLOCK
+  HINT
+  MESSAGE
+}
+
+"""Date custom scalar type"""
+scalar Date
+
+type PlayerReward {
+  id: ID!
+  player: Player!
+  reward: Reward!
+  count: Float!
+}
+
 type Submission {
   id: ID!
   game: Game!
@@ -41,8 +80,58 @@ enum Result {
   ASK_FOR_REEVALUATION
 }
 
-"""Date custom scalar type"""
-scalar Date
+type ChallengeStatus {
+  id: ID!
+  player: Player!
+  challenge: Challenge!
+  startedAt: Date
+  openedAt: Date
+  endedAt: Date
+  state: State!
+}
+
+enum State {
+  AVAILABLE
+  LOCKED
+  HIDDEN
+  OPENED
+  FAILED
+  COMPLETED
+  REJECTED
+}
+
+type Group {
+  id: ID!
+  game: Game!
+  name: String!
+  displayName: String
+  imageUrl: String
+  players: [Player!]!
+  createdAt: Date!
+  updatedAt: Date
+}
+
+type User {
+  id: String
+  emailVerified: Boolean
+  username: String
+  email: String
+  firstName: String
+  lastName: String
+}
+
+type Player {
+  id: ID!
+  game: Game!
+  user: User!
+  group: Group
+  points: Float!
+  submissions: [Submission!]!
+  learningPath: [ChallengeStatus!]!
+  rewards: [PlayerReward!]!
+  createdAt: Date!
+  updatedAt: Date
+}
 
 type Game {
   id: ID!
@@ -52,6 +141,7 @@ type Game {
   gedilLayerDescription: String
   startDate: Date
   endDate: Date
+  instructors: [User!]!
   players: [Player!]!
   submissions: [Submission!]!
   createdAt: Date!
@@ -90,110 +180,6 @@ enum Mode {
   HACK_IT
   TIME_BOMB
   DUEL
-}
-
-type Reward {
-  id: ID!
-  game: Game!
-  parentChallenge: Challenge
-  kind: RewardType!
-  name: String!
-  description: String
-  image: String
-  recurrent: Boolean!
-  cost: Float
-  amount: Float
-  message: String
-  challenges: [Challenge!]
-  players: [PlayerReward!]!
-  createdAt: Date!
-  updatedAt: Date
-}
-
-enum RewardType {
-  POINT
-  BADGE
-  VIRTUAL_ITEM
-  COUPON
-  REVEAL
-  UNLOCK
-  HINT
-  MESSAGE
-}
-
-type PlayerReward {
-  id: ID!
-  player: Player!
-  reward: Reward!
-  count: Float!
-}
-
-type ChallengeStatus {
-  id: ID!
-  player: Player!
-  challenge: Challenge!
-  startedAt: Date
-  openedAt: Date
-  endedAt: Date
-  state: State!
-}
-
-enum State {
-  AVAILABLE
-  LOCKED
-  HIDDEN
-  OPENED
-  FAILED
-  COMPLETED
-  REJECTED
-}
-
-type Group {
-  id: ID!
-  game: Game!
-  name: String!
-  displayName: String
-  imageUrl: String
-  players: [Player!]!
-  createdAt: Date!
-  updatedAt: Date
-}
-
-type Player {
-  id: ID!
-  game: Game!
-  user: User!
-  group: Group
-  points: Float!
-  submissions: [Submission!]!
-  learningPath: [ChallengeStatus!]!
-  rewards: [PlayerReward!]!
-  createdAt: Date!
-  updatedAt: Date
-}
-
-type User {
-  id: ID!
-  name: String!
-  username: String!
-  email: Email!
-  roles: [Role!]!
-  photo: String
-  telephone: String
-  birthDate: Date
-  active: Boolean!
-  lastActivityAt: Date
-  createdAt: Date
-  updatedAt: Date
-  registrations: [Player!]
-}
-
-"""Email custom scalar type"""
-scalar Email
-
-enum Role {
-  USER
-  ADMIN
 }
 
 type Badge {
@@ -379,7 +365,6 @@ enum TriggerEvent {
   SUBMISSION_RECEIVED
   SUBMISSION_ACCEPTED
   SUBMISSION_REJECTED
-  PLAYER_ENROLLED
   CHALLENGE_AVAILABLE
   CHALLENGE_OPENED
   CHALLENGE_HIDDEN
@@ -388,6 +373,8 @@ enum TriggerEvent {
   CHALLENGE_COMPLETED
   CHALLENGE_FAILED
   REWARD_GRANTED
+  PLAYER_ENROLLED
+  PLAYER_LEFT
   PLAYER_UPDATED
   POINTS_UPDATED
   DUEL_INVITATION_RECEIVED
@@ -458,10 +445,7 @@ type Profile {
 }
 
 type Query {
-  user(id: String!): User!
-  users: [User!]!
-  submission(submissionId: String!): Submission!
-  submissions(exerciseId: String!, gameId: String!): [Submission!]!
+  alive: String!
   rewards(gameId: String!): [Reward!]!
   badges(gameId: String!): [Badge!]!
   coupons(gameId: String!): [Coupon!]!
@@ -471,53 +455,55 @@ type Query {
   virtualItems(gameId: String!): [VirtualItem!]!
   unlocks(gameId: String!): [Unlock!]!
   reveals(gameId: String!): [Reveal!]!
-  actionHooks(gameId: String!): [ActionHook!]!
-  scheduledHooks(gameId: String!): [ScheduledHook!]!
-  leaderboards(gameId: String!): [Leaderboard!]!
-  rankings(leaderboardId: String!, gameId: String!): [Ranking!]!
-  groupRankings(leaderboardId: String!, gameId: String!): [Ranking!]!
-  games: [Game!]!
-  game(id: String!): Game!
-  challenges(gameId: String!): [Challenge!]!
-  challengeStatus(challengeId: String!, playerId: String!): ChallengeStatus!
+  submission(id: String!, gameId: String!): Submission!
+  submissions(exerciseId: String, gameId: String!, userId: String!): [Submission!]!
+  mySubmissions(exerciseId: String, gameId: String!): [Submission!]!
   groups(gameId: String!): [Group!]!
-  group(id: String!): Group!
+  group(id: String!, gameId: String!): Group!
   groupInGame(gameId: String!): Group!
   players(gameId: String!): [Player!]!
   profileInGame(gameId: String!): Player!
   player(userId: String!, gameId: String!): Player!
-  alive: String!
+  challengeStatus(challengeId: String!, playerId: String!): ChallengeStatus!
+  myChallengeStatus(challengeId: String!): ChallengeStatus!
+  actionHooks(gameId: String!): [ActionHook!]!
+  scheduledHooks(gameId: String!): [ScheduledHook!]!
+  leaderboards(gameId: String!): [Leaderboard!]!
+  leaderboard(id: String!, gameId: String!): Leaderboard!
+  rankings(leaderboardId: String!, gameId: String!): [Ranking!]!
+  groupRankings(leaderboardId: String!, gameId: String!): [Ranking!]!
+  challenges(gameId: String!): [Challenge!]!
+  challenge(id: String!, gameId: String!): Challenge!
+  games: [Game!]!
+  game(id: String!): Game!
   me: Profile!
+  user(id: String!): User!
+  users: [User!]!
+  usersByRole(role: String!): [User!]!
 }
 
 type Mutation {
-  saveUser(id: ID, userInput: UserInput!): User!
-  deleteUser(id: ID!): User!
   evaluate(gameId: String!, exerciseId: String!, file: Upload!): Submission
-  importGEdILArchive(gameInput: GameInput!, file: Upload!): Game!
-  saveGroup(id: ID, groupInput: GroupInput!): Group!
+  saveGroup(id: ID, groupInput: GroupInput!, gameId: String!): Group!
   autoAssignGroups(gameId: String!): [Group!]!
   enroll(gameId: String!): Player!
   addToGame(gameId: String!, userId: String!): Player!
+  removeFromGame(gameId: String!, userId: String!): Player!
   setGroup(groupId: String!, playerId: String!, gameId: String!): Player!
+  importGEdILArchive(gameInput: GameInput!, file: Upload!): Game!
+  assignInstructor(userId: String!, gameId: String!): Game!
   login(username: String, password: String, scope: String, refreshToken: String, redirectUri: String): Auth!
   logout(redirectUri: String): LogoutResponse!
 }
 
-input UserInput {
-  name: String!
-  username: String!
-  email: Email!
-  telephone: String
-  birthDate: Date
-  photo: String
-  roles: [Role!] = [USER]
-  password: String
-  active: Boolean
-}
-
 """The `Upload` scalar type represents a file upload."""
 scalar Upload
+
+input GroupInput {
+  name: String!
+  displayName: String
+  imageUrl: String
+}
 
 input GameInput {
   name: String!
@@ -528,20 +514,14 @@ input GameInput {
   endDate: Date
 }
 
-input GroupInput {
-  game: String!
-  name: String!
-  displayName: String
-  imageUrl: String
-}
-
 type Subscription {
-  submissionEvaluated: Submission!
-  submissionSent: Submission!
   rewardReceived: Reward!
   rewardRemoved: Reward!
-  rewardSubstracted: Reward!
-  challengeStatusUpdated: ChallengeStatus!
+  rewardSubtracted: Reward!
+  submissionEvaluated: Submission!
+  submissionSent: Submission!
   playerEnrolled: Player!
+  playerLeft: Player!
   pointsUpdated: Float!
+  challengeStatusUpdated: ChallengeStatus!
 }

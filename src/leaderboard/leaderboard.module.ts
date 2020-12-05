@@ -2,7 +2,6 @@ import { forwardRef, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
 import { ChallengeModule } from '../challenge/challenge.module';
-import { UsersModule } from '../users/users.module';
 import { GameModule } from '../game/game.module';
 import { PlayerModule } from '../player/player.module';
 import { SubmissionModule } from '../submission/submission.module';
@@ -16,7 +15,6 @@ import { RankingResolver } from './ranking.resolver';
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: 'Leaderboard', schema: LeaderboardSchema }]),
-    forwardRef(() => UsersModule),
     forwardRef(() => GameModule),
     forwardRef(() => ChallengeModule),
     forwardRef(() => PlayerModule),

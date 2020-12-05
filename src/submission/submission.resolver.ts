@@ -2,11 +2,7 @@ import { UseGuards, NotFoundException, ForbiddenException, Inject } from '@nestj
 import { Resolver, Args, Mutation, Query, ResolveField, Parent, Subscription } from '@nestjs/graphql';
 import { PubSub } from 'graphql-subscriptions';
 
-import { GqlUser } from '../common/decorators/gql-user.decorator';
-import { GqlJwtAuthGuard } from '../common/guards/gql-jwt-auth.guard';
-import { GqlEnrolledInGame } from '../common/guards/gql-game-enrollment.guard';
 import { NotificationEnum } from '../common/enums/notifications.enum';
-import { Role } from '../users/models/role.enum';
 import { GameDto } from '../game/dto/game.dto';
 import { SubmissionToDtoMapper } from './mappers/submission-to-dto.mapper';
 import { GameService } from '../game/game.service';
@@ -21,6 +17,11 @@ import { EvaluateArgs } from './args/evaluate.args';
 import { SubmissionDto } from './dto/submission.dto';
 import { SubmissionService } from './submission.service';
 import { Submission } from './models/submission.model';
+import { Roles } from '../keycloak/decorators/roles.decorator';
+import { Role } from '../common/enums/role.enum';
+import { GqlUserInfo } from '../common/decorators/gql-user-info.decorator';
+import { GqlInstructorAssignedGuard } from '../common/guards/gql-instructor-assigned.guard';
+import { GqlPlayerOfGuard } from '../common/guards/gql-player-of.guard';
 
 @Resolver(() => SubmissionDto)
 export class SubmissionResolver {
@@ -34,35 +35,50 @@ export class SubmissionResolver {
     protected readonly playerToDtoMapper: PlayerToDtoMapper,
   ) {}
 
+  @Roles(Role.TEACHER, Role.STUDENT)
+  @UseGuards(GqlInstructorAssignedGuard, GqlPlayerOfGuard)
   @Query(() => SubmissionDto)
-  @UseGuards(GqlJwtAuthGuard)
   async submission(
     @GqlPlayer('id') playerId: string,
-    @GqlUser('roles') roles: Role[],
-    @Args('submissionId') submissionId: string,
+    @Args('gameId') gameId: string,
+    @Args('id') id: string,
   ): Promise<SubmissionDto> {
-    const submission = await this.submissionService.findById(submissionId);
-    if (!submission) {
+    const submission = await this.submissionService.findById(id);
+    if (!submission || submission.game !== gameId) {
       throw new NotFoundException();
-    } else if (playerId !== submission.player.id && !roles.includes(Role.ADMIN)) {
+    } else if (playerId && playerId !== submission.player) {
       throw new ForbiddenException();
     }
     return this.submissionToDtoMapper.transform(submission);
   }
 
+  @Roles(Role.TEACHER)
+  @UseGuards(GqlInstructorAssignedGuard)
   @Query(() => [SubmissionDto])
-  @UseGuards(GqlJwtAuthGuard)
   async submissions(
-    @GqlUser('id') userId: string,
+    @Args('userId') userId: string,
     @Args('gameId') gameId: string,
-    @Args('exerciseId') exerciseId?: string,
+    @Args('exerciseId', { nullable: true }) exerciseId?: string,
   ): Promise<SubmissionDto[]> {
     const submissions: Submission[] = await this.submissionService.findByUser(gameId, userId, exerciseId);
     return Promise.all(submissions.map(async submission => this.submissionToDtoMapper.transform(submission)));
   }
 
+  @Roles(Role.STUDENT)
+  @UseGuards(GqlPlayerOfGuard)
+  @Query(() => [SubmissionDto])
+  async mySubmissions(
+    @GqlUserInfo('sub') userId: string,
+    @Args('gameId') gameId: string,
+    @Args('exerciseId', { nullable: true }) exerciseId?: string,
+  ): Promise<SubmissionDto[]> {
+    const submissions: Submission[] = await this.submissionService.findByUser(gameId, userId, exerciseId);
+    return Promise.all(submissions.map(async submission => this.submissionToDtoMapper.transform(submission)));
+  }
+
+  @Roles(Role.STUDENT)
+  @UseGuards(GqlPlayerOfGuard)
   @Mutation(() => SubmissionDto, { nullable: true })
-  @UseGuards(GqlJwtAuthGuard, GqlEnrolledInGame)
   async evaluate(@GqlPlayer('id') playerId: string, @Args() args: EvaluateArgs): Promise<SubmissionDto> {
     const { gameId, exerciseId, file } = args;
     const { filename, encoding, mimetype, createReadStream } = await file;
@@ -73,7 +89,7 @@ export class SubmissionResolver {
       content: await createReadStream(),
     });
     const submissionDto = this.submissionToDtoMapper.transform(submission);
-    this.pubSub.publish(NotificationEnum.SUBMISSION_SENT, {
+    await this.pubSub.publish(NotificationEnum.SUBMISSION_SENT, {
       submissionSent: this.submissionToDtoMapper.transform(submission),
     });
     return submissionDto;
@@ -93,13 +109,13 @@ export class SubmissionResolver {
     return this.playerToDtoMapper.transform(player);
   }
 
-  @Subscription(returns => SubmissionDto)
-  submissionEvaluated() {
+  @Subscription(() => SubmissionDto)
+  submissionEvaluated(): AsyncIterator<SubmissionDto> {
     return this.pubSub.asyncIterator(NotificationEnum.SUBMISSION_EVALUATED);
   }
 
-  @Subscription(returns => SubmissionDto)
-  submissionSent() {
+  @Subscription(() => SubmissionDto)
+  submissionSent(): AsyncIterator<SubmissionDto> {
     return this.pubSub.asyncIterator(NotificationEnum.SUBMISSION_SENT);
   }
 }

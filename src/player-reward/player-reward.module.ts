@@ -27,6 +27,6 @@ import { PlayerRewardResolver } from './player-reward.resolver';
     forwardRef(() => HookModule),
   ],
   providers: [PlayerRewardToDtoMapper, PlayerRewardRepository, PlayerRewardResolver, PlayerRewardService],
-  exports: [PlayerRewardToDtoMapper, PlayerRewardResolver, PlayerRewardService],
+  exports: [PlayerRewardToDtoMapper, PlayerRewardRepository, PlayerRewardService],
 })
 export class PlayerRewardModule {}
