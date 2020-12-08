@@ -3,7 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getConnectionToken, MongooseModule } from '@nestjs/mongoose';
 import { Connection } from 'mongoose';
 
-import DbTestModule, { cleanupMongo, closeMongoConnection } from '../../test/utils/db-test.module';
+import DbTestModule, { cleanupMongo } from '../../test/utils/db-test.module';
 import { UsersModule } from '../users/users.module';
 import { PlayerModule } from '../player/player.module';
 import { ChallengeModule } from '../challenge/challenge.module';

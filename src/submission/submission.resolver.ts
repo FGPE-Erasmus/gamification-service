@@ -57,7 +57,7 @@ export class SubmissionResolver {
     @Args('gameId') gameId: string,
     @Args('exerciseId') exerciseId?: string,
   ): Promise<SubmissionDto[]> {
-    const submissions: Submission[] = await this.submissionService.findByUser(gameId, userId, exerciseId);
+    const submissions: Submission[] = await this.submissionService.findByPlayer(gameId, userId, exerciseId);
     return Promise.all(submissions.map(async submission => this.submissionToDtoMapper.transform(submission)));
   }
 
@@ -93,12 +93,14 @@ export class SubmissionResolver {
     return this.playerToDtoMapper.transform(player);
   }
 
-  @Subscription(returns => SubmissionDto)
+  @Subscription(() => SubmissionDto)
+  //eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   submissionEvaluated() {
     return this.pubSub.asyncIterator(NotificationEnum.SUBMISSION_EVALUATED);
   }
 
-  @Subscription(returns => SubmissionDto)
+  @Subscription(() => SubmissionDto)
+  //eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   submissionSent() {
     return this.pubSub.asyncIterator(NotificationEnum.SUBMISSION_SENT);
   }

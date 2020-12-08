@@ -1,7 +1,7 @@
 import { getConnectionToken, MongooseModule } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import DbTestModule, { cleanupMongo, closeMongoConnection } from '../../../test/utils/db-test.module';
+import DbTestModule, { cleanupMongo } from '../../../test/utils/db-test.module';
 import { UserRepository } from './user.repository';
 import { UserSchema } from '../models/user.model';
 import { Connection } from 'mongoose';

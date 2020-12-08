@@ -166,12 +166,14 @@ export class PlayerResolver {
     return Promise.all(rewards.map(async reward => this.playerRewardToDtoMapper.transform(reward)));
   }
 
-  @Subscription(returns => PlayerDto)
+  @Subscription(() => PlayerDto)
+  //eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   playerEnrolled() {
     return this.pubSub.asyncIterator(NotificationEnum.PLAYER_ENROLLED);
   }
 
-  @Subscription(returns => Number)
+  @Subscription(() => Number)
+  //eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   pointsUpdated() {
     return this.pubSub.asyncIterator(NotificationEnum.POINTS_UPDATED);
   }

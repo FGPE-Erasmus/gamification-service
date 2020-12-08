@@ -15,7 +15,6 @@ import { GameToDtoMapper } from './mappers/game-to-dto.mapper';
 import { GameSchema } from './models/game.model';
 import { GameRepository } from './repositories/game.repository';
 import { GameUploadController } from './upload.controller';
-import { SubscriptionsModule } from 'src/common/subscriptions/subscriptions.module';
 
 @Module({
   imports: [
