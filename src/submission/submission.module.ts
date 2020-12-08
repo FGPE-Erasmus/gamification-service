@@ -31,6 +31,6 @@ import { SubmissionToDtoMapper } from './mappers/submission-to-dto.mapper';
     forwardRef(() => SubscriptionsModule),
   ],
   providers: [SubmissionToDtoMapper, SubmissionRepository, SubmissionService, SubmissionResolver],
-  exports: [SubmissionToDtoMapper, SubmissionService],
+  exports: [SubmissionToDtoMapper, SubmissionRepository, SubmissionService],
 })
 export class SubmissionModule {}

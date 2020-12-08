@@ -8,7 +8,6 @@ import { LeaderboardModule } from '../leaderboard/leaderboard.module';
 import { RewardModule } from '../reward/reward.module';
 import { SubmissionModule } from '../submission/submission.module';
 import { PlayerModule } from '../player/player.module';
-import { UsersModule } from '../users/users.module';
 import { GameResolver } from './game.resolver';
 import { GameService } from './game.service';
 import { GameToDtoMapper } from './mappers/game-to-dto.mapper';
@@ -25,7 +24,6 @@ import { GameUploadController } from './upload.controller';
       },
     ]),
     MulterModule,
-    forwardRef(() => UsersModule),
     forwardRef(() => PlayerModule),
     forwardRef(() => ChallengeModule),
     forwardRef(() => LeaderboardModule),

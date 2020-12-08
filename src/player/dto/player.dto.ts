@@ -2,10 +2,10 @@ import { ObjectType, Field, ID } from '@nestjs/graphql';
 
 import { GameDto } from '../../game/dto/game.dto';
 import { PlayerRewardDto } from '../../player-reward/dto/player-reward.dto';
-import { UserDto } from '../../users/dto/user.dto';
 import { SubmissionDto } from '../../submission/dto/submission.dto';
 import { ChallengeStatusDto } from '../../challenge-status/dto/challenge-status.dto';
 import { GroupDto } from '../../group/dto/group.dto';
+import { UserDto } from '../../keycloak/dto/user.dto';
 
 @ObjectType('Player')
 export class PlayerDto {

@@ -3,8 +3,6 @@ import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 
 import { AppModule } from '../../src/app.module';
-import { GqlAdminGuard } from '../../src/common/guards/gql-admin.guard';
-import { GqlJwtAuthGuard } from '../../src/common/guards/gql-jwt-auth.guard';
 
 describe('UsersResolver (e2e)', () => {
   let app: INestApplication;
@@ -13,10 +11,10 @@ describe('UsersResolver (e2e)', () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     })
-      .overrideGuard(GqlJwtAuthGuard)
+      /*.overrideGuard(GqlJwtAuthGuard)
       .useValue({ canActivate: () => true })
       .overrideGuard(GqlAdminGuard)
-      .useValue({ canActivate: () => true })
+      .useValue({ canActivate: () => true })*/
       .compile();
 
     app = moduleFixture.createNestApplication();

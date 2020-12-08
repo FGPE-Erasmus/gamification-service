@@ -93,6 +93,7 @@ export class MooshakConsumer {
       },
     });
 
+    console.log(result);
     if (result.result !== Result.PROCESSING) {
       await this.evaluationQueue.add(FINISH_EVALUATION_JOB, { submissionId, result });
       return;
@@ -114,9 +115,7 @@ export class MooshakConsumer {
       evaluatedAt: result.evaluatedAt,
     });
 
-    this.logger.error(submission);
-
-    this.pubSub.publish(NotificationEnum.SUBMISSION_EVALUATED, {
+    await this.pubSub.publish(NotificationEnum.SUBMISSION_EVALUATED, {
       submissionEvaluated: this.submissionToDtoMapper.transform(submission),
     });
 

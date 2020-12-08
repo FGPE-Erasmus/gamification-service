@@ -33,3 +33,11 @@ export function shuffleArray<T>(input: T[]): Array<T> {
   }
   return output;
 }
+
+export function intersection(a1: any[], a2: any[]): Array<any> {
+  return a1.filter(x => a2.includes(x));
+}
+
+export function difference(a1: any[], a2: any[]): Array<any> {
+  return a1.filter(x => !a2.includes(x));
+}

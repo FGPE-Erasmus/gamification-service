@@ -1,6 +1,7 @@
 import { Field, ID, ObjectType } from '@nestjs/graphql';
 import { PlayerDto } from '../../player/dto/player.dto';
 import { SubmissionDto } from '../../submission/dto/submission.dto';
+import { UserDto } from '../../keycloak/dto/user.dto';
 
 @ObjectType('Game')
 export class GameDto {
@@ -25,11 +26,14 @@ export class GameDto {
   @Field({ nullable: true })
   endDate?: Date;
 
+  @Field(() => [UserDto])
+  instructors?: string[];
+
   @Field(() => [PlayerDto])
-  players?: PlayerDto[];
+  players?: string[];
 
   @Field(() => [SubmissionDto])
-  submissions?: SubmissionDto[];
+  submissions?: string[];
 
   @Field(() => Date)
   createdAt?: Date;

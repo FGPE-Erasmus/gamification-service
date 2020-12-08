@@ -1,13 +1,13 @@
-import { UseGuards } from '@nestjs/common';
 import { Args, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 
-import { GqlJwtAuthGuard } from '../common/guards/gql-jwt-auth.guard';
+import { Role } from '../common/enums/role.enum';
+import { ChallengeDto } from '../challenge/dto/challenge.dto';
+import { ChallengeToDtoMapper } from '../challenge/mappers/challenge-to-dto.mapper';
+import { ChallengeService } from '../challenge/challenge.service';
 import { GameService } from '../game/game.service';
 import { GameDto } from '../game/dto/game.dto';
 import { GameToDtoMapper } from '../game/mappers/game-to-dto.mapper';
-import { ChallengeToDtoMapper } from '../challenge/mappers/challenge-to-dto.mapper';
-import { ChallengeDto } from '../challenge/dto/challenge.dto';
-import { ChallengeService } from '../challenge/challenge.service';
+import { Roles } from '../keycloak/decorators/roles.decorator';
 import { ScheduledHookService } from './scheduled-hook.service';
 import { ScheduledHookDto } from './dto/scheduled-hook.dto';
 import { ScheduledHookToDtoMapper } from './mappers/scheduled-hook-to-dto.mapper';
@@ -24,8 +24,8 @@ export class ScheduledHookResolver {
     protected readonly challengeToDtoMapper: ChallengeToDtoMapper,
   ) {}
 
+  @Roles(Role.AUTHOR)
   @Query(() => [ScheduledHookDto])
-  @UseGuards(GqlJwtAuthGuard)
   async scheduledHooks(@Args('gameId') gameId: string): Promise<ScheduledHookDto[]> {
     const hooks: ScheduledHook[] = await this.scheduledHookService.findByGameId(gameId);
     return Promise.all(hooks.map(async hook => this.scheduledHookToDtoMapper.transform(hook)));

@@ -11,11 +11,14 @@ import { RewardService } from '../reward/reward.service';
 import { GameInput } from './inputs/game.input';
 import { Game, GameDocument } from './models/game.model';
 import { GameRepository } from './repositories/game.repository';
+import { UserDto } from '../keycloak/dto/user.dto';
+import { KeycloakService } from '../keycloak/keycloak.service';
 
 @Injectable()
 export class GameService extends BaseService<Game, GameDocument> {
   constructor(
     protected readonly repository: GameRepository,
+    protected readonly keycloakService: KeycloakService,
     protected readonly challengeService: ChallengeService,
     protected readonly rewardService: RewardService,
     protected readonly leaderboardService: LeaderboardService,
@@ -94,5 +97,30 @@ export class GameService extends BaseService<Game, GameDocument> {
     }
 
     return game;
+  }
+
+  /**
+   * Assigns a user as instructor in a game.
+   *
+   * @param {string} gameId ID of the game.
+   * @param {string} userId ID of the user.
+   * @return {Game} game w/ new instructor.
+   */
+  async assignInstructor(gameId: string, userId: string): Promise<Game> {
+    const user: UserDto = await this.keycloakService.getUser(userId);
+    console.log(user);
+    return this.findOneAndUpdate({ _id: { $eq: gameId } }, { $addToSet: { instructors: user.id } });
+  }
+
+  /**
+   * Check if a user is assigned as instructor in a game.
+   *
+   * @param {string} gameId ID of the game.
+   * @param {string} userId ID of the user.
+   */
+  async isInstructor(gameId: string, userId: string): Promise<boolean> {
+    console.log(gameId);
+    const game: Game = await this.findById(gameId);
+    return game.instructors?.includes(userId);
   }
 }

@@ -56,6 +56,32 @@ services:
     networks:
       - fgpe-gs-nw
 
+  keycloak:
+    container_name: ${AUTH_KEYCLOAK_HOST}
+    image: fgpe/keycloak:latest
+    restart: always
+    command: "-b 0.0.0.0"
+    volumes:
+      - ./docker/keycloak/fgpe-realm.json:/tmp/fgpe-realm.json
+    ports:
+      - 8080:8080
+    environment:
+      - KEYCLOAK_IMPORT=/tmp/fgpe-realm.json
+      - KEYCLOAK_USER=${AUTH_KEYCLOAK_ADMIN_USERNAME}
+      - KEYCLOAK_PASSWORD=${AUTH_KEYCLOAK_ADMIN_PASSWORD}
+      - KEYCLOAK_MIGRATION_STRATEGY=OVERWRITE_EXISTING
+    networks:
+      - fgpe-gs-nw
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    restart: always
+    ports:
+      - 1025:1025
+      - 8025:8025
+    networks:
+      - fgpe-gs-nw
+
 volumes:
   fgpe-gs-db: {}
   fgpe-gs-redis: {}
@@ -63,3 +89,4 @@ volumes:
 
 networks:
   fgpe-gs-nw:
+

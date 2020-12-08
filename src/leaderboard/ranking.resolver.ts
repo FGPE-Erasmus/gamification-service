@@ -1,17 +1,18 @@
 import { Resolver, Args, Query, ResolveField, Parent } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 
-import { GqlJwtAuthGuard } from '../common/guards/gql-jwt-auth.guard';
+import { GqlPlayer } from '../common/decorators/gql-player.decorator';
+import { Player } from '../player/models/player.model';
 import { PlayerDto } from '../player/dto/player.dto';
 import { PlayerService } from '../player/player.service';
 import { PlayerToDtoMapper } from '../player/mappers/player-to-dto.mapper';
 import { LeaderboardService } from './leaderboard.service';
 import { PlayerRankingDto } from './dto/player-ranking.dto';
 import { LeaderboardToDtoMapper } from './mappers/leaderboard-to-dto.mapper';
-import { GqlAdminGuard } from '../common/guards/gql-admin.guard';
-import { GqlEnrolledInGame } from '../common/guards/gql-game-enrollment.guard';
-import { GqlPlayer } from '../common/decorators/gql-player.decorator';
-import { Player } from '../player/models/player.model';
+import { Roles } from '../keycloak/decorators/roles.decorator';
+import { Role } from '../common/enums/role.enum';
+import { GqlInstructorAssignedGuard } from '../common/guards/gql-instructor-assigned.guard';
+import { GqlPlayerOfGuard } from '../common/guards/gql-player-of.guard';
 
 @Resolver(() => PlayerRankingDto)
 export class RankingResolver {
@@ -22,8 +23,9 @@ export class RankingResolver {
     protected readonly playerToDtoMapper: PlayerToDtoMapper,
   ) {}
 
+  @Roles(Role.TEACHER)
+  @UseGuards(GqlInstructorAssignedGuard)
   @Query(() => [PlayerRankingDto])
-  @UseGuards(GqlJwtAuthGuard, GqlAdminGuard)
   async rankings(
     @Args('gameId') gameId: string,
     @Args('leaderboardId') leaderboardId: string,
@@ -31,8 +33,9 @@ export class RankingResolver {
     return this.leaderboardService.getRankings(leaderboardId);
   }
 
+  @Roles(Role.STUDENT)
+  @UseGuards(GqlPlayerOfGuard)
   @Query(() => [PlayerRankingDto])
-  @UseGuards(GqlJwtAuthGuard, GqlEnrolledInGame)
   async groupRankings(
     @GqlPlayer() player: Player,
     @Args('gameId') gameId: string,

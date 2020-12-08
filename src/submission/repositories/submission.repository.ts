@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model } from 'mongoose';
 
@@ -12,7 +12,7 @@ export class SubmissionRepository extends BaseRepository<Submission, SubmissionD
   constructor(
     @InjectModel('Submission') protected readonly model: Model<SubmissionDocument>,
     protected readonly gameRepository: GameRepository,
-    protected readonly playerRepository: PlayerRepository,
+    @Inject(forwardRef(() => PlayerRepository)) protected readonly playerRepository: PlayerRepository,
   ) {
     super(new Logger(SubmissionRepository.name), model);
   }
@@ -37,6 +37,14 @@ export class SubmissionRepository extends BaseRepository<Submission, SubmissionD
     await this.playerRepository.upsertSubmission(result.player, { id: result.id });
 
     return result;
+  }
+
+  async deleteIf(conditions: FilterQuery<Submission>, options: Record<string, unknown> = {}): Promise<Submission[]> {
+    const submissions: Submission[] = await super.deleteIf(conditions, options);
+    for (const submission of submissions) {
+      await this.removeRelationsOnDelete(submission);
+    }
+    return submissions;
   }
 
   async delete(doc: Partial<Submission>): Promise<Submission> {

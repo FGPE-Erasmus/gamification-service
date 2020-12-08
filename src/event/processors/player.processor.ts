@@ -50,6 +50,21 @@ export class PlayerProcessor {
     }
   }
 
+  @Process(`${TriggerEvent.PLAYER_LEFT}_JOB`)
+  async onPlayerLeft(job: Job<{ gameId: string; playerId: string }>): Promise<void> {
+    const { gameId, playerId } = job.data;
+
+    // process hooks
+    const actionHooks = await this.actionHookService.findAll({
+      game: { $eq: gameId },
+      trigger: TriggerEvent.PLAYER_LEFT,
+    });
+
+    for (const actionHook of actionHooks) {
+      await this.hookService.executeHook(actionHook, job.data, {});
+    }
+  }
+
   @Process(`${TriggerEvent.PLAYER_UPDATED}_JOB`)
   async onPlayerUpdated(job: Job<{ gameId: string; playerId: string }>): Promise<void> {
     const { gameId } = job.data;

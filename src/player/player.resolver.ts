@@ -2,24 +2,20 @@ import { Resolver, Args, Query, ResolveField, Parent, Mutation, Subscription } f
 import { NotFoundException, UseGuards, Inject } from '@nestjs/common';
 import { PubSub } from 'graphql-subscriptions';
 
-import { GqlUser } from '../common/decorators/gql-user.decorator';
-import { GqlPlayer } from '../common/decorators/gql-player.decorator';
-import { GqlAdminGuard } from '../common/guards/gql-admin.guard';
-import { GqlEnrolledInGame } from '../common/guards/gql-game-enrollment.guard';
-import { GqlJwtAuthGuard } from '../common/guards/gql-jwt-auth.guard';
-import { NotificationEnum } from '../common/enums/notifications.enum';
 import { ChallengeStatusService } from '../challenge-status/challenge-status.service';
 import { ChallengeStatusDto } from '../challenge-status/dto/challenge-status.dto';
 import { ChallengeStatusToDtoMapper } from '../challenge-status/mappers/challenge-status-to-dto.mapper';
 import { ChallengeStatus } from '../challenge-status/models/challenge-status.model';
+import { GqlPlayer } from '../common/decorators/gql-player.decorator';
+import { GqlUserInfo } from '../common/decorators/gql-user-info.decorator';
+import { GqlInstructorAssignedGuard } from '../common/guards/gql-instructor-assigned.guard';
+import { GqlPlayerOfGuard } from '../common/guards/gql-player-of.guard';
+import { NotificationEnum } from '../common/enums/notifications.enum';
+import { Role } from '../common/enums/role.enum';
 import { GameDto } from '../game/dto/game.dto';
 import { GameService } from '../game/game.service';
 import { GameToDtoMapper } from '../game/mappers/game-to-dto.mapper';
 import { Game } from '../game/models/game.model';
-import { UserDto } from '../users/dto/user.dto';
-import { User } from '../users/models/user.model';
-import { UsersService } from '../users/users.service';
-import { UserToDtoMapper } from '../users/mappers/user-to-dto.mapper';
 import { PlayerRewardDto } from '../player-reward/dto/player-reward.dto';
 import { PlayerReward } from '../player-reward/models/player-reward.model';
 import { PlayerRewardToDtoMapper } from '../player-reward/mappers/player-reward-to-dto.mapper';
@@ -35,6 +31,10 @@ import { Player } from './models/player.model';
 import { Group } from '../group/models/group.model';
 import { GroupService } from '../group/group.service';
 import { GroupToDtoMapper } from '../group/mappers/group-to-dto.mapper';
+import { Roles } from '../keycloak/decorators/roles.decorator';
+import { GroupDto } from '../group/dto/group.dto';
+import { UserDto } from '../keycloak/dto/user.dto';
+import { KeycloakService } from '../keycloak/keycloak.service';
 
 @Resolver(() => PlayerDto)
 export class PlayerResolver {
@@ -44,8 +44,7 @@ export class PlayerResolver {
     protected readonly playerToDtoMapper: PlayerToDtoMapper,
     protected readonly gameService: GameService,
     protected readonly gameToDtoMapper: GameToDtoMapper,
-    protected readonly userService: UsersService,
-    protected readonly userToDtoMapper: UserToDtoMapper,
+    protected readonly keycloakService: KeycloakService,
     protected readonly groupService: GroupService,
     protected readonly groupToDtoMapper: GroupToDtoMapper,
     protected readonly submissionService: SubmissionService,
@@ -56,34 +55,47 @@ export class PlayerResolver {
     protected readonly playerRewardToDtoMapper: PlayerRewardToDtoMapper,
   ) {}
 
+  @Roles(Role.STUDENT)
   @Mutation(() => PlayerDto)
-  @UseGuards(GqlJwtAuthGuard)
-  async enroll(@GqlUser('id') userId: string, @Args('gameId') gameId: string): Promise<PlayerDto> {
+  async enroll(@GqlUserInfo('sub') userId: string, @Args('gameId') gameId: string): Promise<PlayerDto> {
     const player: Player = await this.playerService.enroll(gameId, userId);
-    this.pubSub.publish(NotificationEnum.PLAYER_ENROLLED, { playerEnrolled: this.playerToDtoMapper.transform(player) });
+    await this.pubSub.publish(NotificationEnum.PLAYER_ENROLLED, {
+      playerEnrolled: this.playerToDtoMapper.transform(player),
+    });
     return this.playerToDtoMapper.transform(player);
   }
 
-  //how did we end up with two identical mutation endpoints?
+  @Roles(Role.AUTHOR, Role.TEACHER)
+  @UseGuards(GqlInstructorAssignedGuard)
   @Mutation(() => PlayerDto)
-  @UseGuards(GqlJwtAuthGuard, GqlAdminGuard)
   async addToGame(@Args('userId') userId: string, @Args('gameId') gameId: string): Promise<PlayerDto> {
     const player: Player = await this.playerService.enroll(gameId, userId);
-    this.pubSub.publish(NotificationEnum.PLAYER_ENROLLED, { playerEnrolled: this.playerToDtoMapper.transform(player) });
+    await this.pubSub.publish(NotificationEnum.PLAYER_ENROLLED, { player: this.playerToDtoMapper.transform(player) });
     return this.playerToDtoMapper.transform(player);
   }
 
+  @Roles(Role.AUTHOR, Role.TEACHER)
+  @UseGuards(GqlInstructorAssignedGuard)
+  @Mutation(() => PlayerDto)
+  async removeFromGame(@Args('userId') userId: string, @Args('gameId') gameId: string): Promise<PlayerDto> {
+    const player: Player = await this.playerService.removeFromGame(gameId, userId);
+    await this.pubSub.publish(NotificationEnum.PLAYER_LEFT, { player: this.playerToDtoMapper.transform(player) });
+    return this.playerToDtoMapper.transform(player);
+  }
+
+  @Roles(Role.TEACHER, Role.STUDENT)
+  @UseGuards(GqlInstructorAssignedGuard, GqlPlayerOfGuard)
   @Query(() => [PlayerDto])
-  @UseGuards(GqlJwtAuthGuard)
   async players(@Args('gameId') gameId: string): Promise<PlayerDto[]> {
     const players: Player[] = await this.playerService.findByGame(gameId);
     return Promise.all(players.map(async player => this.playerToDtoMapper.transform(player)));
   }
 
+  @Roles(Role.STUDENT)
+  @UseGuards(GqlPlayerOfGuard)
   @Query(() => PlayerDto)
-  @UseGuards(GqlJwtAuthGuard, GqlEnrolledInGame)
   async profileInGame(
-    @GqlUser('id') userId: string,
+    @GqlUserInfo('sub') userId: string,
     @GqlPlayer() player: Player,
     @Args('gameId') gameId: string,
   ): Promise<PlayerDto> {
@@ -97,8 +109,9 @@ export class PlayerResolver {
     return this.playerToDtoMapper.transform(newPlayer);
   }
 
+  @Roles(Role.TEACHER, Role.STUDENT)
+  @UseGuards(GqlInstructorAssignedGuard, GqlPlayerOfGuard)
   @Query(() => PlayerDto)
-  @UseGuards(GqlJwtAuthGuard, GqlAdminGuard)
   async player(@Args('gameId') gameId: string, @Args('userId') userId: string): Promise<PlayerDto> {
     const player: Player = await this.playerService.findByGameAndUser(gameId, userId);
     if (!player) {
@@ -107,15 +120,16 @@ export class PlayerResolver {
     return this.playerToDtoMapper.transform(player);
   }
 
+  @Roles(Role.TEACHER)
+  @UseGuards(GqlInstructorAssignedGuard)
   @Mutation(() => PlayerDto)
-  @UseGuards(GqlJwtAuthGuard, GqlAdminGuard)
   async setGroup(
     @Args('gameId') gameId: string,
     @Args('playerId') playerId: string,
     @Args('groupId') groupId: string,
   ): Promise<PlayerDto> {
     const player: Player = await this.playerService.setGroup(gameId, playerId, groupId);
-    this.pubSub.publish('message', { message: `Player ${player.id} has been assigned to a group: ${groupId}.` });
+    await this.pubSub.publish('message', { message: `Player ${player.id} has been assigned to a group: ${groupId}.` });
     return this.playerToDtoMapper.transform(player);
   }
 
@@ -129,12 +143,11 @@ export class PlayerResolver {
   @ResolveField()
   async user(@Parent() root: PlayerDto): Promise<UserDto> {
     const { user: userId } = root;
-    const user: User = await this.userService.findById(userId);
-    return this.userToDtoMapper.transform(user);
+    return await this.keycloakService.getUser(userId);
   }
 
   @ResolveField()
-  async group(@Parent() root: PlayerDto): Promise<UserDto | undefined> {
+  async group(@Parent() root: PlayerDto): Promise<GroupDto | undefined> {
     const { group: groupId } = root;
     if (!groupId) {
       return undefined;
@@ -167,14 +180,17 @@ export class PlayerResolver {
   }
 
   @Subscription(() => PlayerDto)
-  //eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  playerEnrolled() {
+  playerEnrolled(): AsyncIterator<PlayerDto> {
     return this.pubSub.asyncIterator(NotificationEnum.PLAYER_ENROLLED);
   }
 
+  @Subscription(() => PlayerDto)
+  playerLeft(): AsyncIterator<PlayerDto> {
+    return this.pubSub.asyncIterator(NotificationEnum.PLAYER_LEFT);
+  }
+
   @Subscription(() => Number)
-  //eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  pointsUpdated() {
+  pointsUpdated(): AsyncIterator<Number> {
     return this.pubSub.asyncIterator(NotificationEnum.POINTS_UPDATED);
   }
 }

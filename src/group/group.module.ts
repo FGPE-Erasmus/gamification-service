@@ -4,7 +4,6 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { GameModule } from '../game/game.module';
 import { EventModule } from '../event/event.module';
 import { PlayerModule } from '../player/player.module';
-import { UsersModule } from '../users/users.module';
 import { GroupToDtoMapper } from './mappers/group-to-dto.mapper';
 import { GroupSchema } from './models/group.model';
 import { GroupRepository } from './repositories/group.repository';
@@ -20,7 +19,6 @@ import { GroupResolver } from './group.resolver';
       },
     ]),
     forwardRef(() => EventModule),
-    forwardRef(() => UsersModule),
     forwardRef(() => GameModule),
     forwardRef(() => PlayerModule),
   ],

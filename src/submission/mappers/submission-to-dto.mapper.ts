@@ -19,6 +19,7 @@ export class SubmissionToDtoMapper implements IMapper<Submission, SubmissionDto>
         'exerciseId',
         'evaluationEngine',
         'evaluationEngineId',
+        'language',
         'result',
         'grade',
         'feedback',

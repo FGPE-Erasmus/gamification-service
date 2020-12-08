@@ -2,7 +2,7 @@ import { HttpService, Injectable, Logger } from '@nestjs/common';
 import { AxiosError, AxiosRequestConfig } from 'axios';
 import * as FormData from 'form-data';
 import { ObservableInput, throwError } from 'rxjs';
-import { catchError, first, map } from 'rxjs/operators';
+import { catchError, first, map, tap } from 'rxjs/operators';
 
 import { Submission } from '../../../submission/models/submission.model';
 import { Result } from '../../../submission/models/result.enum';
@@ -79,6 +79,7 @@ export class MooshakService implements IEngineService {
       .pipe(
         first(),
         map<any, MooshakEvaluationDto>(res => res.data),
+        tap(d => console.log(d)),
         MooshakService.catchMooshakError(),
       )
       .toPromise();
@@ -111,8 +112,6 @@ export class MooshakService implements IEngineService {
       grade: mooshakEval.mark,
       feedback: ((mooshakEval.observations && mooshakEval.observations + '\n\n') || '') + (mooshakEval.feedback || ''),
       metrics: mooshakEval.metrics,
-      evaluationEngine: EvaluationEngine.MOOSHAK,
-      evaluationEngineId: mooshakEval.id,
     };
   }
 
