@@ -53,7 +53,10 @@ export class SubmissionRepository extends BaseRepository<Submission, SubmissionD
     return submission;
   }
 
-  async deleteOne(conditions: FilterQuery<Submission>, options: Record<string, unknown> = {}): Promise<Submission> {
+  async deleteOne(
+    conditions: FilterQuery<SubmissionDocument>,
+    options: Record<string, unknown> = {},
+  ): Promise<Submission> {
     const submission: Submission = await super.deleteOne(conditions, options);
     await this.removeRelationsOnDelete(submission);
     return submission;

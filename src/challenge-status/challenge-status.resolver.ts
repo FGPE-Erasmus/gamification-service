@@ -83,6 +83,7 @@ export class ChallengeStatusResolver {
 
   @Subscription(() => ChallengeStatusDto)
   challengeStatusUpdated(): AsyncIterator<ChallengeStatusDto> {
+    //eslint-disable-next-line  @typescript-eslint/explicit-module-boundary-types
     return this.pubSub.asyncIterator(NotificationEnum.CHALLENGE_STATUS_UPDATED);
   }
 }

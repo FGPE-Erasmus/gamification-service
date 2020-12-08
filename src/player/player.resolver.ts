@@ -190,7 +190,7 @@ export class PlayerResolver {
   }
 
   @Subscription(() => Number)
-  pointsUpdated(): AsyncIterator<PlayerDto> {
+  pointsUpdated(): AsyncIterator<Number> {
     return this.pubSub.asyncIterator(NotificationEnum.POINTS_UPDATED);
   }
 }

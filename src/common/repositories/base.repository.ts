@@ -76,7 +76,7 @@ export class BaseRepository<I extends IBaseEntity, E extends I & Document> imple
     if (!exists) {
       const model = new this.model(doc);
       const saved = await model.save();
-      return saved.toObject({ virtuals: true });
+      return (saved.toObject({ virtuals: true }) as unknown) as I;
     } else {
       if (!overwrite) {
         return this.model
