@@ -9,7 +9,7 @@ import { UserRepository } from '../users/repositories/user.repository';
 import { UsersService } from '../users/users.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { getConnectionToken, MongooseModule } from '@nestjs/mongoose';
-import DbTestModule, { cleanupMongo, closeMongoConnection } from '../../test/utils/db-test.module';
+import DbTestModule, { cleanupMongo } from '../../test/utils/db-test.module';
 import { UserSchema } from '../users/models/user.model';
 import { Connection } from 'mongoose';
 

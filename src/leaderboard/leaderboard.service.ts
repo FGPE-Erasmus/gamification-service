@@ -8,7 +8,7 @@ import { Game } from '../game/models/game.model';
 import { PlayerRankingDto } from './dto/player-ranking.dto';
 import { PlayerService } from '../player/player.service';
 import { SubmissionService } from '../submission/submission.service';
-import { Player } from '../player/models/player.model';
+import { Player, PlayerDocument } from '../player/models/player.model';
 import { PlayerToDtoMapper } from '../player/mappers/player-to-dto.mapper';
 import { groupBy } from '../common/utils/array.utils';
 import { bestSubmission } from '../common/helpers/submission.helper';
@@ -85,7 +85,7 @@ export class LeaderboardService extends BaseService<Leaderboard, LeaderboardDocu
       leaderboard.parentChallenge,
     );
 
-    const queryPlayer: MongooseFilterQuery<Player> = { game: { $eq: leaderboard.game } };
+    const queryPlayer: MongooseFilterQuery<PlayerDocument> = { game: { $eq: leaderboard.game } };
     if (leaderboard.groups && groupId) {
       queryPlayer.group = { $eq: groupId };
     }

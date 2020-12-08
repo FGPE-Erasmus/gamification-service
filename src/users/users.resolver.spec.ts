@@ -4,7 +4,7 @@ import { UsersService } from './users.service';
 import { UsersResolver } from './users.resolver';
 import { UserRepository } from './repositories/user.repository';
 import { UserToDtoMapper } from './mappers/user-to-dto.mapper';
-import DbTestModule, { cleanupMongo, closeMongoConnection } from '../../test/utils/db-test.module';
+import DbTestModule, { cleanupMongo } from '../../test/utils/db-test.module';
 import { getConnectionToken, MongooseModule } from '@nestjs/mongoose';
 import { UserSchema } from './models/user.model';
 import { Connection } from 'mongoose';

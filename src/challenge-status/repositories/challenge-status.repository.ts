@@ -46,7 +46,7 @@ export class ChallengeStatusRepository extends BaseRepository<ChallengeStatus, C
   }
 
   async deleteOne(
-    conditions: FilterQuery<ChallengeStatus>,
+    conditions: FilterQuery<ChallengeStatusDocument>,
     options: Record<string, unknown> = {},
   ): Promise<ChallengeStatus> {
     const challengeStatus: ChallengeStatus = await super.deleteOne(conditions, options);

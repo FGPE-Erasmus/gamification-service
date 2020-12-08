@@ -69,17 +69,20 @@ export class RewardResolver {
     return Promise.all(players.map(async player => this.playerToDtoMapper.transform(player)));
   }
 
-  @Subscription(returns => RewardDto)
+  @Subscription(() => RewardDto)
+  //eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   rewardReceived() {
     return this.pubSub.asyncIterator(NotificationEnum.REWARD_RECEIVED);
   }
 
-  @Subscription(returns => RewardDto)
+  @Subscription(() => RewardDto)
+  //eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   rewardRemoved() {
     return this.pubSub.asyncIterator(NotificationEnum.REWARD_REMOVED);
   }
 
-  @Subscription(returns => RewardDto)
+  @Subscription(() => RewardDto)
+  //eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   rewardSubstracted() {
     return this.pubSub.asyncIterator(NotificationEnum.REWARD_SUBSTRACTED);
   }

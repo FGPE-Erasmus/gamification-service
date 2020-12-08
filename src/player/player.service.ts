@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 
 import { BaseService } from '../common/services/base.service';
 import { Player, PlayerDocument } from './models/player.model';
@@ -13,7 +13,7 @@ export class PlayerService extends BaseService<Player, PlayerDocument> {
   constructor(
     protected readonly repository: PlayerRepository,
     protected readonly eventService: EventService,
-    protected readonly groupService: GroupService,
+    @Inject(forwardRef(() => GroupService)) protected readonly groupService: GroupService,
   ) {
     super(new Logger(PlayerService.name), repository);
   }

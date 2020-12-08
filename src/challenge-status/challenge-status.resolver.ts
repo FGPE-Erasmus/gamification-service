@@ -60,8 +60,9 @@ export class ChallengeStatusResolver {
     return this.playerToDtoMapper.transform(player);
   }
 
-  @Subscription(returns => ChallengeStatusDto)
+  @Subscription(() => ChallengeStatusDto)
   challengeStatusUpdated() {
+    //eslint-disable-next-line  @typescript-eslint/explicit-module-boundary-types
     return this.pubSub.asyncIterator(NotificationEnum.CHALLENGE_STATUS_UPDATED);
   }
 }
