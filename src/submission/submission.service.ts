@@ -23,8 +23,8 @@ export class SubmissionService extends BaseService<Submission, SubmissionDocumen
     super(new Logger(SubmissionService.name), repository);
   }
 
-  async findByPlayer(gameId: string, playerId: string, exerciseId?: string): Promise<Submission[]> {
-    const player: Player = await this.playerService.findByGameAndUser(gameId, playerId);
+  async findByUser(gameId: string, userId: string, exerciseId?: string): Promise<Submission[]> {
+    const player: Player = await this.playerService.findByGameAndUser(gameId, userId);
     const query: Partial<Record<keyof Submission, any>> = {
       player: player.id,
     };

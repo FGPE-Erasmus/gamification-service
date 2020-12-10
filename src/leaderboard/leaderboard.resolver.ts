@@ -1,6 +1,8 @@
 import { Resolver, Query, ResolveField, Parent, Args } from '@nestjs/graphql';
 import { NotFoundException, UseGuards } from '@nestjs/common';
 
+import { GqlInstructorAssignedGuard } from '../common/guards/gql-instructor-assigned.guard';
+import { GqlPlayerOfGuard } from '../common/guards/gql-player-of.guard';
 import { ChallengeDto } from '../challenge/dto/challenge.dto';
 import { GameDto } from '../game/dto/game.dto';
 import { ChallengeService } from '../challenge/challenge.service';
@@ -13,8 +15,6 @@ import { Leaderboard } from './models/leaderboard.model';
 import { LeaderboardToDtoMapper } from './mappers/leaderboard-to-dto.mapper';
 import { Roles } from '../keycloak/decorators/roles.decorator';
 import { Role } from '../common/enums/role.enum';
-import { GqlInstructorAssignedGuard } from '../common/guards/gql-instructor-assigned.guard';
-import { GqlPlayerOfGuard } from '../common/guards/gql-player-of.guard';
 
 @Resolver(() => LeaderboardDto)
 export class LeaderboardResolver {

@@ -1,4 +1,4 @@
-import { Injectable, CanActivate, ExecutionContext, Logger } from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext, Logger, Scope } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 
 import { ROLES } from '../../keycloak/decorators/roles.decorator';
@@ -14,7 +14,7 @@ import { Player } from '../../player/models/player.model';
  * Check if the player is enrolled in the same game as the one passed in the
  * request.
  */
-@Injectable()
+@Injectable({ scope: Scope.REQUEST })
 export class GqlPlayerOfGuard implements CanActivate {
   protected readonly logger = new Logger(GqlPlayerOfGuard.name);
 

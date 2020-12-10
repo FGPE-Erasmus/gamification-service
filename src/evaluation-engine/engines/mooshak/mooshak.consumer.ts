@@ -48,12 +48,16 @@ export class MooshakConsumer {
       appConfig.evaluationEngine.password,
     );
 
+    console.log(token);
+
     // evaluate the attempt
     const result: EvaluationDto = await this.mooshakService.evaluate(submission, filename, content, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
+
+    console.log(result);
 
     submission = await this.submissionService.patch(submissionId, {
       evaluationEngine: result.evaluationEngine,

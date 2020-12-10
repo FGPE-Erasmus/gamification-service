@@ -68,9 +68,12 @@ export class HookService {
           trigger.parameters = sourceIds;
         }
         if (encodedContent.actions[0].parameters && encodedContent.actions[0].parameters !== null) {
-          encodedContent.actions[0].parameters = encodedContent.actions[0].parameters.map(gedilId =>
-            imported.rewards[gedilId]['_id'].toString(),
-          );
+          encodedContent.actions[0].parameters = encodedContent.actions[0].parameters.map(param => {
+            if (imported.rewards[param]) {
+              return imported.rewards[param]['id'];
+            }
+            return param;
+          });
         }
 
         const data: { [key: string]: any } = {
@@ -211,7 +214,7 @@ export class HookService {
       } else if (playerReward) {
         // player already has the reward and it is accumulative
         const quantity: number = playerReward.count + (parameters[1] ? +parameters[1] : 1);
-        this.pubSub.publish(NotificationEnum.REWARD_RECEIVED, {
+        await this.pubSub.publish(NotificationEnum.REWARD_RECEIVED, {
           rewardReceived: this.rewardToDtoMapper.transform(reward),
         });
         await this.playerRewardService.patch(playerReward.id, { count: quantity });
@@ -222,7 +225,7 @@ export class HookService {
           reward: reward.id,
           count: reward.recurrent && parameters[1] ? +parameters[1] : 1,
         });
-        this.pubSub.publish(NotificationEnum.REWARD_RECEIVED, {
+        await this.pubSub.publish(NotificationEnum.REWARD_RECEIVED, {
           rewardReceived: this.rewardToDtoMapper.transform(reward),
         });
       }
@@ -236,7 +239,7 @@ export class HookService {
     } else {
       const quantity: number = parameters[1] ? +parameters[1] : 1;
       await this.playerService.findOneAndUpdate({ _id: playerId }, { $inc: { points: quantity } });
-      this.pubSub.publish(NotificationEnum.POINTS_UPDATED, { pointsUpdated: quantity });
+      await this.pubSub.publish(NotificationEnum.POINTS_UPDATED, { pointsUpdated: quantity });
       // send POINTS_UPDATED event
       await this.eventService.fireEvent(TriggerEvent.POINTS_UPDATED, {
         gameId,
@@ -262,22 +265,22 @@ export class HookService {
         { $inc: { count: -quantity } },
         { new: true },
       );
-      this.pubSub.publish(NotificationEnum.REWARD_SUBSTRACTED, {
-        rewardSubstracted: this.playerRewardToDtoMapper.transform(x),
+      await this.pubSub.publish(NotificationEnum.REWARD_SUBSTRACTED, {
+        rewardSubtracted: this.playerRewardToDtoMapper.transform(x),
       });
       if (x.count <= 0) {
         await this.playerRewardService.deleteOne({
           player: playerId,
           reward: parameters,
         });
-        this.pubSub.publish(NotificationEnum.REWARD_REMOVED, {
+        await this.pubSub.publish(NotificationEnum.REWARD_REMOVED, {
           rewardRemoved: this.playerRewardToDtoMapper.transform(x),
         });
       }
     } else {
       const quantity: number = parameters[1] ? +parameters[1] : 1;
       await this.playerService.findOneAndUpdate({ _id: playerId }, { $inc: { points: -quantity } }, { new: true });
-      this.pubSub.publish(NotificationEnum.POINTS_UPDATED, { pointsUpdated: quantity });
+      await this.pubSub.publish(NotificationEnum.POINTS_UPDATED, { pointsUpdated: quantity });
     }
   }
 
@@ -361,7 +364,7 @@ export class HookService {
    * @param {string} value New value for the property.
    */
   private async updatePlayer(gameId: string, playerId: string, property: string, value: string) {
-    switch (property) {
+    switch (property.toUpperCase()) {
       // more cases can be later added if needed
       case 'POINTS':
         await this.updatePlayerPoints(gameId, playerId, value);
@@ -384,6 +387,7 @@ export class HookService {
    */
   private async updatePlayerPoints(gameId: string, playerId: string, points: string): Promise<void> {
     if (points.startsWith('+')) {
+      console.log('adding');
       await this.playerService.findOneAndUpdate({ _id: playerId }, { $inc: { points: +points.substring(1) } });
     } else if (points.startsWith('-')) {
       await this.playerService.findOneAndUpdate({ _id: playerId }, { $inc: { points: -points.substring(1) } });
@@ -391,7 +395,7 @@ export class HookService {
       await this.playerService.findOneAndUpdate({ _id: playerId }, { points: +points });
     }
 
-    this.pubSub.publish(NotificationEnum.POINTS_UPDATED, { pointsUpdated: points });
+    await this.pubSub.publish(NotificationEnum.POINTS_UPDATED, { pointsUpdated: points });
     // send POINTS_UPDATED event
     await this.eventService.fireEvent(TriggerEvent.POINTS_UPDATED, {
       gameId,

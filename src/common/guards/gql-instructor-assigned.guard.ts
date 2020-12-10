@@ -1,4 +1,4 @@
-import { Injectable, CanActivate, ExecutionContext, Logger } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable, Logger, Scope } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 
 import { ROLES } from '../../keycloak/decorators/roles.decorator';
@@ -13,18 +13,18 @@ import { KeycloakRequest } from '../../keycloak/types/keycloak-request.type';
  * Check if the user is instructor in the same game as the one passed in the
  * request.
  */
-@Injectable()
+@Injectable({ scope: Scope.REQUEST })
 export class GqlInstructorAssignedGuard implements CanActivate {
   protected readonly logger = new Logger(GqlInstructorAssignedGuard.name);
 
   constructor(protected readonly gameService: GameService, protected readonly reflector: Reflector) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    this.logger.debug('running instructor assigned to game guard ...');
+    console.log('running instructor assigned to game guard ...');
     const request: KeycloakRequest = getReq(context);
     // if it is not a teacher, bypass the check
     if (!request.grant?.access_token?.hasRealmRole(Role.TEACHER)) {
-      this.logger.debug('not a teacher, bypassing guard ...');
+      console.log('not a teacher, bypassing guard ...');
       return true;
     }
     // is there a role that bypasses this check
@@ -32,7 +32,7 @@ export class GqlInstructorAssignedGuard implements CanActivate {
     const rolesWithDirectAccess = difference(roles, [Role.TEACHER]);
     for (const roleName of rolesWithDirectAccess) {
       if (request.grant?.access_token?.hasRealmRole(roleName)) {
-        this.logger.debug('has a role that does not require this check, bypassing guard ...');
+        console.log('has a role that does not require this check, bypassing guard ...');
         return true;
       }
     }

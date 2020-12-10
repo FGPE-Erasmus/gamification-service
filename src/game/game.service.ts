@@ -108,7 +108,6 @@ export class GameService extends BaseService<Game, GameDocument> {
    */
   async assignInstructor(gameId: string, userId: string): Promise<Game> {
     const user: UserDto = await this.keycloakService.getUser(userId);
-    console.log(user);
     return this.findOneAndUpdate({ _id: { $eq: gameId } }, { $addToSet: { instructors: user.id } });
   }
 

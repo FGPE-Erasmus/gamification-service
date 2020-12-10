@@ -51,6 +51,8 @@ services:
   mooshak-mock:
     container_name: ${EE_HOST}
     image: jcpaiva/mooshak-fgpe
+    ports:
+      - 8180:80
     volumes:
       - fgpe-gs-mooshak-mock:/home/mooshak/data
     networks:

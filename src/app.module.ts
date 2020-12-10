@@ -50,10 +50,30 @@ import { ResourceGuard } from './keycloak/guards/resource.guard';
       }),
     }),
     GraphQLModule.forRoot({
-      context: ({ req, res }) => ({ req, res }),
+      context: ({ req, res, payload, connection }) => ({
+        req,
+        res,
+        payload,
+        connection,
+      }),
+      subscriptions: {
+        onConnect: (connectionParams: { [key: string]: any }, websocket: { [key: string]: any }) => {
+          return {
+            headers: {
+              ...websocket?.upgradeReq?.headers,
+              authorization: connectionParams.authorization,
+            },
+          };
+        },
+      },
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
       debug: appConfig.isDevelopment,
-      playground: appConfig.isDevelopment,
+      playground: {
+        settings: {
+          'request.credentials': 'include',
+        },
+        // appConfig.isDevelopment
+      },
       installSubscriptionHandlers: true,
       resolvers: { JSON: GraphQLJSON },
     }),

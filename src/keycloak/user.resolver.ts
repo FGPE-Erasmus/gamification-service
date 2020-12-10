@@ -9,19 +9,19 @@ import { Roles } from './decorators/roles.decorator';
 export class UserResolver {
   constructor(protected readonly keycloakService: KeycloakService) {}
 
-  @Roles(Role.AUTHOR)
+  @Roles(Role.AUTHOR, Role.TEACHER)
   @Query(() => [UserDto])
   async users(): Promise<UserDto[]> {
     return this.keycloakService.getUsers();
   }
 
-  @Roles(Role.AUTHOR)
+  @Roles(Role.AUTHOR, Role.TEACHER)
   @Query(() => [UserDto])
   async usersByRole(@Args('role') role: Role): Promise<UserDto[]> {
     return this.keycloakService.getUsersByRole(role);
   }
 
-  @Roles(Role.AUTHOR)
+  @Roles(Role.AUTHOR, Role.TEACHER)
   @Query(() => UserDto)
   async user(@Args('id') userId: string): Promise<UserDto> {
     return this.keycloakService.getUser(userId);

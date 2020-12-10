@@ -89,6 +89,7 @@ export class MooshakService implements IEngineService {
 
   private static catchMooshakError = <T>() =>
     catchError<T, ObservableInput<any>>((error: AxiosError) => {
+      console.log(error);
       if (error.response) {
         const ex: MooshakExceptionDto = error.response.data as MooshakExceptionDto;
         return throwError(new Error(`${ex.status} ${ex.title} -  ${ex.message}`));

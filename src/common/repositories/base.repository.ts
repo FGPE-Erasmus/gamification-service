@@ -1,5 +1,5 @@
 import { LoggerService } from '@nestjs/common';
-import { Document, FilterQuery, Model, MongooseFilterQuery, Schema, UpdateQuery } from 'mongoose';
+import { Document, FilterQuery, Model, MongooseFilterQuery, UpdateQuery } from 'mongoose';
 
 import { IBaseEntity } from '../interfaces/base-entity.interface';
 import { IRepository } from '../interfaces/repository.interface';
@@ -55,7 +55,7 @@ export class BaseRepository<I extends IBaseEntity, E extends I & Document> imple
     options?: Record<string, unknown>,
   ): Promise<I> {
     return this.model
-      .findOneAndUpdate(conditions, updates, options)
+      .findOneAndUpdate(conditions, updates, { ...options, new: true })
       .lean<E>({ virtuals: true })
       .exec();
   }
