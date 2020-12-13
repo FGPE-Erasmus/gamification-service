@@ -13,7 +13,6 @@ services:
     working_dir: /home/node/app
     volumes:
       - ./src:/home/node/app/src
-      - ./.env:/home/node/app/.env
     ports:
       - ${APP_PORT}:${APP_PORT}
     depends_on:

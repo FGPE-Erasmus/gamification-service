@@ -1,0 +1,51 @@
+version: "3.7"
+
+services:
+  mongodb:
+    image: mongo:latest
+    ports:
+      - 27017:27017
+    env_file:
+      - .env.test
+    environment:
+      - MONGO_INITDB_DATABASE=${DB_NAME}
+      - MONGO_INITDB_ROOT_USERNAME=${DB_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${DB_PASSWORD}
+    networks:
+      - fgpe-gs-nw
+
+  mongodb-seed:
+    image: mongo:latest
+    env_file:
+      - .env.test
+    environment:
+      - DB_HOST=mongodb
+    links:
+      - mongodb
+    volumes:
+      - ./docker/mongo-seeder:/mongo-seeder
+    networks:
+      - fgpe-gs-nw
+    command:
+      /mongo-seeder/import.sh
+
+  redis:
+    image: redis:latest
+    ports:
+      - 6379:6379
+    env_file:
+      - .env.test
+    environment:
+      - ALLOW_EMPTY_PASSWORD=${ALLOW_EMPTY_PASSWORD}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    networks:
+      - fgpe-gs-nw
+
+
+volumes:
+  fgpe-gs-db: {}
+  fgpe-gs-redis: {}
+
+networks:
+  fgpe-gs-nw:
+

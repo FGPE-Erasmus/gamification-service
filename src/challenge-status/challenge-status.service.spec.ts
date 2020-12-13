@@ -8,7 +8,6 @@ import { ChallengeModule } from '../challenge/challenge.module';
 import { SubscriptionsModule } from '../common/subscriptions/subscriptions.module';
 import { EventModule } from '../event/event.module';
 import { PlayerModule } from '../player/player.module';
-import { UsersModule } from '../users/users.module';
 import { ChallengeStatusResolver } from './challenge-status.resolver';
 import { ChallengeStatusService } from './challenge-status.service';
 import { ChallengeStatusToDtoMapper } from './mappers/challenge-status-to-dto.mapper';
@@ -35,18 +34,17 @@ describe('ChallengeStatusService', () => {
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
+        DbTestModule({}),
         MongooseModule.forFeature([
           {
             name: 'ChallengeStatus',
             schema: ChallengeStatusSchema,
           },
         ]),
-        forwardRef(() => UsersModule),
         forwardRef(() => EventModule),
         forwardRef(() => PlayerModule),
         forwardRef(() => ChallengeModule),
         forwardRef(() => SubscriptionsModule),
-        DbTestModule({}),
       ],
       providers: [
         ChallengeStatusToDtoMapper,

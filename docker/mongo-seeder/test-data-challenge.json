@@ -1,0 +1,300 @@
+{
+  "_id": {
+    "$oid": "5fd4b3b2c5dc26001e0fe36d"
+  },
+  "hidden": false,
+  "locked": false,
+  "name": "3 Breaths a Beginner",
+  "description": "Solve the first 3 exercises (A to C).",
+  "refs": [
+    "A",
+    "B",
+    "C"
+  ],
+  "mode": "NORMAL",
+  "difficulty": "AVERAGE",
+  "modeParameters": [],
+  "game": "5fd4b3b2c5dc26001e0fe36c",
+  "updatedAt": {
+    "$date": "2020-12-12T12:12:34.781Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:12:34.781Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4b3b2c5dc26001e0fe371"
+  },
+  "hidden": false,
+  "locked": true,
+  "name": "Ultimate Test",
+  "description": "Solve D within one hour (3 600 000 ms).",
+  "refs": [
+    "D"
+  ],
+  "mode": "TIME_BOMB",
+  "difficulty": "MASTER",
+  "modeParameters": [
+    "3600000"
+  ],
+  "game": "5fd4b3b2c5dc26001e0fe36c",
+  "updatedAt": {
+    "$date": "2020-12-12T12:12:34.831Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:12:34.831Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4b657c5dc26001e0fe37b"
+  },
+  "hidden": false,
+  "locked": false,
+  "name": "3 Breaths a Beginner",
+  "description": "Solve the first 3 exercises (A to C).",
+  "refs": [
+    "A",
+    "B",
+    "C"
+  ],
+  "mode": "NORMAL",
+  "difficulty": "AVERAGE",
+  "modeParameters": [],
+  "game": "5fd4b657c5dc26001e0fe37a",
+  "updatedAt": {
+    "$date": "2020-12-12T12:23:51.977Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:23:51.977Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4b657c5dc26001e0fe37f"
+  },
+  "hidden": false,
+  "locked": true,
+  "name": "Ultimate Test",
+  "description": "Solve D within one hour (3 600 000 ms).",
+  "refs": [
+    "D"
+  ],
+  "mode": "TIME_BOMB",
+  "difficulty": "MASTER",
+  "modeParameters": [
+    "3600000"
+  ],
+  "game": "5fd4b657c5dc26001e0fe37a",
+  "updatedAt": {
+    "$date": "2020-12-12T12:23:51.988Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:23:51.988Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4b6c3c5dc26001e0fe389"
+  },
+  "hidden": false,
+  "locked": false,
+  "name": "3 Breaths a Beginner",
+  "description": "Solve the first 3 exercises (A to C).",
+  "refs": [
+    "A",
+    "B",
+    "C"
+  ],
+  "mode": "NORMAL",
+  "difficulty": "AVERAGE",
+  "modeParameters": [],
+  "game": "5fd4b6c3c5dc26001e0fe388",
+  "updatedAt": {
+    "$date": "2020-12-12T12:25:39.485Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:25:39.485Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4b6c3c5dc26001e0fe38d"
+  },
+  "hidden": false,
+  "locked": true,
+  "name": "Ultimate Test",
+  "description": "Solve D within one hour (3 600 000 ms).",
+  "refs": [
+    "D"
+  ],
+  "mode": "TIME_BOMB",
+  "difficulty": "MASTER",
+  "modeParameters": [
+    "3600000"
+  ],
+  "game": "5fd4b6c3c5dc26001e0fe388",
+  "updatedAt": {
+    "$date": "2020-12-12T12:25:39.497Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:25:39.497Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4b768c5dc26001e0fe399"
+  },
+  "hidden": false,
+  "locked": false,
+  "name": "3 Breaths a Beginner",
+  "description": "Solve the first 3 exercises (A to C).",
+  "refs": [
+    "A",
+    "B",
+    "C"
+  ],
+  "mode": "NORMAL",
+  "difficulty": "AVERAGE",
+  "modeParameters": [],
+  "game": "5fd4b768c5dc26001e0fe398",
+  "updatedAt": {
+    "$date": "2020-12-12T12:42:29.803Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:28:24.018Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4b768c5dc26001e0fe39d"
+  },
+  "hidden": false,
+  "locked": true,
+  "name": "Ultimate Test",
+  "description": "Solve D within one hour (3 600 000 ms).",
+  "refs": [
+    "D"
+  ],
+  "mode": "TIME_BOMB",
+  "difficulty": "MASTER",
+  "modeParameters": [
+    "3600000"
+  ],
+  "game": "5fd4b768c5dc26001e0fe398",
+  "updatedAt": {
+    "$date": "2020-12-12T12:42:29.808Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:28:24.031Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4bb2bc5dc26001e0fe3b5"
+  },
+  "hidden": false,
+  "locked": false,
+  "name": "3 Breaths a Beginner",
+  "description": "Solve the first 3 exercises (A to C).",
+  "refs": [
+    "A",
+    "B",
+    "C"
+  ],
+  "mode": "NORMAL",
+  "difficulty": "AVERAGE",
+  "modeParameters": [],
+  "game": "5fd4bb2bc5dc26001e0fe3b4",
+  "updatedAt": {
+    "$date": "2020-12-12T12:47:14.787Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:44:27.878Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4bb2bc5dc26001e0fe3b9"
+  },
+  "hidden": false,
+  "locked": true,
+  "name": "Ultimate Test",
+  "description": "Solve D within one hour (3 600 000 ms).",
+  "refs": [
+    "D"
+  ],
+  "mode": "TIME_BOMB",
+  "difficulty": "MASTER",
+  "modeParameters": [
+    "3600000"
+  ],
+  "game": "5fd4bb2bc5dc26001e0fe3b4",
+  "updatedAt": {
+    "$date": "2020-12-12T12:47:14.792Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:44:27.886Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4bc74c5dc26001e0fe3d1"
+  },
+  "hidden": false,
+  "locked": false,
+  "name": "3 Breaths a Beginner",
+  "description": "Solve the first 3 exercises (A to C).",
+  "refs": [
+    "A",
+    "B",
+    "C"
+  ],
+  "mode": "NORMAL",
+  "difficulty": "AVERAGE",
+  "modeParameters": [],
+  "game": "5fd4bc74c5dc26001e0fe3d0",
+  "updatedAt": {
+    "$date": "2020-12-12T12:57:25.937Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:49:56.964Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4bc74c5dc26001e0fe3d5"
+  },
+  "hidden": false,
+  "locked": true,
+  "name": "Ultimate Test",
+  "description": "Solve D within one hour (3 600 000 ms).",
+  "refs": [
+    "D"
+  ],
+  "mode": "TIME_BOMB",
+  "difficulty": "MASTER",
+  "modeParameters": [
+    "3600000"
+  ],
+  "game": "5fd4bc74c5dc26001e0fe3d0",
+  "updatedAt": {
+    "$date": "2020-12-12T12:57:25.973Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:49:56.972Z"
+  },
+  "__v": 0
+}

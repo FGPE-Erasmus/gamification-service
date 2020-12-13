@@ -1,0 +1,138 @@
+{
+  "_id": {
+    "$oid": "5fd4b3b2c5dc26001e0fe375"
+  },
+  "name": "Flash-aholic",
+  "groups": false,
+  "metrics": [
+    "$.player.points",
+    "$.latestSubmissions.[?(@.result=='ACCEPT')].metrics.programSize"
+  ],
+  "sortingOrders": [
+    "DESC",
+    "ASC"
+  ],
+  "game": "5fd4b3b2c5dc26001e0fe36c",
+  "updatedAt": {
+    "$date": "2020-12-12T12:12:34.862Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:12:34.862Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4b658c5dc26001e0fe383"
+  },
+  "name": "Flash-aholic",
+  "groups": false,
+  "metrics": [
+    "$.player.points",
+    "$.latestSubmissions.[?(@.result=='ACCEPT')].metrics.programSize"
+  ],
+  "sortingOrders": [
+    "DESC",
+    "ASC"
+  ],
+  "game": "5fd4b657c5dc26001e0fe37a",
+  "updatedAt": {
+    "$date": "2020-12-12T12:23:52.003Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:23:52.003Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4b6c3c5dc26001e0fe391"
+  },
+  "name": "Flash-aholic",
+  "groups": false,
+  "metrics": [
+    "$.player.points",
+    "$.latestSubmissions.[?(@.result=='ACCEPT')].metrics.programSize"
+  ],
+  "sortingOrders": [
+    "DESC",
+    "ASC"
+  ],
+  "game": "5fd4b6c3c5dc26001e0fe388",
+  "updatedAt": {
+    "$date": "2020-12-12T12:25:39.509Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:25:39.509Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4b768c5dc26001e0fe3a1"
+  },
+  "name": "Flash-aholic",
+  "groups": false,
+  "metrics": [
+    "$.player.points",
+    "$.latestSubmissions.[?(@.result=='ACCEPT')].metrics.programSize"
+  ],
+  "sortingOrders": [
+    "DESC",
+    "ASC"
+  ],
+  "game": "5fd4b768c5dc26001e0fe398",
+  "updatedAt": {
+    "$date": "2020-12-12T12:28:24.048Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:28:24.048Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4bb2bc5dc26001e0fe3bd"
+  },
+  "name": "Flash-aholic",
+  "groups": false,
+  "metrics": [
+    "$.player.points",
+    "$.latestSubmissions.[?(@.result=='ACCEPT')].metrics.programSize"
+  ],
+  "sortingOrders": [
+    "DESC",
+    "ASC"
+  ],
+  "game": "5fd4bb2bc5dc26001e0fe3b4",
+  "updatedAt": {
+    "$date": "2020-12-12T12:44:27.897Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:44:27.897Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4bc74c5dc26001e0fe3d9"
+  },
+  "name": "Flash-aholic",
+  "groups": false,
+  "metrics": [
+    "$.player.points",
+    "$.latestSubmissions.[?(@.result=='ACCEPT')].metrics.programSize"
+  ],
+  "sortingOrders": [
+    "DESC",
+    "ASC"
+  ],
+  "game": "5fd4bc74c5dc26001e0fe3d0",
+  "updatedAt": {
+    "$date": "2020-12-12T12:49:56.983Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:49:56.983Z"
+  },
+  "__v": 0
+}

@@ -1,16 +1,16 @@
 import { HttpException, HttpService, Inject, Injectable, NotFoundException, Scope } from '@nestjs/common';
 import { REQUEST } from '@nestjs/core';
-import { Grant, Keycloak } from 'keycloak-connect';
+import { Grant } from 'keycloak-connect';
+import * as qs from 'qs';
 
 import { LoginArgs } from './args/login.args';
 import { AuthDto } from './dto/auth.dto';
-import { KEYCLOAK_INSTANCE, KEYCLOAK_OPTIONS } from './keycloak.constants';
+import { KEYCLOAK_OPTIONS } from './keycloak.constants';
 import { KeycloakOptions } from './interfaces/keycloak-options.interface';
 import { UserInfo } from './interfaces/user-info.interface';
 import { KeycloakRequest } from './types/keycloak-request.type';
 import authenticate from './utils/authenticate.utils';
 import { AxiosResponse } from 'axios';
-import * as qs from 'qs';
 import { appConfig } from '../app.config';
 import { User } from './interfaces/user.interface';
 import { UserDto } from './dto/user.dto';
@@ -21,7 +21,6 @@ export class KeycloakService {
   protected readonly realmUrl: string;
 
   constructor(
-    @Inject(KEYCLOAK_INSTANCE) private readonly _keycloak: Keycloak,
     @Inject(KEYCLOAK_OPTIONS) private readonly options: KeycloakOptions,
     @Inject(REQUEST) private readonly req: KeycloakRequest,
     private readonly httpService: HttpService,

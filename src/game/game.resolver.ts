@@ -73,6 +73,7 @@ export class GameResolver {
   @Roles(Role.AUTHOR)
   @Mutation(() => GameDto)
   async assignInstructor(@Args('gameId') gameId: string, @Args('userId') userId: string): Promise<GameDto> {
+    console.log(userId);
     const game: Game = await this.gameService.assignInstructor(gameId, userId);
     return this.gameToDtoMapper.transform(game);
   }

@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model } from 'mongoose';
 
@@ -17,6 +17,7 @@ export class PlayerRepository extends BaseRepository<Player, PlayerDocument> {
     protected readonly gameRepository: GameRepository,
     protected readonly groupRepository: GroupRepository,
     protected readonly playerRewardRepository: PlayerRewardRepository,
+    @Inject(forwardRef(() => ChallengeStatusRepository))
     protected readonly challengeStatusRepository: ChallengeStatusRepository,
     protected readonly submissionRepository: SubmissionRepository,
   ) {

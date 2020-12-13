@@ -1,0 +1,438 @@
+{
+  "_id": {
+    "$oid": "5fd4ba6bc5dc26001e0fe3a9"
+  },
+  "player": "5fd4ba6bc5dc26001e0fe3a8",
+  "challenge": "5fd4b768c5dc26001e0fe399",
+  "startedAt": {
+    "$date": "2020-12-12T12:41:15.939Z"
+  },
+  "state": "AVAILABLE",
+  "updatedAt": {
+    "$date": "2020-12-12T12:41:15.94Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:41:15.94Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4ba6bc5dc26001e0fe3aa"
+  },
+  "player": "5fd4ba6bc5dc26001e0fe3a8",
+  "challenge": "5fd4b768c5dc26001e0fe39d",
+  "startedAt": {
+    "$date": "2020-12-12T12:41:15.963Z"
+  },
+  "state": "LOCKED",
+  "updatedAt": {
+    "$date": "2020-12-12T12:41:15.963Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:41:15.963Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4ba86c5dc26001e0fe3ac"
+  },
+  "player": "5fd4ba86c5dc26001e0fe3ab",
+  "challenge": "5fd4b768c5dc26001e0fe399",
+  "startedAt": {
+    "$date": "2020-12-12T12:41:42.717Z"
+  },
+  "state": "AVAILABLE",
+  "updatedAt": {
+    "$date": "2020-12-12T12:41:42.718Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:41:42.718Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4ba86c5dc26001e0fe3ad"
+  },
+  "player": "5fd4ba86c5dc26001e0fe3ab",
+  "challenge": "5fd4b768c5dc26001e0fe39d",
+  "startedAt": {
+    "$date": "2020-12-12T12:41:42.722Z"
+  },
+  "state": "LOCKED",
+  "updatedAt": {
+    "$date": "2020-12-12T12:41:42.723Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:41:42.723Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4ba9dc5dc26001e0fe3af"
+  },
+  "player": "5fd4ba9dc5dc26001e0fe3ae",
+  "challenge": "5fd4b768c5dc26001e0fe399",
+  "startedAt": {
+    "$date": "2020-12-12T12:42:05.626Z"
+  },
+  "state": "AVAILABLE",
+  "updatedAt": {
+    "$date": "2020-12-12T12:42:05.626Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:42:05.626Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4ba9dc5dc26001e0fe3b0"
+  },
+  "player": "5fd4ba9dc5dc26001e0fe3ae",
+  "challenge": "5fd4b768c5dc26001e0fe39d",
+  "startedAt": {
+    "$date": "2020-12-12T12:42:05.63Z"
+  },
+  "state": "LOCKED",
+  "updatedAt": {
+    "$date": "2020-12-12T12:42:05.631Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:42:05.631Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4bab5c5dc26001e0fe3b2"
+  },
+  "player": "5fd4bab5c5dc26001e0fe3b1",
+  "challenge": "5fd4b768c5dc26001e0fe399",
+  "startedAt": {
+    "$date": "2020-12-12T12:42:29.8Z"
+  },
+  "state": "AVAILABLE",
+  "updatedAt": {
+    "$date": "2020-12-12T12:42:29.801Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:42:29.801Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4bab5c5dc26001e0fe3b3"
+  },
+  "player": "5fd4bab5c5dc26001e0fe3b1",
+  "challenge": "5fd4b768c5dc26001e0fe39d",
+  "startedAt": {
+    "$date": "2020-12-12T12:42:29.806Z"
+  },
+  "state": "LOCKED",
+  "updatedAt": {
+    "$date": "2020-12-12T12:42:29.807Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:42:29.807Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4bb8bc5dc26001e0fe3c5"
+  },
+  "player": "5fd4bb8bc5dc26001e0fe3c4",
+  "challenge": "5fd4bb2bc5dc26001e0fe3b5",
+  "startedAt": {
+    "$date": "2020-12-12T12:46:03.337Z"
+  },
+  "state": "AVAILABLE",
+  "updatedAt": {
+    "$date": "2020-12-12T12:46:03.339Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:46:03.339Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4bb8bc5dc26001e0fe3c6"
+  },
+  "player": "5fd4bb8bc5dc26001e0fe3c4",
+  "challenge": "5fd4bb2bc5dc26001e0fe3b9",
+  "startedAt": {
+    "$date": "2020-12-12T12:46:03.343Z"
+  },
+  "state": "LOCKED",
+  "updatedAt": {
+    "$date": "2020-12-12T12:46:03.344Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:46:03.344Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4bba2c5dc26001e0fe3c8"
+  },
+  "player": "5fd4bba2c5dc26001e0fe3c7",
+  "challenge": "5fd4bb2bc5dc26001e0fe3b5",
+  "startedAt": {
+    "$date": "2020-12-12T12:46:26.383Z"
+  },
+  "state": "AVAILABLE",
+  "updatedAt": {
+    "$date": "2020-12-12T12:46:26.384Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:46:26.384Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4bba2c5dc26001e0fe3c9"
+  },
+  "player": "5fd4bba2c5dc26001e0fe3c7",
+  "challenge": "5fd4bb2bc5dc26001e0fe3b9",
+  "startedAt": {
+    "$date": "2020-12-12T12:46:26.39Z"
+  },
+  "state": "LOCKED",
+  "updatedAt": {
+    "$date": "2020-12-12T12:46:26.39Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:46:26.39Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4bbbdc5dc26001e0fe3cb"
+  },
+  "player": "5fd4bbbdc5dc26001e0fe3ca",
+  "challenge": "5fd4bb2bc5dc26001e0fe3b5",
+  "startedAt": {
+    "$date": "2020-12-12T12:46:53.616Z"
+  },
+  "state": "AVAILABLE",
+  "updatedAt": {
+    "$date": "2020-12-12T12:46:53.617Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:46:53.617Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4bbbdc5dc26001e0fe3cc"
+  },
+  "player": "5fd4bbbdc5dc26001e0fe3ca",
+  "challenge": "5fd4bb2bc5dc26001e0fe3b9",
+  "startedAt": {
+    "$date": "2020-12-12T12:46:53.621Z"
+  },
+  "state": "LOCKED",
+  "updatedAt": {
+    "$date": "2020-12-12T12:46:53.622Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:46:53.622Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4bbd2c5dc26001e0fe3ce"
+  },
+  "player": "5fd4bbd2c5dc26001e0fe3cd",
+  "challenge": "5fd4bb2bc5dc26001e0fe3b5",
+  "startedAt": {
+    "$date": "2020-12-12T12:47:14.784Z"
+  },
+  "state": "AVAILABLE",
+  "updatedAt": {
+    "$date": "2020-12-12T12:47:14.785Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:47:14.785Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4bbd2c5dc26001e0fe3cf"
+  },
+  "player": "5fd4bbd2c5dc26001e0fe3cd",
+  "challenge": "5fd4bb2bc5dc26001e0fe3b9",
+  "startedAt": {
+    "$date": "2020-12-12T12:47:14.791Z"
+  },
+  "state": "LOCKED",
+  "updatedAt": {
+    "$date": "2020-12-12T12:47:14.791Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:47:14.791Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4bce7c5dc26001e0fe3e1"
+  },
+  "player": "5fd4bce7c5dc26001e0fe3e0",
+  "challenge": "5fd4bc74c5dc26001e0fe3d1",
+  "startedAt": {
+    "$date": "2020-12-12T12:51:51.088Z"
+  },
+  "state": "COMPLETED",
+  "updatedAt": {
+    "$date": "2020-12-12T12:57:25.936Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:51:51.089Z"
+  },
+  "__v": 0,
+  "endedAt": {
+    "$date": "2020-12-12T12:57:25.933Z"
+  }
+}
+{
+  "_id": {
+    "$oid": "5fd4bce7c5dc26001e0fe3e2"
+  },
+  "player": "5fd4bce7c5dc26001e0fe3e0",
+  "challenge": "5fd4bc74c5dc26001e0fe3d5",
+  "startedAt": {
+    "$date": "2020-12-12T12:51:51.094Z"
+  },
+  "state": "OPENED",
+  "updatedAt": {
+    "$date": "2020-12-12T12:57:25.973Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:51:51.095Z"
+  },
+  "__v": 0,
+  "openedAt": {
+    "$date": "2020-12-12T12:57:25.971Z"
+  }
+}
+{
+  "_id": {
+    "$oid": "5fd4bceec5dc26001e0fe3e4"
+  },
+  "player": "5fd4bceec5dc26001e0fe3e3",
+  "challenge": "5fd4bc74c5dc26001e0fe3d1",
+  "startedAt": {
+    "$date": "2020-12-12T12:51:58.213Z"
+  },
+  "state": "AVAILABLE",
+  "updatedAt": {
+    "$date": "2020-12-12T12:51:58.213Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:51:58.213Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4bceec5dc26001e0fe3e5"
+  },
+  "player": "5fd4bceec5dc26001e0fe3e3",
+  "challenge": "5fd4bc74c5dc26001e0fe3d5",
+  "startedAt": {
+    "$date": "2020-12-12T12:51:58.217Z"
+  },
+  "state": "LOCKED",
+  "updatedAt": {
+    "$date": "2020-12-12T12:51:58.217Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:51:58.217Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4bd0ac5dc26001e0fe3e7"
+  },
+  "player": "5fd4bd0ac5dc26001e0fe3e6",
+  "challenge": "5fd4bc74c5dc26001e0fe3d1",
+  "startedAt": {
+    "$date": "2020-12-12T12:52:26.335Z"
+  },
+  "state": "AVAILABLE",
+  "updatedAt": {
+    "$date": "2020-12-12T12:52:26.335Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:52:26.335Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4bd0ac5dc26001e0fe3e8"
+  },
+  "player": "5fd4bd0ac5dc26001e0fe3e6",
+  "challenge": "5fd4bc74c5dc26001e0fe3d5",
+  "startedAt": {
+    "$date": "2020-12-12T12:52:26.341Z"
+  },
+  "state": "LOCKED",
+  "updatedAt": {
+    "$date": "2020-12-12T12:52:26.341Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:52:26.341Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4bd20c5dc26001e0fe3ea"
+  },
+  "player": "5fd4bd20c5dc26001e0fe3e9",
+  "challenge": "5fd4bc74c5dc26001e0fe3d1",
+  "startedAt": {
+    "$date": "2020-12-12T12:52:48.857Z"
+  },
+  "state": "AVAILABLE",
+  "updatedAt": {
+    "$date": "2020-12-12T12:52:48.858Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:52:48.858Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4bd20c5dc26001e0fe3eb"
+  },
+  "player": "5fd4bd20c5dc26001e0fe3e9",
+  "challenge": "5fd4bc74c5dc26001e0fe3d5",
+  "startedAt": {
+    "$date": "2020-12-12T12:52:48.862Z"
+  },
+  "state": "LOCKED",
+  "updatedAt": {
+    "$date": "2020-12-12T12:52:48.862Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:52:48.862Z"
+  },
+  "__v": 0
+}

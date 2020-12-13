@@ -1,0 +1,1842 @@
+{
+  "_id": {
+    "$oid": "5fd4b3b2c5dc26001e0fe36e"
+  },
+  "active": true,
+  "recurrent": true,
+  "game": "5fd4b3b2c5dc26001e0fe36c",
+  "parentChallenge": "5fd4b3b2c5dc26001e0fe36d",
+  "sourceId": "A",
+  "trigger": "SUBMISSION_ACCEPTED",
+  "criteria": {
+    "conditions": [
+      {
+        "order": 0,
+        "leftEntity": "FIXED",
+        "leftProperty": "A, B, C",
+        "comparingFunction": "IN",
+        "rightEntity": "PLAYER",
+        "rightProperty": "$.submissions[?(@.result=='ACCEPT')].exerciseId"
+      },
+      {
+        "order": 1,
+        "leftEntity": "FIXED",
+        "leftProperty": "",
+        "comparingFunction": "IN",
+        "rightEntity": "PLAYER",
+        "rightProperty": "$.learningPath[?(@.state=='COMPLETED')].challenge"
+      }
+    ],
+    "junctors": [
+      "AND"
+    ]
+  },
+  "actions": [
+    {
+      "type": "UPDATE",
+      "parameters": [
+        "CHALLENGE",
+        "5fd4b3b2c5dc26001e0fe36d",
+        "STATE",
+        "COMPLETED"
+      ]
+    }
+  ],
+  "updatedAt": {
+    "$date": "2020-12-12T12:12:34.802Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:12:34.802Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4b3b2c5dc26001e0fe36f"
+  },
+  "active": true,
+  "recurrent": true,
+  "game": "5fd4b3b2c5dc26001e0fe36c",
+  "parentChallenge": "5fd4b3b2c5dc26001e0fe36d",
+  "sourceId": "B",
+  "trigger": "SUBMISSION_ACCEPTED",
+  "criteria": {
+    "conditions": [
+      {
+        "order": 0,
+        "leftEntity": "FIXED",
+        "leftProperty": "A, B, C",
+        "comparingFunction": "IN",
+        "rightEntity": "PLAYER",
+        "rightProperty": "$.submissions[?(@.result=='ACCEPT')].exerciseId"
+      },
+      {
+        "order": 1,
+        "leftEntity": "FIXED",
+        "leftProperty": "",
+        "comparingFunction": "IN",
+        "rightEntity": "PLAYER",
+        "rightProperty": "$.learningPath[?(@.state=='COMPLETED')].challenge"
+      }
+    ],
+    "junctors": [
+      "AND"
+    ]
+  },
+  "actions": [
+    {
+      "type": "UPDATE",
+      "parameters": [
+        "CHALLENGE",
+        "5fd4b3b2c5dc26001e0fe36d",
+        "STATE",
+        "COMPLETED"
+      ]
+    }
+  ],
+  "updatedAt": {
+    "$date": "2020-12-12T12:12:34.825Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:12:34.825Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4b3b2c5dc26001e0fe370"
+  },
+  "active": true,
+  "recurrent": true,
+  "game": "5fd4b3b2c5dc26001e0fe36c",
+  "parentChallenge": "5fd4b3b2c5dc26001e0fe36d",
+  "sourceId": "C",
+  "trigger": "SUBMISSION_ACCEPTED",
+  "criteria": {
+    "conditions": [
+      {
+        "order": 0,
+        "leftEntity": "FIXED",
+        "leftProperty": "A, B, C",
+        "comparingFunction": "IN",
+        "rightEntity": "PLAYER",
+        "rightProperty": "$.submissions[?(@.result=='ACCEPT')].exerciseId"
+      },
+      {
+        "order": 1,
+        "leftEntity": "FIXED",
+        "leftProperty": "",
+        "comparingFunction": "IN",
+        "rightEntity": "PLAYER",
+        "rightProperty": "$.learningPath[?(@.state=='COMPLETED')].challenge"
+      }
+    ],
+    "junctors": [
+      "AND"
+    ]
+  },
+  "actions": [
+    {
+      "type": "UPDATE",
+      "parameters": [
+        "CHALLENGE",
+        "5fd4b3b2c5dc26001e0fe36d",
+        "STATE",
+        "COMPLETED"
+      ]
+    }
+  ],
+  "updatedAt": {
+    "$date": "2020-12-12T12:12:34.827Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:12:34.827Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4b3b2c5dc26001e0fe373"
+  },
+  "active": true,
+  "recurrent": false,
+  "game": "5fd4b3b2c5dc26001e0fe36c",
+  "parentChallenge": "5fd4b3b2c5dc26001e0fe371",
+  "sourceId": "5fd4b3b2c5dc26001e0fe371",
+  "trigger": "CHALLENGE_COMPLETED",
+  "criteria": {
+    "conditions": [],
+    "junctors": []
+  },
+  "actions": [
+    {
+      "type": "GIVE",
+      "parameters": [
+        "5fd4b3b2c5dc26001e0fe372"
+      ]
+    }
+  ],
+  "updatedAt": {
+    "$date": "2020-12-12T12:12:34.857Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:12:34.857Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4b3b2c5dc26001e0fe374"
+  },
+  "active": true,
+  "recurrent": true,
+  "game": "5fd4b3b2c5dc26001e0fe36c",
+  "parentChallenge": "5fd4b3b2c5dc26001e0fe371",
+  "sourceId": "D",
+  "trigger": "SUBMISSION_ACCEPTED",
+  "criteria": {
+    "conditions": [
+      {
+        "order": 0,
+        "leftEntity": "FIXED",
+        "leftProperty": "D",
+        "comparingFunction": "IN",
+        "rightEntity": "PLAYER",
+        "rightProperty": "$.submissions[?(@.result=='ACCEPT')].exerciseId"
+      },
+      {
+        "order": 1,
+        "leftEntity": "FIXED",
+        "leftProperty": "",
+        "comparingFunction": "IN",
+        "rightEntity": "PLAYER",
+        "rightProperty": "$.learningPath[?(@.state=='COMPLETED')].challenge"
+      }
+    ],
+    "junctors": [
+      "AND"
+    ]
+  },
+  "actions": [
+    {
+      "type": "UPDATE",
+      "parameters": [
+        "CHALLENGE",
+        "5fd4b3b2c5dc26001e0fe371",
+        "STATE",
+        "COMPLETED"
+      ]
+    }
+  ],
+  "updatedAt": {
+    "$date": "2020-12-12T12:12:34.859Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:12:34.859Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4b3b2c5dc26001e0fe378"
+  },
+  "active": true,
+  "recurrent": false,
+  "game": "5fd4b3b2c5dc26001e0fe36c",
+  "criteria": {
+    "conditions": [
+      {
+        "order": 0,
+        "leftEntity": "PLAYER",
+        "leftProperty": "$.submissions.length",
+        "comparingFunction": "GREAT_OR_EQUAL",
+        "rightEntity": "FIXED",
+        "rightProperty": "5"
+      }
+    ],
+    "junctors": [
+      "AND"
+    ]
+  },
+  "actions": [
+    {
+      "type": "GIVE",
+      "parameters": [
+        "5fd4b3b2c5dc26001e0fe377"
+      ]
+    }
+  ],
+  "trigger": "SUBMISSION_RECEIVED",
+  "sourceId": null,
+  "updatedAt": {
+    "$date": "2020-12-12T12:12:34.893Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:12:34.893Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4b3b2c5dc26001e0fe379"
+  },
+  "active": true,
+  "recurrent": false,
+  "game": "5fd4b3b2c5dc26001e0fe36c",
+  "criteria": {
+    "conditions": [],
+    "junctors": []
+  },
+  "actions": [
+    {
+      "type": "GIVE",
+      "parameters": [
+        "5fd4b3b2c5dc26001e0fe376"
+      ]
+    }
+  ],
+  "trigger": "CHALLENGE_COMPLETED",
+  "sourceId": "5fd4b3b2c5dc26001e0fe36d",
+  "updatedAt": {
+    "$date": "2020-12-12T12:12:34.896Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:12:34.896Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4b657c5dc26001e0fe37c"
+  },
+  "active": true,
+  "recurrent": true,
+  "game": "5fd4b657c5dc26001e0fe37a",
+  "parentChallenge": "5fd4b657c5dc26001e0fe37b",
+  "sourceId": "A",
+  "trigger": "SUBMISSION_ACCEPTED",
+  "criteria": {
+    "conditions": [
+      {
+        "order": 0,
+        "leftEntity": "FIXED",
+        "leftProperty": "A, B, C",
+        "comparingFunction": "IN",
+        "rightEntity": "PLAYER",
+        "rightProperty": "$.submissions[?(@.result=='ACCEPT')].exerciseId"
+      },
+      {
+        "order": 1,
+        "leftEntity": "FIXED",
+        "leftProperty": "",
+        "comparingFunction": "IN",
+        "rightEntity": "PLAYER",
+        "rightProperty": "$.learningPath[?(@.state=='COMPLETED')].challenge"
+      }
+    ],
+    "junctors": [
+      "AND"
+    ]
+  },
+  "actions": [
+    {
+      "type": "UPDATE",
+      "parameters": [
+        "CHALLENGE",
+        "5fd4b657c5dc26001e0fe37b",
+        "STATE",
+        "COMPLETED"
+      ]
+    }
+  ],
+  "updatedAt": {
+    "$date": "2020-12-12T12:23:51.979Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:23:51.979Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4b657c5dc26001e0fe37d"
+  },
+  "active": true,
+  "recurrent": true,
+  "game": "5fd4b657c5dc26001e0fe37a",
+  "parentChallenge": "5fd4b657c5dc26001e0fe37b",
+  "sourceId": "B",
+  "trigger": "SUBMISSION_ACCEPTED",
+  "criteria": {
+    "conditions": [
+      {
+        "order": 0,
+        "leftEntity": "FIXED",
+        "leftProperty": "A, B, C",
+        "comparingFunction": "IN",
+        "rightEntity": "PLAYER",
+        "rightProperty": "$.submissions[?(@.result=='ACCEPT')].exerciseId"
+      },
+      {
+        "order": 1,
+        "leftEntity": "FIXED",
+        "leftProperty": "",
+        "comparingFunction": "IN",
+        "rightEntity": "PLAYER",
+        "rightProperty": "$.learningPath[?(@.state=='COMPLETED')].challenge"
+      }
+    ],
+    "junctors": [
+      "AND"
+    ]
+  },
+  "actions": [
+    {
+      "type": "UPDATE",
+      "parameters": [
+        "CHALLENGE",
+        "5fd4b657c5dc26001e0fe37b",
+        "STATE",
+        "COMPLETED"
+      ]
+    }
+  ],
+  "updatedAt": {
+    "$date": "2020-12-12T12:23:51.982Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:23:51.982Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4b657c5dc26001e0fe37e"
+  },
+  "active": true,
+  "recurrent": true,
+  "game": "5fd4b657c5dc26001e0fe37a",
+  "parentChallenge": "5fd4b657c5dc26001e0fe37b",
+  "sourceId": "C",
+  "trigger": "SUBMISSION_ACCEPTED",
+  "criteria": {
+    "conditions": [
+      {
+        "order": 0,
+        "leftEntity": "FIXED",
+        "leftProperty": "A, B, C",
+        "comparingFunction": "IN",
+        "rightEntity": "PLAYER",
+        "rightProperty": "$.submissions[?(@.result=='ACCEPT')].exerciseId"
+      },
+      {
+        "order": 1,
+        "leftEntity": "FIXED",
+        "leftProperty": "",
+        "comparingFunction": "IN",
+        "rightEntity": "PLAYER",
+        "rightProperty": "$.learningPath[?(@.state=='COMPLETED')].challenge"
+      }
+    ],
+    "junctors": [
+      "AND"
+    ]
+  },
+  "actions": [
+    {
+      "type": "UPDATE",
+      "parameters": [
+        "CHALLENGE",
+        "5fd4b657c5dc26001e0fe37b",
+        "STATE",
+        "COMPLETED"
+      ]
+    }
+  ],
+  "updatedAt": {
+    "$date": "2020-12-12T12:23:51.984Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:23:51.984Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4b657c5dc26001e0fe381"
+  },
+  "active": true,
+  "recurrent": false,
+  "game": "5fd4b657c5dc26001e0fe37a",
+  "parentChallenge": "5fd4b657c5dc26001e0fe37f",
+  "sourceId": "5fd4b657c5dc26001e0fe37f",
+  "trigger": "CHALLENGE_COMPLETED",
+  "criteria": {
+    "conditions": [],
+    "junctors": []
+  },
+  "actions": [
+    {
+      "type": "GIVE",
+      "parameters": [
+        "5fd4b657c5dc26001e0fe380"
+      ]
+    }
+  ],
+  "updatedAt": {
+    "$date": "2020-12-12T12:23:51.997Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:23:51.997Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4b657c5dc26001e0fe382"
+  },
+  "active": true,
+  "recurrent": true,
+  "game": "5fd4b657c5dc26001e0fe37a",
+  "parentChallenge": "5fd4b657c5dc26001e0fe37f",
+  "sourceId": "D",
+  "trigger": "SUBMISSION_ACCEPTED",
+  "criteria": {
+    "conditions": [
+      {
+        "order": 0,
+        "leftEntity": "FIXED",
+        "leftProperty": "D",
+        "comparingFunction": "IN",
+        "rightEntity": "PLAYER",
+        "rightProperty": "$.submissions[?(@.result=='ACCEPT')].exerciseId"
+      },
+      {
+        "order": 1,
+        "leftEntity": "FIXED",
+        "leftProperty": "",
+        "comparingFunction": "IN",
+        "rightEntity": "PLAYER",
+        "rightProperty": "$.learningPath[?(@.state=='COMPLETED')].challenge"
+      }
+    ],
+    "junctors": [
+      "AND"
+    ]
+  },
+  "actions": [
+    {
+      "type": "UPDATE",
+      "parameters": [
+        "CHALLENGE",
+        "5fd4b657c5dc26001e0fe37f",
+        "STATE",
+        "COMPLETED"
+      ]
+    }
+  ],
+  "updatedAt": {
+    "$date": "2020-12-12T12:23:52Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:23:52Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4b658c5dc26001e0fe386"
+  },
+  "active": true,
+  "recurrent": false,
+  "game": "5fd4b657c5dc26001e0fe37a",
+  "criteria": {
+    "conditions": [
+      {
+        "order": 0,
+        "leftEntity": "PLAYER",
+        "leftProperty": "$.submissions.length",
+        "comparingFunction": "GREAT_OR_EQUAL",
+        "rightEntity": "FIXED",
+        "rightProperty": "5"
+      }
+    ],
+    "junctors": [
+      "AND"
+    ]
+  },
+  "actions": [
+    {
+      "type": "GIVE",
+      "parameters": [
+        "5fd4b658c5dc26001e0fe385"
+      ]
+    }
+  ],
+  "trigger": "SUBMISSION_RECEIVED",
+  "sourceId": null,
+  "updatedAt": {
+    "$date": "2020-12-12T12:23:52.013Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:23:52.013Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4b658c5dc26001e0fe387"
+  },
+  "active": true,
+  "recurrent": false,
+  "game": "5fd4b657c5dc26001e0fe37a",
+  "criteria": {
+    "conditions": [],
+    "junctors": []
+  },
+  "actions": [
+    {
+      "type": "GIVE",
+      "parameters": [
+        "5fd4b658c5dc26001e0fe384"
+      ]
+    }
+  ],
+  "trigger": "CHALLENGE_COMPLETED",
+  "sourceId": "5fd4b657c5dc26001e0fe37b",
+  "updatedAt": {
+    "$date": "2020-12-12T12:23:52.016Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:23:52.016Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4b6c3c5dc26001e0fe38a"
+  },
+  "active": true,
+  "recurrent": true,
+  "game": "5fd4b6c3c5dc26001e0fe388",
+  "parentChallenge": "5fd4b6c3c5dc26001e0fe389",
+  "sourceId": "A",
+  "trigger": "SUBMISSION_ACCEPTED",
+  "criteria": {
+    "conditions": [
+      {
+        "order": 0,
+        "leftEntity": "FIXED",
+        "leftProperty": "A, B, C",
+        "comparingFunction": "IN",
+        "rightEntity": "PLAYER",
+        "rightProperty": "$.submissions[?(@.result=='ACCEPT')].exerciseId"
+      },
+      {
+        "order": 1,
+        "leftEntity": "FIXED",
+        "leftProperty": "",
+        "comparingFunction": "IN",
+        "rightEntity": "PLAYER",
+        "rightProperty": "$.learningPath[?(@.state=='COMPLETED')].challenge"
+      }
+    ],
+    "junctors": [
+      "AND"
+    ]
+  },
+  "actions": [
+    {
+      "type": "UPDATE",
+      "parameters": [
+        "CHALLENGE",
+        "5fd4b6c3c5dc26001e0fe389",
+        "STATE",
+        "COMPLETED"
+      ]
+    }
+  ],
+  "updatedAt": {
+    "$date": "2020-12-12T12:25:39.49Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:25:39.49Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4b6c3c5dc26001e0fe38b"
+  },
+  "active": true,
+  "recurrent": true,
+  "game": "5fd4b6c3c5dc26001e0fe388",
+  "parentChallenge": "5fd4b6c3c5dc26001e0fe389",
+  "sourceId": "B",
+  "trigger": "SUBMISSION_ACCEPTED",
+  "criteria": {
+    "conditions": [
+      {
+        "order": 0,
+        "leftEntity": "FIXED",
+        "leftProperty": "A, B, C",
+        "comparingFunction": "IN",
+        "rightEntity": "PLAYER",
+        "rightProperty": "$.submissions[?(@.result=='ACCEPT')].exerciseId"
+      },
+      {
+        "order": 1,
+        "leftEntity": "FIXED",
+        "leftProperty": "",
+        "comparingFunction": "IN",
+        "rightEntity": "PLAYER",
+        "rightProperty": "$.learningPath[?(@.state=='COMPLETED')].challenge"
+      }
+    ],
+    "junctors": [
+      "AND"
+    ]
+  },
+  "actions": [
+    {
+      "type": "UPDATE",
+      "parameters": [
+        "CHALLENGE",
+        "5fd4b6c3c5dc26001e0fe389",
+        "STATE",
+        "COMPLETED"
+      ]
+    }
+  ],
+  "updatedAt": {
+    "$date": "2020-12-12T12:25:39.492Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:25:39.492Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4b6c3c5dc26001e0fe38c"
+  },
+  "active": true,
+  "recurrent": true,
+  "game": "5fd4b6c3c5dc26001e0fe388",
+  "parentChallenge": "5fd4b6c3c5dc26001e0fe389",
+  "sourceId": "C",
+  "trigger": "SUBMISSION_ACCEPTED",
+  "criteria": {
+    "conditions": [
+      {
+        "order": 0,
+        "leftEntity": "FIXED",
+        "leftProperty": "A, B, C",
+        "comparingFunction": "IN",
+        "rightEntity": "PLAYER",
+        "rightProperty": "$.submissions[?(@.result=='ACCEPT')].exerciseId"
+      },
+      {
+        "order": 1,
+        "leftEntity": "FIXED",
+        "leftProperty": "",
+        "comparingFunction": "IN",
+        "rightEntity": "PLAYER",
+        "rightProperty": "$.learningPath[?(@.state=='COMPLETED')].challenge"
+      }
+    ],
+    "junctors": [
+      "AND"
+    ]
+  },
+  "actions": [
+    {
+      "type": "UPDATE",
+      "parameters": [
+        "CHALLENGE",
+        "5fd4b6c3c5dc26001e0fe389",
+        "STATE",
+        "COMPLETED"
+      ]
+    }
+  ],
+  "updatedAt": {
+    "$date": "2020-12-12T12:25:39.495Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:25:39.495Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4b6c3c5dc26001e0fe38f"
+  },
+  "active": true,
+  "recurrent": false,
+  "game": "5fd4b6c3c5dc26001e0fe388",
+  "parentChallenge": "5fd4b6c3c5dc26001e0fe38d",
+  "sourceId": "5fd4b6c3c5dc26001e0fe38d",
+  "trigger": "CHALLENGE_COMPLETED",
+  "criteria": {
+    "conditions": [],
+    "junctors": []
+  },
+  "actions": [
+    {
+      "type": "GIVE",
+      "parameters": [
+        "5fd4b6c3c5dc26001e0fe38e"
+      ]
+    }
+  ],
+  "updatedAt": {
+    "$date": "2020-12-12T12:25:39.503Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:25:39.503Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4b6c3c5dc26001e0fe390"
+  },
+  "active": true,
+  "recurrent": true,
+  "game": "5fd4b6c3c5dc26001e0fe388",
+  "parentChallenge": "5fd4b6c3c5dc26001e0fe38d",
+  "sourceId": "D",
+  "trigger": "SUBMISSION_ACCEPTED",
+  "criteria": {
+    "conditions": [
+      {
+        "order": 0,
+        "leftEntity": "FIXED",
+        "leftProperty": "D",
+        "comparingFunction": "IN",
+        "rightEntity": "PLAYER",
+        "rightProperty": "$.submissions[?(@.result=='ACCEPT')].exerciseId"
+      },
+      {
+        "order": 1,
+        "leftEntity": "FIXED",
+        "leftProperty": "",
+        "comparingFunction": "IN",
+        "rightEntity": "PLAYER",
+        "rightProperty": "$.learningPath[?(@.state=='COMPLETED')].challenge"
+      }
+    ],
+    "junctors": [
+      "AND"
+    ]
+  },
+  "actions": [
+    {
+      "type": "UPDATE",
+      "parameters": [
+        "CHALLENGE",
+        "5fd4b6c3c5dc26001e0fe38d",
+        "STATE",
+        "COMPLETED"
+      ]
+    }
+  ],
+  "updatedAt": {
+    "$date": "2020-12-12T12:25:39.506Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:25:39.506Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4b6c3c5dc26001e0fe394"
+  },
+  "active": true,
+  "recurrent": false,
+  "game": "5fd4b6c3c5dc26001e0fe388",
+  "criteria": {
+    "conditions": [
+      {
+        "order": 0,
+        "leftEntity": "PLAYER",
+        "leftProperty": "$.submissions.length",
+        "comparingFunction": "GREAT_OR_EQUAL",
+        "rightEntity": "FIXED",
+        "rightProperty": "5"
+      }
+    ],
+    "junctors": [
+      "AND"
+    ]
+  },
+  "actions": [
+    {
+      "type": "GIVE",
+      "parameters": [
+        "5fd4b6c3c5dc26001e0fe393"
+      ]
+    }
+  ],
+  "trigger": "SUBMISSION_RECEIVED",
+  "sourceId": null,
+  "updatedAt": {
+    "$date": "2020-12-12T12:25:39.516Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:25:39.516Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4b6c3c5dc26001e0fe395"
+  },
+  "active": true,
+  "recurrent": false,
+  "game": "5fd4b6c3c5dc26001e0fe388",
+  "criteria": {
+    "conditions": [],
+    "junctors": []
+  },
+  "actions": [
+    {
+      "type": "GIVE",
+      "parameters": [
+        "5fd4b6c3c5dc26001e0fe392"
+      ]
+    }
+  ],
+  "trigger": "CHALLENGE_COMPLETED",
+  "sourceId": "5fd4b6c3c5dc26001e0fe389",
+  "updatedAt": {
+    "$date": "2020-12-12T12:25:39.518Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:25:39.518Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4b768c5dc26001e0fe39a"
+  },
+  "active": true,
+  "recurrent": true,
+  "game": "5fd4b768c5dc26001e0fe398",
+  "parentChallenge": "5fd4b768c5dc26001e0fe399",
+  "sourceId": "A",
+  "trigger": "SUBMISSION_ACCEPTED",
+  "criteria": {
+    "conditions": [
+      {
+        "order": 0,
+        "leftEntity": "FIXED",
+        "leftProperty": "A, B, C",
+        "comparingFunction": "IN",
+        "rightEntity": "PLAYER",
+        "rightProperty": "$.submissions[?(@.result=='ACCEPT')].exerciseId"
+      },
+      {
+        "order": 1,
+        "leftEntity": "FIXED",
+        "leftProperty": "",
+        "comparingFunction": "IN",
+        "rightEntity": "PLAYER",
+        "rightProperty": "$.learningPath[?(@.state=='COMPLETED')].challenge"
+      }
+    ],
+    "junctors": [
+      "AND"
+    ]
+  },
+  "actions": [
+    {
+      "type": "UPDATE",
+      "parameters": [
+        "CHALLENGE",
+        "5fd4b768c5dc26001e0fe399",
+        "STATE",
+        "COMPLETED"
+      ]
+    }
+  ],
+  "updatedAt": {
+    "$date": "2020-12-12T12:28:24.021Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:28:24.021Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4b768c5dc26001e0fe39b"
+  },
+  "active": true,
+  "recurrent": true,
+  "game": "5fd4b768c5dc26001e0fe398",
+  "parentChallenge": "5fd4b768c5dc26001e0fe399",
+  "sourceId": "B",
+  "trigger": "SUBMISSION_ACCEPTED",
+  "criteria": {
+    "conditions": [
+      {
+        "order": 0,
+        "leftEntity": "FIXED",
+        "leftProperty": "A, B, C",
+        "comparingFunction": "IN",
+        "rightEntity": "PLAYER",
+        "rightProperty": "$.submissions[?(@.result=='ACCEPT')].exerciseId"
+      },
+      {
+        "order": 1,
+        "leftEntity": "FIXED",
+        "leftProperty": "",
+        "comparingFunction": "IN",
+        "rightEntity": "PLAYER",
+        "rightProperty": "$.learningPath[?(@.state=='COMPLETED')].challenge"
+      }
+    ],
+    "junctors": [
+      "AND"
+    ]
+  },
+  "actions": [
+    {
+      "type": "UPDATE",
+      "parameters": [
+        "CHALLENGE",
+        "5fd4b768c5dc26001e0fe399",
+        "STATE",
+        "COMPLETED"
+      ]
+    }
+  ],
+  "updatedAt": {
+    "$date": "2020-12-12T12:28:24.024Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:28:24.024Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4b768c5dc26001e0fe39c"
+  },
+  "active": true,
+  "recurrent": true,
+  "game": "5fd4b768c5dc26001e0fe398",
+  "parentChallenge": "5fd4b768c5dc26001e0fe399",
+  "sourceId": "C",
+  "trigger": "SUBMISSION_ACCEPTED",
+  "criteria": {
+    "conditions": [
+      {
+        "order": 0,
+        "leftEntity": "FIXED",
+        "leftProperty": "A, B, C",
+        "comparingFunction": "IN",
+        "rightEntity": "PLAYER",
+        "rightProperty": "$.submissions[?(@.result=='ACCEPT')].exerciseId"
+      },
+      {
+        "order": 1,
+        "leftEntity": "FIXED",
+        "leftProperty": "",
+        "comparingFunction": "IN",
+        "rightEntity": "PLAYER",
+        "rightProperty": "$.learningPath[?(@.state=='COMPLETED')].challenge"
+      }
+    ],
+    "junctors": [
+      "AND"
+    ]
+  },
+  "actions": [
+    {
+      "type": "UPDATE",
+      "parameters": [
+        "CHALLENGE",
+        "5fd4b768c5dc26001e0fe399",
+        "STATE",
+        "COMPLETED"
+      ]
+    }
+  ],
+  "updatedAt": {
+    "$date": "2020-12-12T12:28:24.027Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:28:24.027Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4b768c5dc26001e0fe39f"
+  },
+  "active": true,
+  "recurrent": false,
+  "game": "5fd4b768c5dc26001e0fe398",
+  "parentChallenge": "5fd4b768c5dc26001e0fe39d",
+  "sourceId": "5fd4b768c5dc26001e0fe39d",
+  "trigger": "CHALLENGE_COMPLETED",
+  "criteria": {
+    "conditions": [],
+    "junctors": []
+  },
+  "actions": [
+    {
+      "type": "GIVE",
+      "parameters": [
+        "5fd4b768c5dc26001e0fe39e"
+      ]
+    }
+  ],
+  "updatedAt": {
+    "$date": "2020-12-12T12:28:24.042Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:28:24.042Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4b768c5dc26001e0fe3a0"
+  },
+  "active": true,
+  "recurrent": true,
+  "game": "5fd4b768c5dc26001e0fe398",
+  "parentChallenge": "5fd4b768c5dc26001e0fe39d",
+  "sourceId": "D",
+  "trigger": "SUBMISSION_ACCEPTED",
+  "criteria": {
+    "conditions": [
+      {
+        "order": 0,
+        "leftEntity": "FIXED",
+        "leftProperty": "D",
+        "comparingFunction": "IN",
+        "rightEntity": "PLAYER",
+        "rightProperty": "$.submissions[?(@.result=='ACCEPT')].exerciseId"
+      },
+      {
+        "order": 1,
+        "leftEntity": "FIXED",
+        "leftProperty": "",
+        "comparingFunction": "IN",
+        "rightEntity": "PLAYER",
+        "rightProperty": "$.learningPath[?(@.state=='COMPLETED')].challenge"
+      }
+    ],
+    "junctors": [
+      "AND"
+    ]
+  },
+  "actions": [
+    {
+      "type": "UPDATE",
+      "parameters": [
+        "CHALLENGE",
+        "5fd4b768c5dc26001e0fe39d",
+        "STATE",
+        "COMPLETED"
+      ]
+    }
+  ],
+  "updatedAt": {
+    "$date": "2020-12-12T12:28:24.045Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:28:24.045Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4b768c5dc26001e0fe3a4"
+  },
+  "active": true,
+  "recurrent": false,
+  "game": "5fd4b768c5dc26001e0fe398",
+  "criteria": {
+    "conditions": [
+      {
+        "order": 0,
+        "leftEntity": "PLAYER",
+        "leftProperty": "$.submissions.length",
+        "comparingFunction": "GREAT_OR_EQUAL",
+        "rightEntity": "FIXED",
+        "rightProperty": "5"
+      }
+    ],
+    "junctors": [
+      "AND"
+    ]
+  },
+  "actions": [
+    {
+      "type": "GIVE",
+      "parameters": [
+        "5fd4b768c5dc26001e0fe3a3"
+      ]
+    }
+  ],
+  "trigger": "SUBMISSION_RECEIVED",
+  "sourceId": null,
+  "updatedAt": {
+    "$date": "2020-12-12T12:28:24.055Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:28:24.055Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4b768c5dc26001e0fe3a5"
+  },
+  "active": true,
+  "recurrent": false,
+  "game": "5fd4b768c5dc26001e0fe398",
+  "criteria": {
+    "conditions": [],
+    "junctors": []
+  },
+  "actions": [
+    {
+      "type": "GIVE",
+      "parameters": [
+        "5fd4b768c5dc26001e0fe3a2"
+      ]
+    }
+  ],
+  "trigger": "CHALLENGE_COMPLETED",
+  "sourceId": "5fd4b768c5dc26001e0fe399",
+  "updatedAt": {
+    "$date": "2020-12-12T12:28:24.056Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:28:24.056Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4bb2bc5dc26001e0fe3b6"
+  },
+  "active": true,
+  "recurrent": true,
+  "game": "5fd4bb2bc5dc26001e0fe3b4",
+  "parentChallenge": "5fd4bb2bc5dc26001e0fe3b5",
+  "sourceId": "A",
+  "trigger": "SUBMISSION_ACCEPTED",
+  "criteria": {
+    "conditions": [
+      {
+        "order": 0,
+        "leftEntity": "FIXED",
+        "leftProperty": "A, B, C",
+        "comparingFunction": "IN",
+        "rightEntity": "PLAYER",
+        "rightProperty": "$.submissions[?(@.result=='ACCEPT')].exerciseId"
+      },
+      {
+        "order": 1,
+        "leftEntity": "FIXED",
+        "leftProperty": "",
+        "comparingFunction": "IN",
+        "rightEntity": "PLAYER",
+        "rightProperty": "$.learningPath[?(@.state=='COMPLETED')].challenge"
+      }
+    ],
+    "junctors": [
+      "AND"
+    ]
+  },
+  "actions": [
+    {
+      "type": "UPDATE",
+      "parameters": [
+        "CHALLENGE",
+        "5fd4bb2bc5dc26001e0fe3b5",
+        "STATE",
+        "COMPLETED"
+      ]
+    }
+  ],
+  "updatedAt": {
+    "$date": "2020-12-12T12:44:27.88Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:44:27.88Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4bb2bc5dc26001e0fe3b7"
+  },
+  "active": true,
+  "recurrent": true,
+  "game": "5fd4bb2bc5dc26001e0fe3b4",
+  "parentChallenge": "5fd4bb2bc5dc26001e0fe3b5",
+  "sourceId": "B",
+  "trigger": "SUBMISSION_ACCEPTED",
+  "criteria": {
+    "conditions": [
+      {
+        "order": 0,
+        "leftEntity": "FIXED",
+        "leftProperty": "A, B, C",
+        "comparingFunction": "IN",
+        "rightEntity": "PLAYER",
+        "rightProperty": "$.submissions[?(@.result=='ACCEPT')].exerciseId"
+      },
+      {
+        "order": 1,
+        "leftEntity": "FIXED",
+        "leftProperty": "",
+        "comparingFunction": "IN",
+        "rightEntity": "PLAYER",
+        "rightProperty": "$.learningPath[?(@.state=='COMPLETED')].challenge"
+      }
+    ],
+    "junctors": [
+      "AND"
+    ]
+  },
+  "actions": [
+    {
+      "type": "UPDATE",
+      "parameters": [
+        "CHALLENGE",
+        "5fd4bb2bc5dc26001e0fe3b5",
+        "STATE",
+        "COMPLETED"
+      ]
+    }
+  ],
+  "updatedAt": {
+    "$date": "2020-12-12T12:44:27.882Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:44:27.882Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4bb2bc5dc26001e0fe3b8"
+  },
+  "active": true,
+  "recurrent": true,
+  "game": "5fd4bb2bc5dc26001e0fe3b4",
+  "parentChallenge": "5fd4bb2bc5dc26001e0fe3b5",
+  "sourceId": "C",
+  "trigger": "SUBMISSION_ACCEPTED",
+  "criteria": {
+    "conditions": [
+      {
+        "order": 0,
+        "leftEntity": "FIXED",
+        "leftProperty": "A, B, C",
+        "comparingFunction": "IN",
+        "rightEntity": "PLAYER",
+        "rightProperty": "$.submissions[?(@.result=='ACCEPT')].exerciseId"
+      },
+      {
+        "order": 1,
+        "leftEntity": "FIXED",
+        "leftProperty": "",
+        "comparingFunction": "IN",
+        "rightEntity": "PLAYER",
+        "rightProperty": "$.learningPath[?(@.state=='COMPLETED')].challenge"
+      }
+    ],
+    "junctors": [
+      "AND"
+    ]
+  },
+  "actions": [
+    {
+      "type": "UPDATE",
+      "parameters": [
+        "CHALLENGE",
+        "5fd4bb2bc5dc26001e0fe3b5",
+        "STATE",
+        "COMPLETED"
+      ]
+    }
+  ],
+  "updatedAt": {
+    "$date": "2020-12-12T12:44:27.883Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:44:27.883Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4bb2bc5dc26001e0fe3bb"
+  },
+  "active": true,
+  "recurrent": false,
+  "game": "5fd4bb2bc5dc26001e0fe3b4",
+  "parentChallenge": "5fd4bb2bc5dc26001e0fe3b9",
+  "sourceId": "5fd4bb2bc5dc26001e0fe3b9",
+  "trigger": "CHALLENGE_COMPLETED",
+  "criteria": {
+    "conditions": [],
+    "junctors": []
+  },
+  "actions": [
+    {
+      "type": "GIVE",
+      "parameters": [
+        "5fd4bb2bc5dc26001e0fe3ba"
+      ]
+    }
+  ],
+  "updatedAt": {
+    "$date": "2020-12-12T12:44:27.894Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:44:27.894Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4bb2bc5dc26001e0fe3bc"
+  },
+  "active": true,
+  "recurrent": true,
+  "game": "5fd4bb2bc5dc26001e0fe3b4",
+  "parentChallenge": "5fd4bb2bc5dc26001e0fe3b9",
+  "sourceId": "D",
+  "trigger": "SUBMISSION_ACCEPTED",
+  "criteria": {
+    "conditions": [
+      {
+        "order": 0,
+        "leftEntity": "FIXED",
+        "leftProperty": "D",
+        "comparingFunction": "IN",
+        "rightEntity": "PLAYER",
+        "rightProperty": "$.submissions[?(@.result=='ACCEPT')].exerciseId"
+      },
+      {
+        "order": 1,
+        "leftEntity": "FIXED",
+        "leftProperty": "",
+        "comparingFunction": "IN",
+        "rightEntity": "PLAYER",
+        "rightProperty": "$.learningPath[?(@.state=='COMPLETED')].challenge"
+      }
+    ],
+    "junctors": [
+      "AND"
+    ]
+  },
+  "actions": [
+    {
+      "type": "UPDATE",
+      "parameters": [
+        "CHALLENGE",
+        "5fd4bb2bc5dc26001e0fe3b9",
+        "STATE",
+        "COMPLETED"
+      ]
+    }
+  ],
+  "updatedAt": {
+    "$date": "2020-12-12T12:44:27.896Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:44:27.896Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4bb2bc5dc26001e0fe3c0"
+  },
+  "active": true,
+  "recurrent": false,
+  "game": "5fd4bb2bc5dc26001e0fe3b4",
+  "criteria": {
+    "conditions": [
+      {
+        "order": 0,
+        "leftEntity": "PLAYER",
+        "leftProperty": "$.submissions.length",
+        "comparingFunction": "GREAT_OR_EQUAL",
+        "rightEntity": "FIXED",
+        "rightProperty": "5"
+      }
+    ],
+    "junctors": [
+      "AND"
+    ]
+  },
+  "actions": [
+    {
+      "type": "GIVE",
+      "parameters": [
+        "5fd4bb2bc5dc26001e0fe3bf"
+      ]
+    }
+  ],
+  "trigger": "SUBMISSION_RECEIVED",
+  "sourceId": null,
+  "updatedAt": {
+    "$date": "2020-12-12T12:44:27.904Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:44:27.904Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4bb2bc5dc26001e0fe3c1"
+  },
+  "active": true,
+  "recurrent": false,
+  "game": "5fd4bb2bc5dc26001e0fe3b4",
+  "criteria": {
+    "conditions": [],
+    "junctors": []
+  },
+  "actions": [
+    {
+      "type": "GIVE",
+      "parameters": [
+        "5fd4bb2bc5dc26001e0fe3be"
+      ]
+    }
+  ],
+  "trigger": "CHALLENGE_COMPLETED",
+  "sourceId": "5fd4bb2bc5dc26001e0fe3b5",
+  "updatedAt": {
+    "$date": "2020-12-12T12:44:27.905Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:44:27.905Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4bc74c5dc26001e0fe3d2"
+  },
+  "active": true,
+  "recurrent": true,
+  "game": "5fd4bc74c5dc26001e0fe3d0",
+  "parentChallenge": "5fd4bc74c5dc26001e0fe3d1",
+  "sourceId": "A",
+  "trigger": "SUBMISSION_ACCEPTED",
+  "criteria": {
+    "conditions": [
+      {
+        "order": 0,
+        "leftEntity": "FIXED",
+        "leftProperty": "A, B, C",
+        "comparingFunction": "IN",
+        "rightEntity": "PLAYER",
+        "rightProperty": "$.submissions[?(@.result=='ACCEPT')].exerciseId"
+      },
+      {
+        "order": 1,
+        "leftEntity": "FIXED",
+        "leftProperty": "",
+        "comparingFunction": "IN",
+        "rightEntity": "PLAYER",
+        "rightProperty": "$.learningPath[?(@.state=='COMPLETED')].challenge"
+      }
+    ],
+    "junctors": [
+      "AND"
+    ]
+  },
+  "actions": [
+    {
+      "type": "UPDATE",
+      "parameters": [
+        "CHALLENGE",
+        "5fd4bc74c5dc26001e0fe3d1",
+        "STATE",
+        "COMPLETED"
+      ]
+    }
+  ],
+  "updatedAt": {
+    "$date": "2020-12-12T12:49:56.966Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:49:56.966Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4bc74c5dc26001e0fe3d3"
+  },
+  "active": true,
+  "recurrent": true,
+  "game": "5fd4bc74c5dc26001e0fe3d0",
+  "parentChallenge": "5fd4bc74c5dc26001e0fe3d1",
+  "sourceId": "B",
+  "trigger": "SUBMISSION_ACCEPTED",
+  "criteria": {
+    "conditions": [
+      {
+        "order": 0,
+        "leftEntity": "FIXED",
+        "leftProperty": "A, B, C",
+        "comparingFunction": "IN",
+        "rightEntity": "PLAYER",
+        "rightProperty": "$.submissions[?(@.result=='ACCEPT')].exerciseId"
+      },
+      {
+        "order": 1,
+        "leftEntity": "FIXED",
+        "leftProperty": "",
+        "comparingFunction": "IN",
+        "rightEntity": "PLAYER",
+        "rightProperty": "$.learningPath[?(@.state=='COMPLETED')].challenge"
+      }
+    ],
+    "junctors": [
+      "AND"
+    ]
+  },
+  "actions": [
+    {
+      "type": "UPDATE",
+      "parameters": [
+        "CHALLENGE",
+        "5fd4bc74c5dc26001e0fe3d1",
+        "STATE",
+        "COMPLETED"
+      ]
+    }
+  ],
+  "updatedAt": {
+    "$date": "2020-12-12T12:49:56.968Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:49:56.968Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4bc74c5dc26001e0fe3d4"
+  },
+  "active": true,
+  "recurrent": true,
+  "game": "5fd4bc74c5dc26001e0fe3d0",
+  "parentChallenge": "5fd4bc74c5dc26001e0fe3d1",
+  "sourceId": "C",
+  "trigger": "SUBMISSION_ACCEPTED",
+  "criteria": {
+    "conditions": [
+      {
+        "order": 0,
+        "leftEntity": "FIXED",
+        "leftProperty": "A, B, C",
+        "comparingFunction": "IN",
+        "rightEntity": "PLAYER",
+        "rightProperty": "$.submissions[?(@.result=='ACCEPT')].exerciseId"
+      },
+      {
+        "order": 1,
+        "leftEntity": "FIXED",
+        "leftProperty": "",
+        "comparingFunction": "IN",
+        "rightEntity": "PLAYER",
+        "rightProperty": "$.learningPath[?(@.state=='COMPLETED')].challenge"
+      }
+    ],
+    "junctors": [
+      "AND"
+    ]
+  },
+  "actions": [
+    {
+      "type": "UPDATE",
+      "parameters": [
+        "CHALLENGE",
+        "5fd4bc74c5dc26001e0fe3d1",
+        "STATE",
+        "COMPLETED"
+      ]
+    }
+  ],
+  "updatedAt": {
+    "$date": "2020-12-12T12:49:56.97Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:49:56.97Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4bc74c5dc26001e0fe3d7"
+  },
+  "active": true,
+  "recurrent": false,
+  "game": "5fd4bc74c5dc26001e0fe3d0",
+  "parentChallenge": "5fd4bc74c5dc26001e0fe3d5",
+  "sourceId": "5fd4bc74c5dc26001e0fe3d5",
+  "trigger": "CHALLENGE_COMPLETED",
+  "criteria": {
+    "conditions": [],
+    "junctors": []
+  },
+  "actions": [
+    {
+      "type": "GIVE",
+      "parameters": [
+        "5fd4bc74c5dc26001e0fe3d6"
+      ]
+    }
+  ],
+  "updatedAt": {
+    "$date": "2020-12-12T12:49:56.979Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:49:56.979Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4bc74c5dc26001e0fe3d8"
+  },
+  "active": true,
+  "recurrent": true,
+  "game": "5fd4bc74c5dc26001e0fe3d0",
+  "parentChallenge": "5fd4bc74c5dc26001e0fe3d5",
+  "sourceId": "D",
+  "trigger": "SUBMISSION_ACCEPTED",
+  "criteria": {
+    "conditions": [
+      {
+        "order": 0,
+        "leftEntity": "FIXED",
+        "leftProperty": "D",
+        "comparingFunction": "IN",
+        "rightEntity": "PLAYER",
+        "rightProperty": "$.submissions[?(@.result=='ACCEPT')].exerciseId"
+      },
+      {
+        "order": 1,
+        "leftEntity": "FIXED",
+        "leftProperty": "",
+        "comparingFunction": "IN",
+        "rightEntity": "PLAYER",
+        "rightProperty": "$.learningPath[?(@.state=='COMPLETED')].challenge"
+      }
+    ],
+    "junctors": [
+      "AND"
+    ]
+  },
+  "actions": [
+    {
+      "type": "UPDATE",
+      "parameters": [
+        "CHALLENGE",
+        "5fd4bc74c5dc26001e0fe3d5",
+        "STATE",
+        "COMPLETED"
+      ]
+    }
+  ],
+  "updatedAt": {
+    "$date": "2020-12-12T12:49:56.981Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:49:56.981Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4bc74c5dc26001e0fe3dc"
+  },
+  "active": true,
+  "recurrent": false,
+  "game": "5fd4bc74c5dc26001e0fe3d0",
+  "criteria": {
+    "conditions": [
+      {
+        "order": 0,
+        "leftEntity": "PLAYER",
+        "leftProperty": "$.submissions.length",
+        "comparingFunction": "GREAT_OR_EQUAL",
+        "rightEntity": "FIXED",
+        "rightProperty": "5"
+      }
+    ],
+    "junctors": [
+      "AND"
+    ]
+  },
+  "actions": [
+    {
+      "type": "GIVE",
+      "parameters": [
+        "5fd4bc74c5dc26001e0fe3db"
+      ]
+    }
+  ],
+  "trigger": "SUBMISSION_RECEIVED",
+  "sourceId": null,
+  "updatedAt": {
+    "$date": "2020-12-12T12:49:56.988Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:49:56.988Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4bc74c5dc26001e0fe3dd"
+  },
+  "active": true,
+  "recurrent": false,
+  "game": "5fd4bc74c5dc26001e0fe3d0",
+  "criteria": {
+    "conditions": [],
+    "junctors": []
+  },
+  "actions": [
+    {
+      "type": "GIVE",
+      "parameters": [
+        "5fd4bc74c5dc26001e0fe3da"
+      ]
+    }
+  ],
+  "trigger": "CHALLENGE_COMPLETED",
+  "sourceId": "5fd4bc74c5dc26001e0fe3d1",
+  "updatedAt": {
+    "$date": "2020-12-12T12:49:56.991Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:49:56.991Z"
+  },
+  "__v": 0
+}

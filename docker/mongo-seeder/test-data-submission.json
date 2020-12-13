@@ -1,0 +1,102 @@
+{
+  "_id": {
+    "$oid": "5fd4bd7fc5dc26001e0fe3ec"
+  },
+  "game": "5fd4bc74c5dc26001e0fe3d0",
+  "player": "5fd4bce7c5dc26001e0fe3e0",
+  "exerciseId": "A",
+  "submittedAt": {
+    "$date": "2020-12-12T12:54:23.867Z"
+  },
+  "updatedAt": {
+    "$date": "2020-12-12T12:54:25.193Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:54:23.868Z"
+  },
+  "__v": 0,
+  "evaluationEngine": "MOOSHAK",
+  "evaluationEngineId": "16811664_A_team",
+  "evaluatedAt": {
+    "$date": "2020-12-12T12:54:24.888Z"
+  },
+  "feedback": "<br><table width=\"100%\" cellspacing=\"2\" cellpadding=\"2\" rules=\"all\" frame=\"box\"><tr><th>#</th><th>Result</th><th>Points</th><th>Hint</th><th>Test Data</th></tr><tr><td>1</td><td><font color=\"green\">Accepted</font></td><td>100</td><td>&nbsp;</td><td><font color=\"grey\">unavailable</font></td></tr></table>",
+  "grade": 100,
+  "language": "Python",
+  "metrics": {
+    "executionTime": 0,
+    "cpuUsage": 0.027,
+    "memoryUsage": 64,
+    "programSize": 17,
+    "linesOfCode": 1
+  },
+  "result": "ACCEPT"
+}
+{
+  "_id": {
+    "$oid": "5fd4bd9bc5dc26001e0fe3ed"
+  },
+  "game": "5fd4bc74c5dc26001e0fe3d0",
+  "player": "5fd4bce7c5dc26001e0fe3e0",
+  "exerciseId": "B",
+  "submittedAt": {
+    "$date": "2020-12-12T12:54:51.029Z"
+  },
+  "updatedAt": {
+    "$date": "2020-12-12T12:54:51.712Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:54:51.03Z"
+  },
+  "__v": 0,
+  "evaluationEngine": "MOOSHAK",
+  "evaluationEngineId": "16811691_B_team",
+  "evaluatedAt": {
+    "$date": "2020-12-12T12:54:51.406Z"
+  },
+  "feedback": "<br><table width=\"100%\" cellspacing=\"2\" cellpadding=\"2\" rules=\"all\" frame=\"box\"><tr><th>#</th><th>Result</th><th>Points</th><th>Hint</th><th>Test Data</th></tr><tr><td>1</td><td><font color=\"green\">Accepted</font></td><td>20</td><td>&nbsp;</td><td><font color=\"grey\">unavailable</font></td></tr><tr><td>2</td><td><font color=\"green\">Accepted</font></td><td>20</td><td>&nbsp;</td><td><font color=\"grey\">unavailable</font></td></tr><tr><td>3</td><td><font color=\"green\">Accepted</font></td><td>20</td><td>&nbsp;</td><td><font color=\"grey\">unavailable</font></td></tr><tr><td>4</td><td><font color=\"green\">Accepted</font></td><td>20</td><td>&nbsp;</td><td><font color=\"grey\">unavailable</font></td></tr><tr><td>5</td><td><font color=\"green\">Accepted</font></td><td>20</td><td>&nbsp;</td><td><font color=\"grey\">unavailable</font></td></tr></table>",
+  "grade": 100,
+  "language": "Python",
+  "metrics": {
+    "executionTime": 0,
+    "cpuUsage": 0.043,
+    "memoryUsage": 64,
+    "programSize": 127,
+    "linesOfCode": 5
+  },
+  "result": "ACCEPT"
+}
+{
+  "_id": {
+    "$oid": "5fd4be35c5dc26001e0fe3ee"
+  },
+  "game": "5fd4bc74c5dc26001e0fe3d0",
+  "player": "5fd4bce7c5dc26001e0fe3e0",
+  "exerciseId": "C",
+  "submittedAt": {
+    "$date": "2020-12-12T12:57:25.237Z"
+  },
+  "updatedAt": {
+    "$date": "2020-12-12T12:57:25.919Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:57:25.238Z"
+  },
+  "__v": 0,
+  "evaluationEngine": "MOOSHAK",
+  "evaluationEngineId": "16811845_C_team",
+  "evaluatedAt": {
+    "$date": "2020-12-12T12:57:25.513Z"
+  },
+  "feedback": "<br><table width=\"100%\" cellspacing=\"2\" cellpadding=\"2\" rules=\"all\" frame=\"box\"><tr><th>#</th><th>Result</th><th>Points</th><th>Hint</th><th>Test Data</th></tr><tr><td>1</td><td><font color=\"green\">Accepted</font></td><td>20</td><td>&nbsp;</td><td><font color=\"grey\">unavailable</font></td></tr><tr><td>2</td><td><font color=\"green\">Accepted</font></td><td>20</td><td>&nbsp;</td><td><font color=\"grey\">unavailable</font></td></tr><tr><td>3</td><td><font color=\"green\">Accepted</font></td><td>20</td><td>&nbsp;</td><td><font color=\"grey\">unavailable</font></td></tr><tr><td>4</td><td><font color=\"green\">Accepted</font></td><td>20</td><td>&nbsp;</td><td><font color=\"grey\">unavailable</font></td></tr><tr><td>5</td><td><font color=\"green\">Accepted</font></td><td>20</td><td>&nbsp;</td><td><font color=\"grey\">unavailable</font></td></tr></table>",
+  "grade": 100,
+  "language": "Python",
+  "metrics": {
+    "executionTime": 0,
+    "cpuUsage": 0.042,
+    "memoryUsage": 64,
+    "programSize": 173,
+    "linesOfCode": 9
+  },
+  "result": "ACCEPT"
+}

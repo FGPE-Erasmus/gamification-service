@@ -121,7 +121,6 @@ export class AuthGuard implements CanActivate {
       return req.cookies[appConfig.auth.keycloak.cookieKey];
     }
     const { authorization } = req.headers;
-    console.log(req);
     if (typeof authorization === 'undefined') return null;
     if (authorization?.indexOf(' ') <= -1) return authorization;
     const auth = authorization?.split(' ');

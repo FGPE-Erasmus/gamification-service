@@ -10,7 +10,7 @@ import { GameModule } from '../game/game.module';
 import { GroupModule } from '../group/group.module';
 import { PlayerRewardModule } from '../player-reward/player-reward.module';
 import { SubmissionModule } from '../submission/submission.module';
-import { UsersModule } from '../users/users.module';
+
 import DbTestModule, { cleanupMongo } from '../../test/utils/db-test.module';
 import { PlayerToDtoMapper } from './mappers/player-to-dto.mapper';
 import { Player, PlayerSchema } from './models/player.model';
@@ -20,6 +20,7 @@ import { PlayerRepository } from './repositories/player.repository';
 import { Group } from '../group/models/group.model';
 import { GroupService } from '../group/group.service';
 import { EventService } from '../event/event.service';
+import { KeycloakModule } from '../keycloak/keycloak.module';
 
 const gameId = '440850928599';
 const groupId = '440850928588';
@@ -97,21 +98,21 @@ describe('PlayerService', () => {
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
+        DbTestModule({}),
         MongooseModule.forFeature([
           {
             name: 'Player',
             schema: PlayerSchema,
           },
         ]),
+        KeycloakModule,
         forwardRef(() => EventModule),
         forwardRef(() => GameModule),
-        forwardRef(() => UsersModule),
         forwardRef(() => GroupModule),
         forwardRef(() => ChallengeStatusModule),
         forwardRef(() => PlayerRewardModule),
         forwardRef(() => SubmissionModule),
         forwardRef(() => SubscriptionsModule),
-        DbTestModule({}),
       ],
       providers: [PlayerToDtoMapper, PlayerRepository, PlayerService, PlayerResolver],
     }).compile();

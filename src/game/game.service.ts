@@ -118,7 +118,6 @@ export class GameService extends BaseService<Game, GameDocument> {
    * @param {string} userId ID of the user.
    */
   async isInstructor(gameId: string, userId: string): Promise<boolean> {
-    console.log(gameId);
     const game: Game = await this.findById(gameId);
     return game.instructors?.includes(userId);
   }

@@ -1,0 +1,156 @@
+{
+  "_id": {
+    "$oid": "5fd4b728c5dc26001e0fe396"
+  },
+  "players": [],
+  "name": "G1",
+  "displayName": "G1",
+  "game": "5fd4b6c3c5dc26001e0fe388",
+  "updatedAt": {
+    "$date": "2020-12-12T12:27:20.68Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:27:20.68Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4b735c5dc26001e0fe397"
+  },
+  "players": [],
+  "name": "G2",
+  "displayName": "G2",
+  "game": "5fd4b6c3c5dc26001e0fe388",
+  "updatedAt": {
+    "$date": "2020-12-12T12:27:33.466Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:27:33.466Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4b7a7c5dc26001e0fe3a6"
+  },
+  "players": [],
+  "name": "G1",
+  "displayName": "G1",
+  "game": "5fd4b768c5dc26001e0fe398",
+  "updatedAt": {
+    "$date": "2020-12-12T12:29:27.964Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:29:27.964Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4b7b1c5dc26001e0fe3a7"
+  },
+  "players": [],
+  "name": "G2",
+  "displayName": "G2",
+  "game": "5fd4b768c5dc26001e0fe398",
+  "updatedAt": {
+    "$date": "2020-12-12T12:29:37.773Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:29:37.773Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4bb72c5dc26001e0fe3c2"
+  },
+  "players": [
+    {
+      "$oid": "5fd4bbbdc5dc26001e0fe3ca"
+    },
+    {
+      "$oid": "5fd4bbd2c5dc26001e0fe3cd"
+    }
+  ],
+  "name": "G1",
+  "displayName": "G1",
+  "game": "5fd4bb2bc5dc26001e0fe3b4",
+  "updatedAt": {
+    "$date": "2020-12-12T12:47:29.63Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:45:38.654Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4bb7cc5dc26001e0fe3c3"
+  },
+  "players": [
+    {
+      "$oid": "5fd4bba2c5dc26001e0fe3c7"
+    },
+    {
+      "$oid": "5fd4bb8bc5dc26001e0fe3c4"
+    }
+  ],
+  "name": "G2",
+  "displayName": "G2",
+  "game": "5fd4bb2bc5dc26001e0fe3b4",
+  "updatedAt": {
+    "$date": "2020-12-12T12:47:29.639Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:45:48.119Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4bcc0c5dc26001e0fe3de"
+  },
+  "players": [
+    {
+      "$oid": "5fd4bce7c5dc26001e0fe3e0"
+    },
+    {
+      "$oid": "5fd4bd0ac5dc26001e0fe3e6"
+    }
+  ],
+  "name": "G1",
+  "displayName": "G1",
+  "game": "5fd4bc74c5dc26001e0fe3d0",
+  "updatedAt": {
+    "$date": "2020-12-12T12:52:57.629Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:51:12.341Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4bcc9c5dc26001e0fe3df"
+  },
+  "players": [
+    {
+      "$oid": "5fd4bceec5dc26001e0fe3e3"
+    },
+    {
+      "$oid": "5fd4bd20c5dc26001e0fe3e9"
+    }
+  ],
+  "name": "G2",
+  "displayName": "G2",
+  "game": "5fd4bc74c5dc26001e0fe3d0",
+  "updatedAt": {
+    "$date": "2020-12-12T12:52:57.62Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:51:21.583Z"
+  },
+  "__v": 0
+}

@@ -1,0 +1,15 @@
+{
+  "_id": {
+    "$oid": "5fd4be35c5dc26001e0fe3ef"
+  },
+  "count": 1,
+  "player": "5fd4bce7c5dc26001e0fe3e0",
+  "reward": "5fd4bc74c5dc26001e0fe3da",
+  "updatedAt": {
+    "$date": "2020-12-12T12:57:25.945Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:57:25.945Z"
+  },
+  "__v": 0
+}

@@ -1,0 +1,322 @@
+{
+  "_id": {
+    "$oid": "5fd4ba6bc5dc26001e0fe3a8"
+  },
+  "rewards": [],
+  "learningPath": [
+    {
+      "$oid": "5fd4ba6bc5dc26001e0fe3a9"
+    },
+    {
+      "$oid": "5fd4ba6bc5dc26001e0fe3aa"
+    }
+  ],
+  "submissions": [],
+  "game": "5fd4b768c5dc26001e0fe398",
+  "user": "1b335cd6-b6fb-44c9-bddd-4acf549587b2",
+  "points": 0,
+  "updatedAt": {
+    "$date": "2020-12-12T12:41:15.966Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:41:15.85Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4ba86c5dc26001e0fe3ab"
+  },
+  "rewards": [],
+  "learningPath": [
+    {
+      "$oid": "5fd4ba86c5dc26001e0fe3ac"
+    },
+    {
+      "$oid": "5fd4ba86c5dc26001e0fe3ad"
+    }
+  ],
+  "submissions": [],
+  "game": "5fd4b768c5dc26001e0fe398",
+  "user": "61e37d1b-50d8-49e1-88f3-a3e83d7b0d59",
+  "points": 0,
+  "updatedAt": {
+    "$date": "2020-12-12T12:41:42.726Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:41:42.701Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4ba9dc5dc26001e0fe3ae"
+  },
+  "rewards": [],
+  "learningPath": [
+    {
+      "$oid": "5fd4ba9dc5dc26001e0fe3af"
+    },
+    {
+      "$oid": "5fd4ba9dc5dc26001e0fe3b0"
+    }
+  ],
+  "submissions": [],
+  "game": "5fd4b768c5dc26001e0fe398",
+  "user": "9e5352bf-e396-46b0-bf87-9150061ad14b",
+  "points": 0,
+  "updatedAt": {
+    "$date": "2020-12-12T12:42:05.635Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:42:05.613Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4bab5c5dc26001e0fe3b1"
+  },
+  "rewards": [],
+  "learningPath": [
+    {
+      "$oid": "5fd4bab5c5dc26001e0fe3b2"
+    },
+    {
+      "$oid": "5fd4bab5c5dc26001e0fe3b3"
+    }
+  ],
+  "submissions": [],
+  "game": "5fd4b768c5dc26001e0fe398",
+  "user": "a11e8d97-bf28-4531-9411-aa72faba86a7",
+  "points": 0,
+  "updatedAt": {
+    "$date": "2020-12-12T12:42:29.809Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:42:29.789Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4bb8bc5dc26001e0fe3c4"
+  },
+  "rewards": [],
+  "learningPath": [
+    {
+      "$oid": "5fd4bb8bc5dc26001e0fe3c5"
+    },
+    {
+      "$oid": "5fd4bb8bc5dc26001e0fe3c6"
+    }
+  ],
+  "submissions": [],
+  "game": "5fd4bb2bc5dc26001e0fe3b4",
+  "user": "a11e8d97-bf28-4531-9411-aa72faba86a7",
+  "points": 0,
+  "updatedAt": {
+    "$date": "2020-12-12T12:47:29.638Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:46:03.324Z"
+  },
+  "__v": 0,
+  "group": "5fd4bb7cc5dc26001e0fe3c3"
+}
+{
+  "_id": {
+    "$oid": "5fd4bba2c5dc26001e0fe3c7"
+  },
+  "rewards": [],
+  "learningPath": [
+    {
+      "$oid": "5fd4bba2c5dc26001e0fe3c8"
+    },
+    {
+      "$oid": "5fd4bba2c5dc26001e0fe3c9"
+    }
+  ],
+  "submissions": [],
+  "game": "5fd4bb2bc5dc26001e0fe3b4",
+  "user": "9e5352bf-e396-46b0-bf87-9150061ad14b",
+  "points": 0,
+  "updatedAt": {
+    "$date": "2020-12-12T12:47:29.619Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:46:26.372Z"
+  },
+  "__v": 0,
+  "group": "5fd4bb7cc5dc26001e0fe3c3"
+}
+{
+  "_id": {
+    "$oid": "5fd4bbbdc5dc26001e0fe3ca"
+  },
+  "rewards": [],
+  "learningPath": [
+    {
+      "$oid": "5fd4bbbdc5dc26001e0fe3cb"
+    },
+    {
+      "$oid": "5fd4bbbdc5dc26001e0fe3cc"
+    }
+  ],
+  "submissions": [],
+  "game": "5fd4bb2bc5dc26001e0fe3b4",
+  "user": "61e37d1b-50d8-49e1-88f3-a3e83d7b0d59",
+  "points": 0,
+  "updatedAt": {
+    "$date": "2020-12-12T12:47:29.61Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:46:53.607Z"
+  },
+  "__v": 0,
+  "group": "5fd4bb72c5dc26001e0fe3c2"
+}
+{
+  "_id": {
+    "$oid": "5fd4bbd2c5dc26001e0fe3cd"
+  },
+  "rewards": [],
+  "learningPath": [
+    {
+      "$oid": "5fd4bbd2c5dc26001e0fe3ce"
+    },
+    {
+      "$oid": "5fd4bbd2c5dc26001e0fe3cf"
+    }
+  ],
+  "submissions": [],
+  "game": "5fd4bb2bc5dc26001e0fe3b4",
+  "user": "1b335cd6-b6fb-44c9-bddd-4acf549587b2",
+  "points": 0,
+  "updatedAt": {
+    "$date": "2020-12-12T12:47:29.629Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:47:14.775Z"
+  },
+  "__v": 0,
+  "group": "5fd4bb72c5dc26001e0fe3c2"
+}
+{
+  "_id": {
+    "$oid": "5fd4bce7c5dc26001e0fe3e0"
+  },
+  "rewards": [
+    {
+      "$oid": "5fd4be35c5dc26001e0fe3ef"
+    }
+  ],
+  "learningPath": [
+    {
+      "$oid": "5fd4bce7c5dc26001e0fe3e1"
+    },
+    {
+      "$oid": "5fd4bce7c5dc26001e0fe3e2"
+    }
+  ],
+  "submissions": [
+    {
+      "$oid": "5fd4bd7fc5dc26001e0fe3ec"
+    },
+    {
+      "$oid": "5fd4bd9bc5dc26001e0fe3ed"
+    },
+    {
+      "$oid": "5fd4be35c5dc26001e0fe3ee"
+    }
+  ],
+  "game": "5fd4bc74c5dc26001e0fe3d0",
+  "user": "1b335cd6-b6fb-44c9-bddd-4acf549587b2",
+  "points": 0,
+  "updatedAt": {
+    "$date": "2020-12-12T12:57:25.974Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:51:51.076Z"
+  },
+  "__v": 0,
+  "group": "5fd4bcc0c5dc26001e0fe3de"
+}
+{
+  "_id": {
+    "$oid": "5fd4bceec5dc26001e0fe3e3"
+  },
+  "rewards": [],
+  "learningPath": [
+    {
+      "$oid": "5fd4bceec5dc26001e0fe3e4"
+    },
+    {
+      "$oid": "5fd4bceec5dc26001e0fe3e5"
+    }
+  ],
+  "submissions": [],
+  "game": "5fd4bc74c5dc26001e0fe3d0",
+  "user": "61e37d1b-50d8-49e1-88f3-a3e83d7b0d59",
+  "points": 0,
+  "updatedAt": {
+    "$date": "2020-12-12T12:52:57.598Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:51:58.201Z"
+  },
+  "__v": 0,
+  "group": "5fd4bcc9c5dc26001e0fe3df"
+}
+{
+  "_id": {
+    "$oid": "5fd4bd0ac5dc26001e0fe3e6"
+  },
+  "rewards": [],
+  "learningPath": [
+    {
+      "$oid": "5fd4bd0ac5dc26001e0fe3e7"
+    },
+    {
+      "$oid": "5fd4bd0ac5dc26001e0fe3e8"
+    }
+  ],
+  "submissions": [],
+  "game": "5fd4bc74c5dc26001e0fe3d0",
+  "user": "9e5352bf-e396-46b0-bf87-9150061ad14b",
+  "points": 0,
+  "updatedAt": {
+    "$date": "2020-12-12T12:52:57.629Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:52:26.327Z"
+  },
+  "__v": 0,
+  "group": "5fd4bcc0c5dc26001e0fe3de"
+}
+{
+  "_id": {
+    "$oid": "5fd4bd20c5dc26001e0fe3e9"
+  },
+  "rewards": [],
+  "learningPath": [
+    {
+      "$oid": "5fd4bd20c5dc26001e0fe3ea"
+    },
+    {
+      "$oid": "5fd4bd20c5dc26001e0fe3eb"
+    }
+  ],
+  "submissions": [],
+  "game": "5fd4bc74c5dc26001e0fe3d0",
+  "user": "a11e8d97-bf28-4531-9411-aa72faba86a7",
+  "points": 0,
+  "updatedAt": {
+    "$date": "2020-12-12T12:52:57.619Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:52:48.845Z"
+  },
+  "__v": 0,
+  "group": "5fd4bcc9c5dc26001e0fe3df"
+}

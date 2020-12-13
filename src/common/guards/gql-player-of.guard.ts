@@ -47,7 +47,6 @@ export class GqlPlayerOfGuard implements CanActivate {
       return false;
     }
     const player: Player = await this.playerService.findByGameAndUser(gameId, request.userInfo.sub);
-    console.log(player);
     if (!player) {
       return false;
     }

@@ -13,7 +13,6 @@ import { GameModule } from '../game/game.module';
 import { HookModule } from '../hook/hook.module';
 import { LeaderboardModule } from '../leaderboard/leaderboard.module';
 import { RewardModule } from '../reward/reward.module';
-import { UsersModule } from '../users/users.module';
 import { ChallengeRepository } from './repositories/challenge.repository';
 import { Difficulty } from './models/difficulty.enum';
 import { Mode } from './models/mode.enum';
@@ -65,7 +64,6 @@ describe('ChallengeService', () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
         MongooseModule.forFeature([{ name: 'Challenge', schema: ChallengeSchema }]),
-        forwardRef(() => UsersModule),
         forwardRef(() => GameModule),
         forwardRef(() => HookModule),
         forwardRef(() => LeaderboardModule),

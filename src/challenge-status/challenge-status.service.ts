@@ -54,9 +54,11 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
       playerId,
       challengeId,
     });
-    this.pubSub.publish(NotificationEnum.CHALLENGE_STATUS_UPDATED, {
+
+    await this.pubSub.publish(NotificationEnum.CHALLENGE_STATUS_UPDATED, {
       challengeStatusUpdated: this.challengeStatusToDtoMapper.transform(result),
     });
+
     return result;
   }
 
@@ -80,9 +82,10 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
       challengeId,
     });
 
-    this.pubSub.publish(NotificationEnum.CHALLENGE_STATUS_UPDATED, {
+    await this.pubSub.publish(NotificationEnum.CHALLENGE_STATUS_UPDATED, {
       challengeStatusUpdated: this.challengeStatusToDtoMapper.transform(result),
     });
+
     return result;
   }
 
@@ -109,9 +112,10 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
       challengeId,
     });
 
-    this.pubSub.publish(NotificationEnum.CHALLENGE_STATUS_UPDATED, {
+    await this.pubSub.publish(NotificationEnum.CHALLENGE_STATUS_UPDATED, {
       challengeStatusUpdated: this.challengeStatusToDtoMapper.transform(result),
     });
+
     return result;
   }
 
@@ -135,9 +139,10 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
       challengeId,
     });
 
-    this.pubSub.publish(NotificationEnum.CHALLENGE_STATUS_UPDATED, {
+    await this.pubSub.publish(NotificationEnum.CHALLENGE_STATUS_UPDATED, {
       challengeStatusUpdated: this.challengeStatusToDtoMapper.transform(result),
     });
+
     return result;
   }
 
@@ -160,9 +165,10 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
       challengeId,
     });
 
-    this.pubSub.publish(NotificationEnum.CHALLENGE_STATUS_UPDATED, {
+    await this.pubSub.publish(NotificationEnum.CHALLENGE_STATUS_UPDATED, {
       challengeStatusUpdated: this.challengeStatusToDtoMapper.transform(result),
     });
+
     return result;
   }
 
@@ -185,9 +191,10 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
       challengeId,
     });
 
-    this.pubSub.publish(NotificationEnum.CHALLENGE_STATUS_UPDATED, {
+    await this.pubSub.publish(NotificationEnum.CHALLENGE_STATUS_UPDATED, {
       challengeStatusUpdated: this.challengeStatusToDtoMapper.transform(result),
     });
+
     return result;
   }
 
@@ -210,9 +217,10 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
       challengeId,
     });
 
-    this.pubSub.publish(NotificationEnum.CHALLENGE_STATUS_UPDATED, {
+    await this.pubSub.publish(NotificationEnum.CHALLENGE_STATUS_UPDATED, {
       challengeStatusUpdated: this.challengeStatusToDtoMapper.transform(result),
     });
+
     return result;
   }
 }

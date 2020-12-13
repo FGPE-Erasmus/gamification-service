@@ -6,7 +6,7 @@ import { Connection } from 'mongoose';
 import { EventModule } from '../event/event.module';
 import { GameModule } from '../game/game.module';
 import { PlayerModule } from '../player/player.module';
-import { UsersModule } from '../users/users.module';
+
 import { GroupResolver } from './group.resolver';
 import { GroupService } from './group.service';
 import { GroupToDtoMapper } from './mappers/group-to-dto.mapper';
@@ -50,7 +50,6 @@ describe('GroupService', () => {
           },
         ]),
         forwardRef(() => EventModule),
-        forwardRef(() => UsersModule),
         forwardRef(() => GameModule),
         forwardRef(() => PlayerModule),
         DbTestModule({}),

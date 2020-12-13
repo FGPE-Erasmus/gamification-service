@@ -31,7 +31,7 @@ export class RewardProcessor {
       }
     } else if (reward.kind === RewardType.UNLOCK) {
       for (const challengeId of reward.challenges) {
-        await this.challengeStatusService.markAsOpen(gameId, toString(challengeId), playerId, new Date());
+        await this.challengeStatusService.markAsAvailable(gameId, toString(challengeId), playerId);
       }
     }
 

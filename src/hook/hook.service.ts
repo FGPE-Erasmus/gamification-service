@@ -160,8 +160,6 @@ export class HookService {
           populate: 'submissions learningPath rewards',
         }),
     });
-    console.log('meets criteria? ' + meet);
-    console.log('meets criteria? ' + hook);
     if (meet) {
       await this.runActions(hook.game, hook.actions, eventParams);
     }

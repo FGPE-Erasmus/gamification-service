@@ -10,7 +10,8 @@ import { KeycloakAsyncOptions } from './interfaces/keycloak-async-options.interf
 import { UserResolver } from './user.resolver';
 
 @Module({
-  providers: [KeycloakResolver, UserResolver],
+  providers: [KeycloakResolver, KeycloakService, UserResolver],
+  exports: [KeycloakService],
 })
 export class KeycloakModule {
   public static imports = [HttpModule];

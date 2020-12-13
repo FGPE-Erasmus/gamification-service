@@ -4,8 +4,6 @@ import { getConnectionToken, MongooseModule } from '@nestjs/mongoose';
 import { Connection } from 'mongoose';
 
 import DbTestModule, { cleanupMongo } from '../../test/utils/db-test.module';
-import { UsersModule } from '../users/users.module';
-import { PlayerModule } from '../player/player.module';
 import { ChallengeModule } from '../challenge/challenge.module';
 import { LeaderboardModule } from '../leaderboard/leaderboard.module';
 import { HookModule } from '../hook/hook.module';
@@ -21,8 +19,14 @@ import { RewardService } from '../reward/reward.service';
 import { LeaderboardService } from '../leaderboard/leaderboard.service';
 import { HookService } from '../hook/hook.service';
 import { toMongoId } from '../common/utils/mongo.utils';
+import KeycloakMockService from '../../test/__mocks__/keycloak.service';
+import { KeycloakService } from '../keycloak/keycloak.service';
+import { KeycloakModule } from '../keycloak/keycloak.module';
+import { AppModule } from '../app.module';
 
 const GEDIL_FILE = 'test/resources/gedil/the-a-run-gedil.zip';
+
+jest.mock('../keycloak/keycloak.service');
 
 describe('GameService', () => {
   let connection: Connection;
@@ -37,15 +41,23 @@ describe('GameService', () => {
       imports: [
         DbTestModule({}),
         MongooseModule.forFeature([{ name: 'Game', schema: GameSchema }]),
-        forwardRef(() => UsersModule),
-        forwardRef(() => PlayerModule),
+        KeycloakModule.registerAsync({
+          useFactory: () => ({}),
+        }),
         forwardRef(() => ChallengeModule),
         LeaderboardModule,
         HookModule,
         RewardModule,
         forwardRef(() => SubmissionModule),
       ],
-      providers: [GameRepository, GameService],
+      providers: [
+        {
+          provide: KeycloakService,
+          useClass: KeycloakMockService,
+        },
+        GameRepository,
+        GameService,
+      ],
     }).compile();
 
     connection = module.get<Connection>(await getConnectionToken());

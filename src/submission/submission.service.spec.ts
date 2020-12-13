@@ -22,6 +22,7 @@ import { PlayerService } from '../player/player.service';
 import { Player } from '../player/models/player.model';
 import { EventService } from '../event/event.service';
 import { EvaluationEngineService } from '../evaluation-engine/evaluation-engine.service';
+import { KeycloakModule } from '../keycloak/keycloak.module';
 
 const gameId = '440850928599';
 const playerYoda = '440850928500';
@@ -58,6 +59,7 @@ describe('SubmissionService', () => {
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
+        DbTestModule({}),
         MongooseModule.forFeature([
           {
             name: 'Submission',
@@ -65,13 +67,12 @@ describe('SubmissionService', () => {
           },
         ]),
         forwardRef(() => EventModule),
-        forwardRef(() => EvaluationEngineModule),
+        forwardRef(() => EvaluationEngineModule) /**/,
         forwardRef(() => GameModule),
         forwardRef(() => PlayerModule),
-        forwardRef(() => HookModule),
+        /*forwardRef(() => HookModule),
         forwardRef(() => ChallengeStatusModule),
-        forwardRef(() => SubscriptionsModule),
-        DbTestModule({}),
+        forwardRef(() => SubscriptionsModule),*/
       ],
       providers: [SubmissionToDtoMapper, SubmissionRepository, SubmissionService, SubmissionResolver],
     }).compile();
@@ -113,7 +114,7 @@ describe('SubmissionService', () => {
         return player;
       });
 
-      const foundSubmission = await service.findByPlayer(gameId, player.id);
+      const foundSubmission = await service.findByUser(gameId, player.user);
       expect(foundSubmission).toEqual([darkSubmission]);
     });
   });

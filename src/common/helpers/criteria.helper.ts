@@ -153,8 +153,5 @@ export function checkContains(a: string | any[], b: string | any[]): boolean {
 }
 
 export function checkArrayContains(arr1: any[], arr2: any[]): boolean {
-  console.log(`[${arr1.join(', ')}] contains [${arr2.join(', ')}]`);
-  const result = arr2.every(r => arr1.includes(r));
-  console.log(result);
-  return result;
+  return arr2.every(r => arr1.includes(r));
 }

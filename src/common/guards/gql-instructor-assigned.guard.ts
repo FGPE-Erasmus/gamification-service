@@ -20,11 +20,11 @@ export class GqlInstructorAssignedGuard implements CanActivate {
   constructor(protected readonly gameService: GameService, protected readonly reflector: Reflector) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    console.log('running instructor assigned to game guard ...');
+    this.logger.debug('running instructor assigned to game guard ...');
     const request: KeycloakRequest = getReq(context);
     // if it is not a teacher, bypass the check
     if (!request.grant?.access_token?.hasRealmRole(Role.TEACHER)) {
-      console.log('not a teacher, bypassing guard ...');
+      this.logger.debug('not a teacher, bypassing guard ...');
       return true;
     }
     // is there a role that bypasses this check
@@ -32,7 +32,7 @@ export class GqlInstructorAssignedGuard implements CanActivate {
     const rolesWithDirectAccess = difference(roles, [Role.TEACHER]);
     for (const roleName of rolesWithDirectAccess) {
       if (request.grant?.access_token?.hasRealmRole(roleName)) {
-        console.log('has a role that does not require this check, bypassing guard ...');
+        this.logger.debug('has a role that does not require this check, bypassing guard ...');
         return true;
       }
     }

@@ -1,0 +1,183 @@
+{
+  "_id": {
+    "$oid": "5fd4b3b2c5dc26001e0fe36c"
+  },
+  "submissions": [],
+  "players": [],
+  "name": "Some name",
+  "description": "Some description.",
+  "startDate": {
+    "$date": "2020-12-01T00:00:00Z"
+  },
+  "endDate": {
+    "$date": "2020-12-30T00:00:00Z"
+  },
+  "gedilLayerId": "02b98333-cc81-488c-86e1-843f6e74395e",
+  "gedilLayerDescription": "[The A Run] Challenge set involving A-prefixed exercises (for demonstration purposes).",
+  "instructors": [],
+  "updatedAt": {
+    "$date": "2020-12-12T12:12:34.735Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:12:34.735Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4b657c5dc26001e0fe37a"
+  },
+  "submissions": [],
+  "players": [],
+  "name": "Some name",
+  "description": "Some description.",
+  "startDate": {
+    "$date": "2020-12-01T00:00:00Z"
+  },
+  "endDate": {
+    "$date": "2020-12-30T00:00:00Z"
+  },
+  "gedilLayerId": "02b98333-cc81-488c-86e1-843f6e74395e",
+  "gedilLayerDescription": "[The A Run] Challenge set involving A-prefixed exercises (for demonstration purposes).",
+  "instructors": [
+    "28b9a394-3d43-4d3a-8bb3-ea50f89461b8"
+  ],
+  "updatedAt": {
+    "$date": "2020-12-12T12:24:41.219Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:23:51.964Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4b6c3c5dc26001e0fe388"
+  },
+  "submissions": [],
+  "players": [],
+  "name": "Some name",
+  "description": "Some description.",
+  "startDate": {
+    "$date": "2020-12-01T00:00:00Z"
+  },
+  "endDate": {
+    "$date": "2020-12-30T00:00:00Z"
+  },
+  "gedilLayerId": "02b98333-cc81-488c-86e1-843f6e74395e",
+  "gedilLayerDescription": "[The A Run] Challenge set involving A-prefixed exercises (for demonstration purposes).",
+  "instructors": [
+    "28b9a394-3d43-4d3a-8bb3-ea50f89461b8"
+  ],
+  "updatedAt": {
+    "$date": "2020-12-12T12:26:02.032Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:25:39.473Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4b768c5dc26001e0fe398"
+  },
+  "submissions": [],
+  "players": [
+    {
+      "$oid": "5fd4ba6bc5dc26001e0fe3a8"
+    },
+    {
+      "$oid": "5fd4ba86c5dc26001e0fe3ab"
+    },
+    {
+      "$oid": "5fd4ba9dc5dc26001e0fe3ae"
+    },
+    {
+      "$oid": "5fd4bab5c5dc26001e0fe3b1"
+    }
+  ],
+  "name": "Some name",
+  "description": "Some description.",
+  "startDate": {
+    "$date": "2020-12-01T00:00:00Z"
+  },
+  "endDate": {
+    "$date": "2020-12-30T00:00:00Z"
+  },
+  "gedilLayerId": "02b98333-cc81-488c-86e1-843f6e74395e",
+  "gedilLayerDescription": "[The A Run] Challenge set involving A-prefixed exercises (for demonstration purposes).",
+  "instructors": [
+    "28b9a394-3d43-4d3a-8bb3-ea50f89461b8"
+  ],
+  "updatedAt": {
+    "$date": "2020-12-12T12:42:29.791Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:28:24.006Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4bb2bc5dc26001e0fe3b4"
+  },
+  "submissions": [],
+  "players": [],
+  "name": "Some name",
+  "description": "Some description.",
+  "startDate": {
+    "$date": "2020-12-01T00:00:00Z"
+  },
+  "endDate": {
+    "$date": "2020-12-30T00:00:00Z"
+  },
+  "gedilLayerId": "02b98333-cc81-488c-86e1-843f6e74395e",
+  "gedilLayerDescription": "[The A Run] Challenge set involving A-prefixed exercises (for demonstration purposes).",
+  "instructors": [
+    "28b9a394-3d43-4d3a-8bb3-ea50f89461b8"
+  ],
+  "updatedAt": {
+    "$date": "2020-12-12T12:47:29.634Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:44:27.864Z"
+  },
+  "__v": 0
+}
+{
+  "_id": {
+    "$oid": "5fd4bc74c5dc26001e0fe3d0"
+  },
+  "submissions": [
+    {
+      "$oid": "5fd4bd7fc5dc26001e0fe3ec"
+    },
+    {
+      "$oid": "5fd4bd9bc5dc26001e0fe3ed"
+    },
+    {
+      "$oid": "5fd4be35c5dc26001e0fe3ee"
+    }
+  ],
+  "players": [],
+  "name": "Some name",
+  "description": "Some description.",
+  "startDate": {
+    "$date": "2020-12-01T00:00:00Z"
+  },
+  "endDate": {
+    "$date": "2020-12-30T00:00:00Z"
+  },
+  "gedilLayerId": "02b98333-cc81-488c-86e1-843f6e74395e",
+  "gedilLayerDescription": "[The A Run] Challenge set involving A-prefixed exercises (for demonstration purposes).",
+  "instructors": [
+    "28b9a394-3d43-4d3a-8bb3-ea50f89461b8"
+  ],
+  "updatedAt": {
+    "$date": "2020-12-12T12:57:25.92Z"
+  },
+  "createdAt": {
+    "$date": "2020-12-12T12:49:56.947Z"
+  },
+  "__v": 0
+}

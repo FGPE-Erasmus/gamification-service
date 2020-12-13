@@ -21,6 +21,7 @@ RUN npm install
 
 RUN chown -R node:node /home/node/.npm-global
 
+COPY .env.$NODE_ENV ./
 COPY tsconfig*.json ./
 COPY nest-cli.json ./
 
