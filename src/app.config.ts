@@ -17,6 +17,7 @@ interface IAppConfig {
     keycloak: {
       host: string;
       port: number;
+      prefix?: string;
       realm: string;
       clientUniqueId: string;
       clientId: string;
@@ -82,6 +83,7 @@ export const appConfig: IAppConfig = {
     keycloak: {
       host: process.env.AUTH_KEYCLOAK_HOST || 'localhost',
       port: +(process.env.AUTH_KEYCLOAK_PORT || 8080),
+      prefix: process.env.AUTH_KEYCLOAK_PREFIX || '',
       realm: process.env.AUTH_KEYCLOAK_REALM || 'master',
       clientUniqueId: process.env.AUTH_KEYCLOAK_CLIENT_UNIQUE_ID || '00000000-0000-0000-0000-000000000000',
       clientId: process.env.AUTH_KEYCLOAK_CLIENT_ID || 'client_id',
