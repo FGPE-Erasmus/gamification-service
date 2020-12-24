@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { PubSub } from 'graphql-subscriptions';
 
 import { checkCriteria } from '../common/helpers/criteria.helper';
@@ -27,11 +27,14 @@ import { ConditionInput } from './inputs/condition.input';
 import { ScheduledHook } from './models/scheduled-hook.model';
 import { ActionHook } from './models/action-hook.model';
 import { ActionEmbed } from './models/embedded/action.embed';
+import { ChallengeService } from '../challenge/challenge.service';
 
 @Injectable()
 export class HookService {
   constructor(
     @Inject('PUB_SUB') protected readonly pubSub: PubSub,
+    @Inject(forwardRef(() => ChallengeService))
+    protected readonly challengeService: ChallengeService,
     protected readonly actionHookService: ActionHookService,
     protected readonly scheduledHookService: ScheduledHookService,
     protected readonly challengeStatusService: ChallengeStatusService,
@@ -314,10 +317,12 @@ export class HookService {
     playerId: string,
     property: string,
     value: string,
-  ): Promise<ChallengeStatus> {
+  ): Promise<ChallengeStatus | Challenge> {
     switch (property.toUpperCase()) {
       case 'STATE':
         return this.updateChallengeState(gameId, challengeId, playerId, State[value.toUpperCase()]);
+      case 'REF':
+        return await this.challengeService.findOneAndUpdate({ _id: challengeId }, { refs: [value] });
     }
   }
 

@@ -20,6 +20,8 @@ import { Result } from '../submission/models/result.enum';
 import { Challenge, ChallengeDocument } from './models/challenge.model';
 import { Mode } from './models/mode.enum';
 import { ChallengeRepository } from './repositories/challenge.repository';
+import { ScheduledHookService } from 'src/hook/scheduled-hook.service';
+import { ConditionEmbed } from 'src/hook/models/embedded/condition.embed';
 
 @Injectable()
 export class ChallengeService extends BaseService<Challenge, ChallengeDocument> {
@@ -29,6 +31,7 @@ export class ChallengeService extends BaseService<Challenge, ChallengeDocument> 
     protected readonly rewardService: RewardService,
     protected readonly hookService: HookService,
     protected readonly actionHookService: ActionHookService,
+    protected readonly scheduledHookService: ScheduledHookService,
   ) {
     super(new Logger(ChallengeService.name), repository);
   }
@@ -111,6 +114,93 @@ export class ChallengeService extends BaseService<Challenge, ChallengeDocument> 
     }
 
     // add logic hooks of the challenge
+    if (challenge.mode === Mode.SHAPESHIFTER) {
+      for (const exerciseId of challenge.modeParameters) {
+        if (Number(exerciseId)) continue;
+        await this.scheduledHookService.create({
+          game: game.id,
+          parentChallenge: challenge.id,
+          actions: [
+            {
+              type: CategoryEnum.UPDATE,
+              parameters: ['CHALLENGE', challenge.id as string, 'REF', exerciseId],
+            },
+          ],
+          recurrent: true,
+          interval: +challenge.modeParameters[0],
+          active: true,
+        });
+      }
+    } else if (challenge.mode === Mode.TIME_BOMB) {
+      await this.scheduledHookService.create({
+        game: game.id,
+        parentChallenge: challenge.id,
+        criteria: {
+          conditions: [
+            {
+              order: 0,
+              leftEntity: EntityEnum.FIXED,
+              leftProperty: 'COMPLETED',
+              comparingFunction: ComparingFunction.NOT_EQUAL,
+              rightEntity: EntityEnum.PLAYER,
+              rightProperty: `$.learningPath[?(@.challenge==\'${challenge.id}\')].state`,
+            },
+          ],
+          junctors: [],
+        },
+        actions: [
+          {
+            type: CategoryEnum.UPDATE,
+            parameters: ['CHALLENGE', challenge.id as string, 'STATUS', State.FAILED],
+          },
+        ],
+        recurrent: false,
+        interval: +challenge.modeParameters[0],
+        active: true,
+      });
+    }
+
+    const conditionsList: ConditionEmbed[] = [
+      {
+        order: 0,
+        leftEntity: EntityEnum.FIXED,
+        leftProperty: challenge.refs.join(', '),
+        comparingFunction: ComparingFunction.IN,
+        rightEntity: EntityEnum.PLAYER,
+        rightProperty: `$.submissions[?(@.result==\'${Result.ACCEPT}\')].exerciseId`,
+      },
+      {
+        order: 1,
+        leftEntity: EntityEnum.FIXED,
+        leftProperty: Object.values(subObjects.challenges).join(', '),
+        comparingFunction: ComparingFunction.IN,
+        rightEntity: EntityEnum.PLAYER,
+        rightProperty: `$.learningPath[?(@.state==\'${State.COMPLETED}\')].challenge`,
+      },
+    ];
+
+    const junctorsList: Junctor[] = [Junctor.AND];
+
+    if (challenge.mode === Mode.SPEEDUP) {
+      const speedupCondition: ConditionEmbed = {
+        order: 2,
+        leftEntity: EntityEnum.FIXED,
+        leftProperty: challenge.modeParameters[0],
+        comparingFunction: ComparingFunction.GREAT_OR_EQUAL,
+        rightEntity: EntityEnum.PLAYER,
+        rightProperty: `$.submissions[?(@.game==\'${challenge.game}\' && @.result==\'${Result.ACCEPT}\')].metrics.executionTime`,
+      };
+      conditionsList.push(speedupCondition);
+      junctorsList.push(Junctor.AND);
+    } else if (challenge.mode === Mode.SHORTENING) {
+      const shorteningConditions: ConditionEmbed[] = this.shorteningConditionCreation(
+        challenge.modeParameters,
+        challenge.game,
+      );
+      conditionsList.concat(shorteningConditions);
+      junctorsList.push(Junctor.AND);
+    }
+
     for (const exerciseId of challenge.refs) {
       await this.actionHookService.create({
         game: game.id,
@@ -118,25 +208,8 @@ export class ChallengeService extends BaseService<Challenge, ChallengeDocument> 
         sourceId: exerciseId,
         trigger: TriggerEvent.SUBMISSION_ACCEPTED,
         criteria: {
-          conditions: [
-            {
-              order: 0,
-              leftEntity: EntityEnum.FIXED,
-              leftProperty: challenge.refs.join(', '),
-              comparingFunction: ComparingFunction.IN,
-              rightEntity: EntityEnum.PLAYER,
-              rightProperty: `$.submissions[?(@.result==\'${Result.ACCEPT}\')].exerciseId`,
-            },
-            {
-              order: 1,
-              leftEntity: EntityEnum.FIXED,
-              leftProperty: Object.values(subObjects.challenges).join(', '),
-              comparingFunction: ComparingFunction.IN,
-              rightEntity: EntityEnum.PLAYER,
-              rightProperty: `$.learningPath[?(@.state==\'${State.COMPLETED}\')].challenge`,
-            },
-          ],
-          junctors: [Junctor.AND],
+          conditions: conditionsList,
+          junctors: junctorsList,
         },
         actions: [
           {
@@ -272,5 +345,32 @@ export class ChallengeService extends BaseService<Challenge, ChallengeDocument> 
         $and: [{ hidden: { $eq: hidden } }, { game: { $eq: gameId } }],
       });
     }
+  }
+
+  shorteningConditionCreation(modeParameters: string[], gameId: string): ConditionEmbed[] {
+    const linesIndex = modeParameters.indexOf('LINES');
+    const charsIndex = modeParameters.indexOf('CHARS');
+    let shorteningConditions: ConditionEmbed[];
+    if (linesIndex !== -1) {
+      shorteningConditions.push({
+        order: 2,
+        leftEntity: EntityEnum.FIXED,
+        leftProperty: modeParameters[linesIndex],
+        comparingFunction: ComparingFunction.EQUAL,
+        rightEntity: EntityEnum.FIXED,
+        rightProperty: `$.submissions[?(@.game==\'${gameId}\' && @.result==\'${Result.ACCEPT}\')].metrics.linesOfCode`,
+      });
+    }
+    if (charsIndex !== -1) {
+      shorteningConditions.push({
+        order: 3,
+        leftEntity: EntityEnum.FIXED,
+        leftProperty: modeParameters[charsIndex],
+        comparingFunction: ComparingFunction.EQUAL,
+        rightEntity: EntityEnum.FIXED,
+        rightProperty: `$.submissions[?(@.game==\'${gameId}\' && @.result==\'${Result.ACCEPT}\')].metrics.characters`,
+      });
+    }
+    return shorteningConditions;
   }
 }
