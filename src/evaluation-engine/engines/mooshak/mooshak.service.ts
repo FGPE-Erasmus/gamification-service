@@ -40,12 +40,12 @@ export class MooshakService implements IEngineService {
     filename: string,
     solution: string,
     options: AxiosRequestConfig = {},
-    modeParameters?: string,
+    modeParameters?: string[],
   ): Promise<EvaluationDto> {
     const data: FormData = new FormData();
     data.append('program', Buffer.from(solution, 'utf-8'), filename);
     if (modeParameters) {
-      data.append('modeParameters', Buffer.from(modeParameters, 'utf-8'), filename);
+      data.append('modeParameters', Buffer.from(JSON.stringify(modeParameters), 'utf-8'), filename);
     }
 
     const response: MooshakSubmissionDto = await this.httpService

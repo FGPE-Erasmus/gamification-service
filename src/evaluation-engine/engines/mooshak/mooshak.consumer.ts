@@ -24,6 +24,7 @@ import { IRequestEvaluationJobData } from '../../interfaces/request-evaluation-j
 import { MooshakService } from './mooshak.service';
 import { ChallengeService } from 'src/challenge/challenge.service';
 import { Mode } from 'src/challenge/models/mode.enum';
+import { AxiosRequestConfig } from 'axios';
 
 @Processor(appConfig.queue.evaluation.name)
 export class MooshakConsumer {
@@ -43,6 +44,7 @@ export class MooshakConsumer {
   async onEvaluationRequested(job: Job<unknown>): Promise<void> {
     const { submissionId, filename, content } = job.data as IRequestEvaluationJobData;
     let submission: Submission = await this.submissionService.findById(submissionId);
+    let modeParameters;
     const challenge = await this.challengeService.findOne({
       $and: [{ refs: { $elemMatch: { $eq: submission.exerciseId } } }, { gameId: { $eq: submission.game } }],
     });
@@ -56,7 +58,12 @@ export class MooshakConsumer {
 
     console.log(token);
 
-    const args = [
+    if (challenge.mode === Mode.HACK_IT) {
+      modeParameters = challenge.modeParameters;
+    }
+
+    // evaluate the attempt
+    const result = await this.mooshakService.evaluate(
       submission,
       filename,
       content,
@@ -65,14 +72,8 @@ export class MooshakConsumer {
           Authorization: `Bearer ${token}`,
         },
       },
-    ];
-
-    if (challenge.mode === Mode.HACK_IT) {
-      args.push(JSON.stringify(challenge.modeParameters));
-    }
-
-    // evaluate the attempt
-    const result = await this.mooshakService.evaluate.apply(this, args);
+      modeParameters,
+    );
 
     console.log(result);
 
