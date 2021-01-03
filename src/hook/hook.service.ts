@@ -322,7 +322,7 @@ export class HookService {
       case 'STATE':
         return this.updateChallengeState(gameId, challengeId, playerId, State[value.toUpperCase()]);
       case 'REF':
-        return await this.challengeService.findOneAndUpdate({ _id: challengeId }, { refs: [value] });
+        return await this.challengeService.findOneAndUpdate({ _id: challengeId }, { $set: { refs: [value] } });
     }
   }
 

@@ -45,7 +45,9 @@ export class MooshakService implements IEngineService {
     const data: FormData = new FormData();
     data.append('program', Buffer.from(solution, 'utf-8'), filename);
     if (modeParameters) {
-      data.append('modeParameters', Buffer.from(JSON.stringify(modeParameters), 'utf-8'), filename);
+      for (let i = 0; i < modeParameters.length; i++) {
+        data.append('modeParameters[]', modeParameters[i]);
+      }
     }
 
     const response: MooshakSubmissionDto = await this.httpService

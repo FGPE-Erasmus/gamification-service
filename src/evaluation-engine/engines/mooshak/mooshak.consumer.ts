@@ -22,9 +22,9 @@ import {
 } from '../../evaluation-engine.constants';
 import { IRequestEvaluationJobData } from '../../interfaces/request-evaluation-job-data.interface';
 import { MooshakService } from './mooshak.service';
-import { ChallengeService } from 'src/challenge/challenge.service';
-import { Mode } from 'src/challenge/models/mode.enum';
-import { AxiosRequestConfig } from 'axios';
+import { ChallengeService } from '../../../challenge/challenge.service';
+import { Mode } from '../../../challenge/models/mode.enum';
+import { Challenge } from '../../../challenge/models/challenge.model';
 
 @Processor(appConfig.queue.evaluation.name)
 export class MooshakConsumer {
@@ -45,8 +45,9 @@ export class MooshakConsumer {
     const { submissionId, filename, content } = job.data as IRequestEvaluationJobData;
     let submission: Submission = await this.submissionService.findById(submissionId);
     let modeParameters;
-    const challenge = await this.challengeService.findOne({
-      $and: [{ refs: { $elemMatch: { $eq: submission.exerciseId } } }, { gameId: { $eq: submission.game } }],
+
+    const challenge: Challenge = await this.challengeService.findOne({
+      $and: [{ refs: submission.exerciseId }, { game: submission.game }],
     });
 
     // get a token
@@ -58,7 +59,7 @@ export class MooshakConsumer {
 
     console.log(token);
 
-    if (challenge.mode === Mode.HACK_IT) {
+    if (challenge && challenge.mode === Mode.HACK_IT) {
       modeParameters = challenge.modeParameters;
     }
 

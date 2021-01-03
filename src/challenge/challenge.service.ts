@@ -20,8 +20,8 @@ import { Result } from '../submission/models/result.enum';
 import { Challenge, ChallengeDocument } from './models/challenge.model';
 import { Mode } from './models/mode.enum';
 import { ChallengeRepository } from './repositories/challenge.repository';
-import { ScheduledHookService } from 'src/hook/scheduled-hook.service';
-import { ConditionEmbed } from 'src/hook/models/embedded/condition.embed';
+import { ScheduledHookService } from '../hook/scheduled-hook.service';
+import { ConditionEmbed } from '../hook/models/embedded/condition.embed';
 
 @Injectable()
 export class ChallengeService extends BaseService<Challenge, ChallengeDocument> {
@@ -160,7 +160,7 @@ export class ChallengeService extends BaseService<Challenge, ChallengeDocument> 
       });
     }
 
-    const conditionsList: ConditionEmbed[] = [
+    let conditionsList: ConditionEmbed[] = [
       {
         order: 0,
         leftEntity: EntityEnum.FIXED,
@@ -197,7 +197,7 @@ export class ChallengeService extends BaseService<Challenge, ChallengeDocument> 
         challenge.modeParameters,
         challenge.game,
       );
-      conditionsList.concat(shorteningConditions);
+      conditionsList = conditionsList.concat(shorteningConditions);
       junctorsList.push(Junctor.AND);
     }
 
@@ -348,31 +348,40 @@ export class ChallengeService extends BaseService<Challenge, ChallengeDocument> 
   }
 
   shorteningConditionCreation(modeParameters: string[], gameId: string): ConditionEmbed[] {
-    const linesIndex =
-      modeParameters.indexOf('--lines') !== -1 ? modeParameters.indexOf('--lines') : modeParameters.indexOf('-l');
-    const charsIndex =
-      modeParameters.indexOf('--chars') !== -1 ? modeParameters.indexOf('--chars') : modeParameters.indexOf('-c');
-    let shorteningConditions: ConditionEmbed[];
-    if (linesIndex !== -1) {
-      shorteningConditions.push({
-        order: 2,
-        leftEntity: EntityEnum.FIXED,
-        leftProperty: modeParameters[linesIndex + 1],
-        comparingFunction: ComparingFunction.LESS_OR_EQUAL,
-        rightEntity: EntityEnum.FIXED,
-        rightProperty: `$.submissions[?(@.game==\'${gameId}\' && @.result==\'${Result.ACCEPT}\')].metrics.linesOfCode`,
-      });
-    }
-    if (charsIndex !== -1) {
-      shorteningConditions.push({
-        order: 3,
-        leftEntity: EntityEnum.FIXED,
-        leftProperty: modeParameters[charsIndex + 1],
-        comparingFunction: ComparingFunction.LESS_OR_EQUAL,
-        rightEntity: EntityEnum.FIXED,
-        rightProperty: `$.submissions[?(@.game==\'${gameId}\' && @.result==\'${Result.ACCEPT}\')].metrics.chars`,
-      });
-    }
+    let linesIndex;
+    let charsIndex;
+    const shorteningConditions: ConditionEmbed[] = [];
+
+    modeParameters.forEach(param => {
+      linesIndex =
+        Object.keys(param).indexOf('--lines') !== -1
+          ? Object.keys(param).indexOf('--lines')
+          : Object.keys(param).indexOf('-l');
+      charsIndex =
+        Object.keys(param).indexOf('--chars') !== -1
+          ? Object.keys(param).indexOf('--chars')
+          : Object.keys(param).indexOf('-c');
+      if (linesIndex !== -1) {
+        shorteningConditions.push({
+          order: 2,
+          leftEntity: EntityEnum.FIXED,
+          leftProperty: Object.values(param).toString(),
+          comparingFunction: ComparingFunction.GREAT_OR_EQUAL,
+          rightEntity: EntityEnum.PLAYER,
+          rightProperty: `$.submissions[?(@.game==\'${gameId}\' && @.result==\'${Result.ACCEPT}\')].metrics.linesOfCode`,
+        });
+      }
+      if (charsIndex !== -1) {
+        shorteningConditions.push({
+          order: 3,
+          leftEntity: EntityEnum.FIXED,
+          leftProperty: Object.values(param).toString(),
+          comparingFunction: ComparingFunction.GREAT_OR_EQUAL,
+          rightEntity: EntityEnum.PLAYER,
+          rightProperty: `$.submissions[?(@.game==\'${gameId}\' && @.result==\'${Result.ACCEPT}\')].metrics.chars`,
+        });
+      }
+    });
     return shorteningConditions;
   }
 }
