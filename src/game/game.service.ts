@@ -51,6 +51,7 @@ export class GameService extends BaseService<Game, GameDocument> {
           gedilLayerDescription: `[${gedilLayer.name}] ${gedilLayer.description}`,
         });
       } else {
+        if (!fileName.includes('metadata.json')) continue;
         const result = /^(challenges|leaderboards|rewards|rules)\/([^/]+)\//.exec(fileName);
         if (result) {
           const subpath = fileName.substring(result[0].length);
