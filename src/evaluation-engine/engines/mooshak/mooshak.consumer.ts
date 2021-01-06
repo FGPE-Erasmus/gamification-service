@@ -22,6 +22,9 @@ import {
 } from '../../evaluation-engine.constants';
 import { IRequestEvaluationJobData } from '../../interfaces/request-evaluation-job-data.interface';
 import { MooshakService } from './mooshak.service';
+import { ChallengeService } from '../../../challenge/challenge.service';
+import { Mode } from '../../../challenge/models/mode.enum';
+import { Challenge } from '../../../challenge/models/challenge.model';
 
 @Processor(appConfig.queue.evaluation.name)
 export class MooshakConsumer {
@@ -33,6 +36,7 @@ export class MooshakConsumer {
     protected readonly mooshakService: MooshakService,
     protected readonly eventService: EventService,
     protected readonly submissionService: SubmissionService,
+    protected readonly challengeService: ChallengeService,
     protected readonly submissionToDtoMapper: SubmissionToDtoMapper,
   ) {}
 
@@ -40,6 +44,11 @@ export class MooshakConsumer {
   async onEvaluationRequested(job: Job<unknown>): Promise<void> {
     const { submissionId, filename, content } = job.data as IRequestEvaluationJobData;
     let submission: Submission = await this.submissionService.findById(submissionId);
+    let modeParameters;
+
+    const challenge: Challenge = await this.challengeService.findOne({
+      $and: [{ refs: submission.exerciseId }, { game: submission.game }],
+    });
 
     // get a token
     const { token } = await this.mooshakService.login(
@@ -50,12 +59,22 @@ export class MooshakConsumer {
 
     console.log(token);
 
+    if (challenge && challenge.mode === Mode.HACK_IT) {
+      modeParameters = challenge.modeParameters;
+    }
+
     // evaluate the attempt
-    const result: EvaluationDto = await this.mooshakService.evaluate(submission, filename, content, {
-      headers: {
-        Authorization: `Bearer ${token}`,
+    const result = await this.mooshakService.evaluate(
+      submission,
+      filename,
+      content,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       },
-    });
+      modeParameters,
+    );
 
     console.log(result);
 

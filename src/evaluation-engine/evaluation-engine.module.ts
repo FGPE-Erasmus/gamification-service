@@ -10,6 +10,7 @@ import { MooshakService } from './engines/mooshak/mooshak.service';
 import { EvaluationEngineService } from './evaluation-engine.service';
 import { MooshakConsumer } from './engines/mooshak/mooshak.consumer';
 import { EvaluationEngineListener } from './evaluation-engine.listener';
+import { ChallengeModule } from '../challenge/challenge.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { EvaluationEngineListener } from './evaluation-engine.listener';
     forwardRef(() => HookModule),
     forwardRef(() => SubmissionModule),
     forwardRef(() => SubscriptionsModule),
+    forwardRef(() => ChallengeModule),
   ],
   providers: [EvaluationEngineListener, EvaluationEngineService, MooshakService, MooshakConsumer],
   exports: [EvaluationEngineService],
