@@ -132,7 +132,7 @@ function getSelectedPopulationByModel(modelName: string, connection: Connection)
       if (schemaTypeOpts.ref) {
         population.push({
           path,
-          select: [...getSelectedFieldsByModel(schemaTypeOpts.ref, connection)],
+          select: [...getSelectedFieldsByModel(schemaTypeOpts.ref as string, connection)],
         });
       } else if (schemaTypeOpts.type && schemaTypeOpts.type instanceof Array) {
         const options = schemaTypeOpts.type.reduce((_, curr) => curr, null);

@@ -80,7 +80,7 @@ export class BaseRepository<I extends IBaseEntity, E extends I & Document> imple
     } else {
       if (!overwrite) {
         return this.model
-          .findByIdAndUpdate(doc.id, omit(['id', 'createdAt', 'updatedAt'], doc) as Partial<E>, {
+          .findByIdAndUpdate(doc.id, (omit(['id', 'createdAt', 'updatedAt'], doc) as unknown) as UpdateQuery<E>, {
             new: true,
             omitUndefined: true,
           })
@@ -88,10 +88,14 @@ export class BaseRepository<I extends IBaseEntity, E extends I & Document> imple
           .exec();
       } else {
         await this.model
-          .update({ _id: toMongoId(doc.id) }, omit(['id', 'createdAt', 'updatedAt'], doc) as Partial<E>, {
-            upsert: true,
-            overwrite: true,
-          })
+          .update(
+            { _id: toMongoId(doc.id) },
+            (omit(['id', 'createdAt', 'updatedAt'], doc) as unknown) as UpdateQuery<E>,
+            {
+              upsert: true,
+              overwrite: true,
+            },
+          )
           .exec();
         return this.getById(doc.id);
       }
