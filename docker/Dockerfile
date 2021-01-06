@@ -6,7 +6,7 @@ RUN mkdir -p /home/node/app/node_modules
 RUN mkdir -p /home/node/.npm-global
 
 ARG PORT=3000
-ARG NODE_ENV
+ARG NODE_ENV='dev'
 
 ENV NODE_ENV=$NODE_ENV
 ENV NPM_CONFIG_PREFIX=/home/node/.npm-global
