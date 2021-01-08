@@ -120,6 +120,13 @@ export class PlayerResolver {
     return this.playerToDtoMapper.transform(player);
   }
 
+  @Roles(Role.STUDENT)
+  @Query(() => [PlayerDto])
+  async myGameProfiles(@GqlUserInfo('sub') userId: string): Promise<PlayerDto[]> {
+    const players: Player[] = await this.playerService.findByUser(userId);
+    return Promise.all(players.map(async player => this.playerToDtoMapper.transform(player)));
+  }
+
   @Roles(Role.TEACHER)
   @UseGuards(GqlInstructorAssignedGuard)
   @Mutation(() => PlayerDto)

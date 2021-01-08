@@ -21,6 +21,7 @@ import { KeycloakService } from '../keycloak/keycloak.service';
 import { GqlInstructorAssignedGuard } from '../common/guards/gql-instructor-assigned.guard';
 import { GameKeyExtractor } from '../common/decorators/game-key-extractor.decorator';
 import { GqlPlayerOfGuard } from '../common/guards/gql-player-of.guard';
+import { GqlUserInfo } from '../common/decorators/gql-user-info.decorator';
 
 @Resolver(() => GameDto)
 export class GameResolver {
@@ -76,6 +77,13 @@ export class GameResolver {
     console.log(userId);
     const game: Game = await this.gameService.assignInstructor(gameId, userId);
     return this.gameToDtoMapper.transform(game);
+  }
+
+  @Roles(Role.TEACHER)
+  @Query(() => [GameDto])
+  async myGames(@GqlUserInfo('sub') userId: string): Promise<GameDto[]> {
+    const games: Game[] = await this.gameService.findAll({ instructors: userId });
+    return Promise.all(games.map(async game => this.gameToDtoMapper.transform(game)));
   }
 
   @ResolveField()

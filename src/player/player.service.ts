@@ -28,6 +28,12 @@ export class PlayerService extends BaseService<Player, PlayerDocument> {
     });
   }
 
+  async findByUser(userId: string): Promise<Player[]> {
+    return await this.findAll({
+      user: { $eq: userId },
+    });
+  }
+
   async enroll(gameId: string, userId: string): Promise<Player> {
     // is the player already enrolled?
     let player: Player = await this.findByGameAndUser(gameId, userId);
