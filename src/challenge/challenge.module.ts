@@ -13,11 +13,13 @@ import { ChallengeToDtoMapper } from './mappers/challenge-to-dto.mapper';
 import { ChallengeSchema } from './models/challenge.model';
 import { ChallengeRepository } from './repositories/challenge.repository';
 import { PlayerModule } from '../player/player.module';
+import { EvaluationEngineModule } from '../evaluation-engine/evaluation-engine.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: 'Challenge', schema: ChallengeSchema }]),
     forwardRef(() => GameModule),
+    forwardRef(() => EvaluationEngineModule),
     forwardRef(() => PlayerModule),
     forwardRef(() => HookModule),
     forwardRef(() => LeaderboardModule),

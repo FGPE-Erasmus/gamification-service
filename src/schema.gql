@@ -55,6 +55,7 @@ type Submission {
   feedback: String
   submittedAt: Date!
   evaluatedAt: Date
+  program: String
   createdAt: Date!
   updatedAt: Date
 }
@@ -148,6 +149,18 @@ type Game {
   updatedAt: Date
 }
 
+type Activity {
+  id: String
+  name: String
+  title: String
+  timeout: Float
+  color: String
+  type: String
+  difficulty: String
+  statement: String
+  pdf: Boolean
+}
+
 type Challenge {
   id: ID!
   game: Game!
@@ -157,7 +170,7 @@ type Challenge {
   difficulty: Difficulty!
   mode: Mode!
   modeParameters: [String!]!
-  refs: [String!]!
+  refs: [Activity!]!
   locked: Boolean!
   hidden: Boolean!
   createdAt: Date!
@@ -297,6 +310,16 @@ type Reveal {
   players: [PlayerReward!]!
   createdAt: Date!
   updatedAt: Date
+}
+
+type ProgrammingLanguage {
+  id: String
+  name: String
+  extension: String
+  compiler: String
+  version: String
+  compile: String
+  execute: String
 }
 
 type Condition {
@@ -461,12 +484,16 @@ type Query {
   myGameProfiles: [Player!]!
   challengeStatus(challengeId: String!, playerId: String!): ChallengeStatus!
   myChallengeStatus(challengeId: String!): ChallengeStatus!
+  activities(challengeId: String!, gameId: String!): [Activity!]!
+  activity(activityId: String!, gameId: String!): Activity!
+  programmingLanguages(gameId: String!): [ProgrammingLanguage!]!
+  programmingLanguage(languageId: String!, gameId: String!): ProgrammingLanguage!
+  actionHooks(gameId: String!): [ActionHook!]!
+  scheduledHooks(gameId: String!): [ScheduledHook!]!
   leaderboards(gameId: String!): [Leaderboard!]!
   leaderboard(id: String!, gameId: String!): Leaderboard!
   rankings(leaderboardId: String!, gameId: String!): [Ranking!]!
   groupRankings(leaderboardId: String!, gameId: String!): [Ranking!]!
-  actionHooks(gameId: String!): [ActionHook!]!
-  scheduledHooks(gameId: String!): [ScheduledHook!]!
   rewards(gameId: String!): [Reward!]!
   badges(gameId: String!): [Badge!]!
   coupons(gameId: String!): [Coupon!]!

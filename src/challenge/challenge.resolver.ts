@@ -12,6 +12,8 @@ import { Challenge } from './models/challenge.model';
 import { Roles } from '../keycloak/decorators/roles.decorator';
 import { GqlInstructorAssignedGuard } from '../common/guards/gql-instructor-assigned.guard';
 import { GqlPlayerOfGuard } from '../common/guards/gql-player-of.guard';
+import { EvaluationEngineService } from '../evaluation-engine/evaluation-engine.service';
+import { ActivityDto } from '../evaluation-engine/dto/activity.dto';
 
 @Resolver(() => ChallengeDto)
 export class ChallengeResolver {
@@ -20,6 +22,7 @@ export class ChallengeResolver {
     protected readonly challengeToDtoMapper: ChallengeToDtoMapper,
     protected readonly gameService: GameService,
     protected readonly gameToDtoMapper: GameToDtoMapper,
+    protected readonly evaluationEngineService: EvaluationEngineService,
   ) {}
 
   @Roles(Role.AUTHOR, Role.TEACHER, Role.STUDENT)
@@ -56,5 +59,16 @@ export class ChallengeResolver {
     }
     const parentChallenge = await this.challengeService.findById(parentChallengeId);
     return this.challengeToDtoMapper.transform(parentChallenge);
+  }
+
+  @ResolveField('refs', () => [ActivityDto])
+  async refs(@Parent() root: ChallengeDto): Promise<ActivityDto[]> {
+    const { game, refs } = root;
+    const activities = [];
+    for (const activityId of refs) {
+      const activity = await this.evaluationEngineService.getActivity(game, activityId);
+      activities.push(activity);
+    }
+    return activities;
   }
 }

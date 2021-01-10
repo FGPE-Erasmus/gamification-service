@@ -3,6 +3,7 @@ import { Field, ID, ObjectType } from '@nestjs/graphql';
 import { GameDto } from '../../game/dto/game.dto';
 import { Difficulty } from '../models/difficulty.enum';
 import { Mode } from '../models/mode.enum';
+import { ActivityDto } from '../../evaluation-engine/dto/activity.dto';
 
 @ObjectType('Challenge')
 export class ChallengeDto {
@@ -30,7 +31,7 @@ export class ChallengeDto {
   @Field(() => [String])
   modeParameters?: string[];
 
-  @Field(() => [String])
+  @Field(() => [ActivityDto])
   refs?: string[];
 
   @Field()

@@ -12,6 +12,9 @@ import { IEngineService } from '../engine-service.interface';
 import { MooshakEvaluationDto } from './mooshak-evaluation.dto';
 import { MooshakExceptionDto } from './mooshak-exception.dto';
 import { MooshakSubmissionDto } from './mooshak-submission.dto';
+import { ProgrammingLanguageDto } from '../../dto/programming-language.dto';
+import { ActivityDto } from '../../dto/activity.dto';
+import { base64Decode } from '../../../common/utils/string.utils';
 
 @Injectable()
 export class MooshakService implements IEngineService {
@@ -33,6 +36,71 @@ export class MooshakService implements IEngineService {
         MooshakService.catchMooshakError(),
       )
       .toPromise();
+  }
+
+  async getLanguages(gameId: string, options?: AxiosRequestConfig): Promise<ProgrammingLanguageDto[]> {
+    return await this.httpService
+      .get<ProgrammingLanguageDto[]>(`/data/contests/${'proto_fgpe' || gameId}/languages`, options)
+      .pipe(
+        first(),
+        map<any, ProgrammingLanguageDto[]>(res => res.data),
+        MooshakService.catchMooshakError(),
+      )
+      .toPromise();
+  }
+
+  async getLanguage(gameId: string, languageId: string, options?: AxiosRequestConfig): Promise<ProgrammingLanguageDto> {
+    return await this.httpService
+      .get<ProgrammingLanguageDto>(`/data/contests/${'proto_fgpe' || gameId}/languages/${languageId}`, options)
+      .pipe(
+        first(),
+        map<any, ProgrammingLanguageDto>(res => res.data),
+        MooshakService.catchMooshakError(),
+      )
+      .toPromise();
+  }
+
+  async getActivity(gameId: string, activityId: string, options?: AxiosRequestConfig): Promise<ActivityDto> {
+    const activity: ActivityDto = await this.httpService
+      .get<ActivityDto>(`/data/contests/${'proto_fgpe' || gameId}/problems/${activityId}`, options)
+      .pipe(
+        first(),
+        map<any, ActivityDto>(res => res.data),
+        MooshakService.catchMooshakError(),
+      )
+      .toPromise();
+
+    const viewer: { statement: string; PDFviewable: boolean } = await this.httpService
+      .get<{ statement: string; PDFviewable: boolean }>(
+        `/data/contests/${'proto_fgpe' || gameId}/problems/${activityId}/view`,
+        options,
+      )
+      .pipe(
+        first(),
+        map<any, { statement: string; PDFviewable: boolean }>(res => res.data),
+        MooshakService.catchMooshakError(),
+      )
+      .toPromise();
+
+    if (viewer.PDFviewable) {
+      const pdf: ArrayBuffer = await this.httpService
+        .get<ArrayBuffer>(`/data/contests/${'proto_fgpe' || gameId}/problems/${activityId}/view`, {
+          ...options,
+          responseType: 'arraybuffer',
+        })
+        .pipe(
+          first(),
+          map(res => res.data),
+          MooshakService.catchMooshakError(),
+        )
+        .toPromise();
+      activity.statement = String.fromCharCode.apply(null, new Uint16Array(pdf));
+      activity.pdf = true;
+    } else {
+      activity.statement = viewer.statement;
+    }
+
+    return activity;
   }
 
   async evaluate(
@@ -91,6 +159,21 @@ export class MooshakService implements IEngineService {
       .toPromise();
 
     return MooshakService.mapMooshakEvaluationToEvaluation(response as MooshakEvaluationDto);
+  }
+
+  async getEvaluationProgram(submission: Submission, options?: AxiosRequestConfig): Promise<string> {
+    return await this.httpService
+      .get<string>(
+        // TODO use 'submission.game' variable below
+        `/data/contests/${'proto_fgpe' || submission.game}/submissions/${submission.evaluationEngineId}/program`,
+        options,
+      )
+      .pipe(
+        first(),
+        map<any, string>(res => base64Decode(res.data)),
+        MooshakService.catchMooshakError(),
+      )
+      .toPromise();
   }
 
   private static catchMooshakError = <T>() =>

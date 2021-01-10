@@ -22,6 +22,7 @@ import { Role } from '../common/enums/role.enum';
 import { GqlUserInfo } from '../common/decorators/gql-user-info.decorator';
 import { GqlInstructorAssignedGuard } from '../common/guards/gql-instructor-assigned.guard';
 import { GqlPlayerOfGuard } from '../common/guards/gql-player-of.guard';
+import { EvaluationEngineService } from '../evaluation-engine/evaluation-engine.service';
 
 @Resolver(() => SubmissionDto)
 export class SubmissionResolver {
@@ -33,6 +34,7 @@ export class SubmissionResolver {
     protected readonly gameToDtoMapper: GameToDtoMapper,
     protected readonly playerService: PlayerService,
     protected readonly playerToDtoMapper: PlayerToDtoMapper,
+    protected readonly evaluationEngineService: EvaluationEngineService,
   ) {}
 
   @Roles(Role.TEACHER, Role.STUDENT)
@@ -107,6 +109,12 @@ export class SubmissionResolver {
     const { player: playerId } = root;
     const player: Player = await this.playerService.findById(playerId);
     return this.playerToDtoMapper.transform(player);
+  }
+
+  @ResolveField('program', () => String)
+  async program(@Parent() root: SubmissionDto): Promise<string> {
+    const { id: submissionId } = root;
+    return this.evaluationEngineService.getSubmissionProgram(submissionId);
   }
 
   @Subscription(() => SubmissionDto)

@@ -47,6 +47,9 @@ export class SubmissionDto {
   @Field({ nullable: true })
   evaluatedAt?: Date;
 
+  @Field({ nullable: true })
+  program?: string;
+
   @Field(() => Date)
   createdAt?: Date;
 

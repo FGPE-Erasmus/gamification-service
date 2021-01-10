@@ -838,7 +838,7 @@
       "clientAuthenticatorType": "client-secret",
       "secret": "8aaac94e-bd2d-4b5b-8897-88121fd5be37",
       "redirectUris": [
-        "http://localhost",
+        "http://localhost:3006/*",
         "http://insomnia.rest"
       ],
       "webOrigins": [
@@ -851,7 +851,7 @@
       "implicitFlowEnabled": false,
       "directAccessGrantsEnabled": true,
       "serviceAccountsEnabled": false,
-      "publicClient": false,
+      "publicClient": true,
       "frontchannelLogout": false,
       "protocol": "openid-connect",
       "attributes": {
