@@ -1,5 +1,12 @@
-import { Injectable, Logger, Inject } from '@nestjs/common';
+import { Injectable, Logger, Inject, forwardRef } from '@nestjs/common';
 import { PubSub } from 'graphql-subscriptions';
+import { ChallengeService } from 'src/challenge/challenge.service';
+import { Challenge } from 'src/challenge/models/challenge.model';
+import { Mode } from 'src/challenge/models/mode.enum';
+import { CategoryEnum } from 'src/hook/enums/category.enum';
+import { EntityEnum } from 'src/hook/enums/entity.enum';
+import { ScheduledHook } from 'src/hook/models/scheduled-hook.model';
+import { ScheduledHookService } from 'src/hook/scheduled-hook.service';
 
 import { NotificationEnum } from '../common/enums/notifications.enum';
 import { BaseService } from '../common/services/base.service';
@@ -9,11 +16,15 @@ import { ChallengeStatusToDtoMapper } from './mappers/challenge-status-to-dto.ma
 import { ChallengeStatus, ChallengeStatusDocument } from './models/challenge-status.model';
 import { StateEnum } from './models/state.enum';
 import { ChallengeStatusRepository } from './repositories/challenge-status.repository';
+import { ComparingFunctionEnum as ComparingFunction } from '../hook/enums/comparing-function.enum';
 
 @Injectable()
 export class ChallengeStatusService extends BaseService<ChallengeStatus, ChallengeStatusDocument> {
   constructor(
     @Inject('PUB_SUB') protected readonly pubSub: PubSub,
+    @Inject(forwardRef(() => ChallengeService))
+    protected readonly challengeService: ChallengeService,
+    protected readonly scheduledHookService: ScheduledHookService,
     protected readonly challengeStatusToDtoMapper: ChallengeStatusToDtoMapper,
     protected readonly repository: ChallengeStatusRepository,
     protected readonly eventService: EventService,
@@ -157,6 +168,45 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
   async markAsAvailable(gameId: string, challengeId: string, playerId: string): Promise<ChallengeStatus> {
     const temp: ChallengeStatus = await this.findByChallengeIdAndPlayerId(challengeId, playerId);
     const result: ChallengeStatus = await this.patch(temp.id, { state: StateEnum.AVAILABLE });
+    const challenge: Challenge = await this.challengeService.findById(challengeId);
+
+    if (challenge.mode === Mode.TIME_BOMB) {
+      const scheduledHook: ScheduledHook = await this.scheduledHookService.create({
+        game: gameId,
+        parentChallenge: challenge.id,
+        criteria: {
+          conditions: [
+            {
+              order: 0,
+              leftEntity: EntityEnum.FIXED,
+              leftProperty: 'COMPLETED',
+              comparingFunction: ComparingFunction.NOT_EQUAL,
+              rightEntity: EntityEnum.PLAYER,
+              rightProperty: `$.learningPath[?(@.challenge==\'${challenge.id}\')].state`,
+            },
+          ],
+          junctors: [],
+        },
+        actions: [
+          {
+            type: CategoryEnum.UPDATE,
+            parameters: ['CHALLENGE', challenge.id as string, 'STATUS', StateEnum.FAILED],
+          },
+        ],
+        recurrent: false,
+        interval: +challenge.modeParameters[0],
+        active: true,
+      });
+      this.scheduledHookService.addInterval(
+        scheduledHook,
+        {
+          gameId,
+          playerId,
+          challengeId,
+        },
+        scheduledHook.interval,
+      );
+    }
 
     // send CHALLENGE_AVAILABLE message to execute attached hooks
     await this.eventService.fireEvent(TriggerEvent.CHALLENGE_AVAILABLE, {

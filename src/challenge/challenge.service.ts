@@ -133,33 +133,6 @@ export class ChallengeService extends BaseService<Challenge, ChallengeDocument> 
           active: true,
         });
       }
-    } else if (challenge.mode === Mode.TIME_BOMB) {
-      await this.scheduledHookService.create({
-        game: game.id,
-        parentChallenge: challenge.id,
-        criteria: {
-          conditions: [
-            {
-              order: 0,
-              leftEntity: EntityEnum.FIXED,
-              leftProperty: 'COMPLETED',
-              comparingFunction: ComparingFunction.NOT_EQUAL,
-              rightEntity: EntityEnum.PLAYER,
-              rightProperty: `$.learningPath[?(@.challenge==\'${challenge.id}\')].state`,
-            },
-          ],
-          junctors: [],
-        },
-        actions: [
-          {
-            type: CategoryEnum.UPDATE,
-            parameters: ['CHALLENGE', challenge.id as string, 'STATUS', State.FAILED],
-          },
-        ],
-        recurrent: false,
-        interval: +challenge.modeParameters[0],
-        active: true,
-      });
     }
 
     let conditionsList: ConditionEmbed[] = [

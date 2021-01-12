@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { Parse } from 'unzipper';
 
 import { IFile } from '../common/interfaces/file.interface';
@@ -20,11 +20,11 @@ export class GameService extends BaseService<Game, GameDocument> {
   constructor(
     protected readonly repository: GameRepository,
     protected readonly keycloakService: KeycloakService,
-    protected readonly challengeService: ChallengeService,
-    protected readonly scheduledHookService: ScheduledHookService,
     protected readonly rewardService: RewardService,
     protected readonly leaderboardService: LeaderboardService,
-    protected readonly hookService: HookService,
+    @Inject(forwardRef(() => ChallengeService)) protected readonly challengeService: ChallengeService,
+    @Inject(forwardRef(() => ScheduledHookService)) protected readonly scheduledHookService: ScheduledHookService,
+    @Inject(forwardRef(() => HookService)) protected readonly hookService: HookService,
   ) {
     super(new Logger(GameService.name), repository);
   }
