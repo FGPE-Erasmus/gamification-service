@@ -1,4 +1,4 @@
-import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 
 import { BaseService } from '../common/services/base.service';
 import { ScheduledHookRepository } from './repositories/scheduled-hook.repository';
@@ -6,16 +6,26 @@ import { ScheduledHook, ScheduledHookDocument } from './models/scheduled-hook.mo
 import { SchedulerRegistry } from '@nestjs/schedule';
 import { CronJob } from 'cron';
 import { HookService } from './hook.service';
+import { GameService } from 'src/game/game.service';
+import { Game } from 'src/game/models/game.model';
 
 @Injectable()
-export class ScheduledHookService extends BaseService<ScheduledHook, ScheduledHookDocument> {
+export class ScheduledHookService extends BaseService<ScheduledHook, ScheduledHookDocument> implements OnModuleInit {
   constructor(
     protected readonly repository: ScheduledHookRepository,
     @Inject(forwardRef(() => HookService))
     protected readonly hookService: HookService,
+    protected readonly gameService: GameService,
     private schedulerRegistry: SchedulerRegistry,
   ) {
     super(new Logger(ScheduledHookService.name), repository);
+  }
+
+  async onModuleInit(): Promise<void> {
+    const games: Game[] = await this.gameService.findAll();
+    games.forEach(game => {
+      this.schedulingRoutine(game.id);
+    });
   }
 
   /**
