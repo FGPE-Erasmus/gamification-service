@@ -468,70 +468,61 @@ type Profile {
 }
 
 type Query {
-  me: Profile!
-  user(id: String!): User!
-  users: [User!]!
-  usersByRole(role: String!): [User!]!
   alive: String!
-  challenges(gameId: String!): [Challenge!]!
-  challenge(id: String!, gameId: String!): Challenge!
-  games: [Game!]!
-  game(id: String!): Game!
-  myGames: [Game!]!
-  players(gameId: String!): [Player!]!
-  profileInGame(gameId: String!): Player!
-  player(userId: String!, gameId: String!): Player!
-  myGameProfiles: [Player!]!
-  challengeStatus(challengeId: String!, playerId: String!): ChallengeStatus!
-  myChallengeStatus(challengeId: String!): ChallengeStatus!
-  activities(challengeId: String!, gameId: String!): [Activity!]!
-  activity(activityId: String!, gameId: String!): Activity!
-  programmingLanguages(gameId: String!): [ProgrammingLanguage!]!
-  programmingLanguage(languageId: String!, gameId: String!): ProgrammingLanguage!
-  actionHooks(gameId: String!): [ActionHook!]!
-  scheduledHooks(gameId: String!): [ScheduledHook!]!
-  leaderboards(gameId: String!): [Leaderboard!]!
-  leaderboard(id: String!, gameId: String!): Leaderboard!
-  rankings(leaderboardId: String!, gameId: String!): [Ranking!]!
-  groupRankings(leaderboardId: String!, gameId: String!): [Ranking!]!
   rewards(gameId: String!): [Reward!]!
   badges(gameId: String!): [Badge!]!
   coupons(gameId: String!): [Coupon!]!
   hints(gameId: String!): [Hint!]!
   messages(gameId: String!): [Message!]!
   points(gameId: String!): [Point!]!
-  reveals(gameId: String!): [Reveal!]!
   virtualItems(gameId: String!): [VirtualItem!]!
   unlocks(gameId: String!): [Unlock!]!
-  groups(gameId: String!): [Group!]!
-  group(id: String!, gameId: String!): Group!
-  groupInGame(gameId: String!): Group!
+  reveals(gameId: String!): [Reveal!]!
+  programmingLanguages(gameId: String!): [ProgrammingLanguage!]!
+  programmingLanguage(languageId: String!, gameId: String!): ProgrammingLanguage!
+  activities(challengeId: String!, gameId: String!): [Activity!]!
+  activity(activityId: String!, gameId: String!): Activity!
   submission(id: String!, gameId: String!): Submission!
   submissions(exerciseId: String, gameId: String!, userId: String!): [Submission!]!
   mySubmissions(exerciseId: String, gameId: String!): [Submission!]!
+  groups(gameId: String!): [Group!]!
+  group(id: String!, gameId: String!): Group!
+  groupInGame(gameId: String!): Group!
+  players(gameId: String!): [Player!]!
+  profileInGame(gameId: String!): Player!
+  player(userId: String!, gameId: String!): Player!
+  myGameProfiles: [Player!]!
+  challengeStatus(challengeId: String!, playerId: String!): ChallengeStatus!
+  myChallengeStatus(challengeId: String!): ChallengeStatus!
+  actionHooks(gameId: String!): [ActionHook!]!
+  scheduledHooks(gameId: String!): [ScheduledHook!]!
+  leaderboards(gameId: String!): [Leaderboard!]!
+  leaderboard(id: String!, gameId: String!): Leaderboard!
+  rankings(leaderboardId: String!, gameId: String!): [Ranking!]!
+  groupRankings(leaderboardId: String!, gameId: String!): [Ranking!]!
+  challenges(gameId: String!): [Challenge!]!
+  challenge(id: String!, gameId: String!): Challenge!
+  games: [Game!]!
+  game(id: String!): Game!
+  myGames: [Game!]!
+  me: Profile!
+  user(id: String!): User!
+  users: [User!]!
+  usersByRole(role: String!): [User!]!
 }
 
 type Mutation {
-  login(username: String, password: String, scope: String, refreshToken: String, redirectUri: String): Auth!
-  logout(redirectUri: String): LogoutResponse!
-  importGEdILArchive(gameInput: GameInput!, file: Upload!): Game!
-  assignInstructor(userId: String!, gameId: String!): Game!
+  evaluate(gameId: String!, exerciseId: String!, file: Upload!): Submission
+  saveGroup(id: ID, groupInput: GroupInput!, gameId: String!): Group!
+  autoAssignGroups(gameId: String!): [Group!]!
   enroll(gameId: String!): Player!
   addToGame(gameId: String!, userId: String!): Player!
   removeFromGame(gameId: String!, userId: String!): Player!
   setGroup(groupId: String!, playerId: String!, gameId: String!): Player!
-  saveGroup(id: ID, groupInput: GroupInput!, gameId: String!): Group!
-  autoAssignGroups(gameId: String!): [Group!]!
-  evaluate(gameId: String!, exerciseId: String!, file: Upload!): Submission
-}
-
-input GameInput {
-  name: String!
-  description: String
-  gedilLayerId: String
-  gedilLayerDescription: String
-  startDate: Date
-  endDate: Date
+  importGEdILArchive(gameInput: GameInput!, file: Upload!): Game!
+  assignInstructor(userId: String!, gameId: String!): Game!
+  login(username: String, password: String, scope: String, refreshToken: String, redirectUri: String): Auth!
+  logout(redirectUri: String): LogoutResponse!
 }
 
 """The `Upload` scalar type represents a file upload."""
@@ -543,14 +534,23 @@ input GroupInput {
   imageUrl: String
 }
 
+input GameInput {
+  name: String!
+  description: String
+  gedilLayerId: String
+  gedilLayerDescription: String
+  startDate: Date
+  endDate: Date
+}
+
 type Subscription {
-  playerEnrolled: Player!
-  playerLeft: Player!
-  pointsUpdated: Float!
-  challengeStatusUpdated: ChallengeStatus!
   rewardReceived: Reward!
   rewardRemoved: Reward!
   rewardSubtracted: Reward!
   submissionEvaluated: Submission!
   submissionSent: Submission!
+  playerEnrolled: Player!
+  playerLeft: Player!
+  pointsUpdated: Float!
+  challengeStatusUpdated: ChallengeStatus!
 }
