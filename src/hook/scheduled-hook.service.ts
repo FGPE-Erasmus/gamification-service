@@ -30,6 +30,11 @@ export class ScheduledHookService extends BaseService<ScheduledHook, ScheduledHo
     });
   }
 
+  async schedulingRoutine(gameId: string) {
+    const scheduledHooks: ScheduledHook[] = await this.findByGameId(gameId);
+    this.executeScheduledHooks(scheduledHooks, {});
+  }
+
   executeScheduledHooks(scheduledHooks: ScheduledHook[], eventParams: { [key: string]: any }) {
     for (const scheduledHook of scheduledHooks) {
       if (scheduledHook.cron && !scheduledHook.interval)

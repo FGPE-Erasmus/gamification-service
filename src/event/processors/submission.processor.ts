@@ -59,13 +59,6 @@ export class SubmissionProcessor {
       $or: [{ sourceId: { $exists: false } }, { sourceId: { $eq: exerciseId } }],
     });
 
-    const scheduledHooks = await this.scheduledHookService.findAll({
-      game: { $eq: gameId },
-      parentChallenge: challenge.id,
-    });
-
-    if (scheduledHooks.length > 0) this.scheduledHookService.executeScheduledHooks(scheduledHooks, job.data);
-
     for (const actionHook of actionHooks) {
       await this.hookService.executeHook(actionHook, job.data, { exerciseId: exerciseId });
     }

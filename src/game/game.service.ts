@@ -13,6 +13,7 @@ import { Game, GameDocument } from './models/game.model';
 import { GameRepository } from './repositories/game.repository';
 import { UserDto } from '../keycloak/dto/user.dto';
 import { KeycloakService } from '../keycloak/keycloak.service';
+import { ScheduledHookService } from 'src/hook/scheduled-hook.service';
 
 @Injectable()
 export class GameService extends BaseService<Game, GameDocument> {
@@ -20,6 +21,7 @@ export class GameService extends BaseService<Game, GameDocument> {
     protected readonly repository: GameRepository,
     protected readonly keycloakService: KeycloakService,
     protected readonly challengeService: ChallengeService,
+    protected readonly scheduledHookService: ScheduledHookService,
     protected readonly rewardService: RewardService,
     protected readonly leaderboardService: LeaderboardService,
     protected readonly hookService: HookService,
@@ -97,6 +99,7 @@ export class GameService extends BaseService<Game, GameDocument> {
       subObjects.rules[gedilId] = await this.hookService.importGEdIL(subObjects, game, entries.rules[gedilId]);
     }
 
+    this.scheduledHookService.schedulingRoutine(game.id);
     return game;
   }
 
