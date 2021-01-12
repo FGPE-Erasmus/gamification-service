@@ -31,7 +31,8 @@ export class ScheduledHookService extends BaseService<ScheduledHook, ScheduledHo
   }
 
   async schedulingRoutine(gameId: string) {
-    const scheduledHooks: ScheduledHook[] = await this.findByGameId(gameId);
+    let scheduledHooks: ScheduledHook[] = await this.findByGameId(gameId);
+    scheduledHooks = scheduledHooks.filter(hook => hook.active === true);
     this.executeScheduledHooks(scheduledHooks, {});
   }
 
