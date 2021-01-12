@@ -59,30 +59,30 @@ export class ScheduledHookService extends BaseService<ScheduledHook, ScheduledHo
 
   addCronJob(hook: ScheduledHook, eventParams: { [key: string]: any }, cron: string) {
     const job = new CronJob(cron, () => {
-      this.logger.warn(`Cronjob for game ${hook.game} has been created with ${cron} interval.`);
+      this.logger.warn(`Cronjob for ${hook.id} has been created with ${cron} interval.`);
       this.hookService.executeHook(hook, eventParams);
     });
-    this.schedulerRegistry.addCronJob(hook.game, job);
+    this.schedulerRegistry.addCronJob(hook.id, job);
     job.start();
   }
 
   addInterval(hook: ScheduledHook, eventParams: { [key: string]: any }, milliseconds: number) {
     const callback = () => {
-      this.logger.warn(`Interval for game ${hook.game} is set to ${milliseconds}s.`);
+      this.logger.warn(`Interval for ${hook.id} is set to ${milliseconds}s.`);
       this.hookService.executeHook(hook, eventParams);
     };
 
     const interval = setInterval(callback, milliseconds);
-    this.schedulerRegistry.addInterval(hook.game, interval);
+    this.schedulerRegistry.addInterval(hook.id, interval);
   }
 
   addTimeout(hook: ScheduledHook, eventParams: { [key: string]: any }, milliseconds: number) {
     const callback = () => {
-      this.logger.warn(`Timeout for game ${hook.game} is set to ${milliseconds}s.`);
+      this.logger.warn(`Timeout for ${hook.id} is set to ${milliseconds}s.`);
       this.hookService.executeHook(hook, eventParams);
     };
 
     const timeout = setTimeout(callback, milliseconds);
-    this.schedulerRegistry.addTimeout(hook.game, timeout);
+    this.schedulerRegistry.addTimeout(hook.id, timeout);
   }
 }
