@@ -9,19 +9,14 @@ import { Submission } from '../../submission/models/submission.model';
 import { SubmissionService } from '../../submission/submission.service';
 import { HookService } from '../../hook/hook.service';
 import { EventService } from '../event.service';
-import { ScheduledHookService } from 'src/hook/scheduled-hook.service';
-import { ChallengeService } from 'src/challenge/challenge.service';
-import { ChallengeDto } from 'src/challenge/dto/challenge.dto';
 
 @Processor(appConfig.queue.event.name)
 export class SubmissionProcessor {
   constructor(
     protected readonly submissionService: SubmissionService,
     protected readonly eventService: EventService,
-    protected readonly challengeService: ChallengeService,
     protected readonly hookService: HookService,
     protected readonly actionHookService: ActionHookService,
-    protected readonly scheduledHookService: ScheduledHookService,
   ) {}
 
   @Process(`${TriggerEvent.SUBMISSION_RECEIVED}_JOB`)
@@ -46,11 +41,6 @@ export class SubmissionProcessor {
     job: Job<{ gameId: string; submissionId: string; exerciseId: string; playerId: string }>,
   ): Promise<void> {
     const { gameId, submissionId, exerciseId, playerId } = job.data;
-
-    const challenge: ChallengeDto = await this.challengeService.findOne({
-      game: gameId,
-      refs: exerciseId,
-    });
 
     // process hooks
     const actionHooks = await this.actionHookService.findAll({

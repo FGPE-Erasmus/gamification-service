@@ -14,6 +14,8 @@ import { StateEnum } from '../../challenge-status/models/state.enum';
 import { ChallengeStatus } from '../../challenge-status/models/challenge-status.model';
 import { ChallengeStatusService } from '../../challenge-status/challenge-status.service';
 import { RewardService } from '../../reward/reward.service';
+import { Mode } from 'src/challenge/models/mode.enum';
+import { ScheduledHookService } from 'src/hook/scheduled-hook.service';
 
 @Processor(appConfig.queue.event.name)
 export class PlayerProcessor {
@@ -24,6 +26,7 @@ export class PlayerProcessor {
     protected readonly eventService: EventService,
     protected readonly hookService: HookService,
     protected readonly actionHookService: ActionHookService,
+    protected readonly scheduledHookService: ScheduledHookService,
     protected readonly rewardService: RewardService,
   ) {}
 
@@ -102,6 +105,12 @@ export class PlayerProcessor {
       startedAt: new Date(),
       state: challengeState,
     });
+
+    if (challengeStatus.state === StateEnum.AVAILABLE && challenge.mode === Mode.TIME_BOMB) {
+      await this.scheduledHookService.createTimebombHook(challenge.game, player.id, challenge);
+    } else if (challengeStatus.state === StateEnum.AVAILABLE && challenge.mode === Mode.SHAPESHIFTER) {
+      await this.scheduledHookService.createShapeshifterHook();
+    }
 
     // prepare sub-tree
     for (const child of challenge.children) {

@@ -170,43 +170,9 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
     const result: ChallengeStatus = await this.patch(temp.id, { state: StateEnum.AVAILABLE });
     const challenge: Challenge = await this.challengeService.findById(challengeId);
 
-    if (challenge.mode === Mode.TIME_BOMB) {
-      const scheduledHook: ScheduledHook = await this.scheduledHookService.create({
-        game: gameId,
-        parentChallenge: challenge.id,
-        criteria: {
-          conditions: [
-            {
-              order: 0,
-              leftEntity: EntityEnum.FIXED,
-              leftProperty: 'COMPLETED',
-              comparingFunction: ComparingFunction.NOT_EQUAL,
-              rightEntity: EntityEnum.PLAYER,
-              rightProperty: `$.learningPath[?(@.challenge==\'${challenge.id}\')].state`,
-            },
-          ],
-          junctors: [],
-        },
-        actions: [
-          {
-            type: CategoryEnum.UPDATE,
-            parameters: ['CHALLENGE', challenge.id as string, 'STATUS', StateEnum.FAILED],
-          },
-        ],
-        recurrent: false,
-        interval: +challenge.modeParameters[0],
-        active: true,
-      });
-      this.scheduledHookService.addInterval(
-        scheduledHook,
-        {
-          gameId,
-          playerId,
-          challengeId,
-        },
-        scheduledHook.interval,
-      );
-    }
+    if (challenge.mode === Mode.TIME_BOMB)
+      await this.scheduledHookService.createTimebombHook(gameId, playerId, challenge);
+    else if (challenge.mode === Mode.SHAPESHIFTER) await this.scheduledHookService.createShapeshifterHook();
 
     // send CHALLENGE_AVAILABLE message to execute attached hooks
     await this.eventService.fireEvent(TriggerEvent.CHALLENGE_AVAILABLE, {

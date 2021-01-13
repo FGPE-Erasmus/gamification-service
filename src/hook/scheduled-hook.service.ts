@@ -8,6 +8,10 @@ import { CronJob } from 'cron';
 import { HookService } from './hook.service';
 import { GameService } from 'src/game/game.service';
 import { Game } from 'src/game/models/game.model';
+import { StateEnum } from 'src/challenge-status/models/state.enum';
+import { CategoryEnum } from './enums/category.enum';
+import { EntityEnum } from './enums/entity.enum';
+import { ComparingFunctionEnum as ComparingFunction } from './enums/comparing-function.enum';
 
 @Injectable()
 export class ScheduledHookService extends BaseService<ScheduledHook, ScheduledHookDocument> implements OnModuleInit {
@@ -80,9 +84,52 @@ export class ScheduledHookService extends BaseService<ScheduledHook, ScheduledHo
     const callback = () => {
       this.logger.warn(`Timeout for ${hook.id} is set to ${milliseconds}s.`);
       this.hookService.executeHook(hook, eventParams);
+      this.patch(hook.id, { active: false });
     };
 
     const timeout = setTimeout(callback, milliseconds);
     this.schedulerRegistry.addTimeout(hook.id, timeout);
+  }
+
+  async createTimebombHook(gameId, playerId, challenge) {
+    const scheduledHook: ScheduledHook = await this.create({
+      game: gameId,
+      parentChallenge: challenge.id,
+      criteria: {
+        conditions: [
+          {
+            order: 0,
+            leftEntity: EntityEnum.PLAYER,
+            leftProperty: `$.learningPath[?(@.challenge==\'${challenge.id}\')].state`,
+            comparingFunction: ComparingFunction.NOT_EQUAL,
+            rightEntity: EntityEnum.FIXED,
+            rightProperty: StateEnum.COMPLETED,
+          },
+        ],
+        junctors: [],
+      },
+      actions: [
+        {
+          type: CategoryEnum.UPDATE,
+          parameters: ['CHALLENGE', challenge.id as string, 'STATE', StateEnum.FAILED],
+        },
+      ],
+      recurrent: false,
+      interval: +challenge.modeParameters[0],
+      active: true,
+    });
+    this.addTimeout(
+      scheduledHook,
+      {
+        gameId: gameId,
+        playerId: playerId,
+        challengeId: challenge.id,
+      },
+      scheduledHook.interval,
+    );
+  }
+
+  async createShapeshifterHook() {
+    // TODO
   }
 }
