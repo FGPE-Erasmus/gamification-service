@@ -20,6 +20,11 @@ import { Role } from '../common/enums/role.enum';
 import { GqlPlayer } from '../common/decorators/gql-player.decorator';
 import { GqlInstructorAssignedGuard } from '../common/guards/gql-instructor-assigned.guard';
 import { GqlPlayerOfGuard } from '../common/guards/gql-player-of.guard';
+import { ActivityStatusDto } from '../evaluation-engine/dto/activity-status.dto';
+import { ActivityService } from '../evaluation-engine/activity.service';
+import { GameDto } from '../game/dto/game.dto';
+import { GameService } from '../game/game.service';
+import { GameToDtoMapper } from '../game/mappers/game-to-dto.mapper';
 
 @Resolver(() => ChallengeStatusDto)
 export class ChallengeStatusResolver {
@@ -27,10 +32,13 @@ export class ChallengeStatusResolver {
     @Inject('PUB_SUB') protected readonly pubSub: PubSub,
     protected readonly challengeStatusService: ChallengeStatusService,
     protected readonly challengeStatusToDtoMapper: ChallengeStatusToDtoMapper,
+    protected readonly gameService: GameService,
+    protected readonly gameToDtoMapper: GameToDtoMapper,
     protected readonly playerService: PlayerService,
     protected readonly playerToDtoMapper: PlayerToDtoMapper,
     protected readonly challengeService: ChallengeService,
     protected readonly challengeToDtoMapper: ChallengeToDtoMapper,
+    protected readonly activityService: ActivityService,
   ) {}
 
   @Roles(Role.AUTHOR, Role.TEACHER)
@@ -67,6 +75,13 @@ export class ChallengeStatusResolver {
     return this.challengeStatusToDtoMapper.transform(status);
   }
 
+  @ResolveField('game', () => GameDto)
+  async game(@Parent() root: ChallengeDto): Promise<GameDto> {
+    const { game: gameId } = root;
+    const game = await this.gameService.findById(gameId);
+    return this.gameToDtoMapper.transform(game);
+  }
+
   @ResolveField('challenge', () => ChallengeDto)
   async challenge(@Parent() root: ChallengeStatusDto): Promise<ChallengeDto> {
     const { challenge: challengeId } = root;
@@ -79,6 +94,25 @@ export class ChallengeStatusResolver {
     const { player: playerId } = root;
     const player: Player = await this.playerService.findById(playerId);
     return this.playerToDtoMapper.transform(player);
+  }
+
+  @ResolveField('refs', () => [ActivityStatusDto])
+  async refs(@Parent() root: ChallengeStatusDto): Promise<ActivityStatusDto[]> {
+    const { challenge: challengeId, player } = root;
+    const challenge: Challenge = await this.challengeService.findById(challengeId);
+    const activities = [];
+    for (const activityId of challenge.refs) {
+      const activity = await this.activityService.getActivityStatus(challenge.game, activityId, player);
+      activities.push(activity);
+    }
+    return activities;
+  }
+
+  @ResolveField('progress', () => Number)
+  async progress(@Parent() root: ChallengeStatusDto): Promise<number> {
+    const { challenge: challengeId, player } = root;
+    const challenge: Challenge = await this.challengeService.findById(challengeId);
+    return this.challengeStatusService.progress(challenge.game, challengeId, player);
   }
 
   @Subscription(() => ChallengeStatusDto)

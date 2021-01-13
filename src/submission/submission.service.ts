@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 
 import { IFile } from '../common/interfaces/file.interface';
 import { BaseService } from '../common/services/base.service';
@@ -16,9 +16,10 @@ export class SubmissionService extends BaseService<Submission, SubmissionDocumen
   constructor(
     protected readonly repository: SubmissionRepository,
     protected readonly eventService: EventService,
+    @Inject(forwardRef(() => EvaluationEngineService))
     protected readonly evaluationEngineService: EvaluationEngineService,
     protected readonly playerService: PlayerService,
-    protected readonly challengeStatusService: ChallengeStatusService,
+    @Inject(forwardRef(() => ChallengeStatusService)) protected readonly challengeStatusService: ChallengeStatusService,
   ) {
     super(new Logger(SubmissionService.name), repository);
   }

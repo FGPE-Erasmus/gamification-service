@@ -81,6 +81,26 @@ enum Result {
   ASK_FOR_REEVALUATION
 }
 
+type Activity {
+  game: Game!
+  id: String
+  name: String
+  title: String
+  timeout: Float
+  color: String
+  type: String
+  difficulty: String
+  statement: String
+  pdf: Boolean
+  solved: Boolean
+}
+
+type ActivityStatus {
+  game: Game!
+  activity: Activity
+  solved: Boolean
+}
+
 type ChallengeStatus {
   id: ID!
   player: Player!
@@ -88,7 +108,10 @@ type ChallengeStatus {
   startedAt: Date
   openedAt: Date
   endedAt: Date
+  refs: [ActivityStatus!]!
   state: State!
+  progress: Float!
+  game: Game!
 }
 
 enum State {
@@ -147,18 +170,6 @@ type Game {
   submissions: [Submission!]!
   createdAt: Date!
   updatedAt: Date
-}
-
-type Activity {
-  id: String
-  name: String
-  title: String
-  timeout: Float
-  color: String
-  type: String
-  difficulty: String
-  statement: String
-  pdf: Boolean
 }
 
 type Challenge {
@@ -486,6 +497,8 @@ type Query {
   myChallengeStatus(challengeId: String!): ChallengeStatus!
   activities(challengeId: String!, gameId: String!): [Activity!]!
   activity(activityId: String!, gameId: String!): Activity!
+  activityStatus(playerId: String!, activityId: String!, gameId: String!): ActivityStatus!
+  myActivityStatus(activityId: String!, gameId: String!): ActivityStatus!
   programmingLanguages(gameId: String!): [ProgrammingLanguage!]!
   programmingLanguage(languageId: String!, gameId: String!): ProgrammingLanguage!
   actionHooks(gameId: String!): [ActionHook!]!

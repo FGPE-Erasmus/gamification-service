@@ -1,7 +1,11 @@
 import { Field, ObjectType } from '@nestjs/graphql';
+import { GameDto } from '../../game/dto/game.dto';
 
 @ObjectType('Activity')
 export class ActivityDto {
+  @Field(() => GameDto)
+  game?: string;
+
   @Field({ nullable: true })
   id?: string;
 
@@ -28,4 +32,7 @@ export class ActivityDto {
 
   @Field({ nullable: true, defaultValue: false })
   pdf?: boolean;
+
+  @Field({ nullable: true, defaultValue: false })
+  solved?: boolean;
 }

@@ -13,8 +13,9 @@ async function bootstrap() {
   app.use(helmet());
   app.use(cookieParser());
   app.enableCors({
-    credentials: true,
     origin: true,
+    methods: 'GET, HEAD, OPTIONS, PUT, PATCH, POST, DELETE',
+    credentials: true,
   });
   /* app.useGlobalPipes(new ValidationPipe({
     transform: false,
