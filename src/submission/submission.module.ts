@@ -13,6 +13,7 @@ import { SubmissionResolver } from './submission.resolver';
 import { SubmissionRepository } from './repositories/submission.repository';
 import { SubmissionSchema } from './models/submission.model';
 import { SubmissionToDtoMapper } from './mappers/submission-to-dto.mapper';
+import { ChallengeModule } from 'src/challenge/challenge.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { SubmissionToDtoMapper } from './mappers/submission-to-dto.mapper';
     forwardRef(() => PlayerModule),
     forwardRef(() => HookModule),
     forwardRef(() => ChallengeStatusModule),
+    forwardRef(() => ChallengeModule),
     forwardRef(() => SubscriptionsModule),
   ],
   providers: [SubmissionToDtoMapper, SubmissionRepository, SubmissionService, SubmissionResolver],

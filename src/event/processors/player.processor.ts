@@ -107,9 +107,7 @@ export class PlayerProcessor {
     });
 
     if (challengeStatus.state === StateEnum.AVAILABLE && challenge.mode === Mode.TIME_BOMB) {
-      await this.scheduledHookService.createTimebombHook(challenge.game, player.id, challenge);
-    } else if (challengeStatus.state === StateEnum.AVAILABLE && challenge.mode === Mode.SHAPESHIFTER) {
-      await this.scheduledHookService.createShapeshifterHook();
+      await this.scheduledHookService.createTimebombHook(challenge.game, player.id);
     }
 
     // prepare sub-tree

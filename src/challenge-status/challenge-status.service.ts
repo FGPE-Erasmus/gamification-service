@@ -3,9 +3,6 @@ import { PubSub } from 'graphql-subscriptions';
 import { ChallengeService } from 'src/challenge/challenge.service';
 import { Challenge } from 'src/challenge/models/challenge.model';
 import { Mode } from 'src/challenge/models/mode.enum';
-import { CategoryEnum } from 'src/hook/enums/category.enum';
-import { EntityEnum } from 'src/hook/enums/entity.enum';
-import { ScheduledHook } from 'src/hook/models/scheduled-hook.model';
 import { ScheduledHookService } from 'src/hook/scheduled-hook.service';
 
 import { NotificationEnum } from '../common/enums/notifications.enum';
@@ -16,7 +13,7 @@ import { ChallengeStatusToDtoMapper } from './mappers/challenge-status-to-dto.ma
 import { ChallengeStatus, ChallengeStatusDocument } from './models/challenge-status.model';
 import { StateEnum } from './models/state.enum';
 import { ChallengeStatusRepository } from './repositories/challenge-status.repository';
-import { ComparingFunctionEnum as ComparingFunction } from '../hook/enums/comparing-function.enum';
+import { ChallengeDto } from 'src/challenge/dto/challenge.dto';
 
 @Injectable()
 export class ChallengeStatusService extends BaseService<ChallengeStatus, ChallengeStatusDocument> {
@@ -170,9 +167,7 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
     const result: ChallengeStatus = await this.patch(temp.id, { state: StateEnum.AVAILABLE });
     const challenge: Challenge = await this.challengeService.findById(challengeId);
 
-    if (challenge.mode === Mode.TIME_BOMB)
-      await this.scheduledHookService.createTimebombHook(gameId, playerId, challenge);
-    else if (challenge.mode === Mode.SHAPESHIFTER) await this.scheduledHookService.createShapeshifterHook();
+    if (challenge.mode === Mode.TIME_BOMB) await this.scheduledHookService.createTimebombHook(challenge, playerId);
 
     // send CHALLENGE_AVAILABLE message to execute attached hooks
     await this.eventService.fireEvent(TriggerEvent.CHALLENGE_AVAILABLE, {
@@ -238,5 +233,12 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
     });
 
     return result;
+  }
+
+  async getCurrentShape(challenge: ChallengeDto, playerId: string): Promise<string> {
+    const challengeStatus: ChallengeStatus = await this.findByChallengeIdAndPlayerId(challenge.id, playerId);
+    const refIndex =
+      ((Date.now() - challengeStatus.openedAt.getTime()) / +challenge.modeParameters[0]) % challenge.refs.length;
+    return challenge.refs[refIndex];
   }
 }

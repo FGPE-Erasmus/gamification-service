@@ -114,27 +114,6 @@ export class ChallengeService extends BaseService<Challenge, ChallengeDocument> 
     }
 
     // add logic hooks of the challenge
-    if (challenge.mode === Mode.SHAPESHIFTER) {
-      let interval = 0;
-      for (const exerciseId of challenge.modeParameters) {
-        if (Number(exerciseId)) continue;
-        interval += +challenge.modeParameters[0];
-        await this.scheduledHookService.create({
-          game: game.id,
-          parentChallenge: challenge.id,
-          actions: [
-            {
-              type: CategoryEnum.UPDATE,
-              parameters: ['CHALLENGE', challenge.id as string, 'REF', exerciseId],
-            },
-          ],
-          recurrent: false,
-          interval: interval,
-          active: true,
-        });
-      }
-    }
-
     let conditionsList: ConditionEmbed[] = [
       {
         order: 0,

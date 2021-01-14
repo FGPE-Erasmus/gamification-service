@@ -10,6 +10,9 @@ import { Player } from '../player/models/player.model';
 import { PlayerService } from '../player/player.service';
 import { Submission, SubmissionDocument } from './models/submission.model';
 import { SubmissionRepository } from './repositories/submission.repository';
+import { ChallengeService } from 'src/challenge/challenge.service';
+import { ChallengeDto } from 'src/challenge/dto/challenge.dto';
+import { Mode } from 'src/challenge/models/mode.enum';
 
 @Injectable()
 export class SubmissionService extends BaseService<Submission, SubmissionDocument> {
@@ -19,6 +22,7 @@ export class SubmissionService extends BaseService<Submission, SubmissionDocumen
     protected readonly eventService: EventService,
     protected readonly evaluationEngineService: EvaluationEngineService,
     protected readonly playerService: PlayerService,
+    protected readonly challengeService: ChallengeService,
   ) {
     super(new Logger(SubmissionService.name), repository);
   }
@@ -35,6 +39,14 @@ export class SubmissionService extends BaseService<Submission, SubmissionDocumen
   }
 
   async sendSubmission(gameId: string, exerciseId: string, playerId: string, file: IFile): Promise<Submission> {
+    const challenge: ChallengeDto = await this.challengeService.findOne({
+      game: gameId,
+      refs: exerciseId,
+    });
+
+    if (challenge.mode === Mode.SHAPESHIFTER)
+      exerciseId = await this.challengeStatusService.getCurrentShape(challenge, playerId);
+
     const submission: Submission = await super.create({
       game: gameId,
       player: playerId,

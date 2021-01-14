@@ -321,8 +321,6 @@ export class HookService {
     switch (property.toUpperCase()) {
       case 'STATE':
         return this.updateChallengeState(gameId, challengeId, playerId, State[value.toUpperCase()]);
-      case 'REF':
-        return await this.challengeService.findOneAndUpdate({ _id: challengeId }, { $set: { refs: [value] } });
     }
   }
 
