@@ -13,6 +13,11 @@ import { SubmissionResolver } from './submission.resolver';
 import { SubmissionRepository } from './repositories/submission.repository';
 import { SubmissionSchema } from './models/submission.model';
 import { SubmissionToDtoMapper } from './mappers/submission-to-dto.mapper';
+import { ValidationSchema } from './models/validation.model';
+import { ValidationResolver } from './validation.resolver';
+import { ValidationService } from './validation.service';
+import { ValidationRepository } from './repositories/validation.repository';
+import { ValidationToDtoMapper } from './mappers/validation-to-dto.mapper';
 
 @Module({
   imports: [
@@ -20,6 +25,10 @@ import { SubmissionToDtoMapper } from './mappers/submission-to-dto.mapper';
       {
         name: 'Submission',
         schema: SubmissionSchema,
+      },
+      {
+        name: 'Validation',
+        schema: ValidationSchema,
       },
     ]),
     forwardRef(() => EventModule),
@@ -30,7 +39,23 @@ import { SubmissionToDtoMapper } from './mappers/submission-to-dto.mapper';
     forwardRef(() => ChallengeStatusModule),
     forwardRef(() => SubscriptionsModule),
   ],
-  providers: [SubmissionToDtoMapper, SubmissionRepository, SubmissionService, SubmissionResolver],
-  exports: [SubmissionToDtoMapper, SubmissionRepository, SubmissionService],
+  providers: [
+    SubmissionToDtoMapper,
+    ValidationToDtoMapper,
+    SubmissionRepository,
+    ValidationRepository,
+    SubmissionService,
+    ValidationService,
+    SubmissionResolver,
+    ValidationResolver,
+  ],
+  exports: [
+    SubmissionToDtoMapper,
+    ValidationToDtoMapper,
+    SubmissionRepository,
+    ValidationRepository,
+    SubmissionService,
+    ValidationService,
+  ],
 })
 export class SubmissionModule {}

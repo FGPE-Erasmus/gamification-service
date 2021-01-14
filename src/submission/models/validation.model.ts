@@ -2,10 +2,10 @@ import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
 import { IBaseEntity } from '../../common/interfaces/base-entity.interface';
-import { Result } from './result.enum';
 import { EvaluationEngine } from './evaluation-engine.enum';
+import { Result } from './result.enum';
 
-export interface Submission extends IBaseEntity {
+export interface Validation extends IBaseEntity {
   game: any;
   player: any;
   exerciseId: string;
@@ -13,15 +13,16 @@ export interface Submission extends IBaseEntity {
   evaluationEngineId?: string;
   language?: string;
   metrics?: Map<string, number>;
+  outputs?: { [k: string]: string };
+  userExecutionTimes?: { [k: string]: string };
   result?: Result;
-  grade?: number;
   feedback?: string;
   submittedAt?: Date;
   evaluatedAt?: Date;
 }
 
-@Schema({ collection: 'Submission' })
-export class SubmissionDocument extends Document implements Submission {
+@Schema({ collection: 'Validation' })
+export class ValidationDocument extends Document implements Validation {
   @Prop({ type: Types.ObjectId, ref: 'Game' })
   game: any;
 
@@ -43,11 +44,14 @@ export class SubmissionDocument extends Document implements Submission {
   @Prop(raw({ type: Types.Map, of: String, default: () => ({}) }))
   metrics?: Map<string, number>;
 
+  @Prop(raw({ type: Types.Map, of: String, default: () => ({}) }))
+  outputs?: { [k: string]: string };
+
+  @Prop(raw({ type: Types.Map, of: String, default: () => ({}) }))
+  userExecutionTimes?: { [k: string]: string };
+
   @Prop({ type: () => String, enum: Result })
   result?: Result;
-
-  @Prop({ nullable: true })
-  grade?: number;
 
   @Prop({ nullable: true })
   feedback?: string;
@@ -59,4 +63,4 @@ export class SubmissionDocument extends Document implements Submission {
   evaluatedAt?: Date;
 }
 
-export const SubmissionSchema = SchemaFactory.createForClass(SubmissionDocument);
+export const ValidationSchema = SchemaFactory.createForClass(ValidationDocument);

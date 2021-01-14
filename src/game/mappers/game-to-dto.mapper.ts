@@ -21,6 +21,7 @@ export class GameToDtoMapper implements IMapper<Game, GameDto> {
         'startDate',
         'endDate',
         'players',
+        'validations',
         'submissions',
         'instructors',
         'createdAt',

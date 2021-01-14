@@ -7,6 +7,7 @@ export interface Player extends IBaseEntity {
   game: any;
   group?: any;
   points?: number;
+  validations?: any[];
   submissions?: any[];
   learningPath?: any[];
   rewards?: any[];
@@ -28,6 +29,9 @@ export class PlayerDocument extends Document implements Player {
 
   @Prop({ type: [{ type: Types.ObjectId, ref: 'Submission' }] })
   submissions?: any[];
+
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'Validation' }] })
+  validations?: any[];
 
   @Prop({ type: [{ type: Types.ObjectId, ref: 'ChallengeStatus' }] })
   learningPath?: any[];

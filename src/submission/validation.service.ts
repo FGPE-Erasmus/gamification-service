@@ -5,28 +5,28 @@ import { BaseService } from '../common/services/base.service';
 import { ChallengeStatusService } from '../challenge-status/challenge-status.service';
 import { EvaluationEngineService } from '../evaluation-engine/evaluation-engine.service';
 import { EventService } from '../event/event.service';
-import { TriggerEventEnum as TriggerEvent } from '../hook/enums/trigger-event.enum';
 import { Player } from '../player/models/player.model';
 import { PlayerService } from '../player/player.service';
-import { Submission, SubmissionDocument } from './models/submission.model';
-import { SubmissionRepository } from './repositories/submission.repository';
+import { Validation, ValidationDocument } from './models/validation.model';
+import { TriggerEventEnum as TriggerEvent } from '../hook/enums/trigger-event.enum';
+import { ValidationRepository } from './repositories/validation.repository';
 
 @Injectable()
-export class SubmissionService extends BaseService<Submission, SubmissionDocument> {
+export class ValidationService extends BaseService<Validation, ValidationDocument> {
   constructor(
-    protected readonly repository: SubmissionRepository,
+    protected readonly repository: ValidationRepository,
     protected readonly eventService: EventService,
     @Inject(forwardRef(() => EvaluationEngineService))
     protected readonly evaluationEngineService: EvaluationEngineService,
     protected readonly playerService: PlayerService,
     @Inject(forwardRef(() => ChallengeStatusService)) protected readonly challengeStatusService: ChallengeStatusService,
   ) {
-    super(new Logger(SubmissionService.name), repository);
+    super(new Logger(ValidationService.name), repository);
   }
 
-  async findByUser(gameId: string, userId: string, exerciseId?: string): Promise<Submission[]> {
+  async findByUser(gameId: string, userId: string, exerciseId?: string): Promise<Validation[]> {
     const player: Player = await this.playerService.findByGameAndUser(gameId, userId);
-    const query: Partial<Record<keyof Submission, any>> = {
+    const query: Partial<Record<keyof Validation, any>> = {
       player: player.id,
     };
     if (exerciseId) {
@@ -35,22 +35,28 @@ export class SubmissionService extends BaseService<Submission, SubmissionDocumen
     return this.findAll(query);
   }
 
-  async evaluate(gameId: string, exerciseId: string, playerId: string, file: IFile): Promise<Submission> {
-    const submission: Submission = await super.create({
+  async validate(
+    gameId: string,
+    exerciseId: string,
+    playerId: string,
+    file: IFile,
+    inputs: string[],
+  ): Promise<Validation> {
+    const validation: Validation = await super.create({
       game: gameId,
       player: playerId,
       exerciseId: exerciseId,
-    } as Submission);
+    } as Validation);
 
-    // send SUBMISSION_RECEIVED event
-    await this.eventService.fireEvent(TriggerEvent.SUBMISSION_RECEIVED, {
+    // send VALIDATION_RECEIVED event
+    await this.eventService.fireEvent(TriggerEvent.VALIDATION_RECEIVED, {
       gameId: gameId,
       playerId: playerId,
       exerciseId: exerciseId,
     });
 
-    await this.evaluationEngineService.evaluate(submission.id, file);
+    await this.evaluationEngineService.validate(validation.id, file, inputs);
 
-    return submission;
+    return validation;
   }
 }

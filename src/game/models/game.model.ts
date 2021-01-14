@@ -12,6 +12,7 @@ export interface Game extends IBaseEntity {
   instructors?: string[];
   players?: any[];
   submissions?: any[];
+  validations?: any[];
 }
 
 @Schema({ collection: 'Game' })
@@ -42,6 +43,9 @@ export class GameDocument extends Document implements Game {
 
   @Prop({ type: [{ type: Types.ObjectId, ref: 'Submission' }] })
   submissions?: any[];
+
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'Validation' }] })
+  validations?: any[];
 }
 
 export const GameSchema = SchemaFactory.createForClass(GameDocument);

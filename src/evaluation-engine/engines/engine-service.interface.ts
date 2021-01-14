@@ -3,6 +3,7 @@ import { EvaluationDto } from '../dto/evaluation.dto';
 import { AxiosRequestConfig } from 'axios';
 import { ProgrammingLanguageDto } from '../dto/programming-language.dto';
 import { ActivityDto } from '../dto/activity.dto';
+import { Validation } from '../../submission/models/validation.model';
 
 export interface IEngineService {
   /**
@@ -32,6 +33,23 @@ export interface IEngineService {
   getActivity(gameId: string, activityId: string, options?: AxiosRequestConfig): Promise<ActivityDto>;
 
   /**
+   * Validate an attempt submission + file against a set of input test cases.
+   *
+   * @param {Validation} validation the received validation.
+   * @param {string} filename the name of the file.
+   * @param {string} code the file content.
+   * @param {string[]} inputs the set of input test cases.
+   * @param {AxiosRequestConfig} options for the request
+   */
+  validate(
+    validation: Validation,
+    filename: string,
+    code: string,
+    inputs: string[],
+    options?: AxiosRequestConfig,
+  ): Promise<{ validationId: string } | EvaluationDto>;
+
+  /**
    * Evaluate an attempt submission + file.
    *
    * @param {Submission} submission the received submission.
@@ -45,6 +63,14 @@ export interface IEngineService {
     code: string,
     options?: AxiosRequestConfig,
   ): Promise<{ submissionId: string } | EvaluationDto>;
+
+  /**
+   * Get the report of the validation.
+   *
+   * @param {Validation} validation the received validation.
+   * @param {AxiosRequestConfig} options for the request.
+   */
+  getValidationReport(validation: Validation, options?: AxiosRequestConfig): Promise<EvaluationDto>;
 
   /**
    * Get the report of the evaluation.
@@ -62,4 +88,13 @@ export interface IEngineService {
    * @returns {Promise<string>} evaluated program.
    */
   getEvaluationProgram(submission: Submission, options?: AxiosRequestConfig): Promise<string>;
+
+  /**
+   * Get the validated program.
+   *
+   * @param {Validation} validation the received validation.
+   * @param {AxiosRequestConfig} options for the request.
+   * @returns {Promise<string>} validated program.
+   */
+  getValidationProgram(validation: Validation, options?: AxiosRequestConfig): Promise<string>;
 }

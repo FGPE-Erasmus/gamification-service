@@ -2,6 +2,7 @@ import { Field, ID, ObjectType } from '@nestjs/graphql';
 import { PlayerDto } from '../../player/dto/player.dto';
 import { SubmissionDto } from '../../submission/dto/submission.dto';
 import { UserDto } from '../../keycloak/dto/user.dto';
+import { ValidationDto } from '../../submission/dto/validation.dto';
 
 @ObjectType('Game')
 export class GameDto {
@@ -34,6 +35,9 @@ export class GameDto {
 
   @Field(() => [SubmissionDto])
   submissions?: string[];
+
+  @Field(() => [ValidationDto])
+  validations?: string[];
 
   @Field(() => Date)
   createdAt?: Date;

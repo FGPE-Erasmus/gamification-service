@@ -12,7 +12,19 @@ export class PlayerToDtoMapper implements IMapper<Player, PlayerDto> {
       return undefined;
     }
     return pick(
-      ['id', 'game', 'user', 'group', 'points', 'submissions', 'learningPath', 'rewards', 'createdAt', 'updatedAt'],
+      [
+        'id',
+        'game',
+        'user',
+        'group',
+        'points',
+        'submissions',
+        'validations',
+        'learningPath',
+        'rewards',
+        'createdAt',
+        'updatedAt',
+      ],
       obj,
     );
   }
