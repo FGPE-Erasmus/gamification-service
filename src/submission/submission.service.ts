@@ -18,12 +18,12 @@ import { Mode } from 'src/challenge/models/mode.enum';
 export class SubmissionService extends BaseService<Submission, SubmissionDocument> {
   constructor(
     @Inject(forwardRef(() => ChallengeStatusService)) protected readonly challengeStatusService: ChallengeStatusService,
-    protected readonly repository: SubmissionRepository,
-    protected readonly eventService: EventService,
     @Inject(forwardRef(() => EvaluationEngineService))
     protected readonly evaluationEngineService: EvaluationEngineService,
+    @Inject(forwardRef(() => ChallengeService)) protected readonly challengeService: ChallengeService,
+    protected readonly repository: SubmissionRepository,
+    protected readonly eventService: EventService,
     protected readonly playerService: PlayerService,
-    protected readonly challengeService: ChallengeService,
   ) {
     super(new Logger(SubmissionService.name), repository);
   }

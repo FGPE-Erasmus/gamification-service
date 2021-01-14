@@ -1,4 +1,3 @@
-
 import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { PubSub } from 'graphql-subscriptions';
 
@@ -16,7 +15,6 @@ import { ChallengeDto } from 'src/challenge/dto/challenge.dto';
 import { Challenge } from '../challenge/models/challenge.model';
 import { ChallengeService } from '../challenge/challenge.service';
 import { ActivityService } from '../evaluation-engine/activity.service';
-
 
 @Injectable()
 export class ChallengeStatusService extends BaseService<ChallengeStatus, ChallengeStatusDocument> {
@@ -239,12 +237,12 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
     return result;
   }
 
-
   async getCurrentShape(challenge: ChallengeDto, playerId: string): Promise<string> {
     const challengeStatus: ChallengeStatus = await this.findByChallengeIdAndPlayerId(challenge.id, playerId);
     const refIndex =
       ((Date.now() - challengeStatus.openedAt.getTime()) / +challenge.modeParameters[0]) % challenge.refs.length;
     return challenge.refs[refIndex];
+  }
 
   /**
    * Estimate the progress of the player in the challenge.

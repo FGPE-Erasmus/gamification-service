@@ -493,6 +493,8 @@ type Query {
   programmingLanguage(languageId: String!, gameId: String!): ProgrammingLanguage!
   activities(challengeId: String!, gameId: String!): [Activity!]!
   activity(activityId: String!, gameId: String!): Activity!
+  activityStatus(playerId: String!, activityId: String!, gameId: String!): ActivityStatus!
+  myActivityStatus(activityId: String!, gameId: String!): ActivityStatus!
   submission(id: String!, gameId: String!): Submission!
   submissions(exerciseId: String, gameId: String!, userId: String!): [Submission!]!
   mySubmissions(exerciseId: String, gameId: String!): [Submission!]!
@@ -505,12 +507,6 @@ type Query {
   myGameProfiles: [Player!]!
   challengeStatus(challengeId: String!, playerId: String!): ChallengeStatus!
   myChallengeStatus(challengeId: String!): ChallengeStatus!
-  activities(challengeId: String!, gameId: String!): [Activity!]!
-  activity(activityId: String!, gameId: String!): Activity!
-  activityStatus(playerId: String!, activityId: String!, gameId: String!): ActivityStatus!
-  myActivityStatus(activityId: String!, gameId: String!): ActivityStatus!
-  programmingLanguages(gameId: String!): [ProgrammingLanguage!]!
-  programmingLanguage(languageId: String!, gameId: String!): ProgrammingLanguage!
   actionHooks(gameId: String!): [ActionHook!]!
   scheduledHooks(gameId: String!): [ScheduledHook!]!
   leaderboards(gameId: String!): [Leaderboard!]!
