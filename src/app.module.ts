@@ -68,6 +68,13 @@ import { ScheduleModule } from '@nestjs/schedule';
         },
       },
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+      cors: {
+        origin: '*',
+        methods: 'GET, HEAD, OPTIONS, PUT, PATCH, POST, DELETE',
+        preflightContinue: true,
+        optionsSuccessStatus: 204,
+        credentials: true,
+      },
       debug: appConfig.isDevelopment,
       playground: {
         settings: {

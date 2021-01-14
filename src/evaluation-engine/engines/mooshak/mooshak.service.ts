@@ -209,7 +209,12 @@ export class MooshakService implements IEngineService {
     if (!mooshakResult) {
       return null;
     }
-    switch (mooshakResult.toUpperCase().replace(' ', '_')) {
+    switch (
+      mooshakResult
+        .toUpperCase()
+        .split(' ')
+        .join('_')
+    ) {
       case 'EVALUATING':
         return Result.PROCESSING;
       case 'ACCEPTED':

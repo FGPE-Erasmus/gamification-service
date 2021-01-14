@@ -1,10 +1,9 @@
-import { Injectable, Logger, Inject, forwardRef } from '@nestjs/common';
+
+import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { PubSub } from 'graphql-subscriptions';
-import { ChallengeService } from 'src/challenge/challenge.service';
-import { Challenge } from 'src/challenge/models/challenge.model';
+
 import { Mode } from 'src/challenge/models/mode.enum';
 import { ScheduledHookService } from 'src/hook/scheduled-hook.service';
-
 import { NotificationEnum } from '../common/enums/notifications.enum';
 import { BaseService } from '../common/services/base.service';
 import { EventService } from '../event/event.service';
@@ -14,6 +13,10 @@ import { ChallengeStatus, ChallengeStatusDocument } from './models/challenge-sta
 import { StateEnum } from './models/state.enum';
 import { ChallengeStatusRepository } from './repositories/challenge-status.repository';
 import { ChallengeDto } from 'src/challenge/dto/challenge.dto';
+import { Challenge } from '../challenge/models/challenge.model';
+import { ChallengeService } from '../challenge/challenge.service';
+import { ActivityService } from '../evaluation-engine/activity.service';
+
 
 @Injectable()
 export class ChallengeStatusService extends BaseService<ChallengeStatus, ChallengeStatusDocument> {
@@ -25,6 +28,7 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
     protected readonly challengeStatusToDtoMapper: ChallengeStatusToDtoMapper,
     protected readonly repository: ChallengeStatusRepository,
     protected readonly eventService: EventService,
+    protected readonly activityService: ActivityService,
   ) {
     super(new Logger(ChallengeStatusService.name), repository);
   }
@@ -235,10 +239,55 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
     return result;
   }
 
+
   async getCurrentShape(challenge: ChallengeDto, playerId: string): Promise<string> {
     const challengeStatus: ChallengeStatus = await this.findByChallengeIdAndPlayerId(challenge.id, playerId);
     const refIndex =
       ((Date.now() - challengeStatus.openedAt.getTime()) / +challenge.modeParameters[0]) % challenge.refs.length;
     return challenge.refs[refIndex];
+
+  /**
+   * Estimate the progress of the player in the challenge.
+   *
+   * @param {string} gameId the ID of the game
+   * @param {string} challengeId the ID of the challenge
+   * @param {string} playerId the ID of the player
+   * @returns {number} the progress of the player in the challenge.
+   */
+  async progress(gameId: string, challengeId: string, playerId: string): Promise<number> {
+    const challenge: Challenge = await this.challengeService.findById(challengeId);
+    return this.challengeProgress(challenge, playerId);
+  }
+
+  /**
+   * Estimate the progress of the player in the challenge.
+   *
+   * @param {Challenge} challenge the challenge
+   * @param {string} playerId the ID of the player
+   * @returns {number} the progress of the player in the challenge.
+   */
+  async challengeProgress(challenge: Challenge, playerId: string): Promise<number> {
+    const challengeStatus: ChallengeStatus = await this.findByChallengeIdAndPlayerId(challenge.id, playerId);
+    if (challengeStatus.state === StateEnum.COMPLETED) {
+      return 1;
+    } else if (challengeStatus.state === StateEnum.HIDDEN || challengeStatus.state === StateEnum.FAILED) {
+      return 0;
+    }
+    const activities: string[] = challenge.refs;
+    const children: Challenge[] = await this.challengeService.findByParentChallengeId(challenge.game, challenge.id);
+    if (activities.length === 0 && children.length === 0) {
+      return 1;
+    }
+    const sliceValue = 1 / (activities.length + children.length);
+    let progress = 0;
+    for (const activityId of activities) {
+      if (await this.activityService.isActivitySolved(challenge.game, activityId, playerId)) {
+        progress += sliceValue;
+      }
+    }
+    for (const child of children) {
+      progress += sliceValue * (await this.challengeProgress(child, playerId));
+    }
+    return progress;
   }
 }

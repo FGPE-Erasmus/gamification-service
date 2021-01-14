@@ -16,6 +16,7 @@ import { ProgrammingLanguageResolver } from './programming-language.resolver';
 import { PlayerModule } from '../player/player.module';
 import { ActivityResolver } from './activity.resolver';
 import { ActivityService } from './activity.service';
+import { ActivityStatusResolver } from './activity-status.resolver';
 
 @Module({
   imports: [
@@ -51,8 +52,9 @@ import { ActivityService } from './activity.service';
     MooshakConsumer,
     ActivityService,
     ActivityResolver,
+    ActivityStatusResolver,
     ProgrammingLanguageResolver,
   ],
-  exports: [EvaluationEngineService],
+  exports: [EvaluationEngineService, ActivityService],
 })
 export class EvaluationEngineModule {}

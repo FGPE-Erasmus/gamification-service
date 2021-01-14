@@ -20,6 +20,7 @@ export class SubmissionService extends BaseService<Submission, SubmissionDocumen
     @Inject(forwardRef(() => ChallengeStatusService)) protected readonly challengeStatusService: ChallengeStatusService,
     protected readonly repository: SubmissionRepository,
     protected readonly eventService: EventService,
+    @Inject(forwardRef(() => EvaluationEngineService))
     protected readonly evaluationEngineService: EvaluationEngineService,
     protected readonly playerService: PlayerService,
     protected readonly challengeService: ChallengeService,

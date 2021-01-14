@@ -1,12 +1,10 @@
-import { Args, Query, Resolver } from '@nestjs/graphql';
+import { Args, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 
 import { Roles } from '../keycloak/decorators/roles.decorator';
 import { Role } from '../common/enums/role.enum';
 import { GqlInstructorAssignedGuard } from '../common/guards/gql-instructor-assigned.guard';
 import { GqlPlayerOfGuard } from '../common/guards/gql-player-of.guard';
-import { ProgrammingLanguageDto } from './dto/programming-language.dto';
-import { EvaluationEngineService } from './evaluation-engine.service';
 import { ActivityDto } from './dto/activity.dto';
 import { ActivityService } from './activity.service';
 
