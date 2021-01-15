@@ -6,6 +6,7 @@ import { SubmissionDto } from '../../submission/dto/submission.dto';
 import { ChallengeStatusDto } from '../../challenge-status/dto/challenge-status.dto';
 import { GroupDto } from '../../group/dto/group.dto';
 import { UserDto } from '../../keycloak/dto/user.dto';
+import { ValidationDto } from '../../submission/dto/validation.dto';
 
 @ObjectType('Player')
 export class PlayerDto {
@@ -26,6 +27,9 @@ export class PlayerDto {
 
   @Field(() => [SubmissionDto])
   submissions?: string[];
+
+  @Field(() => [ValidationDto])
+  validations?: string[];
 
   @Field(() => [ChallengeStatusDto])
   learningPath?: string[];

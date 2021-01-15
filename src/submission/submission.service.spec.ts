@@ -3,12 +3,9 @@ import { MongooseModule, getConnectionToken } from '@nestjs/mongoose';
 import { TestingModule, Test } from '@nestjs/testing';
 import { Connection } from 'mongoose';
 
-import { ChallengeStatusModule } from '../challenge-status/challenge-status.module';
-import { SubscriptionsModule } from '../common/subscriptions/subscriptions.module';
 import { EvaluationEngineModule } from '../evaluation-engine/evaluation-engine.module';
 import { EventModule } from '../event/event.module';
 import { GameModule } from '../game/game.module';
-import { HookModule } from '../hook/hook.module';
 import { PlayerModule } from '../player/player.module';
 import { SubmissionToDtoMapper } from './mappers/submission-to-dto.mapper';
 import { Submission, SubmissionSchema } from './models/submission.model';
@@ -22,7 +19,6 @@ import { PlayerService } from '../player/player.service';
 import { Player } from '../player/models/player.model';
 import { EventService } from '../event/event.service';
 import { EvaluationEngineService } from '../evaluation-engine/evaluation-engine.service';
-import { KeycloakModule } from '../keycloak/keycloak.module';
 
 const gameId = '440850928599';
 const playerYoda = '440850928500';
@@ -129,7 +125,7 @@ describe('SubmissionService', () => {
       // eslint-disable-next-line @typescript-eslint/no-empty-function
       mockEval.mockImplementation(async () => {});
 
-      const submission: Submission = await service.sendSubmission(gameId, 'A', playerYoda, {
+      const submission: Submission = await service.evaluate(gameId, 'A', playerYoda, {
         filename: 'TEST',
         content: null,
       });

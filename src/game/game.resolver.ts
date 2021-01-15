@@ -22,6 +22,10 @@ import { GqlInstructorAssignedGuard } from '../common/guards/gql-instructor-assi
 import { GameKeyExtractor } from '../common/decorators/game-key-extractor.decorator';
 import { GqlPlayerOfGuard } from '../common/guards/gql-player-of.guard';
 import { GqlUserInfo } from '../common/decorators/gql-user-info.decorator';
+import { ValidationService } from '../submission/validation.service';
+import { ValidationToDtoMapper } from '../submission/mappers/validation-to-dto.mapper';
+import { ValidationDto } from '../submission/dto/validation.dto';
+import { Validation } from '../submission/models/validation.model';
 
 @Resolver(() => GameDto)
 export class GameResolver {
@@ -33,6 +37,8 @@ export class GameResolver {
     protected readonly playerToDtoMapper: PlayerToDtoMapper,
     protected readonly submissionService: SubmissionService,
     protected readonly submissionToDtoMapper: SubmissionToDtoMapper,
+    protected readonly validationService: ValidationService,
+    protected readonly validationToDtoMapper: ValidationToDtoMapper,
   ) {}
 
   @Roles(Role.AUTHOR)
@@ -105,5 +111,11 @@ export class GameResolver {
   async submissions(@Parent() root: GameDto): Promise<SubmissionDto[]> {
     const submissions: Submission[] = await this.submissionService.findAll({ _id: { $in: root.submissions } });
     return Promise.all(submissions.map(async submission => this.submissionToDtoMapper.transform(submission)));
+  }
+
+  @ResolveField()
+  async validations(@Parent() root: PlayerDto): Promise<ValidationDto[]> {
+    const validations: Validation[] = await this.validationService.findAll({ _id: { $in: root.validations } });
+    return Promise.all(validations.map(async validation => this.validationToDtoMapper.transform(validation)));
   }
 }

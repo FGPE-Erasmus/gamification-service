@@ -26,4 +26,12 @@ export class GameRepository extends BaseRepository<Game, GameDocument> {
   async removeSubmission(id: string, submission: { id: string }): Promise<Game> {
     return await this.findOneAndUpdate({ _id: id }, { $pullAll: { submissions: [submission.id] } }, { multi: true });
   }
+
+  async upsertValidation(id: string, validation: { id: string }): Promise<Game> {
+    return await this.findOneAndUpdate({ _id: id }, { $addToSet: { validations: validation.id } });
+  }
+
+  async removeValidation(id: string, validation: { id: string }): Promise<Game> {
+    return await this.findOneAndUpdate({ _id: id }, { $pullAll: { validations: [validation.id] } }, { multi: true });
+  }
 }

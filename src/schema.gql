@@ -92,7 +92,6 @@ type Activity {
   difficulty: String
   statement: String
   pdf: Boolean
-  solved: Boolean
 }
 
 type ActivityStatus {
@@ -144,6 +143,26 @@ type User {
   lastName: String
 }
 
+type Validation {
+  id: ID!
+  game: Game!
+  player: Player!
+  exerciseId: String!
+  evaluationEngine: EvaluationEngine
+  evaluationEngineId: String
+  language: String
+  metrics: JSON
+  outputs: JSON
+  userExecutionTimes: JSON
+  result: Result
+  feedback: String
+  submittedAt: Date!
+  evaluatedAt: Date
+  program: String
+  createdAt: Date!
+  updatedAt: Date
+}
+
 type Player {
   id: ID!
   game: Game!
@@ -151,6 +170,7 @@ type Player {
   group: Group
   points: Float!
   submissions: [Submission!]!
+  validations: [Validation!]!
   learningPath: [ChallengeStatus!]!
   rewards: [PlayerReward!]!
   createdAt: Date!
@@ -168,6 +188,7 @@ type Game {
   instructors: [User!]!
   players: [Player!]!
   submissions: [Submission!]!
+  validations: [Validation!]!
   createdAt: Date!
   updatedAt: Date
 }
@@ -395,8 +416,10 @@ type ActionHook {
 }
 
 enum TriggerEvent {
-  SUBMISSION_EVALUATED
+  VALIDATION_RECEIVED
+  VALIDATION_PROCESSED
   SUBMISSION_RECEIVED
+  SUBMISSION_EVALUATED
   SUBMISSION_ACCEPTED
   SUBMISSION_REJECTED
   CHALLENGE_AVAILABLE
@@ -522,6 +545,9 @@ type Query {
   user(id: String!): User!
   users: [User!]!
   usersByRole(role: String!): [User!]!
+  validation(id: String!, gameId: String!): Validation!
+  validations(exerciseId: String, gameId: String!, userId: String!): [Validation!]!
+  myValidations(exerciseId: String, gameId: String!): [Validation!]!
 }
 
 type Mutation {
@@ -536,6 +562,17 @@ type Mutation {
   assignInstructor(userId: String!, gameId: String!): Game!
   login(username: String, password: String, scope: String, refreshToken: String, redirectUri: String): Auth!
   logout(redirectUri: String): LogoutResponse!
+  evaluate(gameId: String!, exerciseId: String!, file: Upload!): Submission
+  validate(gameId: String!, exerciseId: String!, file: Upload!, inputs: [String!] = []): Validation
+}
+
+input GameInput {
+  name: String!
+  description: String
+  gedilLayerId: String
+  gedilLayerDescription: String
+  startDate: Date
+  endDate: Date
 }
 
 """The `Upload` scalar type represents a file upload."""
@@ -566,4 +603,5 @@ type Subscription {
   playerLeft: Player!
   pointsUpdated: Float!
   challengeStatusUpdated: ChallengeStatus!
+  validationProcessed: Validation!
 }

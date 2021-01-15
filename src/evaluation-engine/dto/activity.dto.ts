@@ -32,7 +32,4 @@ export class ActivityDto {
 
   @Field({ nullable: true, defaultValue: false })
   pdf?: boolean;
-
-  @Field({ nullable: true, defaultValue: false })
-  solved?: boolean;
 }

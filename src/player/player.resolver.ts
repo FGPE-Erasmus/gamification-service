@@ -35,6 +35,10 @@ import { Roles } from '../keycloak/decorators/roles.decorator';
 import { GroupDto } from '../group/dto/group.dto';
 import { UserDto } from '../keycloak/dto/user.dto';
 import { KeycloakService } from '../keycloak/keycloak.service';
+import { ValidationDto } from '../submission/dto/validation.dto';
+import { Validation } from '../submission/models/validation.model';
+import { ValidationService } from '../submission/validation.service';
+import { ValidationToDtoMapper } from '../submission/mappers/validation-to-dto.mapper';
 
 @Resolver(() => PlayerDto)
 export class PlayerResolver {
@@ -49,6 +53,8 @@ export class PlayerResolver {
     protected readonly groupToDtoMapper: GroupToDtoMapper,
     protected readonly submissionService: SubmissionService,
     protected readonly submissionToDtoMapper: SubmissionToDtoMapper,
+    protected readonly validationService: ValidationService,
+    protected readonly validationToDtoMapper: ValidationToDtoMapper,
     protected readonly challengeStatusService: ChallengeStatusService,
     protected readonly challengeStatusToDtoMapper: ChallengeStatusToDtoMapper,
     protected readonly playerRewardService: PlayerRewardService,
@@ -168,6 +174,13 @@ export class PlayerResolver {
     const { id: playerId } = root;
     const submissions: Submission[] = await this.submissionService.findAll({ player: { $eq: playerId } });
     return Promise.all(submissions.map(async submission => this.submissionToDtoMapper.transform(submission)));
+  }
+
+  @ResolveField()
+  async validations(@Parent() root: PlayerDto): Promise<ValidationDto[]> {
+    const { id: playerId } = root;
+    const validations: Validation[] = await this.validationService.findAll({ player: { $eq: playerId } });
+    return Promise.all(validations.map(async validation => this.validationToDtoMapper.transform(validation)));
   }
 
   @ResolveField()

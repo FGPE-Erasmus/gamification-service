@@ -39,7 +39,7 @@ export class SubmissionService extends BaseService<Submission, SubmissionDocumen
     return this.findAll(query);
   }
 
-  async sendSubmission(gameId: string, exerciseId: string, playerId: string, file: IFile): Promise<Submission> {
+  async evaluate(gameId: string, exerciseId: string, playerId: string, file: IFile): Promise<Submission> {
     const challenge: ChallengeDto = await this.challengeService.findOne({
       game: gameId,
       refs: exerciseId,

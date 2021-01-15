@@ -84,7 +84,7 @@ export class SubmissionResolver {
   async evaluate(@GqlPlayer('id') playerId: string, @Args() args: EvaluateArgs): Promise<SubmissionDto> {
     const { gameId, exerciseId, file } = args;
     const { filename, encoding, mimetype, createReadStream } = await file;
-    const submission: Submission = await this.submissionService.sendSubmission(gameId, exerciseId, playerId, {
+    const submission: Submission = await this.submissionService.evaluate(gameId, exerciseId, playerId, {
       filename,
       encoding: encoding as BufferEncoding,
       mimetype,

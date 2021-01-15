@@ -15,6 +15,9 @@ import { MooshakSubmissionDto } from './mooshak-submission.dto';
 import { ProgrammingLanguageDto } from '../../dto/programming-language.dto';
 import { ActivityDto } from '../../dto/activity.dto';
 import { base64Decode } from '../../../common/utils/string.utils';
+import { Validation } from '../../../submission/models/validation.model';
+import { ValidationDto } from '../../dto/validation.dto';
+import { MooshakValidationDto } from './mooshak-validation.dto';
 
 @Injectable()
 export class MooshakService implements IEngineService {
@@ -103,6 +106,43 @@ export class MooshakService implements IEngineService {
     return activity;
   }
 
+  async validate(
+    validation: Validation,
+    filename: string,
+    solution: string,
+    inputs: string[],
+    options: AxiosRequestConfig = {},
+  ): Promise<EvaluationDto> {
+    const data: FormData = new FormData();
+    data.append('program', Buffer.from(solution, 'utf-8'), filename);
+    data.append('consider', 'false');
+    for (const input of inputs) {
+      data.append('input', input);
+    }
+
+    const response: MooshakSubmissionDto = await this.httpService
+      .post<MooshakSubmissionDto>(
+        `/data/contests/${'proto_fgpe' || validation.game}/problems/${validation.exerciseId}/evaluate`,
+        data,
+        {
+          ...options,
+          headers: {
+            ...options.headers,
+            ...data.getHeaders(),
+          },
+        },
+      )
+      .pipe(
+        first(),
+        tap(res => this.logger.debug(JSON.stringify(res.data))),
+        map<any, MooshakSubmissionDto>(res => res.data),
+        MooshakService.catchMooshakError(),
+      )
+      .toPromise();
+
+    return MooshakService.mapMooshakSubmissionToEvaluation(response);
+  }
+
   async evaluate(
     submission: Submission,
     filename: string,
@@ -141,6 +181,25 @@ export class MooshakService implements IEngineService {
     return MooshakService.mapMooshakSubmissionToEvaluation(response);
   }
 
+  async getValidationReport(validation: Validation, options: AxiosRequestConfig = {}): Promise<ValidationDto> {
+    const response: MooshakValidationDto = await this.httpService
+      .get<MooshakValidationDto | MooshakExceptionDto>(
+        `/data/contests/${'proto_fgpe' || validation.game}/validations/${
+          validation.evaluationEngineId
+        }/evaluation-summary`,
+        options,
+      )
+      .pipe(
+        first(),
+        map<any, MooshakValidationDto>(res => res.data),
+        tap(d => console.log(d)),
+        MooshakService.catchMooshakError(),
+      )
+      .toPromise();
+
+    return MooshakService.mapMooshakValidationToValidation(response as MooshakValidationDto);
+  }
+
   async getEvaluationReport(submission: Submission, options: AxiosRequestConfig = {}): Promise<EvaluationDto> {
     const response: MooshakEvaluationDto = await this.httpService
       .get<MooshakEvaluationDto | MooshakExceptionDto>(
@@ -159,6 +218,20 @@ export class MooshakService implements IEngineService {
       .toPromise();
 
     return MooshakService.mapMooshakEvaluationToEvaluation(response as MooshakEvaluationDto);
+  }
+
+  async getValidationProgram(validation: Validation, options?: AxiosRequestConfig): Promise<string> {
+    return await this.httpService
+      .get<string>(
+        `/data/contests/${'proto_fgpe' || validation.game}/validations/${validation.evaluationEngineId}/program`,
+        options,
+      )
+      .pipe(
+        first(),
+        map<any, string>(res => base64Decode(res.data)),
+        MooshakService.catchMooshakError(),
+      )
+      .toPromise();
   }
 
   async getEvaluationProgram(submission: Submission, options?: AxiosRequestConfig): Promise<string> {
@@ -194,6 +267,20 @@ export class MooshakService implements IEngineService {
     };
   }
 
+  private static mapMooshakValidationToValidation(mooshakValidationDto: MooshakValidationDto): ValidationDto {
+    return {
+      evaluatedAt: new Date(mooshakValidationDto.evaluatedAt),
+      language: mooshakValidationDto.language,
+      result: MooshakService.mapMooshakResultToResult(mooshakValidationDto.status),
+      outputs: mooshakValidationDto.outputs,
+      userExecutionTimes: mooshakValidationDto.userExecutionTimes,
+      feedback:
+        ((mooshakValidationDto.observations && mooshakValidationDto.observations + '\n\n') || '') +
+        (mooshakValidationDto.feedback || ''),
+      metrics: mooshakValidationDto.metrics,
+    };
+  }
+
   private static mapMooshakEvaluationToEvaluation(mooshakEval: MooshakEvaluationDto): EvaluationDto {
     return {
       evaluatedAt: new Date(mooshakEval.evaluatedAt),
@@ -217,6 +304,7 @@ export class MooshakService implements IEngineService {
     ) {
       case 'EVALUATING':
         return Result.PROCESSING;
+      case 'VALIDATED':
       case 'ACCEPTED':
       case 'PRESENTATION_ERROR':
         return Result.ACCEPT;

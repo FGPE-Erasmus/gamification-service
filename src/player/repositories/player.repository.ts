@@ -9,6 +9,7 @@ import { PlayerRewardRepository } from '../../player-reward/repositories/player-
 import { ChallengeStatusRepository } from '../../challenge-status/repositories/challenge-status.repository';
 import { Player, PlayerDocument } from '../models/player.model';
 import { SubmissionRepository } from '../../submission/repositories/submission.repository';
+import { ValidationRepository } from '../../submission/repositories/validation.repository';
 
 @Injectable()
 export class PlayerRepository extends BaseRepository<Player, PlayerDocument> {
@@ -20,6 +21,7 @@ export class PlayerRepository extends BaseRepository<Player, PlayerDocument> {
     @Inject(forwardRef(() => ChallengeStatusRepository))
     protected readonly challengeStatusRepository: ChallengeStatusRepository,
     protected readonly submissionRepository: SubmissionRepository,
+    protected readonly validationRepository: ValidationRepository,
   ) {
     super(new Logger(PlayerRepository.name), model);
   }
@@ -81,6 +83,14 @@ export class PlayerRepository extends BaseRepository<Player, PlayerDocument> {
     return await this.findOneAndUpdate({ _id: id }, { $pullAll: { submissions: [submission.id] } }, { multi: true });
   }
 
+  async upsertValidation(id: string, validation: { id: string }): Promise<Player> {
+    return await this.findOneAndUpdate({ _id: id }, { $addToSet: { validations: validation.id } });
+  }
+
+  async removeValidation(id: string, validation: { id: string }): Promise<Player> {
+    return await this.findOneAndUpdate({ _id: id }, { $pullAll: { validations: [validation.id] } }, { multi: true });
+  }
+
   async upsertChallengeStatus(id: string, challengeStatus: { id: string }): Promise<Player> {
     return await this.findOneAndUpdate({ _id: id }, { $addToSet: { learningPath: challengeStatus.id } });
   }
@@ -116,5 +126,7 @@ export class PlayerRepository extends BaseRepository<Player, PlayerDocument> {
     await this.challengeStatusRepository.deleteIf({ player: { $eq: player.id } });
     // remove from submissions' collection
     await this.submissionRepository.deleteIf({ player: { $eq: player.id } });
+    // remove from validations' collection
+    await this.validationRepository.deleteIf({ player: { $eq: player.id } });
   }
 }
