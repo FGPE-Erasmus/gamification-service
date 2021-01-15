@@ -92,7 +92,6 @@ type Activity {
   difficulty: String
   statement: String
   pdf: Boolean
-  solved: Boolean
 }
 
 type ActivityStatus {
