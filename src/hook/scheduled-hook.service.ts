@@ -36,7 +36,7 @@ export class ScheduledHookService extends BaseService<ScheduledHook, ScheduledHo
   /**
    * Find all hooks within a specific game.
    *
-   * @param gameId the ID of the game
+   * @param {string} gameId the ID of the game
    * @returns {Promise<ScheduledHook[]>} the hooks.
    */
   async findByGameId(gameId: string): Promise<ScheduledHook[]> {
@@ -45,12 +45,23 @@ export class ScheduledHookService extends BaseService<ScheduledHook, ScheduledHo
     });
   }
 
+  /**
+   * Triggers active hooks within specific game.
+   *
+   * @param {string} gameId the ID of the game
+   */
   async schedulingRoutine(gameId: string) {
     let scheduledHooks: ScheduledHook[] = await this.findByGameId(gameId);
     scheduledHooks = scheduledHooks.filter(hook => hook.active === true);
     this.executeScheduledHooks(scheduledHooks, {});
   }
 
+  /**
+   * Adds cron job, interval or timeout for each hook accordingly.
+   *
+   * @param {ScheduledHook[]} scheduledHooks array of scheduled hooks
+   * @param {{ [key: string]: any }} eventParams parameters needed for hook execution
+   */
   executeScheduledHooks(scheduledHooks: ScheduledHook[], eventParams: { [key: string]: any }) {
     for (const scheduledHook of scheduledHooks) {
       if (scheduledHook.cron && !scheduledHook.interval) this.addCronJob(scheduledHook, eventParams);
@@ -61,6 +72,12 @@ export class ScheduledHookService extends BaseService<ScheduledHook, ScheduledHo
     }
   }
 
+  /**
+   * Adds a cron job for a hook.
+   *
+   * @param {ScheduledHook} hook the scheduled hook
+   * @param {{ [key: string]: any }} eventParams parameters needed for hook execution
+   */
   addCronJob(hook: ScheduledHook, eventParams: { [key: string]: any }) {
     const job = new CronJob(hook.cron, () => {
       this.logger.warn(`Cronjob for ${hook.id} has been created with ${hook.cron} interval.`);
@@ -70,6 +87,11 @@ export class ScheduledHookService extends BaseService<ScheduledHook, ScheduledHo
     job.start();
   }
 
+  /**
+   * Adds an interval for a hook.
+   * @param {ScheduledHook} hook the scheduled hook
+   * @param {{ [key: string]: any }} eventParams parameters needed for hook execution
+   */
   addInterval(hook: ScheduledHook, eventParams: { [key: string]: any }) {
     const callback = () => {
       this.logger.warn(`Interval for ${hook.id} is set to ${hook.interval}s.`);
@@ -80,6 +102,12 @@ export class ScheduledHookService extends BaseService<ScheduledHook, ScheduledHo
     this.schedulerRegistry.addInterval(hook.id, interval);
   }
 
+  /**
+   * Adds a timeout for a hook.
+   *
+   * @param {ScheduledHook} hook the scheduled hook
+   * @param {{ [key: string]: any }} eventParams parameters needed for hook execution
+   */
   addTimeout(hook: ScheduledHook, eventParams: { [key: string]: any }) {
     const callback = () => {
       this.logger.warn(`Timeout for ${hook.id} is set to ${hook.interval}s.`);
@@ -91,6 +119,13 @@ export class ScheduledHookService extends BaseService<ScheduledHook, ScheduledHo
     this.schedulerRegistry.addTimeout(hook.id, timeout);
   }
 
+  /**
+   * Creates a hook for Timebomb challenge
+   * and adds a timeout for it.
+   *
+   * @param {ChallengeDto} challenge the challenge
+   * @param {string} playerId the ID of the player
+   */
   async createTimebombHook(challenge: ChallengeDto, playerId: string) {
     const scheduledHook: ScheduledHook = await this.create({
       game: challenge.game,
@@ -125,6 +160,11 @@ export class ScheduledHookService extends BaseService<ScheduledHook, ScheduledHo
     });
   }
 
+  /**
+   * Stops particular cron job.
+   *
+   * @param {string} hookId the ID of the hook
+   */
   stopCronJob(hookId: string) {
     const job = this.schedulerRegistry.getCronJob(hookId);
     job.stop();

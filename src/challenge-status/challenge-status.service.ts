@@ -237,6 +237,13 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
     return result;
   }
 
+  /**
+   * Get current exercise of SHAPESHIFTER challenge.
+   *
+   * @param {ChallengeDto} challenge the SHAPESHIFTER challenge
+   * @param {string} playerId the ID of the player
+   * @returns {string} the ID of an exercise
+   */
   async getCurrentShape(challenge: ChallengeDto, playerId: string): Promise<string> {
     const challengeStatus: ChallengeStatus = await this.findByChallengeIdAndPlayerId(challenge.id, playerId);
     const timeDifference = Date.now() - challengeStatus.startedAt.getTime();
