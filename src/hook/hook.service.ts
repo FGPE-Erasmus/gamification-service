@@ -388,7 +388,6 @@ export class HookService {
    */
   private async updatePlayerPoints(gameId: string, playerId: string, points: string): Promise<void> {
     if (points.startsWith('+')) {
-      console.log('adding');
       await this.playerService.findOneAndUpdate({ _id: playerId }, { $inc: { points: +points.substring(1) } });
     } else if (points.startsWith('-')) {
       await this.playerService.findOneAndUpdate({ _id: playerId }, { $inc: { points: -points.substring(1) } });

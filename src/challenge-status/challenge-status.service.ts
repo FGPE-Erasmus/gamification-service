@@ -239,9 +239,9 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
 
   async getCurrentShape(challenge: ChallengeDto, playerId: string): Promise<string> {
     const challengeStatus: ChallengeStatus = await this.findByChallengeIdAndPlayerId(challenge.id, playerId);
-    const refIndex =
-      ((Date.now() - challengeStatus.openedAt.getTime()) / +challenge.modeParameters[0]) % challenge.refs.length;
-    return challenge.refs[refIndex];
+    const timeDifference = Date.now() - challengeStatus.startedAt.getTime();
+    const refIndex = (timeDifference / +challenge.modeParameters[0]) % challenge.refs.length;
+    return challenge.refs[Math.floor(refIndex)];
   }
 
   /**
