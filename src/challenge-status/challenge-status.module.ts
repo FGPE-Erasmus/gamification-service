@@ -11,7 +11,9 @@ import { ChallengeStatusRepository } from './repositories/challenge-status.repos
 import { ChallengeStatusToDtoMapper } from './mappers/challenge-status-to-dto.mapper';
 import { EventModule } from '../event/event.module';
 import { GameModule } from '../game/game.module';
+import { HookModule } from 'src/hook/hook.module';
 import { EvaluationEngineModule } from '../evaluation-engine/evaluation-engine.module';
+
 
 @Module({
   imports: [
@@ -26,6 +28,7 @@ import { EvaluationEngineModule } from '../evaluation-engine/evaluation-engine.m
     forwardRef(() => PlayerModule),
     forwardRef(() => ChallengeModule),
     forwardRef(() => SubscriptionsModule),
+    forwardRef(() => HookModule),
     forwardRef(() => EvaluationEngineModule),
   ],
   providers: [ChallengeStatusToDtoMapper, ChallengeStatusRepository, ChallengeStatusService, ChallengeStatusResolver],

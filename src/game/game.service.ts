@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { Parse } from 'unzipper';
 
 import { IFile } from '../common/interfaces/file.interface';
@@ -13,16 +13,18 @@ import { Game, GameDocument } from './models/game.model';
 import { GameRepository } from './repositories/game.repository';
 import { UserDto } from '../keycloak/dto/user.dto';
 import { KeycloakService } from '../keycloak/keycloak.service';
+import { ScheduledHookService } from 'src/hook/scheduled-hook.service';
 
 @Injectable()
 export class GameService extends BaseService<Game, GameDocument> {
   constructor(
     protected readonly repository: GameRepository,
     protected readonly keycloakService: KeycloakService,
-    protected readonly challengeService: ChallengeService,
     protected readonly rewardService: RewardService,
     protected readonly leaderboardService: LeaderboardService,
-    protected readonly hookService: HookService,
+    @Inject(forwardRef(() => ChallengeService)) protected readonly challengeService: ChallengeService,
+    @Inject(forwardRef(() => ScheduledHookService)) protected readonly scheduledHookService: ScheduledHookService,
+    @Inject(forwardRef(() => HookService)) protected readonly hookService: HookService,
   ) {
     super(new Logger(GameService.name), repository);
   }
@@ -97,6 +99,7 @@ export class GameService extends BaseService<Game, GameDocument> {
       subObjects.rules[gedilId] = await this.hookService.importGEdIL(subObjects, game, entries.rules[gedilId]);
     }
 
+    this.scheduledHookService.schedulingRoutine(game.id);
     return game;
   }
 

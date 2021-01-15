@@ -21,6 +21,7 @@ import { ActionHookRepository } from './repositories/action-hook.repository';
 import { ScheduledHookRepository } from './repositories/scheduled-hook.repository';
 import { ScheduledHookService } from './scheduled-hook.service';
 import { ScheduledHookResolver } from './scheduled-hook.resolver';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { ScheduledHookResolver } from './scheduled-hook.resolver';
         schema: ScheduledHookSchema,
       },
     ]),
+    ScheduleModule.forRoot(),
     forwardRef(() => GameModule),
     forwardRef(() => ChallengeModule),
     forwardRef(() => ChallengeStatusModule),

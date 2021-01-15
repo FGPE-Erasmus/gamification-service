@@ -14,6 +14,7 @@ import { ChallengeSchema } from './models/challenge.model';
 import { ChallengeRepository } from './repositories/challenge.repository';
 import { PlayerModule } from '../player/player.module';
 import { EvaluationEngineModule } from '../evaluation-engine/evaluation-engine.module';
+import { ChallengeStatusModule } from 'src/challenge-status/challenge-status.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { EvaluationEngineModule } from '../evaluation-engine/evaluation-engine.m
     forwardRef(() => LeaderboardModule),
     forwardRef(() => RewardModule),
     forwardRef(() => SubscriptionsModule),
+    forwardRef(() => ChallengeStatusModule),
   ],
   providers: [ChallengeToDtoMapper, ChallengeRepository, ChallengeService, ChallengeResolver],
   exports: [ChallengeToDtoMapper, ChallengeRepository, ChallengeService],

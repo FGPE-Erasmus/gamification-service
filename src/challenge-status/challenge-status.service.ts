@@ -1,6 +1,8 @@
 import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { PubSub } from 'graphql-subscriptions';
 
+import { Mode } from 'src/challenge/models/mode.enum';
+import { ScheduledHookService } from 'src/hook/scheduled-hook.service';
 import { NotificationEnum } from '../common/enums/notifications.enum';
 import { BaseService } from '../common/services/base.service';
 import { EventService } from '../event/event.service';
@@ -9,6 +11,7 @@ import { ChallengeStatusToDtoMapper } from './mappers/challenge-status-to-dto.ma
 import { ChallengeStatus, ChallengeStatusDocument } from './models/challenge-status.model';
 import { StateEnum } from './models/state.enum';
 import { ChallengeStatusRepository } from './repositories/challenge-status.repository';
+import { ChallengeDto } from 'src/challenge/dto/challenge.dto';
 import { Challenge } from '../challenge/models/challenge.model';
 import { ChallengeService } from '../challenge/challenge.service';
 import { ActivityService } from '../evaluation-engine/activity.service';
@@ -17,7 +20,9 @@ import { ActivityService } from '../evaluation-engine/activity.service';
 export class ChallengeStatusService extends BaseService<ChallengeStatus, ChallengeStatusDocument> {
   constructor(
     @Inject('PUB_SUB') protected readonly pubSub: PubSub,
-    @Inject(forwardRef(() => ChallengeService)) protected readonly challengeService: ChallengeService,
+    @Inject(forwardRef(() => ChallengeService))
+    protected readonly challengeService: ChallengeService,
+    protected readonly scheduledHookService: ScheduledHookService,
     protected readonly challengeStatusToDtoMapper: ChallengeStatusToDtoMapper,
     protected readonly repository: ChallengeStatusRepository,
     protected readonly eventService: EventService,
@@ -162,6 +167,9 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
   async markAsAvailable(gameId: string, challengeId: string, playerId: string): Promise<ChallengeStatus> {
     const temp: ChallengeStatus = await this.findByChallengeIdAndPlayerId(challengeId, playerId);
     const result: ChallengeStatus = await this.patch(temp.id, { state: StateEnum.AVAILABLE });
+    const challenge: Challenge = await this.challengeService.findById(challengeId);
+
+    if (challenge.mode === Mode.TIME_BOMB) await this.scheduledHookService.createTimebombHook(challenge, playerId);
 
     // send CHALLENGE_AVAILABLE message to execute attached hooks
     await this.eventService.fireEvent(TriggerEvent.CHALLENGE_AVAILABLE, {
@@ -227,6 +235,20 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
     });
 
     return result;
+  }
+
+  /**
+   * Get current exercise of SHAPESHIFTER challenge.
+   *
+   * @param {ChallengeDto} challenge the SHAPESHIFTER challenge
+   * @param {string} playerId the ID of the player
+   * @returns {string} the ID of an exercise
+   */
+  async getCurrentShape(challenge: ChallengeDto, playerId: string): Promise<string> {
+    const challengeStatus: ChallengeStatus = await this.findByChallengeIdAndPlayerId(challenge.id, playerId);
+    const timeDifference = Date.now() - challengeStatus.startedAt.getTime();
+    const refIndex = (timeDifference / +challenge.modeParameters[0]) % challenge.refs.length;
+    return challenge.refs[Math.floor(refIndex)];
   }
 
   /**

@@ -22,6 +22,7 @@ import { SubscriptionsModule } from './common/subscriptions/subscriptions.module
 import { KeycloakModule } from './keycloak/keycloak.module';
 import { AuthGuard } from './keycloak/guards/auth.guard';
 import { ResourceGuard } from './keycloak/guards/resource.guard';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Global()
 @Module({
@@ -97,7 +98,7 @@ import { ResourceGuard } from './keycloak/guards/resource.guard';
         debug: appConfig.isDevelopment,
       }),
     }),
-
+    ScheduleModule.forRoot(),
     HealthModule,
     EventModule,
     EvaluationEngineModule,
