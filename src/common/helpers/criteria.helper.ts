@@ -147,7 +147,7 @@ export function checkContains(a: string | any[], b: string | any[]): boolean {
   } else if (Array.isArray(b)) {
     return checkArrayContains(parseArray(a as string), b);
   }
-  return a.indexOf(b) != 0;
+  return a.indexOf(b) != -1;
 }
 
 export function checkArrayContains(arr1: any[], arr2: any[]): boolean {

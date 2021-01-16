@@ -17,7 +17,6 @@ import { PlayerService } from '../player/player.service';
 import { PlayerToDtoMapper } from '../player/mappers/player-to-dto.mapper';
 import { Player } from '../player/models/player.model';
 import { UserDto } from '../keycloak/dto/user.dto';
-import { KeycloakService } from '../keycloak/keycloak.service';
 import { GqlInstructorAssignedGuard } from '../common/guards/gql-instructor-assigned.guard';
 import { GameKeyExtractor } from '../common/decorators/game-key-extractor.decorator';
 import { GqlPlayerOfGuard } from '../common/guards/gql-player-of.guard';
@@ -26,13 +25,14 @@ import { ValidationService } from '../submission/validation.service';
 import { ValidationToDtoMapper } from '../submission/mappers/validation-to-dto.mapper';
 import { ValidationDto } from '../submission/dto/validation.dto';
 import { Validation } from '../submission/models/validation.model';
+import { UserService } from '../keycloak/user.service';
 
 @Resolver(() => GameDto)
 export class GameResolver {
   constructor(
     protected readonly gameService: GameService,
     protected readonly gameToDtoMapper: GameToDtoMapper,
-    protected readonly keycloakService: KeycloakService,
+    protected readonly userService: UserService,
     protected readonly playerService: PlayerService,
     protected readonly playerToDtoMapper: PlayerToDtoMapper,
     protected readonly submissionService: SubmissionService,
@@ -96,7 +96,7 @@ export class GameResolver {
   async instructors(@Parent() root: GameDto): Promise<UserDto[]> {
     const dtos: UserDto[] = [];
     for (const userId of root.instructors) {
-      dtos.push(await this.keycloakService.getUser(userId));
+      dtos.push(await this.userService.getUser(userId));
     }
     return dtos;
   }

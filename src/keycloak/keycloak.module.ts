@@ -8,10 +8,11 @@ import { KeycloakService } from './keycloak.service';
 import { KeycloakOptions } from './interfaces/keycloak-options.interface';
 import { KeycloakAsyncOptions } from './interfaces/keycloak-async-options.interface';
 import { UserResolver } from './user.resolver';
+import { UserService } from './user.service';
 
 @Module({
-  providers: [KeycloakResolver, KeycloakService, UserResolver],
-  exports: [KeycloakService],
+  providers: [KeycloakResolver, KeycloakService, UserService, UserResolver],
+  exports: [KeycloakService, UserService],
 })
 export class KeycloakModule {
   public static imports = [HttpModule];

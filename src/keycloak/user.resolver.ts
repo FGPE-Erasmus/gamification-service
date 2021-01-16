@@ -1,29 +1,29 @@
 import { Args, Resolver, Query } from '@nestjs/graphql';
 
-import { KeycloakService } from './keycloak.service';
 import { UserDto } from './dto/user.dto';
 import { Role } from '../common/enums/role.enum';
 import { Roles } from './decorators/roles.decorator';
+import { UserService } from './user.service';
 
 @Resolver(() => UserDto)
 export class UserResolver {
-  constructor(protected readonly keycloakService: KeycloakService) {}
+  constructor(protected readonly userService: UserService) {}
 
   @Roles(Role.AUTHOR, Role.TEACHER)
   @Query(() => [UserDto])
   async users(): Promise<UserDto[]> {
-    return this.keycloakService.getUsers();
+    return this.userService.getUsers();
   }
 
   @Roles(Role.AUTHOR, Role.TEACHER)
   @Query(() => [UserDto])
   async usersByRole(@Args('role') role: Role): Promise<UserDto[]> {
-    return this.keycloakService.getUsersByRole(role);
+    return this.userService.getUsersByRole(role);
   }
 
   @Roles(Role.AUTHOR, Role.TEACHER)
   @Query(() => UserDto)
   async user(@Args('id') userId: string): Promise<UserDto> {
-    return this.keycloakService.getUser(userId);
+    return this.userService.getUser(userId);
   }
 }

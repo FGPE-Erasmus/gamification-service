@@ -20,7 +20,6 @@ import { ValidationService } from './validation.service';
 import { ValidationRepository } from './repositories/validation.repository';
 import { ValidationToDtoMapper } from './mappers/validation-to-dto.mapper';
 
-
 @Module({
   imports: [
     MongooseModule.forFeature([
@@ -38,8 +37,8 @@ import { ValidationToDtoMapper } from './mappers/validation-to-dto.mapper';
     forwardRef(() => GameModule),
     forwardRef(() => PlayerModule),
     forwardRef(() => HookModule),
-    forwardRef(() => ChallengeStatusModule),
     forwardRef(() => ChallengeModule),
+    forwardRef(() => ChallengeStatusModule),
     forwardRef(() => SubscriptionsModule),
   ],
   providers: [

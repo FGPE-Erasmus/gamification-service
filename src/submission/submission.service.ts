@@ -10,19 +10,19 @@ import { Player } from '../player/models/player.model';
 import { PlayerService } from '../player/player.service';
 import { Submission, SubmissionDocument } from './models/submission.model';
 import { SubmissionRepository } from './repositories/submission.repository';
-import { ChallengeService } from 'src/challenge/challenge.service';
-import { ChallengeDto } from 'src/challenge/dto/challenge.dto';
-import { Mode } from 'src/challenge/models/mode.enum';
+import { ChallengeService } from '../challenge/challenge.service';
+import { ChallengeDto } from '../challenge/dto/challenge.dto';
+import { Mode } from '../challenge/models/mode.enum';
 
 @Injectable()
 export class SubmissionService extends BaseService<Submission, SubmissionDocument> {
   constructor(
-    @Inject(forwardRef(() => ChallengeStatusService)) protected readonly challengeStatusService: ChallengeStatusService,
+    protected readonly repository: SubmissionRepository,
+    protected readonly eventService: EventService,
     @Inject(forwardRef(() => EvaluationEngineService))
     protected readonly evaluationEngineService: EvaluationEngineService,
     @Inject(forwardRef(() => ChallengeService)) protected readonly challengeService: ChallengeService,
-    protected readonly repository: SubmissionRepository,
-    protected readonly eventService: EventService,
+    @Inject(forwardRef(() => ChallengeStatusService)) protected readonly challengeStatusService: ChallengeStatusService,
     protected readonly playerService: PlayerService,
   ) {
     super(new Logger(SubmissionService.name), repository);
