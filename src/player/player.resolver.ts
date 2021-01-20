@@ -34,12 +34,12 @@ import { GroupToDtoMapper } from '../group/mappers/group-to-dto.mapper';
 import { Roles } from '../keycloak/decorators/roles.decorator';
 import { GroupDto } from '../group/dto/group.dto';
 import { UserDto } from '../keycloak/dto/user.dto';
-import { KeycloakService } from '../keycloak/keycloak.service';
 import { ValidationDto } from '../submission/dto/validation.dto';
 import { Validation } from '../submission/models/validation.model';
 import { ValidationService } from '../submission/validation.service';
 import { ValidationToDtoMapper } from '../submission/mappers/validation-to-dto.mapper';
 import { GqlRequestedPlayerGuard } from 'src/common/guards/gql-requested-player.guard';
+import { UserService } from '../keycloak/user.service';
 
 @Resolver(() => PlayerDto)
 export class PlayerResolver {
@@ -49,7 +49,7 @@ export class PlayerResolver {
     protected readonly playerToDtoMapper: PlayerToDtoMapper,
     protected readonly gameService: GameService,
     protected readonly gameToDtoMapper: GameToDtoMapper,
-    protected readonly keycloakService: KeycloakService,
+    protected readonly userService: UserService,
     protected readonly groupService: GroupService,
     protected readonly groupToDtoMapper: GroupToDtoMapper,
     protected readonly submissionService: SubmissionService,
@@ -158,7 +158,7 @@ export class PlayerResolver {
   @ResolveField()
   async user(@Parent() root: PlayerDto): Promise<UserDto> {
     const { user: userId } = root;
-    return await this.keycloakService.getUser(userId);
+    return await this.userService.getUser(userId);
   }
 
   @ResolveField()

@@ -14,10 +14,11 @@ import { UserDto } from './dto/user.dto';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from './guards/auth.guard';
 import { Role } from '../common/enums/role.enum';
+import { UserService } from './user.service';
 
 @Resolver('Keycloak')
 export class KeycloakResolver {
-  constructor(protected readonly keycloakService: KeycloakService) {}
+  constructor(protected readonly keycloakService: KeycloakService, protected readonly userService: UserService) {}
 
   @Public()
   @Mutation(() => AuthDto)
@@ -45,7 +46,7 @@ export class KeycloakResolver {
 
   @Query(() => UserDto)
   async user(@Args('id') userId: string): Promise<UserDto> {
-    return this.keycloakService.getUser(userId);
+    return this.userService.getUser(userId);
   }
 
   @Public()
