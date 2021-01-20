@@ -216,18 +216,18 @@ export class HookService {
         // player already has the reward and it is accumulative
         const quantity: number = playerReward.count + (parameters[1] ? +parameters[1] : 1);
         await this.pubSub.publish(NotificationEnum.REWARD_RECEIVED, {
-          rewardReceived: this.rewardToDtoMapper.transform(reward),
+          rewardReceived: await this.playerRewardToDtoMapper.transform(playerReward),
         });
         await this.playerRewardService.patch(playerReward.id, { count: quantity });
       } else {
         // player does not have the reward
-        await this.playerRewardService.create({
+        const createdPlayerReward: PlayerReward = await this.playerRewardService.create({
           player: playerId,
           reward: reward.id,
           count: reward.recurrent && parameters[1] ? +parameters[1] : 1,
         });
         await this.pubSub.publish(NotificationEnum.REWARD_RECEIVED, {
-          rewardReceived: this.rewardToDtoMapper.transform(reward),
+          rewardReceived: await this.playerRewardToDtoMapper.transform(createdPlayerReward),
         });
       }
 
@@ -240,7 +240,11 @@ export class HookService {
     } else {
       const quantity: number = parameters[1] ? +parameters[1] : 1;
       await this.playerService.findOneAndUpdate({ _id: playerId }, { $inc: { points: quantity } });
-      await this.pubSub.publish(NotificationEnum.POINTS_UPDATED, { pointsUpdated: quantity });
+      await this.pubSub.publish(NotificationEnum.POINTS_UPDATED, {
+        playerId: playerId,
+        gameId: gameId,
+        pointsUpdated: quantity,
+      });
       // send POINTS_UPDATED event
       await this.eventService.fireEvent(TriggerEvent.POINTS_UPDATED, {
         gameId,
@@ -267,7 +271,7 @@ export class HookService {
         { new: true },
       );
       await this.pubSub.publish(NotificationEnum.REWARD_SUBSTRACTED, {
-        rewardSubtracted: this.playerRewardToDtoMapper.transform(x),
+        rewardSubtracted: await this.playerRewardToDtoMapper.transform(x),
       });
       if (x.count <= 0) {
         await this.playerRewardService.deleteOne({
@@ -275,13 +279,17 @@ export class HookService {
           reward: parameters,
         });
         await this.pubSub.publish(NotificationEnum.REWARD_REMOVED, {
-          rewardRemoved: this.playerRewardToDtoMapper.transform(x),
+          rewardRemoved: await this.playerRewardToDtoMapper.transform(x),
         });
       }
     } else {
       const quantity: number = parameters[1] ? +parameters[1] : 1;
       await this.playerService.findOneAndUpdate({ _id: playerId }, { $inc: { points: -quantity } }, { new: true });
-      await this.pubSub.publish(NotificationEnum.POINTS_UPDATED, { pointsUpdated: quantity });
+      await this.pubSub.publish(NotificationEnum.POINTS_UPDATED, {
+        playerId: playerId,
+        gameId: gameId,
+        pointsUpdated: quantity,
+      });
     }
   }
 
@@ -395,7 +403,11 @@ export class HookService {
       await this.playerService.findOneAndUpdate({ _id: playerId }, { points: +points });
     }
 
-    await this.pubSub.publish(NotificationEnum.POINTS_UPDATED, { pointsUpdated: points });
+    await this.pubSub.publish(NotificationEnum.POINTS_UPDATED, {
+      playerId: playerId,
+      gameId: gameId,
+      pointsUpdated: points,
+    });
     // send POINTS_UPDATED event
     await this.eventService.fireEvent(TriggerEvent.POINTS_UPDATED, {
       gameId,

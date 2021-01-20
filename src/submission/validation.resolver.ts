@@ -119,8 +119,17 @@ export class ValidationResolver {
     return this.evaluationEngineService.getValidationProgram(validationId);
   }
 
-  @Subscription(() => ValidationDto)
-  validationProcessed(): AsyncIterator<ValidationDto> {
+  @Roles(Role.STUDENT)
+  @UseGuards(GqlPlayerOfGuard)
+  @Subscription(() => ValidationDto, {
+    filter: (payload, variables) =>
+      payload.validationProcessed.game === variables.gameId &&
+      payload.validationProcessed.player === variables.playerId,
+  })
+  validationProcessed(
+    @Args('playerId') playerId: string,
+    @Args('gameId') gameId: string,
+  ): AsyncIterator<ValidationDto> {
     return this.pubSub.asyncIterator(NotificationEnum.VALIDATION_PROCESSED);
   }
 }

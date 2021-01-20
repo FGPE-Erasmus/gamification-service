@@ -39,6 +39,7 @@ import { ValidationDto } from '../submission/dto/validation.dto';
 import { Validation } from '../submission/models/validation.model';
 import { ValidationService } from '../submission/validation.service';
 import { ValidationToDtoMapper } from '../submission/mappers/validation-to-dto.mapper';
+import { GqlRequestedPlayerGuard } from 'src/common/guards/gql-requested-player.guard';
 
 @Resolver(() => PlayerDto)
 export class PlayerResolver {
@@ -66,7 +67,7 @@ export class PlayerResolver {
   async enroll(@GqlUserInfo('sub') userId: string, @Args('gameId') gameId: string): Promise<PlayerDto> {
     const player: Player = await this.playerService.enroll(gameId, userId);
     await this.pubSub.publish(NotificationEnum.PLAYER_ENROLLED, {
-      playerEnrolled: this.playerToDtoMapper.transform(player),
+      playerEnrolled: await this.playerToDtoMapper.transform(player),
     });
     return this.playerToDtoMapper.transform(player);
   }
@@ -76,7 +77,9 @@ export class PlayerResolver {
   @Mutation(() => PlayerDto)
   async addToGame(@Args('userId') userId: string, @Args('gameId') gameId: string): Promise<PlayerDto> {
     const player: Player = await this.playerService.enroll(gameId, userId);
-    await this.pubSub.publish(NotificationEnum.PLAYER_ENROLLED, { player: this.playerToDtoMapper.transform(player) });
+    await this.pubSub.publish(NotificationEnum.PLAYER_ENROLLED, {
+      player: await this.playerToDtoMapper.transform(player),
+    });
     return this.playerToDtoMapper.transform(player);
   }
 
@@ -85,7 +88,7 @@ export class PlayerResolver {
   @Mutation(() => PlayerDto)
   async removeFromGame(@Args('userId') userId: string, @Args('gameId') gameId: string): Promise<PlayerDto> {
     const player: Player = await this.playerService.removeFromGame(gameId, userId);
-    await this.pubSub.publish(NotificationEnum.PLAYER_LEFT, { player: this.playerToDtoMapper.transform(player) });
+    await this.pubSub.publish(NotificationEnum.PLAYER_LEFT, { player: await this.playerToDtoMapper.transform(player) });
     return this.playerToDtoMapper.transform(player);
   }
 
@@ -142,7 +145,6 @@ export class PlayerResolver {
     @Args('groupId') groupId: string,
   ): Promise<PlayerDto> {
     const player: Player = await this.playerService.setGroup(gameId, playerId, groupId);
-    await this.pubSub.publish('message', { message: `Player ${player.id} has been assigned to a group: ${groupId}.` });
     return this.playerToDtoMapper.transform(player);
   }
 
@@ -199,18 +201,31 @@ export class PlayerResolver {
     return Promise.all(rewards.map(async reward => this.playerRewardToDtoMapper.transform(reward)));
   }
 
-  @Subscription(() => PlayerDto)
-  playerEnrolled(): AsyncIterator<PlayerDto> {
+  @Roles(Role.STUDENT)
+  @UseGuards(GqlPlayerOfGuard)
+  @Subscription(() => PlayerDto, {
+    filter: (payload, variables) => payload.playerEnrolled.game === variables.gameId,
+  })
+  playerEnrolled(@Args('gameId') gameId: string): AsyncIterator<PlayerDto> {
     return this.pubSub.asyncIterator(NotificationEnum.PLAYER_ENROLLED);
   }
 
-  @Subscription(() => PlayerDto)
-  playerLeft(): AsyncIterator<PlayerDto> {
+  @Roles(Role.STUDENT)
+  @UseGuards(GqlPlayerOfGuard)
+  @Subscription(() => PlayerDto, {
+    filter: (payload, variables) => payload.playerLeft.game === variables.gameId,
+  })
+  playerLeft(@Args('gameId') gameId: string): AsyncIterator<PlayerDto> {
     return this.pubSub.asyncIterator(NotificationEnum.PLAYER_LEFT);
   }
 
-  @Subscription(() => Number)
-  pointsUpdated(): AsyncIterator<number> {
+  @Roles(Role.STUDENT)
+  @UseGuards(GqlPlayerOfGuard, GqlRequestedPlayerGuard)
+  @Subscription(() => Number, {
+    filter: (payload, variables) => payload.playerId === variables.playerId && payload.gameId === variables.gameId,
+    resolve: payload => payload.pointsUpdated,
+  })
+  pointsUpdated(@Args('playerId') playerId: string, @Args('gameId') gameId: string): AsyncIterator<number> {
     return this.pubSub.asyncIterator(NotificationEnum.POINTS_UPDATED);
   }
 }

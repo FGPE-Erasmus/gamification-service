@@ -66,7 +66,7 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
     });
 
     await this.pubSub.publish(NotificationEnum.CHALLENGE_STATUS_UPDATED, {
-      challengeStatusUpdated: this.challengeStatusToDtoMapper.transform(result),
+      challengeStatusUpdated: await this.challengeStatusToDtoMapper.transform(result),
     });
 
     return result;
@@ -93,7 +93,7 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
     });
 
     await this.pubSub.publish(NotificationEnum.CHALLENGE_STATUS_UPDATED, {
-      challengeStatusUpdated: this.challengeStatusToDtoMapper.transform(result),
+      challengeStatusUpdated: await this.challengeStatusToDtoMapper.transform(result),
     });
 
     return result;
@@ -123,7 +123,7 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
     });
 
     await this.pubSub.publish(NotificationEnum.CHALLENGE_STATUS_UPDATED, {
-      challengeStatusUpdated: this.challengeStatusToDtoMapper.transform(result),
+      challengeStatusUpdated: await this.challengeStatusToDtoMapper.transform(result),
     });
 
     return result;
@@ -150,7 +150,7 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
     });
 
     await this.pubSub.publish(NotificationEnum.CHALLENGE_STATUS_UPDATED, {
-      challengeStatusUpdated: this.challengeStatusToDtoMapper.transform(result),
+      challengeStatusUpdated: await this.challengeStatusToDtoMapper.transform(result),
     });
 
     return result;
@@ -179,7 +179,7 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
     });
 
     await this.pubSub.publish(NotificationEnum.CHALLENGE_STATUS_UPDATED, {
-      challengeStatusUpdated: this.challengeStatusToDtoMapper.transform(result),
+      challengeStatusUpdated: await this.challengeStatusToDtoMapper.transform(result),
     });
 
     return result;
@@ -205,7 +205,7 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
     });
 
     await this.pubSub.publish(NotificationEnum.CHALLENGE_STATUS_UPDATED, {
-      challengeStatusUpdated: this.challengeStatusToDtoMapper.transform(result),
+      challengeStatusUpdated: await this.challengeStatusToDtoMapper.transform(result),
     });
 
     return result;
@@ -231,7 +231,7 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
     });
 
     await this.pubSub.publish(NotificationEnum.CHALLENGE_STATUS_UPDATED, {
-      challengeStatusUpdated: this.challengeStatusToDtoMapper.transform(result),
+      challengeStatusUpdated: await this.challengeStatusToDtoMapper.transform(result),
     });
 
     return result;

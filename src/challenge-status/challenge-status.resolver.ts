@@ -25,6 +25,7 @@ import { ActivityService } from '../evaluation-engine/activity.service';
 import { GameDto } from '../game/dto/game.dto';
 import { GameService } from '../game/game.service';
 import { GameToDtoMapper } from '../game/mappers/game-to-dto.mapper';
+import { GqlRequestedPlayerGuard } from 'src/common/guards/gql-requested-player.guard';
 
 @Resolver(() => ChallengeStatusDto)
 export class ChallengeStatusResolver {
@@ -115,9 +116,15 @@ export class ChallengeStatusResolver {
     return this.challengeStatusService.progress(challenge.game, challengeId, player);
   }
 
-  @Subscription(() => ChallengeStatusDto)
-  challengeStatusUpdated(): AsyncIterator<ChallengeStatusDto> {
-    //eslint-disable-next-line  @typescript-eslint/explicit-module-boundary-types
+  @Roles(Role.STUDENT)
+  @UseGuards(GqlPlayerOfGuard, GqlRequestedPlayerGuard)
+  @Subscription(() => ChallengeStatusDto, {
+    filter: (payload, variables) => payload.challengeStatusUpdated.player === variables.playerId,
+  })
+  challengeStatusUpdated(
+    @Args('playerId') playerId: string,
+    @Args('gameId') gameId: string,
+  ): AsyncIterator<ChallengeStatusDto> {
     return this.pubSub.asyncIterator(NotificationEnum.CHALLENGE_STATUS_UPDATED);
   }
 }

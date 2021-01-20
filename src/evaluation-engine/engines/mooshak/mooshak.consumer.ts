@@ -145,7 +145,7 @@ export class MooshakConsumer {
     });
 
     await this.pubSub.publish(NotificationEnum.SUBMISSION_EVALUATED, {
-      submissionEvaluated: this.submissionToDtoMapper.transform(submission),
+      submissionEvaluated: await this.submissionToDtoMapper.transform(submission),
     });
 
     await this.eventService.fireEvent(TriggerEvent.SUBMISSION_EVALUATED, {
@@ -242,7 +242,7 @@ export class MooshakConsumer {
     });
 
     await this.pubSub.publish(NotificationEnum.VALIDATION_PROCESSED, {
-      validation: this.submissionToDtoMapper.transform(validation),
+      validation: await this.submissionToDtoMapper.transform(validation),
     });
 
     await this.eventService.fireEvent(TriggerEvent.VALIDATION_PROCESSED, {

@@ -59,10 +59,11 @@ import { ScheduleModule } from '@nestjs/schedule';
       }),
       subscriptions: {
         onConnect: (connectionParams: { [key: string]: any }, websocket: { [key: string]: any }) => {
+          console.log(connectionParams);
+          console.log(connectionParams.autorization);
           return {
             headers: {
               ...websocket?.upgradeReq?.headers,
-              authorization: connectionParams.authorization,
             },
           };
         },

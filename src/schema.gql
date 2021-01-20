@@ -521,6 +521,9 @@ type Query {
   submission(id: String!, gameId: String!): Submission!
   submissions(exerciseId: String, gameId: String!, userId: String!): [Submission!]!
   mySubmissions(exerciseId: String, gameId: String!): [Submission!]!
+  validation(id: String!, gameId: String!): Validation!
+  validations(exerciseId: String, gameId: String!, userId: String!): [Validation!]!
+  myValidations(exerciseId: String, gameId: String!): [Validation!]!
   groups(gameId: String!): [Group!]!
   group(id: String!, gameId: String!): Group!
   groupInGame(gameId: String!): Group!
@@ -545,13 +548,11 @@ type Query {
   user(id: String!): User!
   users: [User!]!
   usersByRole(role: String!): [User!]!
-  validation(id: String!, gameId: String!): Validation!
-  validations(exerciseId: String, gameId: String!, userId: String!): [Validation!]!
-  myValidations(exerciseId: String, gameId: String!): [Validation!]!
 }
 
 type Mutation {
   evaluate(gameId: String!, exerciseId: String!, file: Upload!): Submission
+  validate(gameId: String!, exerciseId: String!, file: Upload!, inputs: [String!] = []): Validation
   saveGroup(id: ID, groupInput: GroupInput!, gameId: String!): Group!
   autoAssignGroups(gameId: String!): [Group!]!
   enroll(gameId: String!): Player!
@@ -562,17 +563,6 @@ type Mutation {
   assignInstructor(userId: String!, gameId: String!): Game!
   login(username: String, password: String, scope: String, refreshToken: String, redirectUri: String): Auth!
   logout(redirectUri: String): LogoutResponse!
-  evaluate(gameId: String!, exerciseId: String!, file: Upload!): Submission
-  validate(gameId: String!, exerciseId: String!, file: Upload!, inputs: [String!] = []): Validation
-}
-
-input GameInput {
-  name: String!
-  description: String
-  gedilLayerId: String
-  gedilLayerDescription: String
-  startDate: Date
-  endDate: Date
 }
 
 """The `Upload` scalar type represents a file upload."""
@@ -594,14 +584,14 @@ input GameInput {
 }
 
 type Subscription {
-  rewardReceived: Reward!
-  rewardRemoved: Reward!
-  rewardSubtracted: Reward!
-  submissionEvaluated: Submission!
-  submissionSent: Submission!
-  playerEnrolled: Player!
-  playerLeft: Player!
-  pointsUpdated: Float!
-  challengeStatusUpdated: ChallengeStatus!
-  validationProcessed: Validation!
+  rewardReceived(playerId: String!): PlayerReward!
+  rewardRemoved(playerId: String!): PlayerReward!
+  rewardSubtracted(playerId: String!): PlayerReward!
+  submissionEvaluated(gameId: String!, playerId: String!): Submission!
+  submissionSent(gameId: String!, playerId: String!): Submission!
+  validationProcessed(gameId: String!, playerId: String!): Validation!
+  playerEnrolled(gameId: String!): Player!
+  playerLeft(gameId: String!): Player!
+  pointsUpdated(gameId: String!, playerId: String!): Float!
+  challengeStatusUpdated(gameId: String!, playerId: String!): ChallengeStatus!
 }

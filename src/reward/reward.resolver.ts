@@ -21,6 +21,8 @@ import { Roles } from '../keycloak/decorators/roles.decorator';
 import { Role } from '../common/enums/role.enum';
 import { GqlInstructorAssignedGuard } from '../common/guards/gql-instructor-assigned.guard';
 import { GqlPlayerOfGuard } from '../common/guards/gql-player-of.guard';
+import { GqlRequestedPlayerGuard } from 'src/common/guards/gql-requested-player.guard';
+import { PlayerRewardDto } from 'src/player-reward/dto/player-reward.dto';
 
 @Resolver(() => RewardDto, { isAbstract: true })
 export class RewardResolver {
@@ -73,18 +75,27 @@ export class RewardResolver {
     return Promise.all(players.map(async player => this.playerToDtoMapper.transform(player)));
   }
 
-  @Subscription(() => RewardDto)
-  rewardReceived(): AsyncIterator<Reward> {
+  @Roles(Role.STUDENT)
+  @Subscription(() => PlayerRewardDto, {
+    filter: (payload, variables) => payload.rewardReceived.player === variables.playerId,
+  })
+  rewardReceived(@Args('playerId') playerId: string): AsyncIterator<Reward> {
     return this.pubSub.asyncIterator(NotificationEnum.REWARD_RECEIVED);
   }
 
-  @Subscription(() => RewardDto)
-  rewardRemoved(): AsyncIterator<Reward> {
+  @Roles(Role.STUDENT)
+  @Subscription(() => PlayerRewardDto, {
+    filter: async (payload, variables) => payload.rewardRemoved.player === variables.playerId,
+  })
+  rewardRemoved(@Args('playerId') playerId: string): AsyncIterator<Reward> {
     return this.pubSub.asyncIterator(NotificationEnum.REWARD_REMOVED);
   }
 
-  @Subscription(() => RewardDto)
-  rewardSubtracted(): AsyncIterator<Reward> {
+  @Roles(Role.STUDENT)
+  @Subscription(() => PlayerRewardDto, {
+    filter: (payload, variables) => payload.rewardSubtracted.player === variables.playerId,
+  })
+  rewardSubtracted(@Args('playerId') playerId: string): AsyncIterator<Reward> {
     return this.pubSub.asyncIterator(NotificationEnum.REWARD_SUBSTRACTED);
   }
 }
