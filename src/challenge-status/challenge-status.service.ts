@@ -15,6 +15,7 @@ import { ChallengeDto } from 'src/challenge/dto/challenge.dto';
 import { Challenge } from '../challenge/models/challenge.model';
 import { ChallengeService } from '../challenge/challenge.service';
 import { ActivityService } from '../evaluation-engine/activity.service';
+import { NotificationService } from '../notifications/notification.service';
 
 @Injectable()
 export class ChallengeStatusService extends BaseService<ChallengeStatus, ChallengeStatusDocument> {
@@ -27,6 +28,7 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
     protected readonly repository: ChallengeStatusRepository,
     protected readonly eventService: EventService,
     protected readonly activityService: ActivityService,
+    protected readonly notificationService: NotificationService,
   ) {
     super(new Logger(ChallengeStatusService.name), repository);
   }
@@ -65,10 +67,7 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
       challengeId,
     });
 
-    await this.pubSub.publish(NotificationEnum.CHALLENGE_STATUS_UPDATED, {
-      challengeStatusUpdated: await this.challengeStatusToDtoMapper.transform(result),
-    });
-
+    await this.notificationService.sendNotification(NotificationEnum.CHALLENGE_STATUS_UPDATED, result, gameId);
     return result;
   }
 
@@ -92,9 +91,7 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
       challengeId,
     });
 
-    await this.pubSub.publish(NotificationEnum.CHALLENGE_STATUS_UPDATED, {
-      challengeStatusUpdated: await this.challengeStatusToDtoMapper.transform(result),
-    });
+    await this.notificationService.sendNotification(NotificationEnum.CHALLENGE_STATUS_UPDATED, result, gameId);
 
     return result;
   }
@@ -122,9 +119,7 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
       challengeId,
     });
 
-    await this.pubSub.publish(NotificationEnum.CHALLENGE_STATUS_UPDATED, {
-      challengeStatusUpdated: await this.challengeStatusToDtoMapper.transform(result),
-    });
+    await this.notificationService.sendNotification(NotificationEnum.CHALLENGE_STATUS_UPDATED, result, gameId);
 
     return result;
   }
@@ -149,9 +144,7 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
       challengeId,
     });
 
-    await this.pubSub.publish(NotificationEnum.CHALLENGE_STATUS_UPDATED, {
-      challengeStatusUpdated: await this.challengeStatusToDtoMapper.transform(result),
-    });
+    await this.notificationService.sendNotification(NotificationEnum.CHALLENGE_STATUS_UPDATED, result, gameId);
 
     return result;
   }
@@ -178,9 +171,7 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
       challengeId,
     });
 
-    await this.pubSub.publish(NotificationEnum.CHALLENGE_STATUS_UPDATED, {
-      challengeStatusUpdated: await this.challengeStatusToDtoMapper.transform(result),
-    });
+    await this.notificationService.sendNotification(NotificationEnum.CHALLENGE_STATUS_UPDATED, result, gameId);
 
     return result;
   }
@@ -204,9 +195,7 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
       challengeId,
     });
 
-    await this.pubSub.publish(NotificationEnum.CHALLENGE_STATUS_UPDATED, {
-      challengeStatusUpdated: await this.challengeStatusToDtoMapper.transform(result),
-    });
+    await this.notificationService.sendNotification(NotificationEnum.CHALLENGE_STATUS_UPDATED, result, gameId);
 
     return result;
   }
@@ -230,9 +219,7 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
       challengeId,
     });
 
-    await this.pubSub.publish(NotificationEnum.CHALLENGE_STATUS_UPDATED, {
-      challengeStatusUpdated: await this.challengeStatusToDtoMapper.transform(result),
-    });
+    await this.notificationService.sendNotification(NotificationEnum.CHALLENGE_STATUS_UPDATED, result, gameId);
 
     return result;
   }

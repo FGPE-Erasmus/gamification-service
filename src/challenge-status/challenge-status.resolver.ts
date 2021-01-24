@@ -25,7 +25,7 @@ import { ActivityService } from '../evaluation-engine/activity.service';
 import { GameDto } from '../game/dto/game.dto';
 import { GameService } from '../game/game.service';
 import { GameToDtoMapper } from '../game/mappers/game-to-dto.mapper';
-import { GqlRequestedPlayerGuard } from 'src/common/guards/gql-requested-player.guard';
+import { GqlRequestedPlayerGuard } from '../common/guards/gql-requested-player.guard';
 
 @Resolver(() => ChallengeStatusDto)
 export class ChallengeStatusResolver {
@@ -116,15 +116,29 @@ export class ChallengeStatusResolver {
     return this.challengeStatusService.progress(challenge.game, challengeId, player);
   }
 
+  //Subscription for students
   @Roles(Role.STUDENT)
   @UseGuards(GqlPlayerOfGuard, GqlRequestedPlayerGuard)
   @Subscription(() => ChallengeStatusDto, {
-    filter: (payload, variables) => payload.challengeStatusUpdated.player === variables.playerId,
+    filter: (payload, variables) =>
+      payload.challengeStatusUpdatedStudent.player === variables.playerId && payload.gameId === variables.gameId,
+    resolve: payload => payload.challengeStatusUpdatedStudent as ChallengeStatusDto,
   })
-  challengeStatusUpdated(
+  challengeStatusUpdatedStudent(
     @Args('playerId') playerId: string,
     @Args('gameId') gameId: string,
   ): AsyncIterator<ChallengeStatusDto> {
-    return this.pubSub.asyncIterator(NotificationEnum.CHALLENGE_STATUS_UPDATED);
+    return this.pubSub.asyncIterator(NotificationEnum.CHALLENGE_STATUS_UPDATED + '_STUDENT');
+  }
+
+  //Subscription for teachers
+  @Roles(Role.TEACHER)
+  @UseGuards(GqlInstructorAssignedGuard)
+  @Subscription(() => ChallengeStatusDto, {
+    filter: (payload, variables) => payload.gameId === variables.gameId,
+    resolve: payload => payload.challengeStatusUpdatedTeacher as ChallengeStatusDto,
+  })
+  challengeStatusUpdatedTeacher(@Args('gameId') gameId: string): AsyncIterator<ChallengeStatusDto> {
+    return this.pubSub.asyncIterator(NotificationEnum.CHALLENGE_STATUS_UPDATED + '_TEACHER');
   }
 }

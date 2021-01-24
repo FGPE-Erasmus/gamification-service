@@ -4,6 +4,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { GraphQLModule } from '@nestjs/graphql';
 import { MongooseModule } from '@nestjs/mongoose';
 import { GraphQLJSON } from 'graphql-type-json';
+import { ScheduleModule } from '@nestjs/schedule';
 
 import { appConfig } from './app.config';
 import { DateScalar } from './common/scalars/date.scalar';
@@ -22,7 +23,6 @@ import { SubscriptionsModule } from './common/subscriptions/subscriptions.module
 import { KeycloakModule } from './keycloak/keycloak.module';
 import { AuthGuard } from './keycloak/guards/auth.guard';
 import { ResourceGuard } from './keycloak/guards/resource.guard';
-import { ScheduleModule } from '@nestjs/schedule';
 
 @Global()
 @Module({
@@ -59,8 +59,6 @@ import { ScheduleModule } from '@nestjs/schedule';
       }),
       subscriptions: {
         onConnect: (connectionParams: { [key: string]: any }, websocket: { [key: string]: any }) => {
-          console.log(connectionParams);
-          console.log(connectionParams.autorization);
           return {
             headers: {
               ...websocket?.upgradeReq?.headers,

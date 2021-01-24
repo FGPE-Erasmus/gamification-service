@@ -40,25 +40,27 @@ import { ValidationService } from '../submission/validation.service';
 import { ValidationToDtoMapper } from '../submission/mappers/validation-to-dto.mapper';
 import { GqlRequestedPlayerGuard } from 'src/common/guards/gql-requested-player.guard';
 import { UserService } from '../keycloak/user.service';
+import { NotificationService } from '../notifications/notification.service';
 
 @Resolver(() => PlayerDto)
 export class PlayerResolver {
   constructor(
     @Inject('PUB_SUB') protected readonly pubSub: PubSub,
     protected readonly playerService: PlayerService,
-    protected readonly playerToDtoMapper: PlayerToDtoMapper,
     protected readonly gameService: GameService,
-    protected readonly gameToDtoMapper: GameToDtoMapper,
     protected readonly userService: UserService,
     protected readonly groupService: GroupService,
-    protected readonly groupToDtoMapper: GroupToDtoMapper,
     protected readonly submissionService: SubmissionService,
-    protected readonly submissionToDtoMapper: SubmissionToDtoMapper,
     protected readonly validationService: ValidationService,
-    protected readonly validationToDtoMapper: ValidationToDtoMapper,
     protected readonly challengeStatusService: ChallengeStatusService,
-    protected readonly challengeStatusToDtoMapper: ChallengeStatusToDtoMapper,
     protected readonly playerRewardService: PlayerRewardService,
+    protected readonly notificationService: NotificationService,
+    protected readonly challengeStatusToDtoMapper: ChallengeStatusToDtoMapper,
+    protected readonly groupToDtoMapper: GroupToDtoMapper,
+    protected readonly validationToDtoMapper: ValidationToDtoMapper,
+    protected readonly submissionToDtoMapper: SubmissionToDtoMapper,
+    protected readonly gameToDtoMapper: GameToDtoMapper,
+    protected readonly playerToDtoMapper: PlayerToDtoMapper,
     protected readonly playerRewardToDtoMapper: PlayerRewardToDtoMapper,
   ) {}
 
@@ -66,9 +68,8 @@ export class PlayerResolver {
   @Mutation(() => PlayerDto)
   async enroll(@GqlUserInfo('sub') userId: string, @Args('gameId') gameId: string): Promise<PlayerDto> {
     const player: Player = await this.playerService.enroll(gameId, userId);
-    await this.pubSub.publish(NotificationEnum.PLAYER_ENROLLED, {
-      playerEnrolled: await this.playerToDtoMapper.transform(player),
-    });
+    await this.notificationService.sendNotification(NotificationEnum.PLAYER_ENROLLED, player);
+
     return this.playerToDtoMapper.transform(player);
   }
 
@@ -77,9 +78,7 @@ export class PlayerResolver {
   @Mutation(() => PlayerDto)
   async addToGame(@Args('userId') userId: string, @Args('gameId') gameId: string): Promise<PlayerDto> {
     const player: Player = await this.playerService.enroll(gameId, userId);
-    await this.pubSub.publish(NotificationEnum.PLAYER_ENROLLED, {
-      player: await this.playerToDtoMapper.transform(player),
-    });
+    await this.notificationService.sendNotification(NotificationEnum.PLAYER_ENROLLED, player);
     return this.playerToDtoMapper.transform(player);
   }
 
@@ -88,7 +87,7 @@ export class PlayerResolver {
   @Mutation(() => PlayerDto)
   async removeFromGame(@Args('userId') userId: string, @Args('gameId') gameId: string): Promise<PlayerDto> {
     const player: Player = await this.playerService.removeFromGame(gameId, userId);
-    await this.pubSub.publish(NotificationEnum.PLAYER_LEFT, { player: await this.playerToDtoMapper.transform(player) });
+    await this.notificationService.sendNotification(NotificationEnum.PLAYER_LEFT, player);
     return this.playerToDtoMapper.transform(player);
   }
 
@@ -201,8 +200,9 @@ export class PlayerResolver {
     return Promise.all(rewards.map(async reward => this.playerRewardToDtoMapper.transform(reward)));
   }
 
-  @Roles(Role.STUDENT)
-  @UseGuards(GqlPlayerOfGuard)
+  //Subscriptions for both students and teachers
+  @Roles(Role.STUDENT, Role.TEACHER)
+  @UseGuards(GqlPlayerOfGuard, GqlInstructorAssignedGuard)
   @Subscription(() => PlayerDto, {
     filter: (payload, variables) => payload.playerEnrolled.game === variables.gameId,
   })
@@ -210,8 +210,8 @@ export class PlayerResolver {
     return this.pubSub.asyncIterator(NotificationEnum.PLAYER_ENROLLED);
   }
 
-  @Roles(Role.STUDENT)
-  @UseGuards(GqlPlayerOfGuard)
+  @Roles(Role.STUDENT, Role.TEACHER)
+  @UseGuards(GqlPlayerOfGuard, GqlInstructorAssignedGuard)
   @Subscription(() => PlayerDto, {
     filter: (payload, variables) => payload.playerLeft.game === variables.gameId,
   })
@@ -219,13 +219,24 @@ export class PlayerResolver {
     return this.pubSub.asyncIterator(NotificationEnum.PLAYER_LEFT);
   }
 
+  //Subscriptions for students
   @Roles(Role.STUDENT)
   @UseGuards(GqlPlayerOfGuard, GqlRequestedPlayerGuard)
-  @Subscription(() => Number, {
-    filter: (payload, variables) => payload.playerId === variables.playerId && payload.gameId === variables.gameId,
-    resolve: payload => payload.pointsUpdated,
+  @Subscription(() => PlayerDto, {
+    filter: (payload, variables) =>
+      payload.pointsUpdatedStudent.id === variables.playerId && payload.pointsUpdatedPlayer.game === variables.gameId,
   })
-  pointsUpdated(@Args('playerId') playerId: string, @Args('gameId') gameId: string): AsyncIterator<number> {
-    return this.pubSub.asyncIterator(NotificationEnum.POINTS_UPDATED);
+  pointsUpdatedStudent(@Args('playerId') playerId: string, @Args('gameId') gameId: string): AsyncIterator<PlayerDto> {
+    return this.pubSub.asyncIterator(NotificationEnum.POINTS_UPDATED + '_STUDENT');
+  }
+
+  //Subscriptions for teachers
+  @Roles(Role.TEACHER)
+  @UseGuards(GqlInstructorAssignedGuard)
+  @Subscription(() => PlayerDto, {
+    filter: (payload, variables) => payload.pointsUpdatedTeacher.game === variables.gameId,
+  })
+  pointsUpdatedTeacher(@Args('gameId') gameId: string): AsyncIterator<PlayerDto> {
+    return this.pubSub.asyncIterator(NotificationEnum.POINTS_UPDATED + '_TEACHER');
   }
 }

@@ -13,6 +13,7 @@ import { PlayerSchema } from './models/player.model';
 import { PlayerRepository } from './repositories/player.repository';
 import { PlayerToDtoMapper } from './mappers/player-to-dto.mapper';
 import { PlayerResolver } from './player.resolver';
+import { NotificationModule } from '../notifications/notification.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { PlayerResolver } from './player.resolver';
     forwardRef(() => PlayerRewardModule),
     forwardRef(() => SubmissionModule),
     forwardRef(() => SubscriptionsModule),
+    forwardRef(() => NotificationModule),
   ],
   providers: [PlayerToDtoMapper, PlayerRepository, PlayerService, PlayerResolver],
   exports: [PlayerToDtoMapper, PlayerRepository, PlayerService],

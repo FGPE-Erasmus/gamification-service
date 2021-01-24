@@ -67,6 +67,10 @@ interface IAppConfig {
       name: string;
       jobOptions: JobOptions;
     };
+    notifications: {
+      name: string;
+      jobOptions: JobOptions;
+    };
   };
   logger: LoggerService | LogLevel[] | boolean;
 }
@@ -140,6 +144,13 @@ export const appConfig: IAppConfig = {
           type: 'exponential',
           delay: 2000,
         },
+      },
+    },
+    notifications: {
+      name: 'NOTIFICATIONS_QUEUE',
+      jobOptions: {
+        attempts: 5,
+        backoff: 2000,
       },
     },
   },

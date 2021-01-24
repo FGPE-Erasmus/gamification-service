@@ -24,18 +24,20 @@ import { EvaluationEngineService } from '../evaluation-engine/evaluation-engine.
 import { GqlRequestedPlayerGuard } from '../common/guards/gql-requested-player.guard';
 import { GqlInstructorAssignedGuard } from '../common/guards/gql-instructor-assigned.guard';
 import { GqlPlayerOfGuard } from '../common/guards/gql-player-of.guard';
+import { NotificationService } from '../notifications/notification.service';
 
 @Resolver(() => SubmissionDto)
 export class SubmissionResolver {
   constructor(
     @Inject('PUB_SUB') protected readonly pubSub: PubSub,
     protected readonly submissionService: SubmissionService,
-    protected readonly submissionToDtoMapper: SubmissionToDtoMapper,
     protected readonly gameService: GameService,
-    protected readonly gameToDtoMapper: GameToDtoMapper,
     protected readonly playerService: PlayerService,
-    protected readonly playerToDtoMapper: PlayerToDtoMapper,
     protected readonly evaluationEngineService: EvaluationEngineService,
+    protected readonly notificationService: NotificationService,
+    protected readonly submissionToDtoMapper: SubmissionToDtoMapper,
+    protected readonly gameToDtoMapper: GameToDtoMapper,
+    protected readonly playerToDtoMapper: PlayerToDtoMapper,
   ) {}
 
   @Roles(Role.TEACHER, Role.STUDENT)
@@ -91,11 +93,8 @@ export class SubmissionResolver {
       mimetype,
       content: await createReadStream(),
     });
-    const submissionDto = await this.submissionToDtoMapper.transform(submission);
-    await this.pubSub.publish(NotificationEnum.SUBMISSION_SENT, {
-      submissionSent: submissionDto,
-    });
-    return submissionDto;
+    await this.notificationService.sendNotification(NotificationEnum.SUBMISSION_SENT, submission);
+    return await this.submissionToDtoMapper.transform(submission);
   }
 
   @ResolveField('game', () => GameDto)
@@ -118,27 +117,50 @@ export class SubmissionResolver {
     return this.evaluationEngineService.getSubmissionProgram(submissionId);
   }
 
+  //Subscriptions for students
   @Roles(Role.STUDENT)
   @UseGuards(GqlPlayerOfGuard, GqlRequestedPlayerGuard)
   @Subscription(() => SubmissionDto, {
     filter: (payload, variables) =>
-      payload.submissionEvaluated.player === variables.playerId &&
-      payload.submissionEvaluated.game === variables.gameId,
+      payload.submissionEvaluatedStudent.player === variables.playerId &&
+      payload.submissionEvaluatedStudent.game === variables.gameId,
   })
-  submissionEvaluated(
+  submissionEvaluatedStudent(
     @Args('playerId') playerId: string,
     @Args('gameId') gameId: string,
   ): AsyncIterator<SubmissionDto> {
-    return this.pubSub.asyncIterator(NotificationEnum.SUBMISSION_EVALUATED);
+    return this.pubSub.asyncIterator(NotificationEnum.SUBMISSION_EVALUATED + '_STUDENT');
   }
 
   @Roles(Role.STUDENT)
   @UseGuards(GqlPlayerOfGuard, GqlRequestedPlayerGuard)
   @Subscription(() => SubmissionDto, {
     filter: (payload, variables) =>
-      payload.submissionSent.player === variables.playerId && payload.submissionSent.game === variables.gameId,
+      payload.submissionSentStudent.player === variables.playerId &&
+      payload.submissionSentStudent.game === variables.gameId,
   })
-  submissionSent(@Args('playerId') playerId: string, @Args('gameId') gameId: string): AsyncIterator<SubmissionDto> {
-    return this.pubSub.asyncIterator(NotificationEnum.SUBMISSION_SENT);
+  submissionSentStudent(
+    @Args('playerId') playerId: string,
+    @Args('gameId') gameId: string,
+  ): AsyncIterator<SubmissionDto> {
+    return this.pubSub.asyncIterator(NotificationEnum.SUBMISSION_SENT + '_STUDENT');
+  }
+  //Subscriptions for teachers
+  @Roles(Role.TEACHER)
+  @UseGuards(GqlInstructorAssignedGuard)
+  @Subscription(() => SubmissionDto, {
+    filter: (payload, variables) => payload.submissionEvaluatedTeacher.game === variables.gameId,
+  })
+  submissionEvaluatedTeacher(@Args('gameId') gameId: string): AsyncIterator<SubmissionDto> {
+    return this.pubSub.asyncIterator(NotificationEnum.SUBMISSION_EVALUATED + '_TEACHER');
+  }
+
+  @Roles(Role.TEACHER)
+  @UseGuards(GqlInstructorAssignedGuard)
+  @Subscription(() => SubmissionDto, {
+    filter: (payload, variables) => payload.submissionSentTeacher.game === variables.gameId,
+  })
+  submissionSentTeacher(@Args('gameId') gameId: string): AsyncIterator<SubmissionDto> {
+    return this.pubSub.asyncIterator(NotificationEnum.SUBMISSION_SENT + '_TEACHER');
   }
 }
