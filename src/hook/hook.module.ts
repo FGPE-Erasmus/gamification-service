@@ -1,5 +1,6 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { ScheduleModule } from '@nestjs/schedule';
 
 import { ChallengeModule } from '../challenge/challenge.module';
 import { ChallengeStatusModule } from '../challenge-status/challenge-status.module';
@@ -21,7 +22,7 @@ import { ActionHookRepository } from './repositories/action-hook.repository';
 import { ScheduledHookRepository } from './repositories/scheduled-hook.repository';
 import { ScheduledHookService } from './scheduled-hook.service';
 import { ScheduledHookResolver } from './scheduled-hook.resolver';
-import { ScheduleModule } from '@nestjs/schedule';
+import { NotificationModule } from '../notifications/notification.module';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     forwardRef(() => SubmissionModule),
     forwardRef(() => EventModule),
     forwardRef(() => SubscriptionsModule),
+    forwardRef(() => NotificationModule),
   ],
   providers: [
     ActionHookToDtoMapper,

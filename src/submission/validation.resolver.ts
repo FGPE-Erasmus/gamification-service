@@ -23,6 +23,7 @@ import { GqlPlayerOfGuard } from '../common/guards/gql-player-of.guard';
 import { EvaluationEngineService } from '../evaluation-engine/evaluation-engine.service';
 import { ValidateArgs } from './args/validate.args';
 import { ValidationToDtoMapper } from './mappers/validation-to-dto.mapper';
+import { GqlRequestedPlayerGuard } from '../common/guards/gql-requested-player.guard';
 
 @Resolver(() => ValidationDto)
 export class ValidationResolver {
@@ -119,8 +120,28 @@ export class ValidationResolver {
     return this.evaluationEngineService.getValidationProgram(validationId);
   }
 
-  @Subscription(() => ValidationDto)
-  validationProcessed(): AsyncIterator<ValidationDto> {
-    return this.pubSub.asyncIterator(NotificationEnum.VALIDATION_PROCESSED);
+  //Subscription for students
+  @Roles(Role.STUDENT)
+  @UseGuards(GqlPlayerOfGuard, GqlRequestedPlayerGuard)
+  @Subscription(() => ValidationDto, {
+    filter: (payload, variables) =>
+      payload.validationProcessedStudent.game === variables.gameId &&
+      payload.validationProcessedStudent.player === variables.playerId,
+  })
+  validationProcessedStudent(
+    @Args('playerId') playerId: string,
+    @Args('gameId') gameId: string,
+  ): AsyncIterator<ValidationDto> {
+    return this.pubSub.asyncIterator(NotificationEnum.VALIDATION_PROCESSED + '_STUDENT');
+  }
+
+  //Subscription for teachers
+  @Roles(Role.TEACHER)
+  @UseGuards(GqlInstructorAssignedGuard)
+  @Subscription(() => ValidationDto, {
+    filter: (payload, variables) => payload.validationProcessedTeacher.game === variables.gameId,
+  })
+  validationProcessedTeacher(@Args('gameId') gameId: string): AsyncIterator<ValidationDto> {
+    return this.pubSub.asyncIterator(NotificationEnum.VALIDATION_PROCESSED + '_TEACHER');
   }
 }

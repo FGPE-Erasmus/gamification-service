@@ -1,5 +1,6 @@
 import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { JSONPath } from 'jsonpath-plus';
+import { FilterQuery, MongooseFilterQuery, UpdateQuery } from 'mongoose';
 
 import { BaseService } from '../common/services/base.service';
 import { extractToJson } from '../common/utils/extraction.utils';
@@ -18,7 +19,8 @@ import { LeaderboardToDtoMapper } from './mappers/leaderboard-to-dto.mapper';
 import { Leaderboard, LeaderboardDocument } from './models/leaderboard.model';
 import { SortingOrder } from './models/sorting.enum';
 import { LeaderboardRepository } from './repositories/leaderboard.repository';
-import { MongooseFilterQuery } from 'mongoose';
+import { NotificationEnum } from '../common/enums/notifications.enum';
+import { NotificationService } from '../notifications/notification.service';
 
 @Injectable()
 export class LeaderboardService extends BaseService<Leaderboard, LeaderboardDocument> {
@@ -27,10 +29,54 @@ export class LeaderboardService extends BaseService<Leaderboard, LeaderboardDocu
     protected readonly toDtoMapper: LeaderboardToDtoMapper,
     @Inject(forwardRef(() => ChallengeService)) protected readonly challengeService: ChallengeService,
     protected readonly playerService: PlayerService,
-    protected readonly playerToDtoMapper: PlayerToDtoMapper,
+    protected readonly notificationService: NotificationService,
     protected readonly submissionService: SubmissionService,
+    protected readonly playerToDtoMapper: PlayerToDtoMapper,
   ) {
     super(new Logger(LeaderboardService.name), repository);
+  }
+
+  async create(input: Leaderboard): Promise<Leaderboard> {
+    const result = await super.create(input);
+    this.notificationService.sendNotification(NotificationEnum.LEADERBOARD_MODIFIED, result);
+    return result;
+  }
+
+  async update(id: string, input: Leaderboard): Promise<Leaderboard> {
+    const result = await super.update(id, input);
+    this.notificationService.sendNotification(NotificationEnum.LEADERBOARD_MODIFIED, result);
+    return result;
+  }
+
+  async patch(id: string, input: Partial<Leaderboard>): Promise<Leaderboard> {
+    const result = await super.patch(id, input);
+    this.notificationService.sendNotification(NotificationEnum.LEADERBOARD_MODIFIED, result);
+    return result;
+  }
+
+  async findOneAndUpdate(
+    conditions: FilterQuery<LeaderboardDocument>,
+    updates: UpdateQuery<LeaderboardDocument>,
+    options?: Record<string, unknown>,
+  ): Promise<Leaderboard> {
+    const result = await super.findOneAndUpdate(conditions, updates, options);
+    this.notificationService.sendNotification(NotificationEnum.LEADERBOARD_MODIFIED, result);
+    return result;
+  }
+
+  async delete(id: string, soft = false): Promise<Leaderboard> {
+    const result = await super.delete(id, soft);
+    this.notificationService.sendNotification(NotificationEnum.LEADERBOARD_MODIFIED, result);
+    return result;
+  }
+
+  async deleteOne(
+    conditions: FilterQuery<LeaderboardDocument>,
+    options?: Record<string, unknown>,
+  ): Promise<Leaderboard> {
+    const result = await super.deleteOne(conditions, options);
+    this.notificationService.sendNotification(NotificationEnum.LEADERBOARD_MODIFIED, result);
+    return result;
   }
 
   /**

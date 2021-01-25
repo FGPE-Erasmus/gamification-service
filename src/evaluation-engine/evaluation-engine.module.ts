@@ -17,6 +17,7 @@ import { PlayerModule } from '../player/player.module';
 import { ActivityResolver } from './activity.resolver';
 import { ActivityService } from './activity.service';
 import { ActivityStatusResolver } from './activity-status.resolver';
+import { NotificationModule } from '../notifications/notification.module';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { ActivityStatusResolver } from './activity-status.resolver';
     forwardRef(() => SubscriptionsModule),
     forwardRef(() => ChallengeModule),
     forwardRef(() => SubmissionModule),
+    forwardRef(() => NotificationModule),
   ],
   providers: [
     EvaluationEngineListener,

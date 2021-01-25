@@ -14,6 +14,8 @@ import { GameToDtoMapper } from './mappers/game-to-dto.mapper';
 import { GameSchema } from './models/game.model';
 import { GameRepository } from './repositories/game.repository';
 import { GameUploadController } from './upload.controller';
+import { NotificationModule } from '../notifications/notification.module';
+import { SubscriptionsModule } from '../common/subscriptions/subscriptions.module';
 
 @Module({
   imports: [
@@ -30,6 +32,8 @@ import { GameUploadController } from './upload.controller';
     forwardRef(() => HookModule),
     forwardRef(() => RewardModule),
     forwardRef(() => SubmissionModule),
+    forwardRef(() => NotificationModule),
+    forwardRef(() => SubscriptionsModule),
   ],
   controllers: [GameUploadController],
   providers: [GameToDtoMapper, GameRepository, GameService, GameResolver],

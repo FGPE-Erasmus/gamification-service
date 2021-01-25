@@ -32,6 +32,7 @@ import { ValidationService } from '../../../submission/validation.service';
 import { Validation } from '../../../submission/models/validation.model';
 import { IRequestValidationJobData } from '../../interfaces/request-validation-job-data.interface';
 import { ValidationDto } from '../../dto/validation.dto';
+import { NotificationService } from '../../../notifications/notification.service';
 
 @Processor(appConfig.queue.evaluation.name)
 export class MooshakConsumer {
@@ -45,6 +46,7 @@ export class MooshakConsumer {
     protected readonly submissionService: SubmissionService,
     protected readonly validationService: ValidationService,
     protected readonly challengeService: ChallengeService,
+    protected readonly notificationService: NotificationService,
     protected readonly submissionToDtoMapper: SubmissionToDtoMapper,
   ) {}
 
@@ -144,9 +146,7 @@ export class MooshakConsumer {
       evaluatedAt: result.evaluatedAt,
     });
 
-    await this.pubSub.publish(NotificationEnum.SUBMISSION_EVALUATED, {
-      submissionEvaluated: this.submissionToDtoMapper.transform(submission),
-    });
+    await this.notificationService.sendNotification(NotificationEnum.SUBMISSION_EVALUATED, submission);
 
     await this.eventService.fireEvent(TriggerEvent.SUBMISSION_EVALUATED, {
       gameId: submission.game,
@@ -241,9 +241,7 @@ export class MooshakConsumer {
       evaluatedAt: result.evaluatedAt,
     });
 
-    await this.pubSub.publish(NotificationEnum.VALIDATION_PROCESSED, {
-      validation: this.submissionToDtoMapper.transform(validation),
-    });
+    await this.notificationService.sendNotification(NotificationEnum.VALIDATION_PROCESSED, validation);
 
     await this.eventService.fireEvent(TriggerEvent.VALIDATION_PROCESSED, {
       gameId: validation.game,

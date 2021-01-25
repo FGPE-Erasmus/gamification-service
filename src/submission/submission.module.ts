@@ -19,6 +19,7 @@ import { ValidationResolver } from './validation.resolver';
 import { ValidationService } from './validation.service';
 import { ValidationRepository } from './repositories/validation.repository';
 import { ValidationToDtoMapper } from './mappers/validation-to-dto.mapper';
+import { NotificationModule } from '../notifications/notification.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { ValidationToDtoMapper } from './mappers/validation-to-dto.mapper';
     forwardRef(() => ChallengeModule),
     forwardRef(() => ChallengeStatusModule),
     forwardRef(() => SubscriptionsModule),
+    forwardRef(() => NotificationModule),
   ],
   providers: [
     SubmissionToDtoMapper,

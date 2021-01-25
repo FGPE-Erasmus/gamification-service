@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { FilterQuery, UpdateQuery } from 'mongoose';
 
 import { BaseService } from '../common/services/base.service';
 import { extractToJson } from '../common/utils/extraction.utils';
@@ -12,6 +13,8 @@ import { Reward, RewardDocument } from './models/reward.model';
 import { RewardRepository } from './repositories/reward.repository';
 import { TriggerEventEnum as TriggerEvent } from '../hook/enums/trigger-event.enum';
 import { CategoryEnum } from '../hook/enums/category.enum';
+import { NotificationEnum } from '../common/enums/notifications.enum';
+import { NotificationService } from '../notifications/notification.service';
 
 @Injectable()
 export class RewardService extends BaseService<Reward, RewardDocument> {
@@ -20,8 +23,49 @@ export class RewardService extends BaseService<Reward, RewardDocument> {
     protected readonly eventService: EventService,
     protected readonly playerService: PlayerService,
     protected readonly actionHookService: ActionHookService,
+    protected readonly notificationService: NotificationService,
   ) {
     super(new Logger(RewardService.name), repository);
+  }
+
+  async create(input: Reward): Promise<Reward> {
+    const result = await super.create(input);
+    this.notificationService.sendNotification(NotificationEnum.REWARD_MODIFIED, result);
+    return result;
+  }
+
+  async update(id: string, input: Reward): Promise<Reward> {
+    const result = await super.update(id, input);
+    this.notificationService.sendNotification(NotificationEnum.REWARD_MODIFIED, result);
+    return result;
+  }
+
+  async patch(id: string, input: Partial<Reward>): Promise<Reward> {
+    const result = await super.patch(id, input);
+    this.notificationService.sendNotification(NotificationEnum.REWARD_MODIFIED, result);
+    return result;
+  }
+
+  async findOneAndUpdate(
+    conditions: FilterQuery<RewardDocument>,
+    updates: UpdateQuery<RewardDocument>,
+    options?: Record<string, unknown>,
+  ): Promise<Reward> {
+    const result = await super.findOneAndUpdate(conditions, updates, options);
+    this.notificationService.sendNotification(NotificationEnum.REWARD_MODIFIED, result);
+    return result;
+  }
+
+  async delete(id: string, soft = false): Promise<Reward> {
+    const result = await super.delete(id, soft);
+    this.notificationService.sendNotification(NotificationEnum.REWARD_MODIFIED, result);
+    return result;
+  }
+
+  async deleteOne(conditions: FilterQuery<RewardDocument>, options?: Record<string, unknown>): Promise<Reward> {
+    const result = await super.deleteOne(conditions, options);
+    this.notificationService.sendNotification(NotificationEnum.REWARD_MODIFIED, result);
+    return result;
   }
 
   /**

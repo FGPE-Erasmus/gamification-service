@@ -13,7 +13,7 @@ import { EventModule } from '../event/event.module';
 import { GameModule } from '../game/game.module';
 import { HookModule } from 'src/hook/hook.module';
 import { EvaluationEngineModule } from '../evaluation-engine/evaluation-engine.module';
-
+import { NotificationModule } from 'src/notifications/notification.module';
 
 @Module({
   imports: [
@@ -30,6 +30,7 @@ import { EvaluationEngineModule } from '../evaluation-engine/evaluation-engine.m
     forwardRef(() => SubscriptionsModule),
     forwardRef(() => HookModule),
     forwardRef(() => EvaluationEngineModule),
+    forwardRef(() => NotificationModule),
   ],
   providers: [ChallengeStatusToDtoMapper, ChallengeStatusRepository, ChallengeStatusService, ChallengeStatusResolver],
   exports: [ChallengeStatusToDtoMapper, ChallengeStatusRepository, ChallengeStatusService],

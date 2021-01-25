@@ -21,6 +21,8 @@ import { Roles } from '../keycloak/decorators/roles.decorator';
 import { Role } from '../common/enums/role.enum';
 import { GqlInstructorAssignedGuard } from '../common/guards/gql-instructor-assigned.guard';
 import { GqlPlayerOfGuard } from '../common/guards/gql-player-of.guard';
+import { GqlRequestedPlayerGuard } from '../common/guards/gql-requested-player.guard';
+import { PlayerRewardDto } from '../player-reward/dto/player-reward.dto';
 
 @Resolver(() => RewardDto, { isAbstract: true })
 export class RewardResolver {
@@ -73,18 +75,74 @@ export class RewardResolver {
     return Promise.all(players.map(async player => this.playerToDtoMapper.transform(player)));
   }
 
-  @Subscription(() => RewardDto)
-  rewardReceived(): AsyncIterator<Reward> {
-    return this.pubSub.asyncIterator(NotificationEnum.REWARD_RECEIVED);
+  //Subscriptions for students
+  @Roles(Role.STUDENT)
+  @UseGuards(GqlPlayerOfGuard, GqlRequestedPlayerGuard)
+  @Subscription(() => PlayerRewardDto, {
+    filter: (payload, variables) =>
+      payload.rewardReceivedStudent.player === variables.playerId && payload.gameId === variables.gameId,
+    resolve: payload => payload.rewardReceivedStudent as PlayerRewardDto,
+  })
+  rewardReceivedStudent(@Args('playerId') playerId: string, @Args('gameId') gameId: string): AsyncIterator<Reward> {
+    return this.pubSub.asyncIterator(NotificationEnum.REWARD_RECEIVED + '_STUDENT');
   }
 
-  @Subscription(() => RewardDto)
-  rewardRemoved(): AsyncIterator<Reward> {
-    return this.pubSub.asyncIterator(NotificationEnum.REWARD_REMOVED);
+  @Roles(Role.STUDENT)
+  @UseGuards(GqlPlayerOfGuard, GqlRequestedPlayerGuard)
+  @Subscription(() => PlayerRewardDto, {
+    filter: async (payload, variables) =>
+      payload.rewardRemovedStudent.player === variables.playerId && payload.gameId === variables.gameId,
+    resolve: payload => payload.rewardRemovedStudent as PlayerRewardDto,
+  })
+  rewardRemovedStudent(@Args('playerId') playerId: string, @Args('gameId') gameId: string): AsyncIterator<Reward> {
+    return this.pubSub.asyncIterator(NotificationEnum.REWARD_REMOVED + '_STUDENT');
   }
 
+  @Roles(Role.STUDENT)
+  @UseGuards(GqlPlayerOfGuard, GqlRequestedPlayerGuard)
+  @Subscription(() => PlayerRewardDto, {
+    filter: (payload, variables) =>
+      payload.rewardSubtractedStudent.player === variables.playerId && payload.gameId === variables.gameId,
+    resolve: payload => payload.rewardSubtractedStudent as PlayerRewardDto,
+  })
+  rewardSubtractedStudent(@Args('playerId') playerId: string, @Args('gameId') gameId: string): AsyncIterator<Reward> {
+    return this.pubSub.asyncIterator(NotificationEnum.REWARD_SUBSTRACTED + '_STUDENT');
+  }
+
+  //Subscriptions for teachers
+  @Roles(Role.TEACHER)
+  @UseGuards(GqlInstructorAssignedGuard)
+  @Subscription(() => PlayerRewardDto, {
+    filter: (payload, variables) => payload.gameId === variables.gameId,
+    resolve: payload => payload.rewardReceivedTeacher as PlayerRewardDto,
+  })
+  rewardReceivedTeacher(@Args('gameId') gameId: string): AsyncIterator<Reward> {
+    return this.pubSub.asyncIterator(NotificationEnum.REWARD_RECEIVED + '_TEACHER');
+  }
+
+  @Roles(Role.TEACHER)
+  @UseGuards(GqlInstructorAssignedGuard)
+  @Subscription(() => PlayerRewardDto, {
+    filter: async (payload, variables) => payload.gameId === variables.gameId,
+    resolve: payload => payload.rewardRemovedTeacher as PlayerRewardDto,
+  })
+  rewardRemovedTeacher(@Args('gameId') gameId: string): AsyncIterator<Reward> {
+    return this.pubSub.asyncIterator(NotificationEnum.REWARD_REMOVED + '_TEACHER');
+  }
+
+  @Roles(Role.TEACHER)
+  @UseGuards(GqlInstructorAssignedGuard)
+  @Subscription(() => PlayerRewardDto, {
+    filter: (payload, variables) => payload.gameId === variables.gameId,
+    resolve: payload => payload.rewardSubtractedTeacher as PlayerRewardDto,
+  })
+  rewardSubtractedTeacher(@Args('gameId') gameId: string): AsyncIterator<Reward> {
+    return this.pubSub.asyncIterator(NotificationEnum.REWARD_SUBSTRACTED + '_TEACHER');
+  }
+
+  @Roles(Role.AUTHOR)
   @Subscription(() => RewardDto)
-  rewardSubtracted(): AsyncIterator<Reward> {
-    return this.pubSub.asyncIterator(NotificationEnum.REWARD_SUBSTRACTED);
+  rewardModified(): AsyncIterator<RewardDto> {
+    return this.pubSub.asyncIterator(NotificationEnum.REWARD_MODIFIED);
   }
 }
