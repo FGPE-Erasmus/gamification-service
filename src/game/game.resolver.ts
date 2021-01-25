@@ -1,5 +1,15 @@
-import { Args, GqlExecutionContext, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
-import { NotFoundException, UseGuards } from '@nestjs/common';
+import {
+  Args,
+  GqlExecutionContext,
+  Mutation,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
+  Subscription,
+} from '@nestjs/graphql';
+import { Inject, NotFoundException, UseGuards } from '@nestjs/common';
+import { PubSub } from 'graphql-subscriptions';
 
 import { ImportGameArgs } from './args/import-game.args';
 import { GameService } from './game.service';
@@ -26,10 +36,12 @@ import { ValidationToDtoMapper } from '../submission/mappers/validation-to-dto.m
 import { ValidationDto } from '../submission/dto/validation.dto';
 import { Validation } from '../submission/models/validation.model';
 import { UserService } from '../keycloak/user.service';
+import { NotificationEnum } from '../common/enums/notifications.enum';
 
 @Resolver(() => GameDto)
 export class GameResolver {
   constructor(
+    @Inject('PUB_SUB') protected readonly pubSub: PubSub,
     protected readonly gameService: GameService,
     protected readonly gameToDtoMapper: GameToDtoMapper,
     protected readonly userService: UserService,
@@ -117,5 +129,11 @@ export class GameResolver {
   async validations(@Parent() root: PlayerDto): Promise<ValidationDto[]> {
     const validations: Validation[] = await this.validationService.findAll({ _id: { $in: root.validations } });
     return Promise.all(validations.map(async validation => this.validationToDtoMapper.transform(validation)));
+  }
+
+  @Roles(Role.AUTHOR)
+  @Subscription(() => GameDto)
+  gameModified(): AsyncIterator<GameDto> {
+    return this.pubSub.asyncIterator(NotificationEnum.GAME_MODIFIED);
   }
 }

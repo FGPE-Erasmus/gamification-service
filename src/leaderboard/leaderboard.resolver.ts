@@ -1,5 +1,6 @@
-import { Resolver, Query, ResolveField, Parent, Args } from '@nestjs/graphql';
-import { NotFoundException, UseGuards } from '@nestjs/common';
+import { Resolver, Query, ResolveField, Parent, Args, Subscription, Mutation } from '@nestjs/graphql';
+import { Inject, NotFoundException, UseGuards } from '@nestjs/common';
+import { PubSub } from 'graphql-subscriptions/dist/pubsub';
 
 import { GqlInstructorAssignedGuard } from '../common/guards/gql-instructor-assigned.guard';
 import { GqlPlayerOfGuard } from '../common/guards/gql-player-of.guard';
@@ -15,10 +16,12 @@ import { Leaderboard } from './models/leaderboard.model';
 import { LeaderboardToDtoMapper } from './mappers/leaderboard-to-dto.mapper';
 import { Roles } from '../keycloak/decorators/roles.decorator';
 import { Role } from '../common/enums/role.enum';
+import { NotificationEnum } from '../common/enums/notifications.enum';
 
 @Resolver(() => LeaderboardDto)
 export class LeaderboardResolver {
   constructor(
+    @Inject('PUB_SUB') protected readonly pubSub: PubSub,
     protected readonly leaderboardService: LeaderboardService,
     protected readonly leaderboardToDtoMapper: LeaderboardToDtoMapper,
     protected readonly gameService: GameService,
@@ -61,5 +64,11 @@ export class LeaderboardResolver {
     }
     const parentChallenge = await this.challengeService.findById(parentChallengeId);
     return this.challengeToDtoMapper.transform(parentChallenge);
+  }
+
+  @Roles(Role.AUTHOR)
+  @Subscription(() => LeaderboardDto)
+  leaderboardModified(): AsyncIterator<LeaderboardDto> {
+    return this.pubSub.asyncIterator(NotificationEnum.LEADERBOARD_MODIFIED);
   }
 }

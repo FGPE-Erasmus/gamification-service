@@ -1,5 +1,6 @@
-import { NotFoundException, UseGuards } from '@nestjs/common';
-import { Args, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
+import { Inject, NotFoundException, UseGuards } from '@nestjs/common';
+import { Args, Mutation, Parent, Query, ResolveField, Resolver, Subscription } from '@nestjs/graphql';
+import { PubSub } from 'graphql-subscriptions';
 
 import { Role } from '../common/enums/role.enum';
 import { GameDto } from '../game/dto/game.dto';
@@ -14,10 +15,14 @@ import { GqlInstructorAssignedGuard } from '../common/guards/gql-instructor-assi
 import { GqlPlayerOfGuard } from '../common/guards/gql-player-of.guard';
 import { ActivityDto } from '../evaluation-engine/dto/activity.dto';
 import { ActivityService } from '../evaluation-engine/activity.service';
+import { NotificationEnum } from '../common/enums/notifications.enum';
+import { Difficulty } from './models/difficulty.enum';
+import { Mode } from './models/mode.enum';
 
 @Resolver(() => ChallengeDto)
 export class ChallengeResolver {
   constructor(
+    @Inject('PUB_SUB') protected readonly pubSub: PubSub,
     protected readonly challengeService: ChallengeService,
     protected readonly challengeToDtoMapper: ChallengeToDtoMapper,
     protected readonly gameService: GameService,
@@ -70,5 +75,11 @@ export class ChallengeResolver {
       activities.push(activity);
     }
     return activities;
+  }
+
+  @Roles(Role.AUTHOR)
+  @Subscription(() => ChallengeDto)
+  challengeModified(): AsyncIterator<ChallengeDto> {
+    return this.pubSub.asyncIterator(NotificationEnum.CHALLENGE_MODIFIED);
   }
 }

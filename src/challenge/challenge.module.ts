@@ -6,6 +6,9 @@ import { GameModule } from '../game/game.module';
 import { HookModule } from '../hook/hook.module';
 import { LeaderboardModule } from '../leaderboard/leaderboard.module';
 import { RewardModule } from '../reward/reward.module';
+import { ChallengeStatusModule } from '../challenge-status/challenge-status.module';
+import { EvaluationEngineModule } from '../evaluation-engine/evaluation-engine.module';
+import { NotificationModule } from '../notifications/notification.module';
 
 import { ChallengeService } from './challenge.service';
 import { ChallengeResolver } from './challenge.resolver';
@@ -13,8 +16,6 @@ import { ChallengeToDtoMapper } from './mappers/challenge-to-dto.mapper';
 import { ChallengeSchema } from './models/challenge.model';
 import { ChallengeRepository } from './repositories/challenge.repository';
 import { PlayerModule } from '../player/player.module';
-import { EvaluationEngineModule } from '../evaluation-engine/evaluation-engine.module';
-import { ChallengeStatusModule } from 'src/challenge-status/challenge-status.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { ChallengeStatusModule } from 'src/challenge-status/challenge-status.mod
     forwardRef(() => RewardModule),
     forwardRef(() => SubscriptionsModule),
     forwardRef(() => ChallengeStatusModule),
+    forwardRef(() => NotificationModule),
   ],
   providers: [ChallengeToDtoMapper, ChallengeRepository, ChallengeService, ChallengeResolver],
   exports: [ChallengeToDtoMapper, ChallengeRepository, ChallengeService],

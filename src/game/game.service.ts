@@ -1,5 +1,6 @@
 import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { Parse } from 'unzipper';
+import { FilterQuery, UpdateQuery } from 'mongoose';
 
 import { IFile } from '../common/interfaces/file.interface';
 import { BaseService } from '../common/services/base.service';
@@ -14,6 +15,8 @@ import { GameRepository } from './repositories/game.repository';
 import { UserDto } from '../keycloak/dto/user.dto';
 import { ScheduledHookService } from '../hook/scheduled-hook.service';
 import { UserService } from '../keycloak/user.service';
+import { NotificationService } from '../notifications/notification.service';
+import { NotificationEnum } from '../common/enums/notifications.enum';
 
 @Injectable()
 export class GameService extends BaseService<Game, GameDocument> {
@@ -22,11 +25,52 @@ export class GameService extends BaseService<Game, GameDocument> {
     protected readonly userService: UserService,
     protected readonly rewardService: RewardService,
     protected readonly leaderboardService: LeaderboardService,
+    protected readonly notificationService: NotificationService,
     @Inject(forwardRef(() => ChallengeService)) protected readonly challengeService: ChallengeService,
     @Inject(forwardRef(() => ScheduledHookService)) protected readonly scheduledHookService: ScheduledHookService,
     @Inject(forwardRef(() => HookService)) protected readonly hookService: HookService,
   ) {
     super(new Logger(GameService.name), repository);
+  }
+
+  async create(input: Game): Promise<Game> {
+    const result = await super.create(input);
+    this.notificationService.sendNotification(NotificationEnum.GAME_MODIFIED, result);
+    return result;
+  }
+
+  async update(id: string, input: Game): Promise<Game> {
+    const result = await super.update(id, input);
+    this.notificationService.sendNotification(NotificationEnum.GAME_MODIFIED, result);
+    return result;
+  }
+
+  async patch(id: string, input: Partial<Game>): Promise<Game> {
+    const result = await super.patch(id, input);
+    this.notificationService.sendNotification(NotificationEnum.GAME_MODIFIED, result);
+    return result;
+  }
+
+  async findOneAndUpdate(
+    conditions: FilterQuery<GameDocument>,
+    updates: UpdateQuery<GameDocument>,
+    options?: Record<string, unknown>,
+  ): Promise<Game> {
+    const result = await super.findOneAndUpdate(conditions, updates, options);
+    this.notificationService.sendNotification(NotificationEnum.GAME_MODIFIED, result);
+    return result;
+  }
+
+  async delete(id: string, soft = false): Promise<Game> {
+    const result = await super.delete(id, soft);
+    this.notificationService.sendNotification(NotificationEnum.GAME_MODIFIED, result);
+    return result;
+  }
+
+  async deleteOne(conditions: FilterQuery<GameDocument>, options?: Record<string, unknown>): Promise<Game> {
+    const result = await super.deleteOne(conditions, options);
+    this.notificationService.sendNotification(NotificationEnum.GAME_MODIFIED, result);
+    return result;
   }
 
   /**

@@ -20,6 +20,7 @@ import { RevealResolver } from './reveal.resolver';
 import { RewardSchema } from './models/reward.model';
 import { RewardRepository } from './repositories/reward.repository';
 import { RewardToDtoMapper } from './mappers/reward-to-dto.mapper';
+import { NotificationModule } from '../notifications/notification.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { RewardToDtoMapper } from './mappers/reward-to-dto.mapper';
     forwardRef(() => PlayerModule),
     forwardRef(() => HookModule),
     forwardRef(() => SubscriptionsModule),
+    forwardRef(() => NotificationModule),
   ],
   providers: [
     RewardToDtoMapper,

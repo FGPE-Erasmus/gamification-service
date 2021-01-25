@@ -11,6 +11,8 @@ import { LeaderboardRepository } from './repositories/leaderboard.repository';
 import { LeaderboardResolver } from './leaderboard.resolver';
 import { LeaderboardToDtoMapper } from './mappers/leaderboard-to-dto.mapper';
 import { RankingResolver } from './ranking.resolver';
+import { NotificationModule } from '../notifications/notification.module';
+import { SubscriptionsModule } from 'src/common/subscriptions/subscriptions.module';
 
 @Module({
   imports: [
@@ -19,6 +21,8 @@ import { RankingResolver } from './ranking.resolver';
     forwardRef(() => ChallengeModule),
     forwardRef(() => PlayerModule),
     forwardRef(() => SubmissionModule),
+    forwardRef(() => SubscriptionsModule),
+    forwardRef(() => NotificationModule),
   ],
   providers: [LeaderboardToDtoMapper, LeaderboardRepository, LeaderboardService, LeaderboardResolver, RankingResolver],
   exports: [LeaderboardToDtoMapper, LeaderboardService],

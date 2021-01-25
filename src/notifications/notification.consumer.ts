@@ -106,19 +106,19 @@ export class NotificationConsumer {
         });
       case NotificationEnum.GAME_MODIFIED:
         await this.pubSub.publish(NotificationEnum.GAME_MODIFIED, {
-          gameModification: payload as GameDto,
+          gameModified: payload as GameDto,
         });
       case NotificationEnum.CHALLENGE_MODIFIED:
         await this.pubSub.publish(NotificationEnum.CHALLENGE_MODIFIED, {
-          challengeModification: payload as ChallengeDto,
+          challengeModified: payload as ChallengeDto,
         });
       case NotificationEnum.LEADERBOARD_MODIFIED:
         await this.pubSub.publish(NotificationEnum.LEADERBOARD_MODIFIED, {
-          leaderboardModification: payload as LeaderboardDto,
+          leaderboardModified: payload as LeaderboardDto,
         });
       case NotificationEnum.REWARD_MODIFIED:
         await this.pubSub.publish(NotificationEnum.REWARD_MODIFIED, {
-          rewardModification: payload as RewardDto,
+          rewardModified: payload as RewardDto,
         });
     }
   }

@@ -139,4 +139,10 @@ export class RewardResolver {
   rewardSubtractedTeacher(@Args('gameId') gameId: string): AsyncIterator<Reward> {
     return this.pubSub.asyncIterator(NotificationEnum.REWARD_SUBSTRACTED + '_TEACHER');
   }
+
+  @Roles(Role.AUTHOR)
+  @Subscription(() => RewardDto)
+  rewardModified(): AsyncIterator<RewardDto> {
+    return this.pubSub.asyncIterator(NotificationEnum.REWARD_MODIFIED);
+  }
 }

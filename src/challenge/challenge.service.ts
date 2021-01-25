@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { FilterQuery, UpdateQuery } from 'mongoose';
 
 import { BaseService } from '../common/services/base.service';
 import { flatten } from '../common/utils/array.utils';
@@ -16,12 +17,14 @@ import { CategoryEnum } from '../hook/enums/category.enum';
 import { LeaderboardService } from '../leaderboard/leaderboard.service';
 import { RewardService } from '../reward/reward.service';
 import { Result } from '../submission/models/result.enum';
-
 import { Challenge, ChallengeDocument } from './models/challenge.model';
 import { Mode } from './models/mode.enum';
 import { ChallengeRepository } from './repositories/challenge.repository';
 import { ScheduledHookService } from '../hook/scheduled-hook.service';
 import { ConditionEmbed } from '../hook/models/embedded/condition.embed';
+import { NotificationEnum } from '../common/enums/notifications.enum';
+import { NotificationService } from '../notifications/notification.service';
+import { ChallengeToDtoMapper } from './mappers/challenge-to-dto.mapper';
 
 @Injectable()
 export class ChallengeService extends BaseService<Challenge, ChallengeDocument> {
@@ -32,8 +35,50 @@ export class ChallengeService extends BaseService<Challenge, ChallengeDocument> 
     protected readonly hookService: HookService,
     protected readonly actionHookService: ActionHookService,
     protected readonly scheduledHookService: ScheduledHookService,
+    protected readonly notificationService: NotificationService,
+    protected readonly challengeToDtoMapper: ChallengeToDtoMapper,
   ) {
     super(new Logger(ChallengeService.name), repository);
+  }
+
+  async create(input: Challenge): Promise<Challenge> {
+    const result = await super.create(input);
+    await this.notificationService.sendNotification(NotificationEnum.CHALLENGE_MODIFIED, result);
+    return result;
+  }
+
+  async update(id: string, input: Challenge): Promise<Challenge> {
+    const result = await super.update(id, input);
+    await this.notificationService.sendNotification(NotificationEnum.CHALLENGE_MODIFIED, result);
+    return result;
+  }
+
+  async patch(id: string, input: Partial<Challenge>): Promise<Challenge> {
+    const result = await super.patch(id, input);
+    this.notificationService.sendNotification(NotificationEnum.CHALLENGE_MODIFIED, result);
+    return result;
+  }
+
+  async findOneAndUpdate(
+    conditions: FilterQuery<ChallengeDocument>,
+    updates: UpdateQuery<ChallengeDocument>,
+    options?: Record<string, unknown>,
+  ): Promise<Challenge> {
+    const result = await super.findOneAndUpdate(conditions, updates, options);
+    this.notificationService.sendNotification(NotificationEnum.CHALLENGE_MODIFIED, result);
+    return result;
+  }
+
+  async delete(id: string, soft = false): Promise<Challenge> {
+    const result = await super.delete(id, soft);
+    this.notificationService.sendNotification(NotificationEnum.CHALLENGE_MODIFIED, result);
+    return result;
+  }
+
+  async deleteOne(conditions: FilterQuery<ChallengeDocument>, options?: Record<string, unknown>): Promise<Challenge> {
+    const result = await super.deleteOne(conditions, options);
+    this.notificationService.sendNotification(NotificationEnum.CHALLENGE_MODIFIED, result);
+    return result;
   }
 
   async importGEdIL(
