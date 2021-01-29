@@ -18,6 +18,8 @@ import { ActivityResolver } from './activity.resolver';
 import { ActivityService } from './activity.service';
 import { ActivityStatusResolver } from './activity-status.resolver';
 import { NotificationModule } from '../notifications/notification.module';
+import { BaseConsumer } from './engines/base/base.consumer';
+import { BaseService } from './engines/base/base-engine.service';
 
 @Module({
   imports: [
@@ -52,6 +54,8 @@ import { NotificationModule } from '../notifications/notification.module';
     EvaluationEngineService,
     MooshakService,
     MooshakConsumer,
+    BaseConsumer,
+    BaseService,
     ActivityService,
     ActivityResolver,
     ActivityStatusResolver,

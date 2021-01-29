@@ -13,17 +13,21 @@ import { SubmissionRepository } from './repositories/submission.repository';
 import { ChallengeService } from '../challenge/challenge.service';
 import { ChallengeDto } from '../challenge/dto/challenge.dto';
 import { Mode } from '../challenge/models/mode.enum';
+import { GameDto } from 'src/game/dto/game.dto';
+import { GameService } from 'src/game/game.service';
+import { GameStateEnum } from 'src/game/enum/game-state.enum';
 
 @Injectable()
 export class SubmissionService extends BaseService<Submission, SubmissionDocument> {
   constructor(
     protected readonly repository: SubmissionRepository,
     protected readonly eventService: EventService,
+    protected readonly playerService: PlayerService,
+    @Inject(forwardRef(() => GameService)) protected readonly gameService: GameService,
     @Inject(forwardRef(() => EvaluationEngineService))
     protected readonly evaluationEngineService: EvaluationEngineService,
     @Inject(forwardRef(() => ChallengeService)) protected readonly challengeService: ChallengeService,
     @Inject(forwardRef(() => ChallengeStatusService)) protected readonly challengeStatusService: ChallengeStatusService,
-    protected readonly playerService: PlayerService,
   ) {
     super(new Logger(SubmissionService.name), repository);
   }
@@ -40,6 +44,10 @@ export class SubmissionService extends BaseService<Submission, SubmissionDocumen
   }
 
   async evaluate(gameId: string, exerciseId: string, playerId: string, file: IFile): Promise<Submission> {
+    const game: GameDto = await this.gameService.findById(gameId);
+    if (game.state === GameStateEnum.LOCKED || game.state === GameStateEnum.CLOSED)
+      throw new Error('Submission sent for an unavailable game.');
+
     const challenge: ChallengeDto = await this.challengeService.findOne({
       game: gameId,
       refs: exerciseId,

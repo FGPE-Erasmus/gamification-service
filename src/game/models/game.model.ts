@@ -1,10 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 import { IBaseEntity } from '../../common/interfaces/base-entity.interface';
+import { GameStateEnum } from '../enum/game-state.enum';
 
 export interface Game extends IBaseEntity {
   name: string;
   description?: string;
+  state: GameStateEnum;
   gedilLayerId?: string;
   gedilLayerDescription?: string;
   startDate?: Date;
@@ -22,6 +24,9 @@ export class GameDocument extends Document implements Game {
 
   @Prop({ nullable: true })
   description?: string;
+
+  @Prop()
+  state: GameStateEnum;
 
   @Prop({ nullable: true })
   gedilLayerId?: string;

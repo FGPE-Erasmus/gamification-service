@@ -3,6 +3,7 @@ import { PlayerDto } from '../../player/dto/player.dto';
 import { SubmissionDto } from '../../submission/dto/submission.dto';
 import { UserDto } from '../../keycloak/dto/user.dto';
 import { ValidationDto } from '../../submission/dto/validation.dto';
+import { GameStateEnum } from '../enum/game-state.enum';
 
 @ObjectType('Game')
 export class GameDto {
@@ -11,6 +12,9 @@ export class GameDto {
 
   @Field()
   name?: string;
+
+  @Field(() => GameStateEnum)
+  state?: GameStateEnum;
 
   @Field({ nullable: true })
   description?: string;

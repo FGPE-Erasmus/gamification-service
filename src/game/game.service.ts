@@ -17,6 +17,8 @@ import { ScheduledHookService } from '../hook/scheduled-hook.service';
 import { UserService } from '../keycloak/user.service';
 import { NotificationService } from '../notifications/notification.service';
 import { NotificationEnum } from '../common/enums/notifications.enum';
+import { CategoryEnum } from 'src/hook/enums/category.enum';
+import { GameStateEnum } from './enum/game-state.enum';
 
 @Injectable()
 export class GameService extends BaseService<Game, GameDocument> {
@@ -93,6 +95,7 @@ export class GameService extends BaseService<Game, GameDocument> {
         const gedilLayer = extractToJson(buffer);
         game = await this.create({
           ...input,
+          state: GameStateEnum.LOCKED,
           gedilLayerId: gedilLayer.id,
           gedilLayerDescription: `[${gedilLayer.name}] ${gedilLayer.description}`,
         });
@@ -141,6 +144,39 @@ export class GameService extends BaseService<Game, GameDocument> {
     // rules
     for (const gedilId of Object.keys(entries.rules)) {
       subObjects.rules[gedilId] = await this.hookService.importGEdIL(subObjects, game, entries.rules[gedilId]);
+    }
+
+    //add scheduled hooks for start and end of the game
+    if (game.startDate.getTime() < new Date().getTime() || !game.startDate) {
+      await this.patch(game.id, { state: GameStateEnum.OPEN });
+    } else {
+      await this.scheduledHookService.create({
+        game: game.id?.toString(),
+        cron: game.startDate,
+        actions: [
+          {
+            type: CategoryEnum.UPDATE,
+            parameters: ['GAME', 'STATE', GameStateEnum.OPEN],
+          },
+        ],
+        recurrent: false,
+        active: true,
+      });
+    }
+
+    if (game.endDate) {
+      await this.scheduledHookService.create({
+        game: game.id?.toString(),
+        cron: game.endDate,
+        actions: [
+          {
+            type: CategoryEnum.UPDATE,
+            parameters: ['GAME', 'STATE', GameStateEnum.CLOSED],
+          },
+        ],
+        recurrent: false,
+        active: true,
+      });
     }
 
     await this.scheduledHookService.schedulingRoutine(game.id);

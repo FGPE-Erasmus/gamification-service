@@ -306,8 +306,8 @@ export class MooshakService implements IEngineService {
         return Result.PROCESSING;
       case 'VALIDATED':
       case 'ACCEPTED':
-      case 'PRESENTATION_ERROR':
         return Result.ACCEPT;
+      case 'PRESENTATION_ERROR':
       case 'WRONG_ANSWER':
         return Result.WRONG_ANSWER;
       case 'INVALID_SUBMISSION':

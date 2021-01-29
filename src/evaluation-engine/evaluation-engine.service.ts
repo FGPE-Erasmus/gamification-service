@@ -95,7 +95,9 @@ export class EvaluationEngineService {
 
   async evaluate(submissionId: string, file: IFile): Promise<void> {
     const content: string = await streamToString(file.content);
-    await this.evaluationQueue.add(REQUEST_EVALUATION_JOB, {
+    let jobName;
+    if (appConfig.useBaseEE) jobName = `BASE_${REQUEST_EVALUATION_JOB}`;
+    await this.evaluationQueue.add(jobName || REQUEST_EVALUATION_JOB, {
       submissionId,
       filename: file.filename,
       content,

@@ -11,7 +11,7 @@ export interface ScheduledHook extends IBaseEntity {
   criteria?: Criteria;
   actions: Action[];
   recurrent: boolean;
-  cron?: string;
+  cron?: string | Date;
   interval?: number;
   active: boolean;
   lastRun?: Date;
@@ -34,8 +34,8 @@ export class ScheduledHookDocument extends Document implements ScheduledHook {
   @Prop()
   recurrent: boolean;
 
-  @Prop({ nullable: true })
-  cron?: string;
+  @Prop({ type: String || Date, nullable: true })
+  cron?: string | Date;
 
   @Prop({ nullable: true })
   interval?: number;

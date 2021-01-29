@@ -31,6 +31,8 @@ import { ChallengeService } from '../challenge/challenge.service';
 import { Player } from '../player/models/player.model';
 import { PlayerToDtoMapper } from '../player/mappers/player-to-dto.mapper';
 import { NotificationService } from '../notifications/notification.service';
+import { GameService } from 'src/game/game.service';
+import { GameStateEnum } from 'src/game/enum/game-state.enum';
 
 @Injectable()
 export class HookService {
@@ -46,6 +48,7 @@ export class HookService {
     protected readonly playerRewardService: PlayerRewardService,
     protected readonly submissionService: SubmissionService,
     protected readonly eventService: EventService,
+    protected readonly gameService: GameService,
     protected readonly notificationService: NotificationService,
     protected readonly rewardToDtoMapper: RewardToDtoMapper,
     protected readonly playerRewardToDtoMapper: PlayerRewardToDtoMapper,
@@ -169,6 +172,7 @@ export class HookService {
         }),
     });
     if (meet) {
+      console.log('running actions');
       await this.runActions(hook.game, hook.actions, eventParams);
     }
   }
@@ -192,6 +196,8 @@ export class HookService {
           await this.runTakeActions(gameId, eventParams.playerId?.toString(), action.parameters);
           break;
         case Category.UPDATE:
+          console.log('running updates');
+
           await this.runUpdateActions(gameId, eventParams.playerId?.toString(), action.parameters);
           break;
       }
@@ -299,10 +305,29 @@ export class HookService {
    * @param {string[]} parameters Parameters of the event
    */
   private async runUpdateActions(gameId: string, playerId: string, parameters: string[]) {
-    if (parameters[0].toUpperCase() === 'PLAYER') {
-      await this.updatePlayer(gameId, playerId, parameters[1], parameters[2]);
-    } else if (parameters[0].toUpperCase() === 'CHALLENGE') {
-      await this.updateChallenge(gameId, parameters[1], playerId, parameters[2], parameters[3]);
+    console.log('running actions UPDATE');
+
+    switch (parameters[0].toUpperCase()) {
+      case 'PLAYER':
+        await this.updatePlayer(gameId, playerId, parameters[1], parameters[2]);
+      case 'CHALLENGE':
+        await this.updateChallenge(gameId, parameters[1], playerId, parameters[2], parameters[3]);
+      case 'GAME':
+        console.log('GAME');
+        await this.updateGame(gameId, parameters[1], parameters[2]);
+    }
+  }
+
+  private async updateGame(gameId: string, property: string, value: string): Promise<Game> {
+    switch (property.toUpperCase()) {
+      case 'STATE':
+        console.log('state updating');
+        if (value.toUpperCase() === GameStateEnum.CLOSED)
+          return await this.gameService.patch(gameId, { state: GameStateEnum.CLOSED });
+        else if (value.toUpperCase() === GameStateEnum.LOCKED)
+          return await this.gameService.patch(gameId, { state: GameStateEnum.LOCKED });
+        else if (value.toUpperCase() === GameStateEnum.OPEN)
+          return await this.gameService.patch(gameId, { state: GameStateEnum.OPEN });
     }
   }
 

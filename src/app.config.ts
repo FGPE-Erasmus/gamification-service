@@ -12,6 +12,7 @@ interface IAppConfig {
   isProduction: boolean;
   isDevelopment: boolean;
   isTesting: boolean;
+  useBaseEE: boolean;
   assetsPath: string;
   auth: {
     keycloak: {
@@ -52,6 +53,12 @@ interface IAppConfig {
     username: string;
     password: string;
   };
+  baseEngine: {
+    protocol: string;
+    host: string;
+    port: number;
+    urlPrefix: string;
+  };
   port: number;
   host: string;
   http: {
@@ -82,6 +89,7 @@ export const appConfig: IAppConfig = {
   isProduction: process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'prod',
   isDevelopment: process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'dev',
   isTesting: process.env.NODE_ENV === 'test',
+  useBaseEE: true,
   assetsPath: `${__dirname}/../assets`,
   auth: {
     keycloak: {
@@ -121,6 +129,12 @@ export const appConfig: IAppConfig = {
     urlPrefix: process.env.EE_URL_PREFIX,
     username: process.env.EE_USERNAME,
     password: process.env.EE_PASSWORD,
+  },
+  baseEngine: {
+    protocol: process.env.BASE_PROTOCOL,
+    host: process.env.BASE_HOST,
+    port: +process.env.BASE_PORT,
+    urlPrefix: process.env.BASE_URL_PREFIX,
   },
   port: +process.env.APP_PORT,
   host: process.env.APP_HOST,

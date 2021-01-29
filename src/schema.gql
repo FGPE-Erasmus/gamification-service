@@ -2,6 +2,56 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Activity {
+  game: Game!
+  id: String
+  name: String
+  title: String
+  timeout: Float
+  color: String
+  type: String
+  difficulty: String
+  statement: String
+  pdf: Boolean
+}
+
+type Challenge {
+  id: ID!
+  game: Game!
+  parentChallenge: Challenge
+  name: String!
+  description: String
+  difficulty: Difficulty!
+  mode: Mode!
+  modeParameters: [String!]!
+  refs: [Activity!]!
+  locked: Boolean!
+  hidden: Boolean!
+  createdAt: Date!
+  updatedAt: Date
+}
+
+enum Difficulty {
+  BEGINNER
+  EASY
+  AVERAGE
+  HARD
+  MASTER
+}
+
+enum Mode {
+  NORMAL
+  SHAPESHIFTER
+  SHORTENING
+  SPEEDUP
+  HACK_IT
+  TIME_BOMB
+  DUEL
+}
+
+"""Date custom scalar type"""
+scalar Date
+
 type Reward {
   id: ID!
   game: Game!
@@ -31,9 +81,6 @@ enum RewardType {
   MESSAGE
 }
 
-"""Date custom scalar type"""
-scalar Date
-
 type PlayerReward {
   id: ID!
   player: Player!
@@ -62,6 +109,7 @@ type Submission {
 
 enum EvaluationEngine {
   MOOSHAK
+  BASE
 }
 
 """
@@ -79,19 +127,6 @@ enum Result {
   RUNTIME_ERROR
   RESOURCE_USAGE_EXCEEDED
   ASK_FOR_REEVALUATION
-}
-
-type Activity {
-  game: Game!
-  id: String
-  name: String
-  title: String
-  timeout: Float
-  color: String
-  type: String
-  difficulty: String
-  statement: String
-  pdf: Boolean
 }
 
 type ActivityStatus {
@@ -180,6 +215,7 @@ type Player {
 type Game {
   id: ID!
   name: String!
+  state: GameStateEnum!
   description: String
   gedilLayerId: String
   gedilLayerDescription: String
@@ -193,38 +229,10 @@ type Game {
   updatedAt: Date
 }
 
-type Challenge {
-  id: ID!
-  game: Game!
-  parentChallenge: Challenge
-  name: String!
-  description: String
-  difficulty: Difficulty!
-  mode: Mode!
-  modeParameters: [String!]!
-  refs: [Activity!]!
-  locked: Boolean!
-  hidden: Boolean!
-  createdAt: Date!
-  updatedAt: Date
-}
-
-enum Difficulty {
-  BEGINNER
-  EASY
-  AVERAGE
-  HARD
-  MASTER
-}
-
-enum Mode {
-  NORMAL
-  SHAPESHIFTER
-  SHORTENING
-  SPEEDUP
-  HACK_IT
-  TIME_BOMB
-  DUEL
+enum GameStateEnum {
+  LOCKED
+  OPEN
+  CLOSED
 }
 
 type Badge {
@@ -532,7 +540,7 @@ type Query {
   player(userId: String!, gameId: String!): Player!
   myGameProfiles: [Player!]!
   challengeStatus(challengeId: String!, playerId: String!): ChallengeStatus!
-  myChallengeStatus(challengeId: String!): ChallengeStatus!
+  myChallengeStatus(gameId: String!, challengeId: String!): ChallengeStatus!
   actionHooks(gameId: String!): [ActionHook!]!
   scheduledHooks(gameId: String!): [ScheduledHook!]!
   leaderboards(gameId: String!): [Leaderboard!]!
