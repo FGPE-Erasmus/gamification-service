@@ -16,6 +16,9 @@ export class GameDto {
   @Field(() => GameStateEnum)
   state?: GameStateEnum;
 
+  @Field()
+  evaluationEngine?: string;
+
   @Field({ nullable: true })
   description?: string;
 

@@ -13,9 +13,9 @@ import { SubmissionRepository } from './repositories/submission.repository';
 import { ChallengeService } from '../challenge/challenge.service';
 import { ChallengeDto } from '../challenge/dto/challenge.dto';
 import { Mode } from '../challenge/models/mode.enum';
-import { GameDto } from 'src/game/dto/game.dto';
-import { GameService } from 'src/game/game.service';
-import { GameStateEnum } from 'src/game/enum/game-state.enum';
+import { GameDto } from '../game/dto/game.dto';
+import { GameService } from '../game/game.service';
+import { GameStateEnum } from '../game/enum/game-state.enum';
 
 @Injectable()
 export class SubmissionService extends BaseService<Submission, SubmissionDocument> {
@@ -69,7 +69,7 @@ export class SubmissionService extends BaseService<Submission, SubmissionDocumen
       exerciseId: exerciseId,
     });
 
-    await this.evaluationEngineService.evaluate(submission.id, file);
+    await this.evaluationEngineService.evaluate(gameId, submission.id, file);
 
     return submission;
   }

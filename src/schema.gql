@@ -216,6 +216,7 @@ type Game {
   id: ID!
   name: String!
   state: GameStateEnum!
+  evaluationEngine: String!
   description: String
   gedilLayerId: String
   gedilLayerDescription: String
@@ -589,6 +590,7 @@ input GameInput {
   gedilLayerDescription: String
   startDate: Date
   endDate: Date
+  evaluationEngine: EvaluationEngine
 }
 
 type Subscription {

@@ -4,7 +4,6 @@ import { Job, Queue } from 'bull';
 
 import { appConfig } from '../../../app.config';
 import { Submission } from '../../../submission/models/submission.model';
-import { Result } from '../../../submission/models/result.enum';
 import { SubmissionService } from '../../../submission/submission.service';
 import { EvaluationDto } from '../../dto/evaluation.dto';
 import {
@@ -42,67 +41,28 @@ export class BaseConsumer {
       $and: [{ refs: submission.exerciseId }, { game: submission.game }],
     });
 
-    // get a token
-    const { token } = await this.baseService.login(
-      submission.game as string,
-      appConfig.evaluationEngine.username,
-      appConfig.evaluationEngine.password,
-    );
-
     if (challenge && challenge.mode === Mode.HACK_IT) {
       modeParameters = challenge.modeParameters;
     }
 
     // evaluate the attempt
-    const result = await this.baseService.evaluate(
-      submission,
-      filename,
-      content,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      },
-      modeParameters,
-    );
+    const result = this.baseService.evaluate(submission, filename, content);
 
     submission = await this.submissionService.patch(submissionId, {
       evaluationEngine: result.evaluationEngine,
       evaluationEngineId: result.evaluationEngineId,
     });
 
-    await this.evaluationQueue.add(
-      `BASE_${WAIT_EVALUATION_RESULT_JOB}`,
-      {
-        submissionId,
-      },
-      {
-        backoff: WAIT_EVALUATION_RESULT_JOB_BACKOFF,
-        attempts: WAIT_EVALUATION_RESULT_JOB_ATTEMPTS,
-        timeout: WAIT_EVALUATION_RESULT_JOB_TIMEOUT,
-      },
-    );
+    await this.evaluationQueue.add(`BASE_${WAIT_EVALUATION_RESULT_JOB}`, { submissionId });
   }
 
   @Process(`BASE_${WAIT_EVALUATION_RESULT_JOB}`)
   async onWaitEvaluationResult(job: Job<unknown>): Promise<void> {
     const { submissionId } = job.data as { submissionId: string };
-    const submission: Submission = await this.submissionService.findById(submissionId);
 
-    // get a token
-    const { token } = await this.baseService.login(
-      submission.game as string,
-      appConfig.evaluationEngine.username,
-      appConfig.evaluationEngine.password,
-    );
+    const result: EvaluationDto = await this.baseService.getEvaluationReport();
 
-    // evaluate the attempt
-    const result: EvaluationDto = await this.baseService.getEvaluationReport(submission, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    if (result.result && result.result !== Result.PROCESSING) {
+    if (result.result) {
       await this.evaluationQueue.add(`BASE_${FINISH_EVALUATION_JOB}`, { submissionId, result });
       return;
     }
@@ -115,11 +75,8 @@ export class BaseConsumer {
     const { submissionId, result } = job.data as { submissionId: string; result: EvaluationDto };
 
     const submission: Submission = await this.submissionService.patch(submissionId, {
-      language: result.language,
       grade: result.grade,
       result: result.result,
-      metrics: result.metrics,
-      feedback: result.feedback,
       evaluatedAt: result.evaluatedAt,
     });
 
