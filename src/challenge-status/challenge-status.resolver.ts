@@ -65,6 +65,7 @@ export class ChallengeStatusResolver {
   async myChallengeStatus(
     @GqlPlayer('id') playerId: string,
     @Args('challengeId') challengeId: string,
+    @Args('gameId') gameId: string,
   ): Promise<ChallengeStatusDto> {
     const status: ChallengeStatus = await this.challengeStatusService.findByChallengeIdAndPlayerId(
       challengeId,

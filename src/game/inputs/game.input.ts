@@ -1,6 +1,7 @@
 import { Field, InputType } from '@nestjs/graphql';
 import { Type } from 'class-transformer';
-import { MinLength, MaxLength, IsString, IsOptional, IsDate, IsUUID } from 'class-validator';
+import { MinLength, MaxLength, IsString, IsOptional, IsDate, IsUUID, IsEnum } from 'class-validator';
+import { EvaluationEngine } from '../../submission/models/evaluation-engine.enum';
 
 @InputType()
 export class GameInput {
@@ -36,4 +37,9 @@ export class GameInput {
   @IsOptional()
   @IsDate()
   endDate?: Date;
+
+  @Field(() => EvaluationEngine, { nullable: true })
+  @IsOptional()
+  @IsEnum(EvaluationEngine)
+  evaluationEngine?: EvaluationEngine;
 }

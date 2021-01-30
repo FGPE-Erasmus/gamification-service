@@ -62,6 +62,7 @@ type Submission {
 
 enum EvaluationEngine {
   MOOSHAK
+  BASE
 }
 
 """
@@ -180,6 +181,8 @@ type Player {
 type Game {
   id: ID!
   name: String!
+  state: GameStateEnum!
+  evaluationEngine: String!
   description: String
   gedilLayerId: String
   gedilLayerDescription: String
@@ -191,6 +194,12 @@ type Game {
   validations: [Validation!]!
   createdAt: Date!
   updatedAt: Date
+}
+
+enum GameStateEnum {
+  LOCKED
+  OPEN
+  CLOSED
 }
 
 type Challenge {
@@ -532,7 +541,7 @@ type Query {
   player(userId: String!, gameId: String!): Player!
   myGameProfiles: [Player!]!
   challengeStatus(challengeId: String!, playerId: String!): ChallengeStatus!
-  myChallengeStatus(challengeId: String!): ChallengeStatus!
+  myChallengeStatus(gameId: String!, challengeId: String!): ChallengeStatus!
   actionHooks(gameId: String!): [ActionHook!]!
   scheduledHooks(gameId: String!): [ScheduledHook!]!
   leaderboards(gameId: String!): [Leaderboard!]!
@@ -581,6 +590,7 @@ input GameInput {
   gedilLayerDescription: String
   startDate: Date
   endDate: Date
+  evaluationEngine: EvaluationEngine
 }
 
 type Subscription {

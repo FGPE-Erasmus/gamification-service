@@ -13,6 +13,7 @@ import { Submission } from '../submission/models/submission.model';
 import { SubmissionService } from '../submission/submission.service';
 import { ValidationService } from '../submission/validation.service';
 import { Validation } from '../submission/models/validation.model';
+import { GameService } from '../game/game.service';
 
 @Injectable()
 export class EvaluationEngineService {
@@ -21,6 +22,7 @@ export class EvaluationEngineService {
   constructor(
     @Inject(forwardRef(() => ValidationService)) protected readonly validationService: ValidationService,
     @Inject(forwardRef(() => SubmissionService)) protected readonly submissionService: SubmissionService,
+    @Inject(forwardRef(() => GameService)) protected readonly gameService: GameService,
     protected readonly mooshakService: MooshakService,
     @InjectQueue(appConfig.queue.evaluation.name) protected readonly evaluationQueue: Queue,
   ) {}
@@ -93,9 +95,10 @@ export class EvaluationEngineService {
     });
   }
 
-  async evaluate(submissionId: string, file: IFile): Promise<void> {
+  async evaluate(gameId: string, submissionId: string, file: IFile): Promise<void> {
     const content: string = await streamToString(file.content);
-    await this.evaluationQueue.add(REQUEST_EVALUATION_JOB, {
+    const game = await this.gameService.findById(gameId);
+    await this.evaluationQueue.add(`${(game.evaluationEngine || 'BASE').toUpperCase()}_${REQUEST_EVALUATION_JOB}`, {
       submissionId,
       filename: file.filename,
       content,
