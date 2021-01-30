@@ -10,9 +10,6 @@ import {
   FINISH_EVALUATION_JOB,
   REQUEST_EVALUATION_JOB,
   WAIT_EVALUATION_RESULT_JOB,
-  WAIT_EVALUATION_RESULT_JOB_ATTEMPTS,
-  WAIT_EVALUATION_RESULT_JOB_BACKOFF,
-  WAIT_EVALUATION_RESULT_JOB_TIMEOUT,
 } from '../../evaluation-engine.constants';
 import { IRequestEvaluationJobData } from '../../interfaces/request-evaluation-job-data.interface';
 import { ChallengeService } from '../../../challenge/challenge.service';

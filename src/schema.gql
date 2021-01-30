@@ -2,56 +2,6 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type Activity {
-  game: Game!
-  id: String
-  name: String
-  title: String
-  timeout: Float
-  color: String
-  type: String
-  difficulty: String
-  statement: String
-  pdf: Boolean
-}
-
-type Challenge {
-  id: ID!
-  game: Game!
-  parentChallenge: Challenge
-  name: String!
-  description: String
-  difficulty: Difficulty!
-  mode: Mode!
-  modeParameters: [String!]!
-  refs: [Activity!]!
-  locked: Boolean!
-  hidden: Boolean!
-  createdAt: Date!
-  updatedAt: Date
-}
-
-enum Difficulty {
-  BEGINNER
-  EASY
-  AVERAGE
-  HARD
-  MASTER
-}
-
-enum Mode {
-  NORMAL
-  SHAPESHIFTER
-  SHORTENING
-  SPEEDUP
-  HACK_IT
-  TIME_BOMB
-  DUEL
-}
-
-"""Date custom scalar type"""
-scalar Date
-
 type Reward {
   id: ID!
   game: Game!
@@ -80,6 +30,9 @@ enum RewardType {
   HINT
   MESSAGE
 }
+
+"""Date custom scalar type"""
+scalar Date
 
 type PlayerReward {
   id: ID!
@@ -127,6 +80,19 @@ enum Result {
   RUNTIME_ERROR
   RESOURCE_USAGE_EXCEEDED
   ASK_FOR_REEVALUATION
+}
+
+type Activity {
+  game: Game!
+  id: String
+  name: String
+  title: String
+  timeout: Float
+  color: String
+  type: String
+  difficulty: String
+  statement: String
+  pdf: Boolean
 }
 
 type ActivityStatus {
@@ -234,6 +200,40 @@ enum GameStateEnum {
   LOCKED
   OPEN
   CLOSED
+}
+
+type Challenge {
+  id: ID!
+  game: Game!
+  parentChallenge: Challenge
+  name: String!
+  description: String
+  difficulty: Difficulty!
+  mode: Mode!
+  modeParameters: [String!]!
+  refs: [Activity!]!
+  locked: Boolean!
+  hidden: Boolean!
+  createdAt: Date!
+  updatedAt: Date
+}
+
+enum Difficulty {
+  BEGINNER
+  EASY
+  AVERAGE
+  HARD
+  MASTER
+}
+
+enum Mode {
+  NORMAL
+  SHAPESHIFTER
+  SHORTENING
+  SPEEDUP
+  HACK_IT
+  TIME_BOMB
+  DUEL
 }
 
 type Badge {

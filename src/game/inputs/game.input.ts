@@ -1,8 +1,7 @@
 import { Field, InputType } from '@nestjs/graphql';
 import { Type } from 'class-transformer';
 import { MinLength, MaxLength, IsString, IsOptional, IsDate, IsUUID, IsEnum } from 'class-validator';
-import { EvaluationEngineListener } from '../evaluation-engine/evaluation-engine.listener';
-import { EvaluationEngine } from '../submission/models/evaluation-engine.enum';
+import { EvaluationEngine } from '../../submission/models/evaluation-engine.enum';
 
 @InputType()
 export class GameInput {

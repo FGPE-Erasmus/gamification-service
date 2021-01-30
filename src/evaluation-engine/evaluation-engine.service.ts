@@ -13,7 +13,6 @@ import { Submission } from '../submission/models/submission.model';
 import { SubmissionService } from '../submission/submission.service';
 import { ValidationService } from '../submission/validation.service';
 import { Validation } from '../submission/models/validation.model';
-import { EvaluationEngine } from '../submission/models/evaluation-engine.enum';
 import { GameService } from '../game/game.service';
 
 @Injectable()
@@ -99,10 +98,7 @@ export class EvaluationEngineService {
   async evaluate(gameId: string, submissionId: string, file: IFile): Promise<void> {
     const content: string = await streamToString(file.content);
     const game = await this.gameService.findById(gameId);
-    let jobName;
-    if (!game.evaluationEngine || game.evaluationEngine.toUpperCase() === EvaluationEngine.BASE)
-      jobName = `BASE_${REQUEST_EVALUATION_JOB}`;
-    await this.evaluationQueue.add(jobName || REQUEST_EVALUATION_JOB, {
+    await this.evaluationQueue.add(`${(game.evaluationEngine || 'BASE').toUpperCase()}_${REQUEST_EVALUATION_JOB}`, {
       submissionId,
       filename: file.filename,
       content,
