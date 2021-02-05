@@ -3,7 +3,7 @@ import { JobOptions } from 'bull';
 import * as path from 'path';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-require('dotenv').config({ path: path.resolve(__dirname, `../.env.${process.env.NODE_ENV || 'dev'}`) });
+require('dotenv').config({ path: path.resolve(__dirname, `../../.env.${process.env.NODE_ENV || 'dev'}`) });
 
 interface IAppConfig {
   version: string;

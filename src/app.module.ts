@@ -88,7 +88,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 
     KeycloakModule.registerAsync({
       useFactory: () => ({
-        authServerUrl: `http://${appConfig.auth.keycloak.host}:${appConfig.auth.keycloak.port}${appConfig.auth.keycloak.prefix}/auth`,
+        authServerUrl: `http://${appConfig.auth.keycloak.host}${appConfig.auth.keycloak.prefix}/auth`,
         realm: appConfig.auth.keycloak.realm,
         clientId: appConfig.auth.keycloak.clientId,
         secret: appConfig.auth.keycloak.clientSecret,
