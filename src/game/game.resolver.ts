@@ -64,6 +64,7 @@ export class GameResolver {
         description: gameInput.description,
         startDate: gameInput.startDate,
         endDate: gameInput.endDate,
+        evaluationEngine: gameInput.evaluationEngine,
       },
       { filename, mimetype, encoding: encoding as BufferEncoding, content: createReadStream() },
     );

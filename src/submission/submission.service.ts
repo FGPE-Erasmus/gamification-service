@@ -13,9 +13,9 @@ import { SubmissionRepository } from './repositories/submission.repository';
 import { ChallengeService } from '../challenge/challenge.service';
 import { ChallengeDto } from '../challenge/dto/challenge.dto';
 import { Mode } from '../challenge/models/mode.enum';
-import { GameDto } from '../game/dto/game.dto';
 import { GameService } from '../game/game.service';
 import { GameStateEnum } from '../game/enum/game-state.enum';
+import { Game } from '../game/models/game.model';
 
 @Injectable()
 export class SubmissionService extends BaseService<Submission, SubmissionDocument> {
@@ -44,7 +44,7 @@ export class SubmissionService extends BaseService<Submission, SubmissionDocumen
   }
 
   async evaluate(gameId: string, exerciseId: string, playerId: string, file: IFile): Promise<Submission> {
-    const game: GameDto = await this.gameService.findById(gameId);
+    const game: Game = await this.gameService.findById(gameId);
     if (game.state === GameStateEnum.LOCKED || game.state === GameStateEnum.CLOSED)
       throw new Error('Submission sent for an unavailable game.');
 

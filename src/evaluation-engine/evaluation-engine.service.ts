@@ -85,9 +85,10 @@ export class EvaluationEngineService {
     return (await this.getActivities(gameId, [activityId]))[0];
   }
 
-  async validate(validationId: string, file: IFile, inputs: string[]): Promise<void> {
+  async validate(gameId: string, validationId: string, file: IFile, inputs: string[]): Promise<void> {
     const content: string = await streamToString(file.content);
-    await this.evaluationQueue.add(REQUEST_VALIDATION_JOB, {
+    const game = await this.gameService.findById(gameId);
+    await this.evaluationQueue.add(`${(game.evaluationEngine || 'BASE').toUpperCase()}_${REQUEST_VALIDATION_JOB}`, {
       validationId,
       filename: file.filename,
       content,

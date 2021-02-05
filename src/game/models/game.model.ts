@@ -2,6 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 import { IBaseEntity } from '../../common/interfaces/base-entity.interface';
 import { GameStateEnum } from '../enum/game-state.enum';
+import { EvaluationEngine } from '../../submission/models/evaluation-engine.enum';
 
 export interface Game extends IBaseEntity {
   name: string;
@@ -29,8 +30,8 @@ export class GameDocument extends Document implements Game {
   @Prop()
   state: GameStateEnum;
 
-  @Prop({ default: () => 'BASE' })
-  evaluationEngine: string;
+  @Prop({ default: () => EvaluationEngine.BASE })
+  evaluationEngine: EvaluationEngine;
 
   @Prop({ nullable: true })
   gedilLayerId?: string;

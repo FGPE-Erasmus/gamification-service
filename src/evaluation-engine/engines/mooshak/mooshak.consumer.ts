@@ -50,7 +50,7 @@ export class MooshakConsumer {
     protected readonly submissionToDtoMapper: SubmissionToDtoMapper,
   ) {}
 
-  @Process(REQUEST_EVALUATION_JOB)
+  @Process(`MOOSHAK_${REQUEST_EVALUATION_JOB}`)
   async onEvaluationRequested(job: Job<unknown>): Promise<void> {
     const { submissionId, filename, content } = job.data as IRequestEvaluationJobData;
     let submission: Submission = await this.submissionService.findById(submissionId);
@@ -126,14 +126,14 @@ export class MooshakConsumer {
 
     console.log(result);
     if (result.result !== Result.PROCESSING) {
-      await this.evaluationQueue.add(FINISH_EVALUATION_JOB, { submissionId, result });
+      await this.evaluationQueue.add(`MOOSHAK_${FINISH_EVALUATION_JOB}`, { submissionId, result });
       return;
     }
 
     throw new Error('Result not yet available');
   }
 
-  @Process(FINISH_EVALUATION_JOB)
+  @Process(`MOOSHAK_${FINISH_EVALUATION_JOB}`)
   async onEvaluationFinished(job: Job<unknown>): Promise<void> {
     const { submissionId, result } = job.data as { submissionId: string; result: EvaluationDto };
 
@@ -156,7 +156,7 @@ export class MooshakConsumer {
     });
   }
 
-  @Process(REQUEST_VALIDATION_JOB)
+  @Process(`MOOSHAK_${REQUEST_VALIDATION_JOB}`)
   async onValidationRequested(job: Job<unknown>): Promise<void> {
     const { validationId, filename, content, inputs } = job.data as IRequestValidationJobData;
     let validation: Validation = await this.validationService.findById(validationId);
@@ -220,14 +220,14 @@ export class MooshakConsumer {
 
     console.log(result);
     if (result.result !== Result.PROCESSING) {
-      await this.evaluationQueue.add(FINISH_VALIDATION_JOB, { validationId, result });
+      await this.evaluationQueue.add(`MOOSHAK_${FINISH_VALIDATION_JOB}`, { validationId, result });
       return;
     }
 
     throw new Error('Result not yet available');
   }
 
-  @Process(FINISH_VALIDATION_JOB)
+  @Process(`MOOSHAK_${FINISH_VALIDATION_JOB}`)
   async onValidationFinished(job: Job<unknown>): Promise<void> {
     const { validationId, result } = job.data as { validationId: string; result: ValidationDto };
 

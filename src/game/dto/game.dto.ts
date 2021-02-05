@@ -4,6 +4,7 @@ import { SubmissionDto } from '../../submission/dto/submission.dto';
 import { UserDto } from '../../keycloak/dto/user.dto';
 import { ValidationDto } from '../../submission/dto/validation.dto';
 import { GameStateEnum } from '../enum/game-state.enum';
+import { EvaluationEngine } from '../../submission/models/evaluation-engine.enum';
 
 @ObjectType('Game')
 export class GameDto {
@@ -16,8 +17,8 @@ export class GameDto {
   @Field(() => GameStateEnum)
   state?: GameStateEnum;
 
-  @Field()
-  evaluationEngine?: string;
+  @Field(() => EvaluationEngine)
+  evaluationEngine?: EvaluationEngine;
 
   @Field({ nullable: true })
   description?: string;

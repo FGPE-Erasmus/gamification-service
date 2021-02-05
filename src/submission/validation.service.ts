@@ -55,7 +55,7 @@ export class ValidationService extends BaseService<Validation, ValidationDocumen
       exerciseId: exerciseId,
     });
 
-    await this.evaluationEngineService.validate(validation.id, file, inputs);
+    await this.evaluationEngineService.validate(gameId, validation.id, file, inputs);
 
     return validation;
   }
