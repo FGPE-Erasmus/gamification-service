@@ -81,8 +81,9 @@ export class ScheduledHookService extends BaseService<ScheduledHook, ScheduledHo
    * @param {{ [key: string]: any }} eventParams parameters needed for hook execution
    */
   addCronJob(hook: ScheduledHook, eventParams: { [key: string]: any }) {
-    const date = new Date(hook.cron).toString() !== 'Invalid Date' ? new Date(hook.cron) : hook.cron;
-    const job = new CronJob(date, () => {
+    const date = new Date(hook.cron).toString() !== 'Invalid Date' ? new Date(hook.cron) : undefined;
+    if (date && date.getTime() < Date.now()) return;
+    const job = new CronJob(date || hook.cron, () => {
       this.logger.warn(`Cronjob for ${hook.id} has been created with ${hook.cron} interval.`);
       this.hookService.executeHook(hook, eventParams);
     });

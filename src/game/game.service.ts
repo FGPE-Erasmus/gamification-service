@@ -165,18 +165,22 @@ export class GameService extends BaseService<Game, GameDocument> {
     }
 
     if (game.endDate) {
-      await this.scheduledHookService.create({
-        game: game.id?.toString(),
-        cron: game.endDate,
-        actions: [
-          {
-            type: CategoryEnum.UPDATE,
-            parameters: ['GAME', 'STATE', GameStateEnum.CLOSED],
-          },
-        ],
-        recurrent: false,
-        active: true,
-      });
+      if (game.endDate.getTime() < new Date().getTime()) {
+        await this.patch(game.id, { state: GameStateEnum.CLOSED });
+      } else {
+        await this.scheduledHookService.create({
+          game: game.id?.toString(),
+          cron: game.endDate,
+          actions: [
+            {
+              type: CategoryEnum.UPDATE,
+              parameters: ['GAME', 'STATE', GameStateEnum.CLOSED],
+            },
+          ],
+          recurrent: false,
+          active: true,
+        });
+      }
     }
 
     await this.scheduledHookService.schedulingRoutine(game.id);
