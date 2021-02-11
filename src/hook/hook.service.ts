@@ -31,8 +31,8 @@ import { ChallengeService } from '../challenge/challenge.service';
 import { Player } from '../player/models/player.model';
 import { PlayerToDtoMapper } from '../player/mappers/player-to-dto.mapper';
 import { NotificationService } from '../notifications/notification.service';
-import { GameService } from 'src/game/game.service';
-import { GameStateEnum } from 'src/game/enum/game-state.enum';
+import { GameService } from '../game/game.service';
+import { GameStateEnum } from '../game/enum/game-state.enum';
 
 @Injectable()
 export class HookService {
@@ -172,7 +172,6 @@ export class HookService {
         }),
     });
     if (meet) {
-      console.log('running actions');
       await this.runActions(hook.game, hook.actions, eventParams);
     }
   }
@@ -196,8 +195,6 @@ export class HookService {
           await this.runTakeActions(gameId, eventParams.playerId?.toString(), action.parameters);
           break;
         case Category.UPDATE:
-          console.log('running updates');
-
           await this.runUpdateActions(gameId, eventParams.playerId?.toString(), action.parameters);
           break;
       }
@@ -305,29 +302,45 @@ export class HookService {
    * @param {string[]} parameters Parameters of the event
    */
   private async runUpdateActions(gameId: string, playerId: string, parameters: string[]) {
-    console.log('running actions UPDATE');
-
     switch (parameters[0].toUpperCase()) {
       case 'PLAYER':
         await this.updatePlayer(gameId, playerId, parameters[1], parameters[2]);
       case 'CHALLENGE':
         await this.updateChallenge(gameId, parameters[1], playerId, parameters[2], parameters[3]);
       case 'GAME':
-        console.log('GAME');
         await this.updateGame(gameId, parameters[1], parameters[2]);
     }
   }
 
   private async updateGame(gameId: string, property: string, value: string): Promise<Game> {
+    let game: Game;
     switch (property.toUpperCase()) {
       case 'STATE':
-        console.log('state updating');
-        if (value.toUpperCase() === GameStateEnum.CLOSED)
-          return await this.gameService.patch(gameId, { state: GameStateEnum.CLOSED });
-        else if (value.toUpperCase() === GameStateEnum.LOCKED)
-          return await this.gameService.patch(gameId, { state: GameStateEnum.LOCKED });
-        else if (value.toUpperCase() === GameStateEnum.OPEN)
-          return await this.gameService.patch(gameId, { state: GameStateEnum.OPEN });
+        switch (value.toUpperCase()) {
+          case GameStateEnum.CLOSED:
+            game = await this.gameService.findOneAndUpdate(
+              { _id: gameId },
+              { state: GameStateEnum.CLOSED },
+              { new: true },
+            );
+            await this.notificationService.sendNotification(NotificationEnum.GAME_FINISHED, game);
+            return game;
+          case GameStateEnum.LOCKED:
+            game = await this.gameService.findOneAndUpdate(
+              { _id: gameId },
+              { state: GameStateEnum.LOCKED },
+              { new: true },
+            );
+            return game;
+          case GameStateEnum.OPEN:
+            game = await this.gameService.findOneAndUpdate(
+              { _id: gameId },
+              { state: GameStateEnum.OPEN },
+              { new: true },
+            );
+            await this.notificationService.sendNotification(NotificationEnum.GAME_STARTED, game);
+            return game;
+        }
     }
   }
 

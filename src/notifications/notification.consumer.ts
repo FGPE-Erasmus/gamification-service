@@ -1,7 +1,8 @@
-import { InjectQueue, Process, Processor } from '@nestjs/bull';
+import { Process, Processor } from '@nestjs/bull';
 import { Logger, Inject } from '@nestjs/common';
-import { Queue, Job } from 'bull';
+import { Job } from 'bull';
 import { PubSub } from 'graphql-subscriptions';
+import { PlayerRewardDto } from '../player-reward/dto/player-reward.dto';
 
 import { appConfig } from '../app.config';
 import { ChallengeStatusDto } from '../challenge-status/dto/challenge-status.dto';
@@ -27,32 +28,32 @@ export class NotificationConsumer {
     switch (type) {
       case NotificationEnum.REWARD_RECEIVED:
         await this.pubSub.publish(NotificationEnum.REWARD_RECEIVED + '_STUDENT', {
-          rewardReceivedStudent: payload as RewardDto,
+          rewardReceivedStudent: payload as PlayerRewardDto,
           gameId: gameId,
         });
 
         await this.pubSub.publish(NotificationEnum.REWARD_RECEIVED + '_TEACHER', {
-          rewardReceivedTeacher: payload as RewardDto,
+          rewardReceivedTeacher: payload as PlayerRewardDto,
           gameId: gameId,
         });
       case NotificationEnum.REWARD_REMOVED:
         await this.pubSub.publish(NotificationEnum.REWARD_REMOVED + '_STUDENT', {
-          rewardRemovedStudent: payload as RewardDto,
+          rewardRemovedStudent: payload as PlayerRewardDto,
           gameId: gameId,
         });
 
         await this.pubSub.publish(NotificationEnum.REWARD_REMOVED + '_TEACHER', {
-          rewardRemovedTeacher: payload as RewardDto,
+          rewardRemovedTeacher: payload as PlayerRewardDto,
           gameId: gameId,
         });
       case NotificationEnum.REWARD_SUBSTRACTED:
         await this.pubSub.publish(NotificationEnum.REWARD_SUBSTRACTED + '_STUDENT', {
-          rewardSubstractedStudent: payload as RewardDto,
+          rewardSubstractedStudent: payload as PlayerRewardDto,
           gameId: gameId,
         });
 
         await this.pubSub.publish(NotificationEnum.REWARD_SUBSTRACTED + '_TEACHER', {
-          rewardSubstractedTeacher: payload as RewardDto,
+          rewardSubstractedTeacher: payload as PlayerRewardDto,
           gameId: gameId,
         });
       case NotificationEnum.SUBMISSION_SENT:
@@ -119,6 +120,14 @@ export class NotificationConsumer {
       case NotificationEnum.REWARD_MODIFIED:
         await this.pubSub.publish(NotificationEnum.REWARD_MODIFIED, {
           rewardModified: payload as RewardDto,
+        });
+      case NotificationEnum.GAME_STARTED:
+        await this.pubSub.publish(NotificationEnum.GAME_STARTED, {
+          gameStarted: payload as GameDto,
+        });
+      case NotificationEnum.GAME_FINISHED:
+        await this.pubSub.publish(NotificationEnum.GAME_FINISHED, {
+          gameFinished: payload as GameDto,
         });
     }
   }
