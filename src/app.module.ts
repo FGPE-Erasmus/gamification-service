@@ -62,6 +62,7 @@ import { ResourceGuard } from './keycloak/guards/resource.guard';
           return {
             headers: {
               ...websocket?.upgradeReq?.headers,
+              ...connectionParams.headers,
             },
           };
         },

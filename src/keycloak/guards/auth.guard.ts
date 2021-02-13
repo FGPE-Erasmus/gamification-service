@@ -117,12 +117,8 @@ export class AuthGuard implements CanActivate {
   }
 
   extractJwt(req: Request): string | null {
-    if (req) {
-      if (req.cookies && req.cookies[appConfig.auth.keycloak.cookieKey]) {
-        return req.cookies[appConfig.auth.keycloak.cookieKey];
-      } else if (req.headers.cookie && req.headers.cookie) {
-        return req.headers.cookie.substring(req.headers.cookie.indexOf('=') + 1);
-      }
+    if (req.cookies && req.cookies[appConfig.auth.keycloak.cookieKey]) {
+      return req.cookies[appConfig.auth.keycloak.cookieKey];
     }
 
     const { authorization } = req.headers;
