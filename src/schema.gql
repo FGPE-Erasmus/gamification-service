@@ -614,6 +614,6 @@ type Subscription {
   submissionSentStudent(gameId: String!, playerId: String!): Submission!
   submissionEvaluatedTeacher(gameId: String!): Submission!
   submissionSentTeacher(gameId: String!): Submission!
-  validationProcessedStudent(gameId: String!, playerId: String!): Validation!
+  validationProcessedStudent(gameId: String!): Validation!
   validationProcessedTeacher(gameId: String!): Validation!
 }

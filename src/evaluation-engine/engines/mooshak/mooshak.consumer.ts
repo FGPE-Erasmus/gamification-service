@@ -84,8 +84,6 @@ export class MooshakConsumer {
       modeParameters,
     );
 
-    console.log(result);
-
     submission = await this.submissionService.patch(submissionId, {
       evaluationEngine: result.evaluationEngine,
       evaluationEngineId: result.evaluationEngineId,
@@ -124,7 +122,6 @@ export class MooshakConsumer {
       },
     });
 
-    console.log(result);
     if (result.result !== Result.PROCESSING) {
       await this.evaluationQueue.add(`MOOSHAK_${FINISH_EVALUATION_JOB}`, { submissionId, result });
       return;
@@ -161,8 +158,6 @@ export class MooshakConsumer {
     const { validationId, filename, content, inputs } = job.data as IRequestValidationJobData;
     let validation: Validation = await this.validationService.findById(validationId);
 
-    console.log(validationId);
-
     // get a token
     const { token } = await this.mooshakService.login(
       validation.game as string,
@@ -176,9 +171,6 @@ export class MooshakConsumer {
         Authorization: `Bearer ${token}`,
       },
     });
-
-    console.log('------------------');
-    console.log(result);
 
     validation = await this.validationService.patch(validationId, {
       evaluationEngine: result.evaluationEngine,
@@ -218,7 +210,6 @@ export class MooshakConsumer {
       },
     });
 
-    console.log(result);
     if (result.result !== Result.PROCESSING) {
       await this.evaluationQueue.add(`MOOSHAK_${FINISH_VALIDATION_JOB}`, { validationId, result });
       return;
