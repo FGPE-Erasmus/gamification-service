@@ -35,6 +35,7 @@ export class NotificationConsumer {
           rewardReceivedTeacher: payload as RewardDto,
           gameId: gameId,
         });
+        break;
       case NotificationEnum.REWARD_REMOVED:
         await this.pubSub.publish(NotificationEnum.REWARD_REMOVED + '_STUDENT', {
           rewardRemovedStudent: payload as RewardDto,
@@ -45,6 +46,7 @@ export class NotificationConsumer {
           rewardRemovedTeacher: payload as RewardDto,
           gameId: gameId,
         });
+        break;
       case NotificationEnum.REWARD_SUBSTRACTED:
         await this.pubSub.publish(NotificationEnum.REWARD_SUBSTRACTED + '_STUDENT', {
           rewardSubstractedStudent: payload as RewardDto,
@@ -55,6 +57,7 @@ export class NotificationConsumer {
           rewardSubstractedTeacher: payload as RewardDto,
           gameId: gameId,
         });
+        break;
       case NotificationEnum.SUBMISSION_SENT:
         await this.pubSub.publish(NotificationEnum.SUBMISSION_SENT + '_STUDENT', {
           submissionSentStudent: payload as SubmissionDto,
@@ -63,6 +66,7 @@ export class NotificationConsumer {
         await this.pubSub.publish(NotificationEnum.SUBMISSION_SENT + '_TEACHER', {
           submissionSentTeacher: payload as SubmissionDto,
         });
+        break;
       case NotificationEnum.SUBMISSION_EVALUATED:
         await this.pubSub.publish(NotificationEnum.SUBMISSION_EVALUATED + '_STUDENT', {
           submissionEvaluatedStudent: payload as SubmissionDto,
@@ -71,14 +75,17 @@ export class NotificationConsumer {
         await this.pubSub.publish(NotificationEnum.SUBMISSION_EVALUATED + '_TEACHER', {
           submissionEvaluatedTeacher: payload as SubmissionDto,
         });
+        break;
       case NotificationEnum.VALIDATION_PROCESSED:
+        console.log(payload);
         await this.pubSub.publish(NotificationEnum.VALIDATION_PROCESSED + '_STUDENT', {
-          submissionEvaluatedStudent: payload as ValidationDto,
+          validationProcessedStudent: payload as ValidationDto,
         });
 
         await this.pubSub.publish(NotificationEnum.VALIDATION_PROCESSED + '_TEACHER', {
-          submissionEvaluatedTeacher: payload as ValidationDto,
+          validationProcessedTeacher: payload as ValidationDto,
         });
+        break;
       case NotificationEnum.POINTS_UPDATED:
         await this.pubSub.publish(NotificationEnum.POINTS_UPDATED + '_STUDENT', {
           pointsUpdatedStudent: payload as PlayerDto,
@@ -86,6 +93,7 @@ export class NotificationConsumer {
         await this.pubSub.publish(NotificationEnum.POINTS_UPDATED + '_TEACHER', {
           pointsUpdatedTeacher: payload as PlayerDto,
         });
+        break;
       case NotificationEnum.CHALLENGE_STATUS_UPDATED:
         await this.pubSub.publish(NotificationEnum.CHALLENGE_STATUS_UPDATED + '_STUDENT', {
           challengeStatusUpdatedStudent: payload as ChallengeStatusDto,
@@ -96,30 +104,39 @@ export class NotificationConsumer {
           challengeStatusUpdatedTeacher: payload as ChallengeStatusDto,
           gameId: gameId,
         });
+        break;
       case NotificationEnum.PLAYER_ENROLLED:
         await this.pubSub.publish(NotificationEnum.PLAYER_ENROLLED, {
           playerEnrolled: payload as PlayerDto,
         });
+        break;
       case NotificationEnum.PLAYER_LEFT:
         await this.pubSub.publish(NotificationEnum.PLAYER_LEFT, {
           playerLeft: payload as PlayerDto,
         });
+        break;
       case NotificationEnum.GAME_MODIFIED:
         await this.pubSub.publish(NotificationEnum.GAME_MODIFIED, {
           gameModified: payload as GameDto,
         });
+        break;
       case NotificationEnum.CHALLENGE_MODIFIED:
         await this.pubSub.publish(NotificationEnum.CHALLENGE_MODIFIED, {
           challengeModified: payload as ChallengeDto,
         });
+        break;
       case NotificationEnum.LEADERBOARD_MODIFIED:
         await this.pubSub.publish(NotificationEnum.LEADERBOARD_MODIFIED, {
           leaderboardModified: payload as LeaderboardDto,
         });
+        break;
       case NotificationEnum.REWARD_MODIFIED:
         await this.pubSub.publish(NotificationEnum.REWARD_MODIFIED, {
           rewardModified: payload as RewardDto,
         });
+        break;
+      default:
+        break;
     }
   }
 }
