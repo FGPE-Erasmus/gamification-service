@@ -2,8 +2,8 @@ import { Process, Processor } from '@nestjs/bull';
 import { Logger, Inject } from '@nestjs/common';
 import { Job } from 'bull';
 import { PubSub } from 'graphql-subscriptions';
-import { PlayerRewardDto } from '../player-reward/dto/player-reward.dto';
 
+import { PlayerRewardDto } from '../player-reward/dto/player-reward.dto';
 import { appConfig } from '../app.config';
 import { ChallengeStatusDto } from '../challenge-status/dto/challenge-status.dto';
 import { ChallengeDto } from '../challenge/dto/challenge.dto';
