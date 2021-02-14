@@ -143,7 +143,7 @@ export class MooshakConsumer {
       evaluatedAt: result.evaluatedAt,
     });
 
-    await this.notificationService.sendNotification(NotificationEnum.SUBMISSION_EVALUATED, submission);
+    this.notificationService.sendNotification(NotificationEnum.SUBMISSION_EVALUATED, submission);
 
     await this.eventService.fireEvent(TriggerEvent.SUBMISSION_EVALUATED, {
       gameId: submission.game,
@@ -232,7 +232,7 @@ export class MooshakConsumer {
       evaluatedAt: result.evaluatedAt,
     });
 
-    await this.notificationService.sendNotification(NotificationEnum.VALIDATION_PROCESSED, validation);
+    this.notificationService.sendNotification(NotificationEnum.VALIDATION_PROCESSED, validation);
 
     await this.eventService.fireEvent(TriggerEvent.VALIDATION_PROCESSED, {
       gameId: validation.game,

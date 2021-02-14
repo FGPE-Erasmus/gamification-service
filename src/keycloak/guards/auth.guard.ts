@@ -20,7 +20,7 @@ export class AuthGuard implements CanActivate {
     @Inject(KEYCLOAK_OPTIONS) protected readonly options: KeycloakOptions,
     protected readonly reflector: Reflector,
     protected readonly httpService: HttpService,
-  ) {}
+  ) { }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     this.logger.debug('running auth guard ...');
@@ -119,8 +119,14 @@ export class AuthGuard implements CanActivate {
   extractJwt(req: Request): string | null {
     if (req.cookies && req.cookies[appConfig.auth.keycloak.cookieKey]) {
       return req.cookies[appConfig.auth.keycloak.cookieKey];
+    } else if (req.headers.cookie) {
+      const cookies = req.headers.cookie.split(';\s?');
+      for (let i = 0; i < cookies.length; i++) {
+        if (cookies[i].split('=').includes('KEYCLOAK_JWT')) {
+          return cookies[i].split('=')[1];
+        }
+      }
     }
-
     const { authorization } = req.headers;
     if (typeof authorization === 'undefined') return null;
     if (authorization?.indexOf(' ') <= -1) return authorization;

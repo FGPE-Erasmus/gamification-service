@@ -32,25 +32,35 @@ export class LeaderboardService extends BaseService<Leaderboard, LeaderboardDocu
     protected readonly notificationService: NotificationService,
     protected readonly submissionService: SubmissionService,
     protected readonly playerToDtoMapper: PlayerToDtoMapper,
+    protected readonly leaderboardToDtoMapper: LeaderboardToDtoMapper,
   ) {
     super(new Logger(LeaderboardService.name), repository);
   }
 
   async create(input: Leaderboard): Promise<Leaderboard> {
     const result = await super.create(input);
-    this.notificationService.sendNotification(NotificationEnum.LEADERBOARD_MODIFIED, result);
+    this.notificationService.sendNotification(
+      NotificationEnum.LEADERBOARD_MODIFIED,
+      await this.leaderboardToDtoMapper.transform(result),
+    );
     return result;
   }
 
   async update(id: string, input: Leaderboard): Promise<Leaderboard> {
     const result = await super.update(id, input);
-    this.notificationService.sendNotification(NotificationEnum.LEADERBOARD_MODIFIED, result);
+    this.notificationService.sendNotification(
+      NotificationEnum.LEADERBOARD_MODIFIED,
+      await this.leaderboardToDtoMapper.transform(result),
+    );
     return result;
   }
 
   async patch(id: string, input: Partial<Leaderboard>): Promise<Leaderboard> {
     const result = await super.patch(id, input);
-    this.notificationService.sendNotification(NotificationEnum.LEADERBOARD_MODIFIED, result);
+    this.notificationService.sendNotification(
+      NotificationEnum.LEADERBOARD_MODIFIED,
+      await this.leaderboardToDtoMapper.transform(result),
+    );
     return result;
   }
 
@@ -60,13 +70,19 @@ export class LeaderboardService extends BaseService<Leaderboard, LeaderboardDocu
     options?: Record<string, unknown>,
   ): Promise<Leaderboard> {
     const result = await super.findOneAndUpdate(conditions, updates, options);
-    this.notificationService.sendNotification(NotificationEnum.LEADERBOARD_MODIFIED, result);
+    this.notificationService.sendNotification(
+      NotificationEnum.LEADERBOARD_MODIFIED,
+      await this.leaderboardToDtoMapper.transform(result),
+    );
     return result;
   }
 
   async delete(id: string, soft = false): Promise<Leaderboard> {
     const result = await super.delete(id, soft);
-    this.notificationService.sendNotification(NotificationEnum.LEADERBOARD_MODIFIED, result);
+    this.notificationService.sendNotification(
+      NotificationEnum.LEADERBOARD_MODIFIED,
+      await this.leaderboardToDtoMapper.transform(result),
+    );
     return result;
   }
 
@@ -75,7 +91,10 @@ export class LeaderboardService extends BaseService<Leaderboard, LeaderboardDocu
     options?: Record<string, unknown>,
   ): Promise<Leaderboard> {
     const result = await super.deleteOne(conditions, options);
-    this.notificationService.sendNotification(NotificationEnum.LEADERBOARD_MODIFIED, result);
+    this.notificationService.sendNotification(
+      NotificationEnum.LEADERBOARD_MODIFIED,
+      await this.leaderboardToDtoMapper.transform(result),
+    );
     return result;
   }
 

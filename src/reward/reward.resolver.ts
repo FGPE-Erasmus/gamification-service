@@ -21,8 +21,8 @@ import { Roles } from '../keycloak/decorators/roles.decorator';
 import { Role } from '../common/enums/role.enum';
 import { GqlInstructorAssignedGuard } from '../common/guards/gql-instructor-assigned.guard';
 import { GqlPlayerOfGuard } from '../common/guards/gql-player-of.guard';
-import { GqlRequestedPlayerGuard } from '../common/guards/gql-requested-player.guard';
 import { PlayerRewardDto } from '../player-reward/dto/player-reward.dto';
+import { GqlPlayer } from '../common/decorators/gql-player.decorator';
 
 @Resolver(() => RewardDto, { isAbstract: true })
 export class RewardResolver {
@@ -77,35 +77,38 @@ export class RewardResolver {
 
   //Subscriptions for students
   @Roles(Role.STUDENT)
-  @UseGuards(GqlPlayerOfGuard, GqlRequestedPlayerGuard)
+  @UseGuards(GqlPlayerOfGuard)
   @Subscription(() => PlayerRewardDto, {
-    filter: (payload, variables) =>
-      payload.rewardReceivedStudent.player === variables.playerId && payload.gameId === variables.gameId,
+    filter: (payload, variables, context) =>
+      payload.rewardReceivedStudent.player === context.connection.context.player.id &&
+      payload.gameId === variables.gameId,
     resolve: payload => payload.rewardReceivedStudent as PlayerRewardDto,
   })
-  rewardReceivedStudent(@Args('playerId') playerId: string, @Args('gameId') gameId: string): AsyncIterator<Reward> {
+  rewardReceivedStudent(@GqlPlayer('id') playerId: string, @Args('gameId') gameId: string): AsyncIterator<Reward> {
     return this.pubSub.asyncIterator(NotificationEnum.REWARD_RECEIVED + '_STUDENT');
   }
 
   @Roles(Role.STUDENT)
-  @UseGuards(GqlPlayerOfGuard, GqlRequestedPlayerGuard)
+  @UseGuards(GqlPlayerOfGuard)
   @Subscription(() => PlayerRewardDto, {
-    filter: async (payload, variables) =>
-      payload.rewardRemovedStudent.player === variables.playerId && payload.gameId === variables.gameId,
+    filter: async (payload, variables, context) =>
+      payload.rewardRemovedStudent.player === context.connection.context.player.id &&
+      payload.gameId === variables.gameId,
     resolve: payload => payload.rewardRemovedStudent as PlayerRewardDto,
   })
-  rewardRemovedStudent(@Args('playerId') playerId: string, @Args('gameId') gameId: string): AsyncIterator<Reward> {
+  rewardRemovedStudent(@GqlPlayer('id') playerId: string, @Args('gameId') gameId: string): AsyncIterator<Reward> {
     return this.pubSub.asyncIterator(NotificationEnum.REWARD_REMOVED + '_STUDENT');
   }
 
   @Roles(Role.STUDENT)
-  @UseGuards(GqlPlayerOfGuard, GqlRequestedPlayerGuard)
+  @UseGuards(GqlPlayerOfGuard)
   @Subscription(() => PlayerRewardDto, {
-    filter: (payload, variables) =>
-      payload.rewardSubtractedStudent.player === variables.playerId && payload.gameId === variables.gameId,
+    filter: (payload, variables, context) =>
+      payload.rewardSubtractedStudent.player === context.connection.context.player.id &&
+      payload.gameId === variables.gameId,
     resolve: payload => payload.rewardSubtractedStudent as PlayerRewardDto,
   })
-  rewardSubtractedStudent(@Args('playerId') playerId: string, @Args('gameId') gameId: string): AsyncIterator<Reward> {
+  rewardSubtractedStudent(@GqlPlayer('id') playerId: string, @Args('gameId') gameId: string): AsyncIterator<Reward> {
     return this.pubSub.asyncIterator(NotificationEnum.REWARD_SUBSTRACTED + '_STUDENT');
   }
 

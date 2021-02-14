@@ -23,7 +23,6 @@ import { GqlPlayerOfGuard } from '../common/guards/gql-player-of.guard';
 import { EvaluationEngineService } from '../evaluation-engine/evaluation-engine.service';
 import { ValidateArgs } from './args/validate.args';
 import { ValidationToDtoMapper } from './mappers/validation-to-dto.mapper';
-import { GqlRequestedPlayerGuard } from '../common/guards/gql-requested-player.guard';
 
 @Resolver(() => ValidationDto)
 export class ValidationResolver {

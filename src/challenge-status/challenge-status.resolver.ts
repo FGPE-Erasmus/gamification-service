@@ -25,7 +25,6 @@ import { ActivityService } from '../evaluation-engine/activity.service';
 import { GameDto } from '../game/dto/game.dto';
 import { GameService } from '../game/game.service';
 import { GameToDtoMapper } from '../game/mappers/game-to-dto.mapper';
-import { GqlRequestedPlayerGuard } from '../common/guards/gql-requested-player.guard';
 
 @Resolver(() => ChallengeStatusDto)
 export class ChallengeStatusResolver {
@@ -119,14 +118,15 @@ export class ChallengeStatusResolver {
 
   //Subscription for students
   @Roles(Role.STUDENT)
-  @UseGuards(GqlPlayerOfGuard, GqlRequestedPlayerGuard)
+  @UseGuards(GqlPlayerOfGuard)
   @Subscription(() => ChallengeStatusDto, {
-    filter: (payload, variables) =>
-      payload.challengeStatusUpdatedStudent.player === variables.playerId && payload.gameId === variables.gameId,
+    filter: (payload, variables, context) =>
+      payload.challengeStatusUpdatedStudent.player === context.connection.context.player.id &&
+      payload.gameId === variables.gameId,
     resolve: payload => payload.challengeStatusUpdatedStudent as ChallengeStatusDto,
   })
   challengeStatusUpdatedStudent(
-    @Args('playerId') playerId: string,
+    @GqlPlayer('id') playerId: string,
     @Args('gameId') gameId: string,
   ): AsyncIterator<ChallengeStatusDto> {
     return this.pubSub.asyncIterator(NotificationEnum.CHALLENGE_STATUS_UPDATED + '_STUDENT');

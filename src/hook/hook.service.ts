@@ -31,8 +31,9 @@ import { ChallengeService } from '../challenge/challenge.service';
 import { Player } from '../player/models/player.model';
 import { PlayerToDtoMapper } from '../player/mappers/player-to-dto.mapper';
 import { NotificationService } from '../notifications/notification.service';
-import { GameService } from 'src/game/game.service';
-import { GameStateEnum } from 'src/game/enum/game-state.enum';
+import { GameService } from '../game/game.service';
+import { GameStateEnum } from '../game/enum/game-state.enum';
+import { GameToDtoMapper } from '../game/mappers/game-to-dto.mapper';
 
 @Injectable()
 export class HookService {
@@ -53,6 +54,7 @@ export class HookService {
     protected readonly rewardToDtoMapper: RewardToDtoMapper,
     protected readonly playerRewardToDtoMapper: PlayerRewardToDtoMapper,
     protected readonly playerToDtoMapper: PlayerToDtoMapper,
+    protected readonly gameToDtoMapper: GameToDtoMapper,
   ) {}
 
   async importGEdIL(
@@ -172,7 +174,6 @@ export class HookService {
         }),
     });
     if (meet) {
-      console.log('running actions');
       await this.runActions(hook.game, hook.actions, eventParams);
     }
   }
@@ -196,8 +197,6 @@ export class HookService {
           await this.runTakeActions(gameId, eventParams.playerId?.toString(), action.parameters);
           break;
         case Category.UPDATE:
-          console.log('running updates');
-
           await this.runUpdateActions(gameId, eventParams.playerId?.toString(), action.parameters);
           break;
       }
@@ -226,7 +225,11 @@ export class HookService {
       } else if (playerReward) {
         // player already has the reward and it is accumulative
         const quantity: number = playerReward.count + (parameters[1] ? +parameters[1] : 1);
-        await this.notificationService.sendNotification(NotificationEnum.REWARD_RECEIVED, playerReward, gameId);
+        this.notificationService.sendNotification(
+          NotificationEnum.REWARD_RECEIVED,
+          await this.playerRewardToDtoMapper.transform(playerReward),
+          gameId,
+        );
         await this.playerRewardService.patch(playerReward.id, { count: quantity });
       } else {
         // player does not have the reward
@@ -235,7 +238,11 @@ export class HookService {
           reward: reward.id,
           count: reward.recurrent && parameters[1] ? +parameters[1] : 1,
         });
-        await this.notificationService.sendNotification(NotificationEnum.REWARD_RECEIVED, createdPlayerReward, gameId);
+        this.notificationService.sendNotification(
+          NotificationEnum.REWARD_RECEIVED,
+          await this.playerRewardToDtoMapper.transform(createdPlayerReward),
+          gameId,
+        );
       }
 
       // send REWARD_GRANTED event
@@ -250,7 +257,10 @@ export class HookService {
         { _id: playerId },
         { $inc: { points: quantity } },
       );
-      await this.notificationService.sendNotification(NotificationEnum.POINTS_UPDATED, updatedPointsPlayer);
+      this.notificationService.sendNotification(
+        NotificationEnum.POINTS_UPDATED,
+        await this.playerToDtoMapper.transform(updatedPointsPlayer),
+      );
 
       // send POINTS_UPDATED event
       await this.eventService.fireEvent(TriggerEvent.POINTS_UPDATED, {
@@ -277,13 +287,21 @@ export class HookService {
         { $inc: { count: -quantity } },
         { new: true },
       );
-      await this.notificationService.sendNotification(NotificationEnum.REWARD_SUBSTRACTED, playerReward, gameId);
+      this.notificationService.sendNotification(
+        NotificationEnum.REWARD_SUBSTRACTED,
+        await this.playerRewardToDtoMapper.transform(playerReward),
+        gameId,
+      );
       if (playerReward.count <= 0) {
         await this.playerRewardService.deleteOne({
           player: playerId,
           reward: parameters,
         });
-        await this.notificationService.sendNotification(NotificationEnum.REWARD_REMOVED, playerReward, gameId);
+        this.notificationService.sendNotification(
+          NotificationEnum.REWARD_REMOVED,
+          await this.playerRewardToDtoMapper.transform(playerReward),
+          gameId,
+        );
       }
     } else {
       const quantity: number = parameters[1] ? +parameters[1] : 1;
@@ -292,7 +310,10 @@ export class HookService {
         { $inc: { points: -quantity } },
         { new: true },
       );
-      await this.notificationService.sendNotification(NotificationEnum.POINTS_UPDATED, updatedPointsPlayer);
+      this.notificationService.sendNotification(
+        NotificationEnum.POINTS_UPDATED,
+        await this.playerToDtoMapper.transform(updatedPointsPlayer),
+      );
     }
   }
 
@@ -305,29 +326,51 @@ export class HookService {
    * @param {string[]} parameters Parameters of the event
    */
   private async runUpdateActions(gameId: string, playerId: string, parameters: string[]) {
-    console.log('running actions UPDATE');
-
     switch (parameters[0].toUpperCase()) {
       case 'PLAYER':
         await this.updatePlayer(gameId, playerId, parameters[1], parameters[2]);
       case 'CHALLENGE':
         await this.updateChallenge(gameId, parameters[1], playerId, parameters[2], parameters[3]);
       case 'GAME':
-        console.log('GAME');
         await this.updateGame(gameId, parameters[1], parameters[2]);
     }
   }
 
   private async updateGame(gameId: string, property: string, value: string): Promise<Game> {
+    let game: Game;
     switch (property.toUpperCase()) {
       case 'STATE':
-        console.log('state updating');
-        if (value.toUpperCase() === GameStateEnum.CLOSED)
-          return await this.gameService.patch(gameId, { state: GameStateEnum.CLOSED });
-        else if (value.toUpperCase() === GameStateEnum.LOCKED)
-          return await this.gameService.patch(gameId, { state: GameStateEnum.LOCKED });
-        else if (value.toUpperCase() === GameStateEnum.OPEN)
-          return await this.gameService.patch(gameId, { state: GameStateEnum.OPEN });
+        switch (value.toUpperCase()) {
+          case GameStateEnum.CLOSED:
+            game = await this.gameService.findOneAndUpdate(
+              { _id: gameId },
+              { state: GameStateEnum.CLOSED },
+              { new: true },
+            );
+            this.notificationService.sendNotification(
+              NotificationEnum.GAME_FINISHED,
+              await this.gameToDtoMapper.transform(game),
+            );
+            return game;
+          case GameStateEnum.LOCKED:
+            game = await this.gameService.findOneAndUpdate(
+              { _id: gameId },
+              { state: GameStateEnum.LOCKED },
+              { new: true },
+            );
+            return game;
+          case GameStateEnum.OPEN:
+            game = await this.gameService.findOneAndUpdate(
+              { _id: gameId },
+              { state: GameStateEnum.OPEN },
+              { new: true },
+            );
+            this.notificationService.sendNotification(
+              NotificationEnum.GAME_STARTED,
+              await this.gameToDtoMapper.transform(game),
+            );
+            return game;
+        }
     }
   }
 
@@ -431,7 +474,10 @@ export class HookService {
     } else {
       updatedPlayer = await this.playerService.findOneAndUpdate({ _id: playerId }, { points: +points });
     }
-    await this.notificationService.sendNotification(NotificationEnum.POINTS_UPDATED, updatedPlayer);
+    this.notificationService.sendNotification(
+      NotificationEnum.POINTS_UPDATED,
+      await this.playerToDtoMapper.transform(updatedPlayer),
+    );
     // send POINTS_UPDATED event
     await this.eventService.fireEvent(TriggerEvent.POINTS_UPDATED, {
       gameId,

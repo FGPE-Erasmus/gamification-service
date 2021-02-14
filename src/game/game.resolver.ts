@@ -137,4 +137,22 @@ export class GameResolver {
   gameModified(): AsyncIterator<GameDto> {
     return this.pubSub.asyncIterator(NotificationEnum.GAME_MODIFIED);
   }
+
+  @Roles(Role.STUDENT, Role.TEACHER)
+  @UseGuards(GqlPlayerOfGuard, GqlInstructorAssignedGuard)
+  @Subscription(() => GameDto, {
+    filter: (payload, variables) => payload.gameStarted.id === variables.gameId,
+  })
+  gameStarted(@Args('gameId') gameId: string): AsyncIterator<GameDto> {
+    return this.pubSub.asyncIterator(NotificationEnum.GAME_STARTED);
+  }
+
+  @Roles(Role.STUDENT, Role.TEACHER)
+  @UseGuards(GqlPlayerOfGuard, GqlInstructorAssignedGuard)
+  @Subscription(() => GameDto, {
+    filter: (payload, variables) => payload.gameFinished.id === variables.gameId,
+  })
+  gameFinished(@Args('gameId') gameId: string): AsyncIterator<GameDto> {
+    return this.pubSub.asyncIterator(NotificationEnum.GAME_FINISHED);
+  }
 }
