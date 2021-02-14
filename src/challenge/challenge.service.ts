@@ -43,19 +43,28 @@ export class ChallengeService extends BaseService<Challenge, ChallengeDocument> 
 
   async create(input: Challenge): Promise<Challenge> {
     const result = await super.create(input);
-    await this.notificationService.sendNotification(NotificationEnum.CHALLENGE_MODIFIED, result);
+    this.notificationService.sendNotification(
+      NotificationEnum.CHALLENGE_MODIFIED,
+      await this.challengeToDtoMapper.transform(result),
+    );
     return result;
   }
 
   async update(id: string, input: Challenge): Promise<Challenge> {
     const result = await super.update(id, input);
-    await this.notificationService.sendNotification(NotificationEnum.CHALLENGE_MODIFIED, result);
+    this.notificationService.sendNotification(
+      NotificationEnum.CHALLENGE_MODIFIED,
+      await this.challengeToDtoMapper.transform(result),
+    );
     return result;
   }
 
   async patch(id: string, input: Partial<Challenge>): Promise<Challenge> {
     const result = await super.patch(id, input);
-    this.notificationService.sendNotification(NotificationEnum.CHALLENGE_MODIFIED, result);
+    this.notificationService.sendNotification(
+      NotificationEnum.CHALLENGE_MODIFIED,
+      await this.challengeToDtoMapper.transform(result),
+    );
     return result;
   }
 
@@ -65,19 +74,28 @@ export class ChallengeService extends BaseService<Challenge, ChallengeDocument> 
     options?: Record<string, unknown>,
   ): Promise<Challenge> {
     const result = await super.findOneAndUpdate(conditions, updates, options);
-    this.notificationService.sendNotification(NotificationEnum.CHALLENGE_MODIFIED, result);
+    this.notificationService.sendNotification(
+      NotificationEnum.CHALLENGE_MODIFIED,
+      await this.challengeToDtoMapper.transform(result),
+    );
     return result;
   }
 
   async delete(id: string, soft = false): Promise<Challenge> {
     const result = await super.delete(id, soft);
-    this.notificationService.sendNotification(NotificationEnum.CHALLENGE_MODIFIED, result);
+    this.notificationService.sendNotification(
+      NotificationEnum.CHALLENGE_MODIFIED,
+      await this.challengeToDtoMapper.transform(result),
+    );
     return result;
   }
 
   async deleteOne(conditions: FilterQuery<ChallengeDocument>, options?: Record<string, unknown>): Promise<Challenge> {
     const result = await super.deleteOne(conditions, options);
-    this.notificationService.sendNotification(NotificationEnum.CHALLENGE_MODIFIED, result);
+    this.notificationService.sendNotification(
+      NotificationEnum.CHALLENGE_MODIFIED,
+      await this.challengeToDtoMapper.transform(result),
+    );
     return result;
   }
 

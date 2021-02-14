@@ -21,7 +21,6 @@ import { Roles } from '../keycloak/decorators/roles.decorator';
 import { Role } from '../common/enums/role.enum';
 import { GqlUserInfo } from '../common/decorators/gql-user-info.decorator';
 import { EvaluationEngineService } from '../evaluation-engine/evaluation-engine.service';
-import { GqlRequestedPlayerGuard } from '../common/guards/gql-requested-player.guard';
 import { GqlInstructorAssignedGuard } from '../common/guards/gql-instructor-assigned.guard';
 import { GqlPlayerOfGuard } from '../common/guards/gql-player-of.guard';
 import { NotificationService } from '../notifications/notification.service';
@@ -93,7 +92,10 @@ export class SubmissionResolver {
       mimetype,
       content: await createReadStream(),
     });
-    await this.notificationService.sendNotification(NotificationEnum.SUBMISSION_SENT, submission);
+    this.notificationService.sendNotification(
+      NotificationEnum.SUBMISSION_SENT,
+      await this.submissionToDtoMapper.transform(submission),
+    );
     return await this.submissionToDtoMapper.transform(submission);
   }
 
@@ -119,28 +121,28 @@ export class SubmissionResolver {
 
   //Subscriptions for students
   @Roles(Role.STUDENT)
-  @UseGuards(GqlPlayerOfGuard, GqlRequestedPlayerGuard)
+  @UseGuards(GqlPlayerOfGuard)
   @Subscription(() => SubmissionDto, {
-    filter: (payload, variables) =>
-      payload.submissionEvaluatedStudent.player === variables.playerId &&
+    filter: (payload, variables, context) =>
+      payload.submissionEvaluatedStudent.player === context.connection.context.player.id &&
       payload.submissionEvaluatedStudent.game === variables.gameId,
   })
   submissionEvaluatedStudent(
-    @Args('playerId') playerId: string,
+    @GqlPlayer('id') playerId: string,
     @Args('gameId') gameId: string,
   ): AsyncIterator<SubmissionDto> {
     return this.pubSub.asyncIterator(NotificationEnum.SUBMISSION_EVALUATED + '_STUDENT');
   }
 
   @Roles(Role.STUDENT)
-  @UseGuards(GqlPlayerOfGuard, GqlRequestedPlayerGuard)
+  @UseGuards(GqlPlayerOfGuard)
   @Subscription(() => SubmissionDto, {
-    filter: (payload, variables) =>
-      payload.submissionSentStudent.player === variables.playerId &&
+    filter: (payload, variables, context) =>
+      payload.submissionSentStudent.player === context.connection.context.player.id &&
       payload.submissionSentStudent.game === variables.gameId,
   })
   submissionSentStudent(
-    @Args('playerId') playerId: string,
+    @GqlPlayer('id') playerId: string,
     @Args('gameId') gameId: string,
   ): AsyncIterator<SubmissionDto> {
     return this.pubSub.asyncIterator(NotificationEnum.SUBMISSION_SENT + '_STUDENT');

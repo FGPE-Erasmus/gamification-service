@@ -37,7 +37,6 @@ import { ValidationDto } from '../submission/dto/validation.dto';
 import { Validation } from '../submission/models/validation.model';
 import { UserService } from '../keycloak/user.service';
 import { NotificationEnum } from '../common/enums/notifications.enum';
-import { GqlRequestedPlayerGuard } from '../common/guards/gql-requested-player.guard';
 
 @Resolver(() => GameDto)
 export class GameResolver {
@@ -140,7 +139,7 @@ export class GameResolver {
   }
 
   @Roles(Role.STUDENT, Role.TEACHER)
-  @UseGuards(GqlPlayerOfGuard, GqlRequestedPlayerGuard, GqlInstructorAssignedGuard)
+  @UseGuards(GqlPlayerOfGuard, GqlInstructorAssignedGuard)
   @Subscription(() => GameDto, {
     filter: (payload, variables) => payload.gameStarted.id === variables.gameId,
   })
@@ -149,7 +148,7 @@ export class GameResolver {
   }
 
   @Roles(Role.STUDENT, Role.TEACHER)
-  @UseGuards(GqlPlayerOfGuard, GqlRequestedPlayerGuard, GqlInstructorAssignedGuard)
+  @UseGuards(GqlPlayerOfGuard, GqlInstructorAssignedGuard)
   @Subscription(() => GameDto, {
     filter: (payload, variables) => payload.gameFinished.id === variables.gameId,
   })

@@ -23,7 +23,6 @@ import { GqlPlayerOfGuard } from '../common/guards/gql-player-of.guard';
 import { EvaluationEngineService } from '../evaluation-engine/evaluation-engine.service';
 import { ValidateArgs } from './args/validate.args';
 import { ValidationToDtoMapper } from './mappers/validation-to-dto.mapper';
-import { GqlRequestedPlayerGuard } from '../common/guards/gql-requested-player.guard';
 
 @Resolver(() => ValidationDto)
 export class ValidationResolver {
@@ -122,14 +121,14 @@ export class ValidationResolver {
 
   //Subscription for students
   @Roles(Role.STUDENT)
-  @UseGuards(GqlPlayerOfGuard, GqlRequestedPlayerGuard)
+  @UseGuards(GqlPlayerOfGuard)
   @Subscription(() => ValidationDto, {
-    filter: (payload, variables) =>
+    filter: (payload, variables, context) =>
       payload.validationProcessedStudent.game === variables.gameId &&
-      payload.validationProcessedStudent.player === variables.playerId,
+      payload.validationProcessedStudent.player === context.connection.context.player.id,
   })
   validationProcessedStudent(
-    @Args('playerId') playerId: string,
+    @GqlPlayer('id') playerId: string,
     @Args('gameId') gameId: string,
   ): AsyncIterator<ValidationDto> {
     return this.pubSub.asyncIterator(NotificationEnum.VALIDATION_PROCESSED + '_STUDENT');

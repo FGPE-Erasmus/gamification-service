@@ -67,7 +67,11 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
       challengeId,
     });
 
-    await this.notificationService.sendNotification(NotificationEnum.CHALLENGE_STATUS_UPDATED, result, gameId);
+    this.notificationService.sendNotification(
+      NotificationEnum.CHALLENGE_STATUS_UPDATED,
+      await this.challengeStatusToDtoMapper.transform(result),
+      gameId,
+    );
     return result;
   }
 
@@ -91,7 +95,11 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
       challengeId,
     });
 
-    await this.notificationService.sendNotification(NotificationEnum.CHALLENGE_STATUS_UPDATED, result, gameId);
+    this.notificationService.sendNotification(
+      NotificationEnum.CHALLENGE_STATUS_UPDATED,
+      await this.challengeStatusToDtoMapper.transform(result),
+      gameId,
+    );
 
     return result;
   }
@@ -119,7 +127,11 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
       challengeId,
     });
 
-    await this.notificationService.sendNotification(NotificationEnum.CHALLENGE_STATUS_UPDATED, result, gameId);
+    this.notificationService.sendNotification(
+      NotificationEnum.CHALLENGE_STATUS_UPDATED,
+      await this.challengeStatusToDtoMapper.transform(result),
+      gameId,
+    );
 
     return result;
   }
@@ -144,7 +156,11 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
       challengeId,
     });
 
-    await this.notificationService.sendNotification(NotificationEnum.CHALLENGE_STATUS_UPDATED, result, gameId);
+    this.notificationService.sendNotification(
+      NotificationEnum.CHALLENGE_STATUS_UPDATED,
+      await this.challengeStatusToDtoMapper.transform(result),
+      gameId,
+    );
 
     return result;
   }
@@ -171,7 +187,11 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
       challengeId,
     });
 
-    await this.notificationService.sendNotification(NotificationEnum.CHALLENGE_STATUS_UPDATED, result, gameId);
+    this.notificationService.sendNotification(
+      NotificationEnum.CHALLENGE_STATUS_UPDATED,
+      await this.challengeStatusToDtoMapper.transform(result),
+      gameId,
+    );
 
     return result;
   }
@@ -195,7 +215,11 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
       challengeId,
     });
 
-    await this.notificationService.sendNotification(NotificationEnum.CHALLENGE_STATUS_UPDATED, result, gameId);
+    this.notificationService.sendNotification(
+      NotificationEnum.CHALLENGE_STATUS_UPDATED,
+      await this.challengeStatusToDtoMapper.transform(result),
+      gameId,
+    );
 
     return result;
   }
@@ -219,7 +243,11 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
       challengeId,
     });
 
-    await this.notificationService.sendNotification(NotificationEnum.CHALLENGE_STATUS_UPDATED, result, gameId);
+    this.notificationService.sendNotification(
+      NotificationEnum.CHALLENGE_STATUS_UPDATED,
+      await this.challengeStatusToDtoMapper.transform(result),
+      gameId,
+    );
 
     return result;
   }

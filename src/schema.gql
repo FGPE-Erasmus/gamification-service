@@ -594,26 +594,28 @@ input GameInput {
 }
 
 type Subscription {
-  rewardReceivedStudent(gameId: String!, playerId: String!): PlayerReward!
-  rewardRemovedStudent(gameId: String!, playerId: String!): PlayerReward!
-  rewardSubtractedStudent(gameId: String!, playerId: String!): PlayerReward!
+  rewardReceivedStudent(gameId: String!): PlayerReward!
+  rewardRemovedStudent(gameId: String!): PlayerReward!
+  rewardSubtractedStudent(gameId: String!): PlayerReward!
   rewardReceivedTeacher(gameId: String!): PlayerReward!
   rewardRemovedTeacher(gameId: String!): PlayerReward!
   rewardSubtractedTeacher(gameId: String!): PlayerReward!
   rewardModified: Reward!
-  submissionEvaluatedStudent(gameId: String!, playerId: String!): Submission!
-  submissionSentStudent(gameId: String!, playerId: String!): Submission!
+  submissionEvaluatedStudent(gameId: String!): Submission!
+  submissionSentStudent(gameId: String!): Submission!
   submissionEvaluatedTeacher(gameId: String!): Submission!
   submissionSentTeacher(gameId: String!): Submission!
-  validationProcessedStudent(gameId: String!, playerId: String!): Validation!
+  validationProcessedStudent(gameId: String!): Validation!
   validationProcessedTeacher(gameId: String!): Validation!
   playerEnrolled(gameId: String!): Player!
   playerLeft(gameId: String!): Player!
-  pointsUpdatedStudent(gameId: String!, playerId: String!): Player!
+  pointsUpdatedStudent(gameId: String!): Player!
   pointsUpdatedTeacher(gameId: String!): Player!
-  challengeStatusUpdatedStudent(gameId: String!, playerId: String!): ChallengeStatus!
+  challengeStatusUpdatedStudent(gameId: String!): ChallengeStatus!
   challengeStatusUpdatedTeacher(gameId: String!): ChallengeStatus!
   leaderboardModified: Leaderboard!
   challengeModified: Challenge!
   gameModified: Game!
+  gameStarted(gameId: String!): Game!
+  gameFinished(gameId: String!): Game!
 }
