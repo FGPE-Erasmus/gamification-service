@@ -127,7 +127,6 @@ export class AuthGuard implements CanActivate {
         }
       }
     }
-
     const { authorization } = req.headers;
     if (typeof authorization === 'undefined') return null;
     if (authorization?.indexOf(' ') <= -1) return authorization;
