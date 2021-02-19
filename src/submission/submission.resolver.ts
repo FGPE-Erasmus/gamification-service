@@ -82,6 +82,22 @@ export class SubmissionResolver {
 
   @Roles(Role.STUDENT)
   @UseGuards(GqlPlayerOfGuard)
+  @Query(() => SubmissionDto)
+  async latestSubmission(
+    @GqlPlayer('id') playerId: string,
+    @Args('gameId') gameId: string,
+    @Args('exerciseId') exerciseId: string,
+  ): Promise<SubmissionDto> {
+    const submission: Submission = await this.submissionService.findOne(
+      { exerciseId: exerciseId },
+      {},
+      { sort: { createdAt: -1 } },
+    );
+    return await this.submissionToDtoMapper.transform(submission);
+  }
+
+  @Roles(Role.STUDENT)
+  @UseGuards(GqlPlayerOfGuard)
   @Mutation(() => SubmissionDto, { nullable: true })
   async evaluate(@GqlPlayer('id') playerId: string, @Args() args: EvaluateArgs): Promise<SubmissionDto> {
     const { gameId, exerciseId, file } = args;

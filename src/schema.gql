@@ -530,8 +530,10 @@ type Query {
   submission(id: String!, gameId: String!): Submission!
   submissions(exerciseId: String, gameId: String!, userId: String!): [Submission!]!
   mySubmissions(exerciseId: String, gameId: String!): [Submission!]!
+  latestSubmission(exerciseId: String!, gameId: String!): Submission!
   validation(id: String!, gameId: String!): Validation!
   validations(exerciseId: String, gameId: String!, userId: String!): [Validation!]!
+  latestValidation(exerciseId: String!, gameId: String!): Validation!
   myValidations(exerciseId: String, gameId: String!): [Validation!]!
   groups(gameId: String!): [Group!]!
   group(id: String!, gameId: String!): Group!
