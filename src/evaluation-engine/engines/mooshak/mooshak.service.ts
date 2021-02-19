@@ -18,6 +18,7 @@ import { base64Decode } from '../../../common/utils/string.utils';
 import { Validation } from '../../../submission/models/validation.model';
 import { ValidationDto } from '../../dto/validation.dto';
 import { MooshakValidationDto } from './mooshak-validation.dto';
+import { CodeSkeletonDto } from '../../../evaluation-engine/dto/code-skeleton.dto';
 
 @Injectable()
 export class MooshakService implements IEngineService {
@@ -72,6 +73,17 @@ export class MooshakService implements IEngineService {
         MooshakService.catchMooshakError(),
       )
       .toPromise();
+
+    const codeSkeletons: CodeSkeletonDto[] = await this.httpService
+      .get<[any]>(`/data/contests/${'proto_fgpe' || gameId}/problems/${activityId}/skeletons`, options)
+      .pipe(
+        first(),
+        map<any, ActivityDto>(res => res.data),
+        MooshakService.catchMooshakError(),
+      )
+      .toPromise();
+
+    activity.codeSkeletons = codeSkeletons ? codeSkeletons : [];
 
     const viewer: { statement: string; PDFviewable: boolean } = await this.httpService
       .get<{ statement: string; PDFviewable: boolean }>(

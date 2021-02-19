@@ -82,6 +82,12 @@ enum Result {
   ASK_FOR_REEVALUATION
 }
 
+type CodeSkeleton {
+  id: String
+  extension: String
+  code: String
+}
+
 type Activity {
   game: Game!
   id: String
@@ -93,6 +99,7 @@ type Activity {
   difficulty: String
   statement: String
   pdf: Boolean
+  codeSkeletons: [CodeSkeleton!]
 }
 
 type ActivityStatus {
