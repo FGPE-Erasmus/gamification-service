@@ -68,6 +68,26 @@ export class ValidationResolver {
 
   @Roles(Role.STUDENT)
   @UseGuards(GqlPlayerOfGuard)
+  @Query(() => ValidationDto)
+  async latestValidation(
+    @GqlPlayer('id') playerId: string,
+    @Args('gameId') gameId: string,
+    @Args('exerciseId') exerciseId: string,
+  ): Promise<ValidationDto> {
+    const validation: Validation = await this.validationService.findOne(
+      {
+        game: gameId,
+        player: playerId,
+        exerciseId: exerciseId,
+      },
+      {},
+      { sort: { createdAt: -1 } },
+    );
+    return await this.validationToDtoMapper.transform(validation);
+  }
+
+  @Roles(Role.STUDENT)
+  @UseGuards(GqlPlayerOfGuard)
   @Query(() => [ValidationDto])
   async myValidations(
     @GqlUserInfo('sub') userId: string,
