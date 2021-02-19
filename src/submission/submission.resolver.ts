@@ -89,7 +89,11 @@ export class SubmissionResolver {
     @Args('exerciseId') exerciseId: string,
   ): Promise<SubmissionDto> {
     const submission: Submission = await this.submissionService.findOne(
-      { exerciseId: exerciseId },
+      {
+        game: gameId,
+        player: playerId,
+        exerciseId: exerciseId,
+      },
       {},
       { sort: { createdAt: -1 } },
     );

@@ -75,7 +75,11 @@ export class ValidationResolver {
     @Args('exerciseId') exerciseId: string,
   ): Promise<ValidationDto> {
     const validation: Validation = await this.validationService.findOne(
-      { exerciseId: exerciseId },
+      {
+        game: gameId,
+        player: playerId,
+        exerciseId: exerciseId,
+      },
       {},
       { sort: { createdAt: -1 } },
     );
