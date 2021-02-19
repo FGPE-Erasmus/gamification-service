@@ -1,5 +1,6 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { GameDto } from '../../game/dto/game.dto';
+import { CodeSkeletonDto } from './code-skeleton.dto';
 
 @ObjectType('Activity')
 export class ActivityDto {
@@ -32,4 +33,7 @@ export class ActivityDto {
 
   @Field({ nullable: true, defaultValue: false })
   pdf?: boolean;
+
+  @Field(() => [CodeSkeletonDto], { nullable: true })
+  codeSkeletons?: CodeSkeletonDto[];
 }
