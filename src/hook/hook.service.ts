@@ -328,11 +328,11 @@ export class HookService {
   private async runUpdateActions(gameId: string, playerId: string, parameters: string[]) {
     switch (parameters[0].toUpperCase()) {
       case 'PLAYER':
-        await this.updatePlayer(gameId, playerId, parameters[1], parameters[2]);
+        return await this.updatePlayer(gameId, playerId, parameters[1], parameters[2]);
       case 'CHALLENGE':
-        await this.updateChallenge(gameId, parameters[1], playerId, parameters[2], parameters[3]);
+        return await this.updateChallenge(gameId, parameters[1], playerId, parameters[2], parameters[3]);
       case 'GAME':
-        await this.updateGame(gameId, parameters[1], parameters[2]);
+        return await this.updateGame(gameId, parameters[1], parameters[2]);
     }
   }
 

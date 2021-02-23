@@ -77,8 +77,7 @@ export async function inferCriteriaEntityValue(
       return JSONPath({ path: property, json: event });
 
     case 'PLAYER': //property is the JSONPath to be applied to the player inside the trigger
-      const entry = JSONPath({ path: property, json: await resolvers.player(params.playerId) });
-      return entry;
+      return JSONPath({ path: property, json: await resolvers.player(params.playerId) });
 
     case 'ENVIRONMENT': //JSON object with current time, submissions, and players
       let environment;
