@@ -11,6 +11,8 @@ import { Reward } from './models/reward.model';
 import { UseGuards } from '@nestjs/common';
 import { GqlInstructorAssignedGuard } from '../common/guards/gql-instructor-assigned.guard';
 import { GqlPlayerOfGuard } from '../common/guards/gql-player-of.guard';
+import { GqlPlayer } from '../common/decorators/gql-player.decorator';
+import { PlayerReward } from '../player-reward/models/player-reward.model';
 
 @Resolver(() => RevealDto)
 export class RevealResolver extends RewardResolver {
@@ -32,5 +34,19 @@ export class RevealResolver extends RewardResolver {
       _id: { $in: challengeIds },
     });
     return Promise.all(challenges.map(async challenge => this.challengeToDtoMapper.transform(challenge)));
+  }
+
+  @Roles(Role.STUDENT)
+  @UseGuards(GqlPlayerOfGuard)
+  @Query(() => [RevealDto])
+  async playerReveals(@Args('gameId') gameId: string, @GqlPlayer('id') playerId: string): Promise<RevealDto[]> {
+    const gameReveals: Reward[] = await this.rewardService.findByGameId(gameId, RewardType.REVEAL);
+    const playerReveals: PlayerReward[] = await this.playerRewardService.findAll({
+      player: { $eq: playerId },
+    });
+    const reveals: Reward[] = gameReveals.filter(reveal1 =>
+      playerReveals.some(reveal2 => reveal1.id === reveal2.reward),
+    );
+    return Promise.all(reveals.map(async reveal => this.rewardToDtoMapper.transform(reveal)));
   }
 }

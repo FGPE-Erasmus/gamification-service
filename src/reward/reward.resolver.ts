@@ -23,6 +23,7 @@ import { GqlInstructorAssignedGuard } from '../common/guards/gql-instructor-assi
 import { GqlPlayerOfGuard } from '../common/guards/gql-player-of.guard';
 import { PlayerRewardDto } from '../player-reward/dto/player-reward.dto';
 import { GqlPlayer } from '../common/decorators/gql-player.decorator';
+import { PlayerRewardService } from '../player-reward/player-reward.service';
 
 @Resolver(() => RewardDto, { isAbstract: true })
 export class RewardResolver {
@@ -36,6 +37,7 @@ export class RewardResolver {
     protected readonly playerToDtoMapper: PlayerToDtoMapper,
     protected readonly challengeService: ChallengeService,
     protected readonly challengeToDtoMapper: ChallengeToDtoMapper,
+    protected readonly playerRewardService: PlayerRewardService,
   ) {}
 
   @Roles(Role.AUTHOR, Role.TEACHER, Role.STUDENT)
