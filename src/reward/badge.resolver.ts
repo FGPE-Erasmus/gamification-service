@@ -28,7 +28,7 @@ export class BadgeResolver extends RewardResolver {
   async playerBadges(@Args('gameId') gameId: string, @GqlPlayer('id') playerId: string): Promise<BadgeDto[]> {
     const gameBadges: Reward[] = await this.rewardService.findByGameId(gameId, RewardType.BADGE);
     const playerBadges: PlayerReward[] = await this.playerRewardService.findAll({
-      player: playerId,
+      player: { $eq: playerId },
     });
     const badges: Reward[] = gameBadges.filter(badge1 => playerBadges.some(badge2 => badge1.id === badge2.reward));
     return Promise.all(badges.map(async badge => this.rewardToDtoMapper.transform(badge)));
