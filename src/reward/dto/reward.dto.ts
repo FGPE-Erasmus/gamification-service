@@ -3,7 +3,7 @@ import { Field, ID, ObjectType } from '@nestjs/graphql';
 import { RewardType } from '../models/reward-type.enum';
 import { ChallengeDto } from '../../challenge/dto/challenge.dto';
 import { GameDto } from '../../game/dto/game.dto';
-import { PlayerDto } from '../../player/dto/player.dto';
+import { PlayerRewardDto } from '../../player-reward/dto/player-reward.dto';
 
 @ObjectType('Reward')
 export class RewardDto {
@@ -43,7 +43,7 @@ export class RewardDto {
   @Field(() => [ChallengeDto], { nullable: true })
   challenges?: string[];
 
-  @Field(() => [PlayerDto], { nullable: true })
+  @Field(() => [PlayerRewardDto])
   players?: string[];
 
   @Field(() => Date)

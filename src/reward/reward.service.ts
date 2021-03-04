@@ -16,6 +16,8 @@ import { CategoryEnum } from '../hook/enums/category.enum';
 import { NotificationEnum } from '../common/enums/notifications.enum';
 import { NotificationService } from '../notifications/notification.service';
 import { RewardToDtoMapper } from './mappers/reward-to-dto.mapper';
+import { PlayerRewardService } from '../player-reward/player-reward.service';
+import { PlayerReward } from '../player-reward/models/player-reward.model';
 
 @Injectable()
 export class RewardService extends BaseService<Reward, RewardDocument> {
@@ -26,6 +28,7 @@ export class RewardService extends BaseService<Reward, RewardDocument> {
     protected readonly actionHookService: ActionHookService,
     protected readonly notificationService: NotificationService,
     protected readonly rewardToDtoMapper: RewardToDtoMapper,
+    protected readonly playerRewardService: PlayerRewardService,
   ) {
     super(new Logger(RewardService.name), repository);
   }
@@ -156,14 +159,23 @@ export class RewardService extends BaseService<Reward, RewardDocument> {
     if (kind) {
       query.kind = { $eq: kind };
     }
+    console.log(query);
     return await this.findAll(query);
   }
 
   async findByGameIdAndPlayerId(gameId: string, playerId: string, kind?: RewardType): Promise<Reward[]> {
-    const query: { game: any; players: any; kind?: any } = { game: { $eq: gameId }, players: playerId };
+    const playerRewards: PlayerReward[] = await this.playerRewardService.findAll({
+      player: playerId,
+    });
+    const query: { game: any; players: any; kind?: any } = {
+      game: { $eq: gameId },
+      players: { $in: playerRewards },
+    };
     if (kind) {
       query.kind = { $eq: kind };
     }
+    console.log(query);
+    console.log(playerId);
     return await this.findAll(query);
   }
 }

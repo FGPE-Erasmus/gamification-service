@@ -23,6 +23,9 @@ import { GqlInstructorAssignedGuard } from '../common/guards/gql-instructor-assi
 import { GqlPlayerOfGuard } from '../common/guards/gql-player-of.guard';
 import { PlayerRewardDto } from '../player-reward/dto/player-reward.dto';
 import { GqlPlayer } from '../common/decorators/gql-player.decorator';
+import { PlayerReward } from '../player-reward/models/player-reward.model';
+import { PlayerRewardService } from '../player-reward/player-reward.service';
+import { PlayerRewardToDtoMapper } from '../player-reward/mappers/player-reward-to-dto.mapper';
 
 @Resolver(() => RewardDto, { isAbstract: true })
 export class RewardResolver {
@@ -36,6 +39,8 @@ export class RewardResolver {
     protected readonly playerToDtoMapper: PlayerToDtoMapper,
     protected readonly challengeService: ChallengeService,
     protected readonly challengeToDtoMapper: ChallengeToDtoMapper,
+    protected readonly playerRewardService: PlayerRewardService,
+    protected readonly playerRewardToDtoMapper: PlayerRewardToDtoMapper,
   ) {}
 
   @Roles(Role.AUTHOR, Role.TEACHER, Role.STUDENT)
@@ -63,14 +68,11 @@ export class RewardResolver {
     return this.challengeToDtoMapper.transform(parentChallenge);
   }
 
-  @ResolveField('players', () => [PlayerDto])
-  async players(@Parent() root: RewardDto): Promise<PlayerDto[]> {
-    const { players: playerIds } = root;
-    if (!playerIds || playerIds.length === 0) {
-      return [];
-    }
-    const players: Player[] = await this.playerService.findAll({ _id: { $in: playerIds } });
-    return Promise.all(players.map(async player => this.playerToDtoMapper.transform(player)));
+  @ResolveField('players', () => [PlayerRewardDto])
+  async players(@Parent() root: RewardDto): Promise<PlayerRewardDto[]> {
+    const { id: rewardId } = root;
+    const rewards: PlayerReward[] = await this.playerRewardService.findAll({ reward: { $eq: rewardId } });
+    return Promise.all(rewards.map(async reward => this.playerRewardToDtoMapper.transform(reward)));
   }
 
   //Subscriptions for students
