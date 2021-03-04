@@ -159,7 +159,6 @@ export class RewardService extends BaseService<Reward, RewardDocument> {
     if (kind) {
       query.kind = { $eq: kind };
     }
-    console.log(query);
     return await this.findAll(query);
   }
 
@@ -174,8 +173,6 @@ export class RewardService extends BaseService<Reward, RewardDocument> {
     if (kind) {
       query.kind = { $eq: kind };
     }
-    console.log(query);
-    console.log(playerId);
     return await this.findAll(query);
   }
 }

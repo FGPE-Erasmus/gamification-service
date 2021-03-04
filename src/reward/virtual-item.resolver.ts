@@ -33,6 +33,6 @@ export class VirtualItemResolver extends RewardResolver {
       playerId,
       RewardType.VIRTUAL_ITEM,
     );
-    return Promise.all(virtualItems.map(async VirtualItem => this.rewardToDtoMapper.transform(VirtualItem)));
+    return Promise.all(virtualItems.map(async virtualItem => this.rewardToDtoMapper.transform(virtualItem)));
   }
 }

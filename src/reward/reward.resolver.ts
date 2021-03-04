@@ -71,8 +71,8 @@ export class RewardResolver {
   @ResolveField('players', () => [PlayerRewardDto])
   async players(@Parent() root: RewardDto): Promise<PlayerRewardDto[]> {
     const { id: rewardId } = root;
-    const rewards: PlayerReward[] = await this.playerRewardService.findAll({ reward: { $eq: rewardId } });
-    return Promise.all(rewards.map(async reward => this.playerRewardToDtoMapper.transform(reward)));
+    const players: PlayerReward[] = await this.playerRewardService.findAll({ reward: { $eq: rewardId } });
+    return Promise.all(players.map(async player => this.playerRewardToDtoMapper.transform(player)));
   }
 
   //Subscriptions for students
