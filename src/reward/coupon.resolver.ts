@@ -26,13 +26,7 @@ export class CouponResolver extends RewardResolver {
   @UseGuards(GqlPlayerOfGuard)
   @Query(() => [CouponDto])
   async playerCoupons(@Args('gameId') gameId: string, @GqlPlayer('id') playerId: string): Promise<CouponDto[]> {
-    const gameCoupons: Reward[] = await this.rewardService.findByGameId(gameId, RewardType.COUPON);
-    const playerCoupons: PlayerReward[] = await this.playerRewardService.findAll({
-      player: { $eq: playerId },
-    });
-    const coupons: Reward[] = gameCoupons.filter(coupon1 =>
-      playerCoupons.some(coupon2 => coupon1.id === coupon2.reward),
-    );
+    const coupons: Reward[] = await this.rewardService.findByGameIdAndPlayerId(gameId, playerId, RewardType.COUPON);
     return Promise.all(coupons.map(async coupon => this.rewardToDtoMapper.transform(coupon)));
   }
 }

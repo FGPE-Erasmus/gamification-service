@@ -30,17 +30,10 @@ export class HintResolver extends RewardResolver {
     @GqlPlayer('id') playerId: string,
     @Args('challengeId') challengeId?: string,
   ): Promise<HintDto[]> {
-    let gameHints: Reward[];
+    let hints: Reward[] = await this.rewardService.findByGameIdAndPlayerId(gameId, playerId, RewardType.HINT);
     if (challengeId) {
-      gameHints = await this.rewardService.findAll({
-        $and: [{ game: gameId }, { parentChallenge: challengeId }],
-      });
+      hints = hints.filter(hint => hint.parentChallenge === challengeId);
     }
-    gameHints = await this.rewardService.findByGameId(gameId);
-    const playerHints: PlayerReward[] = await this.playerRewardService.findAll({
-      player: { $eq: playerId },
-    });
-    const hints: Reward[] = gameHints.filter(hint1 => playerHints.some(hint2 => hint1.id === hint2.reward));
     return Promise.all(hints.map(async hint => this.rewardToDtoMapper.transform(hint)));
   }
 }

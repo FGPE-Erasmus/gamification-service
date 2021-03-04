@@ -40,13 +40,7 @@ export class RevealResolver extends RewardResolver {
   @UseGuards(GqlPlayerOfGuard)
   @Query(() => [RevealDto])
   async playerReveals(@Args('gameId') gameId: string, @GqlPlayer('id') playerId: string): Promise<RevealDto[]> {
-    const gameReveals: Reward[] = await this.rewardService.findByGameId(gameId, RewardType.REVEAL);
-    const playerReveals: PlayerReward[] = await this.playerRewardService.findAll({
-      player: { $eq: playerId },
-    });
-    const reveals: Reward[] = gameReveals.filter(reveal1 =>
-      playerReveals.some(reveal2 => reveal1.id === reveal2.reward),
-    );
+    const reveals: Reward[] = await this.rewardService.findByGameIdAndPlayerId(gameId, playerId, RewardType.REVEAL);
     return Promise.all(reveals.map(async reveal => this.rewardToDtoMapper.transform(reveal)));
   }
 }

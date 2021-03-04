@@ -212,13 +212,13 @@ export class HookService {
    * @param {string[]} parameters Parameters of the event
    */
   private async runGiveActions(gameId: string, playerId: string, parameters: string[]): Promise<void> {
-    if (parameters[0].toUpperCase() !== 'POINTS') {
-      const reward: Reward = await this.rewardService.findById(parameters[0]);
-      const playerReward: PlayerReward = await this.playerRewardService.findOne({
-        player: playerId,
-        reward: reward.id,
-      });
+    const reward: Reward = await this.rewardService.findById(parameters[0]);
+    const playerReward: PlayerReward = await this.playerRewardService.findOne({
+      player: playerId,
+      reward: reward.id,
+    });
 
+    if (parameters[0].toUpperCase() !== 'POINTS') {
       if (playerReward && !reward.recurrent) {
         // player already has the reward and it is not accumulative
         return;
@@ -238,6 +238,8 @@ export class HookService {
           reward: reward.id,
           count: reward.recurrent && parameters[1] ? +parameters[1] : 1,
         });
+        // add player to the list in reward obj
+        await this.rewardService.findOneAndUpdate({ _id: { $eq: reward.id } }, { $addToSet: { players: playerId } });
         this.notificationService.sendNotification(
           NotificationEnum.REWARD_RECEIVED,
           await this.playerRewardToDtoMapper.transform(createdPlayerReward),
@@ -257,6 +259,8 @@ export class HookService {
         { _id: playerId },
         { $inc: { points: quantity } },
       );
+      await this.rewardService.findOneAndUpdate({ _id: { $eq: reward.id } }, { $addToSet: { players: playerId } });
+
       this.notificationService.sendNotification(
         NotificationEnum.POINTS_UPDATED,
         await this.playerToDtoMapper.transform(updatedPointsPlayer),
@@ -297,6 +301,11 @@ export class HookService {
           player: playerId,
           reward: parameters,
         });
+        await this.rewardService.findOneAndUpdate(
+          { _id: { $eq: parameters } },
+          { $pull: { players: { $eq: playerId } } },
+        );
+
         this.notificationService.sendNotification(
           NotificationEnum.REWARD_REMOVED,
           await this.playerRewardToDtoMapper.transform(playerReward),

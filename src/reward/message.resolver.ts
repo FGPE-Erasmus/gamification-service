@@ -26,13 +26,7 @@ export class MessageResolver extends RewardResolver {
   @UseGuards(GqlPlayerOfGuard)
   @Query(() => [MessageDto])
   async playerMessages(@Args('gameId') gameId: string, @GqlPlayer('id') playerId: string): Promise<MessageDto[]> {
-    const gameMessages: Reward[] = await this.rewardService.findByGameId(gameId, RewardType.MESSAGE);
-    const playerMessages: PlayerReward[] = await this.playerRewardService.findAll({
-      player: { $eq: playerId },
-    });
-    const messages: Reward[] = gameMessages.filter(message1 =>
-      playerMessages.some(message2 => message1.id === message2.reward),
-    );
+    const messages: Reward[] = await this.rewardService.findByGameIdAndPlayerId(gameId, playerId, RewardType.MESSAGE);
     return Promise.all(messages.map(async message => this.rewardToDtoMapper.transform(message)));
   }
 }

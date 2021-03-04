@@ -26,11 +26,7 @@ export class PointResolver extends RewardResolver {
   @UseGuards(GqlPlayerOfGuard)
   @Query(() => [PointDto])
   async playerPoints(@Args('gameId') gameId: string, @GqlPlayer('id') playerId: string): Promise<PointDto[]> {
-    const gamePoints: Reward[] = await this.rewardService.findByGameId(gameId, RewardType.POINT);
-    const playerPoints: PlayerReward[] = await this.playerRewardService.findAll({
-      player: { $eq: playerId },
-    });
-    const points: Reward[] = gamePoints.filter(point1 => playerPoints.some(point2 => point1.id === point2.reward));
+    const points: Reward[] = await this.rewardService.findByGameIdAndPlayerId(gameId, playerId, RewardType.POINT);
     return Promise.all(points.map(async point => this.rewardToDtoMapper.transform(point)));
   }
 }

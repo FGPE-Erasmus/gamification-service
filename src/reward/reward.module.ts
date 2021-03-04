@@ -21,7 +21,6 @@ import { RewardSchema } from './models/reward.model';
 import { RewardRepository } from './repositories/reward.repository';
 import { RewardToDtoMapper } from './mappers/reward-to-dto.mapper';
 import { NotificationModule } from '../notifications/notification.module';
-import { PlayerRewardModule } from '../player-reward/player-reward.module';
 
 @Module({
   imports: [
@@ -38,7 +37,6 @@ import { PlayerRewardModule } from '../player-reward/player-reward.module';
     forwardRef(() => HookModule),
     forwardRef(() => SubscriptionsModule),
     forwardRef(() => NotificationModule),
-    forwardRef(() => PlayerRewardModule),
   ],
   providers: [
     RewardToDtoMapper,

@@ -15,7 +15,7 @@ type Reward {
   amount: Float
   message: String
   challenges: [Challenge!]
-  players: [PlayerReward!]!
+  players: [Player!]
   createdAt: Date!
   updatedAt: Date
 }
@@ -252,7 +252,7 @@ type Badge {
   image: String
   recurrent: Boolean!
   cost: Float
-  players: [PlayerReward!]!
+  players: [Player!]
   createdAt: Date!
   updatedAt: Date
 }
@@ -267,7 +267,7 @@ type Coupon {
   recurrent: Boolean!
   cost: Float
   amount: Float
-  players: [PlayerReward!]!
+  players: [Player!]
   createdAt: Date!
   updatedAt: Date
 }
@@ -283,7 +283,7 @@ type Hint {
   cost: Float
   message: String
   challenges: [Challenge!]
-  players: [PlayerReward!]!
+  players: [Player!]
   createdAt: Date!
   updatedAt: Date
 }
@@ -299,7 +299,7 @@ type Message {
   cost: Float
   message: String
   challenges: [Challenge!]
-  players: [PlayerReward!]!
+  players: [Player!]
   createdAt: Date!
   updatedAt: Date
 }
@@ -312,7 +312,7 @@ type Point {
   description: String
   recurrent: Boolean!
   amount: Float
-  players: [PlayerReward!]!
+  players: [Player!]
   createdAt: Date!
   updatedAt: Date
 }
@@ -327,7 +327,7 @@ type VirtualItem {
   recurrent: Boolean!
   cost: Float
   amount: Float
-  players: [PlayerReward!]!
+  players: [Player!]
   createdAt: Date!
   updatedAt: Date
 }
@@ -341,7 +341,7 @@ type Unlock {
   recurrent: Boolean!
   cost: Float
   challenges: [Challenge!]!
-  players: [PlayerReward!]!
+  players: [Player!]
   createdAt: Date!
   updatedAt: Date
 }
@@ -355,7 +355,7 @@ type Reveal {
   recurrent: Boolean!
   cost: Float
   challenges: [Challenge!]!
-  players: [PlayerReward!]!
+  players: [Player!]
   createdAt: Date!
   updatedAt: Date
 }

@@ -54,7 +54,7 @@ export class RewardDocument extends Document implements Reward {
   @Prop({ type: [{ type: Types.ObjectId, ref: 'Challenge' }], nullable: true })
   challenges?: any[];
 
-  @Prop({ type: [{ type: Types.ObjectId, ref: 'PlayerReward' }] })
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'Player' }], nullable: true })
   players?: any[];
 }
 

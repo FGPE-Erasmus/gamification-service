@@ -158,4 +158,12 @@ export class RewardService extends BaseService<Reward, RewardDocument> {
     }
     return await this.findAll(query);
   }
+
+  async findByGameIdAndPlayerId(gameId: string, playerId: string, kind?: RewardType): Promise<Reward[]> {
+    const query: { game: any; players: any; kind?: any } = { game: { $eq: gameId }, players: playerId };
+    if (kind) {
+      query.kind = { $eq: kind };
+    }
+    return await this.findAll(query);
+  }
 }

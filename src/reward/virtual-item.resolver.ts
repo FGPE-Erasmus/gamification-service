@@ -10,7 +10,6 @@ import { UseGuards } from '@nestjs/common';
 import { GqlInstructorAssignedGuard } from '../common/guards/gql-instructor-assigned.guard';
 import { GqlPlayerOfGuard } from '../common/guards/gql-player-of.guard';
 import { GqlPlayer } from '../common/decorators/gql-player.decorator';
-import { PlayerReward } from '../player-reward/models/player-reward.model';
 
 @Resolver(() => VirtualItemDto)
 export class VirtualItemResolver extends RewardResolver {
@@ -29,12 +28,10 @@ export class VirtualItemResolver extends RewardResolver {
     @Args('gameId') gameId: string,
     @GqlPlayer('id') playerId: string,
   ): Promise<VirtualItemDto[]> {
-    const gameVirtualItems: Reward[] = await this.rewardService.findByGameId(gameId, RewardType.VIRTUAL_ITEM);
-    const playerVirtualItems: PlayerReward[] = await this.playerRewardService.findAll({
-      player: { $eq: playerId },
-    });
-    const virtualItems: Reward[] = gameVirtualItems.filter(virtualItem1 =>
-      playerVirtualItems.some(virtualItem2 => virtualItem1.id === virtualItem2.reward),
+    const virtualItems: Reward[] = await this.rewardService.findByGameIdAndPlayerId(
+      gameId,
+      playerId,
+      RewardType.VIRTUAL_ITEM,
     );
     return Promise.all(virtualItems.map(async VirtualItem => this.rewardToDtoMapper.transform(VirtualItem)));
   }
