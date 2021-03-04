@@ -12,10 +12,10 @@ export class RewardRepository extends BaseRepository<Reward, RewardDocument> {
   }
 
   async upsertPlayerReward(id: string, playerReward: { id: string }): Promise<Reward> {
-    return await this.findOneAndUpdate({ _id: id }, { $addToSet: { rewards: playerReward.id } });
+    return await this.findOneAndUpdate({ _id: id }, { $addToSet: { players: playerReward.id } });
   }
 
   async removePlayerReward(id: string, playerReward: { id: string }): Promise<Reward> {
-    return await this.findOneAndUpdate({ _id: id }, { $pull: { rewards: { _id: playerReward.id } } });
+    return await this.findOneAndUpdate({ _id: id }, { $pullAll: { players: [playerReward.id] } }, { multi: true });
   }
 }

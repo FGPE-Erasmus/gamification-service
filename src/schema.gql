@@ -521,13 +521,21 @@ type Query {
   alive: String!
   rewards(gameId: String!): [Reward!]!
   badges(gameId: String!): [Badge!]!
+  playerBadges(gameId: String!): [Badge!]!
   coupons(gameId: String!): [Coupon!]!
+  playerCoupons(gameId: String!): [Coupon!]!
   hints(gameId: String!): [Hint!]!
+  playerHints(challengeId: String!, gameId: String!): [Hint!]!
   messages(gameId: String!): [Message!]!
+  playerMessages(gameId: String!): [Message!]!
   points(gameId: String!): [Point!]!
+  playerPoints(gameId: String!): [Point!]!
   virtualItems(gameId: String!): [VirtualItem!]!
+  playerVirtualItems(gameId: String!): [VirtualItem!]!
   unlocks(gameId: String!): [Unlock!]!
+  playerUnlocks(gameId: String!): [Unlock!]!
   reveals(gameId: String!): [Reveal!]!
+  playerReveals(gameId: String!): [Reveal!]!
   programmingLanguages(gameId: String!): [ProgrammingLanguage!]!
   programmingLanguage(languageId: String!, gameId: String!): ProgrammingLanguage!
   activities(challengeId: String!, gameId: String!): [Activity!]!

@@ -9,6 +9,8 @@ import { Role } from '../common/enums/role.enum';
 import { UseGuards } from '@nestjs/common';
 import { GqlInstructorAssignedGuard } from '../common/guards/gql-instructor-assigned.guard';
 import { GqlPlayerOfGuard } from '../common/guards/gql-player-of.guard';
+import { GqlPlayer } from '../common/decorators/gql-player.decorator';
+import { PlayerReward } from '../player-reward/models/player-reward.model';
 
 @Resolver(() => PointDto)
 export class PointResolver extends RewardResolver {
@@ -18,5 +20,13 @@ export class PointResolver extends RewardResolver {
   async points(@Args('gameId') gameId: string): Promise<PointDto[]> {
     const rewards: Reward[] = await this.rewardService.findByGameId(gameId, RewardType.POINT);
     return Promise.all(rewards.map(async reward => this.rewardToDtoMapper.transform(reward)));
+  }
+
+  @Roles(Role.STUDENT)
+  @UseGuards(GqlPlayerOfGuard)
+  @Query(() => [PointDto])
+  async playerPoints(@Args('gameId') gameId: string, @GqlPlayer('id') playerId: string): Promise<PointDto[]> {
+    const points: Reward[] = await this.rewardService.findByGameIdAndPlayerId(gameId, playerId, RewardType.POINT);
+    return Promise.all(points.map(async point => this.rewardToDtoMapper.transform(point)));
   }
 }

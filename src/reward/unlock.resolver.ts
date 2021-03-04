@@ -11,6 +11,7 @@ import { RewardResolver } from './reward.resolver';
 import { Reward } from './models/reward.model';
 import { GqlInstructorAssignedGuard } from '../common/guards/gql-instructor-assigned.guard';
 import { GqlPlayerOfGuard } from '../common/guards/gql-player-of.guard';
+import { GqlPlayer } from '../common/decorators/gql-player.decorator';
 
 @Resolver(() => UnlockDto)
 export class UnlockResolver extends RewardResolver {
@@ -32,5 +33,13 @@ export class UnlockResolver extends RewardResolver {
       _id: { $in: challengeIds },
     });
     return Promise.all(challenges.map(async challenge => this.challengeToDtoMapper.transform(challenge)));
+  }
+
+  @Roles(Role.STUDENT)
+  @UseGuards(GqlPlayerOfGuard)
+  @Query(() => [UnlockDto])
+  async playerUnlocks(@Args('gameId') gameId: string, @GqlPlayer('id') playerId: string): Promise<UnlockDto[]> {
+    const unlocks: Reward[] = await this.rewardService.findByGameIdAndPlayerId(gameId, playerId, RewardType.UNLOCK);
+    return Promise.all(unlocks.map(async unlock => this.rewardToDtoMapper.transform(unlock)));
   }
 }
