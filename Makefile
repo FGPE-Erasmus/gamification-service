@@ -18,7 +18,7 @@ run:
 	docker run -d -i \
     --env-file $(variables) \
     --name $(APP_NAME) \
-    -p $(APP_PORT):$(APP_PORT) \
+    -p 3000:3000 \
     $(APP_NAME)
 
 up: build run

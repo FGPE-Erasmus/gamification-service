@@ -28,15 +28,18 @@ export class EvaluationEngineService {
   ) {}
 
   async getProgrammingLanguages(gameId: string): Promise<ProgrammingLanguageDto[]> {
+    // get the game
+    const game = await this.gameService.findById(gameId);
+
     // get a token
     const { token } = await this.mooshakService.login(
-      'proto_fgpe' || gameId,
+      game.courseId,
       appConfig.evaluationEngine.username,
       appConfig.evaluationEngine.password,
     );
 
     // evaluate the attempt
-    return await this.mooshakService.getLanguages(gameId, {
+    return await this.mooshakService.getLanguages(game.courseId, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -44,25 +47,28 @@ export class EvaluationEngineService {
   }
 
   async getProgrammingLanguage(gameId: string, languageId: string): Promise<ProgrammingLanguageDto> {
+    // get the game
+    const game = await this.gameService.findById(gameId);
+
     // get a token
     const { token } = await this.mooshakService.login(
-      'proto_fgpe' || gameId,
+      game.courseId,
       appConfig.evaluationEngine.username,
       appConfig.evaluationEngine.password,
     );
 
     // evaluate the attempt
-    return await this.mooshakService.getLanguage(gameId, languageId, {
+    return await this.mooshakService.getLanguage(game.courseId, languageId, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
   }
 
-  async getActivities(gameId: string, activityIds: string[]): Promise<ActivityDto[]> {
+  async getActivities(courseId: string, activityIds: string[]): Promise<ActivityDto[]> {
     // get a token
     const { token } = await this.mooshakService.login(
-      'proto_fgpe' || gameId,
+      courseId,
       appConfig.evaluationEngine.username,
       appConfig.evaluationEngine.password,
     );
@@ -71,7 +77,7 @@ export class EvaluationEngineService {
     const activities = [];
     for (const activityId of activityIds) {
       activities.push(
-        await this.mooshakService.getActivity(gameId, activityId, {
+        await this.mooshakService.getActivity(courseId, activityId, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -81,14 +87,19 @@ export class EvaluationEngineService {
     return activities;
   }
 
-  async getActivity(gameId: string, activityId: string): Promise<ActivityDto> {
-    return (await this.getActivities(gameId, [activityId]))[0];
+  async getActivity(courseId: string, activityId: string): Promise<ActivityDto> {
+    // get the activities
+    return (await this.getActivities(courseId, [activityId]))[0];
   }
 
   async validate(gameId: string, validationId: string, file: IFile, inputs: string[]): Promise<void> {
-    const content: string = await streamToString(file.content);
+    // get the game
     const game = await this.gameService.findById(gameId);
+
+    // validate
+    const content: string = await streamToString(file.content);
     await this.evaluationQueue.add(`${(game.evaluationEngine || 'BASE').toUpperCase()}_${REQUEST_VALIDATION_JOB}`, {
+      courseId: game.courseId,
       validationId,
       filename: file.filename,
       content,
@@ -97,9 +108,13 @@ export class EvaluationEngineService {
   }
 
   async evaluate(gameId: string, submissionId: string, file: IFile): Promise<void> {
-    const content: string = await streamToString(file.content);
+    // get the game
     const game = await this.gameService.findById(gameId);
+
+    // evaluate
+    const content: string = await streamToString(file.content);
     await this.evaluationQueue.add(`${(game.evaluationEngine || 'BASE').toUpperCase()}_${REQUEST_EVALUATION_JOB}`, {
+      courseId: game.courseId,
       submissionId,
       filename: file.filename,
       content,
@@ -107,17 +122,20 @@ export class EvaluationEngineService {
   }
 
   async getValidationProgram(validationId: string): Promise<string> {
-    const validation: Validation = await this.validationService.findById(validationId);
+    const validation: Validation = await this.validationService.findById(validationId, null, {
+      lean: true,
+      populate: 'game',
+    });
 
     // get a token
     const { token } = await this.mooshakService.login(
-      'proto_fgpe' || validation.game,
+      validation.game.courseId,
       appConfig.evaluationEngine.username,
       appConfig.evaluationEngine.password,
     );
 
     // get the program
-    return await this.mooshakService.getValidationProgram(validation, {
+    return await this.mooshakService.getValidationProgram(validation.game.courseId, validation, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -125,17 +143,20 @@ export class EvaluationEngineService {
   }
 
   async getSubmissionProgram(submissionId: string): Promise<string> {
-    const submission: Submission = await this.submissionService.findById(submissionId);
+    const submission: Submission = await this.submissionService.findById(submissionId, null, {
+      lean: true,
+      populate: 'game',
+    });
 
     // get a token
     const { token } = await this.mooshakService.login(
-      'proto_fgpe' || submission.game,
+      submission.game.courseId,
       appConfig.evaluationEngine.username,
       appConfig.evaluationEngine.password,
     );
 
     // get the program
-    return await this.mooshakService.getEvaluationProgram(submission, {
+    return await this.mooshakService.getEvaluationProgram(submission.game.courseId, submission, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

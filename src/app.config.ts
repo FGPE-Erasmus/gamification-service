@@ -122,8 +122,8 @@ export const appConfig: IAppConfig = {
     username: process.env.EE_USERNAME,
     password: process.env.EE_PASSWORD,
   },
-  port: +process.env.APP_PORT,
-  host: process.env.APP_HOST,
+  port: 3000,
+  host: '0.0.0.0',
   http: {
     timeout: +process.env.HTTP_TIMEOUT || 5000,
     maxRedirects: +process.env.HTTP_MAX_REDIRECTS || 5,

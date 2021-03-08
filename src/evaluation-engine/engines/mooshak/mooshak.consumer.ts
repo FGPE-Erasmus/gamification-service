@@ -53,16 +53,19 @@ export class MooshakConsumer {
   @Process(`MOOSHAK_${REQUEST_EVALUATION_JOB}`)
   async onEvaluationRequested(job: Job<unknown>): Promise<void> {
     const { submissionId, filename, content } = job.data as IRequestEvaluationJobData;
-    let submission: Submission = await this.submissionService.findById(submissionId);
+    let submission: Submission = await this.submissionService.findById(submissionId, null, {
+      lean: true,
+      populate: 'game',
+    });
     let modeParameters;
 
     const challenge: Challenge = await this.challengeService.findOne({
-      $and: [{ refs: submission.exerciseId }, { game: submission.game }],
+      $and: [{ refs: submission.exerciseId }, { game: submission.game.id }],
     });
 
     // get a token
     const { token } = await this.mooshakService.login(
-      submission.game as string,
+      submission.game.courseId,
       appConfig.evaluationEngine.username,
       appConfig.evaluationEngine.password,
     );
@@ -73,6 +76,7 @@ export class MooshakConsumer {
 
     // evaluate the attempt
     const result = await this.mooshakService.evaluate(
+      submission.game.courseId,
       submission,
       filename,
       content,
@@ -106,17 +110,20 @@ export class MooshakConsumer {
   @Process(`MOOSHAK_${WAIT_EVALUATION_RESULT_JOB}`)
   async onWaitEvaluationResult(job: Job<unknown>): Promise<void> {
     const { submissionId } = job.data as { submissionId: string };
-    const submission: Submission = await this.submissionService.findById(submissionId);
+    const submission: Submission = await this.submissionService.findById(submissionId, null, {
+      lean: true,
+      populate: 'game',
+    });
 
     // get a token
     const { token } = await this.mooshakService.login(
-      submission.game as string,
+      submission.game.courseId,
       appConfig.evaluationEngine.username,
       appConfig.evaluationEngine.password,
     );
 
     // evaluate the attempt
-    const result: EvaluationDto = await this.mooshakService.getEvaluationReport(submission, {
+    const result: EvaluationDto = await this.mooshakService.getEvaluationReport(submission.game.courseId, submission, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -156,17 +163,20 @@ export class MooshakConsumer {
   @Process(`MOOSHAK_${REQUEST_VALIDATION_JOB}`)
   async onValidationRequested(job: Job<unknown>): Promise<void> {
     const { validationId, filename, content, inputs } = job.data as IRequestValidationJobData;
-    let validation: Validation = await this.validationService.findById(validationId);
+    let validation: Validation = await this.validationService.findById(validationId, null, {
+      lean: true,
+      populate: 'game',
+    });
 
     // get a token
     const { token } = await this.mooshakService.login(
-      validation.game as string,
+      validation.game.courseId,
       appConfig.evaluationEngine.username,
       appConfig.evaluationEngine.password,
     );
 
     // evaluate the attempt
-    const result = await this.mooshakService.validate(validation, filename, content, inputs, {
+    const result = await this.mooshakService.validate(validation.game.courseId, validation, filename, content, inputs, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -194,17 +204,20 @@ export class MooshakConsumer {
   @Process(`MOOSHAK_${WAIT_VALIDATION_RESULT_JOB}`)
   async onWaitValidationResult(job: Job<unknown>): Promise<void> {
     const { validationId } = job.data as { validationId: string };
-    const validation: Validation = await this.validationService.findById(validationId);
+    const validation: Validation = await this.validationService.findById(validationId, null, {
+      lean: true,
+      populate: 'game',
+    });
 
     // get a token
     const { token } = await this.mooshakService.login(
-      validation.game as string,
+      validation.game.courseId,
       appConfig.evaluationEngine.username,
       appConfig.evaluationEngine.password,
     );
 
     // evaluate the attempt
-    const result: ValidationDto = await this.mooshakService.getValidationReport(validation, {
+    const result: ValidationDto = await this.mooshakService.getValidationReport(validation.game.courseId, validation, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

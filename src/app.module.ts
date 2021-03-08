@@ -82,6 +82,7 @@ import { ResourceGuard } from './keycloak/guards/resource.guard';
         },
         // appConfig.isDevelopment
       },
+      introspection: true,
       installSubscriptionHandlers: true,
       resolvers: { JSON: GraphQLJSON },
     }),

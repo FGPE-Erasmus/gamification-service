@@ -23,6 +23,9 @@ export class GameDto {
   @Field({ nullable: true })
   description?: string;
 
+  @Field()
+  courseId: string;
+
   @Field({ nullable: true })
   gedilLayerId?: string;
 

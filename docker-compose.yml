@@ -6,15 +6,12 @@ services:
     build:
       context: .
       dockerfile: ./docker/Dockerfile
-      args:
-        - PORT=${APP_PORT}
-        - NODE_ENV=${NODE_ENV}
     user: node
     working_dir: /home/node/app
     volumes:
       - ./src:/home/node/app/src
     ports:
-      - ${APP_PORT}:${APP_PORT}
+      - 3000:3000
     depends_on:
       - mongodb
       - redis

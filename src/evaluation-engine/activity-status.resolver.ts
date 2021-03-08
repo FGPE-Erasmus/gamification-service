@@ -13,6 +13,7 @@ import { ActivityDto } from './dto/activity.dto';
 import { ActivityService } from './activity.service';
 import { ActivityStatusDto } from './dto/activity-status.dto';
 import { GameToDtoMapper } from '../game/mappers/game-to-dto.mapper';
+import { Game } from '../game/models/game.model';
 
 @Resolver(() => ActivityStatusDto)
 export class ActivityStatusResolver {
@@ -29,7 +30,7 @@ export class ActivityStatusResolver {
     @Args('gameId') gameId: string,
     @Args('activityId') activityId: string,
     @Args('playerId') playerId: string,
-  ): Promise<ActivityDto> {
+  ): Promise<ActivityStatusDto> {
     return this.activityService.getActivityStatus(gameId, activityId, playerId);
   }
 
@@ -40,14 +41,15 @@ export class ActivityStatusResolver {
     @GqlPlayer('id') playerId: string,
     @Args('gameId') gameId: string,
     @Args('activityId') activityId: string,
-  ): Promise<ActivityDto> {
+  ): Promise<ActivityStatusDto> {
     return this.activityService.getActivityStatus(gameId, activityId, playerId);
   }
 
   @ResolveField('activity', () => ActivityDto)
   async activity(@Parent() root: ActivityStatusDto): Promise<ActivityDto> {
     const { game: gameId, activity: activityId } = root;
-    return this.activityService.getActivity(gameId, activityId);
+    const game: Game = await this.gameService.findById(gameId);
+    return this.activityService.getActivity(game.courseId, activityId);
   }
 
   @ResolveField('game', () => GameDto)

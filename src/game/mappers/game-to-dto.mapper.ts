@@ -18,6 +18,7 @@ export class GameToDtoMapper implements IMapper<Game, GameDto> {
         'state',
         'evaluationEngine',
         'description',
+        'courseId',
         'gedilLayerId',
         'gedilLayerDescription',
         'startDate',

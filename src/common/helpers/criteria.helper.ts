@@ -76,10 +76,21 @@ export async function inferCriteriaEntityValue(
       };
       return JSONPath({ path: property, json: event });
 
-    case 'PLAYER': //property is the JSONPath to be applied to the player inside the trigger
+    case 'ACTION':
+      const action = {
+        ...actionObj,
+      };
+      if (action.playerId) {
+        actionObj.player = await resolvers.player(params.playerId);
+      }
+      return JSONPath({ path: property, json: action });
+
+    case 'PLAYER':
+      // property is the JSONPath to be applied to the player inside the trigger
       return JSONPath({ path: property, json: await resolvers.player(params.playerId) });
 
-    case 'ENVIRONMENT': //JSON object with current time, submissions, and players
+    case 'ENVIRONMENT':
+      // JSON object with current time, submissions, and players
       let environment;
       if (property.startsWith('$.submissions')) {
         environment = {

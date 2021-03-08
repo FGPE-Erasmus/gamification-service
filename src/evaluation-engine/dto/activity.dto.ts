@@ -1,12 +1,8 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { GameDto } from '../../game/dto/game.dto';
 import { CodeSkeletonDto } from './code-skeleton.dto';
 
 @ObjectType('Activity')
 export class ActivityDto {
-  @Field(() => GameDto)
-  game?: string;
-
   @Field({ nullable: true })
   id?: string;
 

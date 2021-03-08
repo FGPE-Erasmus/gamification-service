@@ -9,6 +9,7 @@ export interface Game extends IBaseEntity {
   description?: string;
   state: GameStateEnum;
   evaluationEngine?: string;
+  courseId?: string;
   gedilLayerId?: string;
   gedilLayerDescription?: string;
   startDate?: Date;
@@ -32,6 +33,9 @@ export class GameDocument extends Document implements Game {
 
   @Prop({ default: () => EvaluationEngine.BASE })
   evaluationEngine: EvaluationEngine;
+
+  @Prop()
+  courseId?: string;
 
   @Prop({ nullable: true })
   gedilLayerId?: string;

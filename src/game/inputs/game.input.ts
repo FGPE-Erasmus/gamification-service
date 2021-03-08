@@ -1,6 +1,6 @@
 import { Field, InputType } from '@nestjs/graphql';
 import { Type } from 'class-transformer';
-import { MinLength, MaxLength, IsString, IsOptional, IsDate, IsUUID, IsEnum } from 'class-validator';
+import { MinLength, MaxLength, IsString, IsOptional, IsDate, IsUUID, IsEnum, Matches } from 'class-validator';
 import { EvaluationEngine } from '../../submission/models/evaluation-engine.enum';
 
 @InputType()
@@ -15,6 +15,13 @@ export class GameInput {
   @IsOptional()
   @MaxLength(1000)
   description?: string;
+
+  @Field()
+  @IsString()
+  @MinLength(1)
+  @MaxLength(50)
+  @Matches(/[a-zA-Z0-9_-]+/)
+  courseId: string;
 
   @Field({ nullable: true })
   @IsOptional()

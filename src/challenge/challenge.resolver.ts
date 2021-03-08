@@ -1,5 +1,5 @@
 import { Inject, NotFoundException, UseGuards } from '@nestjs/common';
-import { Args, Mutation, Parent, Query, ResolveField, Resolver, Subscription } from '@nestjs/graphql';
+import { Args, Parent, Query, ResolveField, Resolver, Subscription } from '@nestjs/graphql';
 import { PubSub } from 'graphql-subscriptions';
 
 import { Role } from '../common/enums/role.enum';
@@ -16,8 +16,7 @@ import { GqlPlayerOfGuard } from '../common/guards/gql-player-of.guard';
 import { ActivityDto } from '../evaluation-engine/dto/activity.dto';
 import { ActivityService } from '../evaluation-engine/activity.service';
 import { NotificationEnum } from '../common/enums/notifications.enum';
-import { Difficulty } from './models/difficulty.enum';
-import { Mode } from './models/mode.enum';
+import { Game } from '../game/models/game.model';
 
 @Resolver(() => ChallengeDto)
 export class ChallengeResolver {
@@ -68,10 +67,11 @@ export class ChallengeResolver {
 
   @ResolveField('refs', () => [ActivityDto])
   async refs(@Parent() root: ChallengeDto): Promise<ActivityDto[]> {
-    const { game, refs } = root;
+    const { game: gameId, refs } = root;
+    const game: Game = await this.gameService.findById(gameId);
     const activities = [];
     for (const activityId of refs) {
-      const activity = await this.activityService.getActivity(game, activityId);
+      const activity = await this.activityService.getActivity(game.courseId, activityId);
       activities.push(activity);
     }
     return activities;

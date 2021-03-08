@@ -19,16 +19,16 @@ export class ActivityService {
     this.logger = new Logger(ActivityService.name);
   }
 
-  public async getActivities(gameId: string, challengeId: string): Promise<ActivityDto[]> {
+  public async getActivities(courseId: string, challengeId: string): Promise<ActivityDto[]> {
     const challenge = await this.challengeService.findById(challengeId, 'refs');
     if (challenge) {
-      return this.evaluationEngineService.getActivities(gameId, challenge.refs);
+      return this.evaluationEngineService.getActivities(courseId, challenge.refs);
     }
     throw new NotFoundException();
   }
 
-  public async getActivity(gameId: string, activityId: string): Promise<ActivityDto> {
-    return this.evaluationEngineService.getActivity(gameId, activityId);
+  public async getActivity(courseId: string, activityId: string): Promise<ActivityDto> {
+    return this.evaluationEngineService.getActivity(courseId, activityId);
   }
 
   public async getActivityStatus(gameId: string, activityId: string, playerId: string): Promise<ActivityStatusDto> {

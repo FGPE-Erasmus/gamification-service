@@ -9,32 +9,33 @@ export interface IEngineService {
   /**
    * Get configured programming languages from evaluation engine.
    *
-   * @param gameId ID of the game.
+   * @param courseId {string} ID of the course.
    * @param {AxiosRequestConfig} options for the request
    */
-  getLanguages(gameId: string, options?: AxiosRequestConfig): Promise<ProgrammingLanguageDto[]>;
+  getLanguages(courseId: string, options?: AxiosRequestConfig): Promise<ProgrammingLanguageDto[]>;
 
   /**
    * Get configured programming language from evaluation engine.
    *
-   * @param gameId ID of the game.
+   * @param courseId {string} ID of the course.
    * @param languageId ID of the language.
    * @param {AxiosRequestConfig} options for the request
    */
-  getLanguage(gameId: string, languageId: string, options?: AxiosRequestConfig): Promise<ProgrammingLanguageDto>;
+  getLanguage(courseId: string, languageId: string, options?: AxiosRequestConfig): Promise<ProgrammingLanguageDto>;
 
   /**
    * Get activity from evaluation engine.
    *
-   * @param gameId ID of the game.
+   * @param courseId {string} ID of the course.
    * @param activityId ID of the activity.
    * @param {AxiosRequestConfig} options for the request
    */
-  getActivity(gameId: string, activityId: string, options?: AxiosRequestConfig): Promise<ActivityDto>;
+  getActivity(courseId: string, activityId: string, options?: AxiosRequestConfig): Promise<ActivityDto>;
 
   /**
    * Validate an attempt submission + file against a set of input test cases.
    *
+   * @param courseId {string} ID of the course.
    * @param {Validation} validation the received validation.
    * @param {string} filename the name of the file.
    * @param {string} code the file content.
@@ -42,6 +43,7 @@ export interface IEngineService {
    * @param {AxiosRequestConfig} options for the request
    */
   validate(
+    courseId: string,
     validation: Validation,
     filename: string,
     code: string,
@@ -52,12 +54,14 @@ export interface IEngineService {
   /**
    * Evaluate an attempt submission + file.
    *
+   * @param courseId {string} ID of the course.
    * @param {Submission} submission the received submission.
    * @param {string} filename the name of the file.
    * @param {string} code the file content.
    * @param {AxiosRequestConfig} options for the request
    */
   evaluate(
+    courseId: string,
     submission: Submission,
     filename: string,
     code: string,
@@ -67,34 +71,38 @@ export interface IEngineService {
   /**
    * Get the report of the validation.
    *
+   * @param courseId {string} ID of the course.
    * @param {Validation} validation the received validation.
    * @param {AxiosRequestConfig} options for the request.
    */
-  getValidationReport(validation: Validation, options?: AxiosRequestConfig): Promise<EvaluationDto>;
+  getValidationReport(courseId: string, validation: Validation, options?: AxiosRequestConfig): Promise<EvaluationDto>;
 
   /**
    * Get the report of the evaluation.
    *
+   * @param courseId {string} ID of the course.
    * @param {Submission} submission the received submission.
    * @param {AxiosRequestConfig} options for the request.
    */
-  getEvaluationReport(submission: Submission, options?: AxiosRequestConfig): Promise<EvaluationDto>;
+  getEvaluationReport(courseId: string, submission: Submission, options?: AxiosRequestConfig): Promise<EvaluationDto>;
 
   /**
    * Get the evaluated program.
    *
+   * @param courseId {string} ID of the course.
    * @param {Submission} submission the received submission.
    * @param {AxiosRequestConfig} options for the request.
    * @returns {Promise<string>} evaluated program.
    */
-  getEvaluationProgram(submission: Submission, options?: AxiosRequestConfig): Promise<string>;
+  getEvaluationProgram(courseId: string, submission: Submission, options?: AxiosRequestConfig): Promise<string>;
 
   /**
    * Get the validated program.
    *
+   * @param courseId {string} ID of the course.
    * @param {Validation} validation the received validation.
    * @param {AxiosRequestConfig} options for the request.
    * @returns {Promise<string>} validated program.
    */
-  getValidationProgram(validation: Validation, options?: AxiosRequestConfig): Promise<string>;
+  getValidationProgram(courseId: string, validation: Validation, options?: AxiosRequestConfig): Promise<string>;
 }
