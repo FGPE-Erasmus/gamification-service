@@ -10,7 +10,6 @@ import { RewardResolver } from './reward.resolver';
 import { GqlInstructorAssignedGuard } from '../common/guards/gql-instructor-assigned.guard';
 import { GqlPlayerOfGuard } from '../common/guards/gql-player-of.guard';
 import { GqlPlayer } from '../common/decorators/gql-player.decorator';
-import { PlayerReward } from '../player-reward/models/player-reward.model';
 
 @Resolver(() => BadgeDto)
 export class BadgeResolver extends RewardResolver {

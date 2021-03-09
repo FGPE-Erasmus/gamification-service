@@ -2,8 +2,10 @@
 /node_modules
 
 /src/.old_code
+/docker/keycloak/postgres/pgdata
 
 .env
+.env.correct
 *.log
 yarn.lock
 package-lock.json
