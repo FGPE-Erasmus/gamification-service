@@ -24,7 +24,7 @@ export class ActionHookResolver {
     protected readonly challengeToDtoMapper: ChallengeToDtoMapper,
   ) {}
 
-  @Roles(Role.AUTHOR)
+  @Roles(Role.TEACHER)
   @Query(() => [ActionHookDto])
   async actionHooks(@Args('gameId') gameId: string): Promise<ActionHookDto[]> {
     const hooks: ActionHook[] = await this.actionHookService.findByGameId(gameId);

@@ -14,7 +14,7 @@ import { PlayerReward } from '../player-reward/models/player-reward.model';
 
 @Resolver(() => PointDto)
 export class PointResolver extends RewardResolver {
-  @Roles(Role.AUTHOR, Role.TEACHER, Role.STUDENT)
+  @Roles(Role.TEACHER, Role.STUDENT)
   @UseGuards(GqlInstructorAssignedGuard, GqlPlayerOfGuard)
   @Query(() => [PointDto])
   async points(@Args('gameId') gameId: string): Promise<PointDto[]> {

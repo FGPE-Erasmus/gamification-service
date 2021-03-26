@@ -8,9 +8,8 @@ import { AuthGuard } from '../../src/keycloak/guards/auth.guard';
 import { KeycloakRequest } from '../../src/keycloak/types/keycloak-request.type';
 import { getReq } from '../../src/common/utils/request.utils';
 import { Role } from '../../src/common/enums/role.enum';
-import { GAMES_WORKFLOW, USERS, USERS_BY_ROLE } from '../utils/test-data';
+import { USERS } from '../utils/test-data';
 import { KeycloakService } from '../../src/keycloak/keycloak.service';
-import mockKeycloakService from '../../test/__mocks__/keycloak.service';
 import { UserDto } from '../../src/keycloak/dto/user.dto';
 
 describe('GameResolver (e2e)', () => {
@@ -55,7 +54,7 @@ describe('GameResolver (e2e)', () => {
             return false;
           },
           hasRealmRole(roleName: string): boolean {
-            return roleName.toUpperCase() === Role.AUTHOR.toUpperCase();
+            return roleName.toUpperCase() === Role.TEACHER.toUpperCase();
           },
           isExpired(): boolean {
             return false;

@@ -13,7 +13,7 @@ import { GqlPlayer } from '../common/decorators/gql-player.decorator';
 
 @Resolver(() => BadgeDto)
 export class BadgeResolver extends RewardResolver {
-  @Roles(Role.AUTHOR, Role.TEACHER, Role.STUDENT)
+  @Roles(Role.TEACHER, Role.STUDENT)
   @UseGuards(GqlInstructorAssignedGuard, GqlPlayerOfGuard)
   @Query(() => [BadgeDto])
   async badges(@Args('gameId') gameId: string): Promise<BadgeDto[]> {

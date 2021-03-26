@@ -10,11 +10,10 @@ import { UseGuards } from '@nestjs/common';
 import { GqlInstructorAssignedGuard } from '../common/guards/gql-instructor-assigned.guard';
 import { GqlPlayerOfGuard } from '../common/guards/gql-player-of.guard';
 import { GqlPlayer } from '../common/decorators/gql-player.decorator';
-import { PlayerReward } from '../player-reward/models/player-reward.model';
 
 @Resolver(() => HintDto)
 export class HintResolver extends RewardResolver {
-  @Roles(Role.AUTHOR, Role.TEACHER, Role.STUDENT)
+  @Roles(Role.TEACHER, Role.STUDENT)
   @UseGuards(GqlInstructorAssignedGuard, GqlPlayerOfGuard)
   @Query(() => [HintDto])
   async hints(@Args('gameId') gameId: string): Promise<HintDto[]> {

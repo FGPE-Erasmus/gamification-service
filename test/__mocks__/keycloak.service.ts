@@ -3,7 +3,7 @@ import { AuthDto } from '../../src/keycloak/dto/auth.dto';
 import { UserInfo } from '../../src/keycloak/interfaces/user-info.interface';
 import { UserDto } from '../../src/keycloak/dto/user.dto';
 import { Role } from '../../src/common/enums/role.enum';
-import { LOGGED_IN_STUDENT, USERS, USERS_BY_ROLE } from '../utils/test-data';
+import { USERS, USERS_BY_ROLE } from '../utils/test-data';
 import KeycloakConnect from 'keycloak-connect';
 
 const mock = jest.fn().mockImplementation(() => {

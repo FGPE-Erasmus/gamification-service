@@ -81,7 +81,9 @@ services:
     image: postgres:11-alpine
     restart: unless-stopped
     volumes:
-      - ./docker/keycloak/postgres:/var/lib/postgresql/data
+      # - ./docker/keycloak/postgres:/var/lib/postgresql ##workaround for windows
+       - ./docker/keycloak/postgres:/var/lib/postgresql/data 
+
     environment:
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=password

@@ -23,7 +23,7 @@ export class ActivityStatusResolver {
     protected readonly activityService: ActivityService,
   ) {}
 
-  @Roles(Role.AUTHOR, Role.TEACHER)
+  @Roles(Role.TEACHER)
   @UseGuards(GqlInstructorAssignedGuard)
   @Query(() => ActivityStatusDto)
   async activityStatus(

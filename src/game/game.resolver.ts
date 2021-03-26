@@ -53,7 +53,7 @@ export class GameResolver {
     protected readonly validationToDtoMapper: ValidationToDtoMapper,
   ) {}
 
-  @Roles(Role.AUTHOR)
+  @Roles(Role.TEACHER)
   @Mutation(() => GameDto)
   async importGEdILArchive(@Args() importGameArgs: ImportGameArgs): Promise<GameDto> {
     const { file, gameInput } = importGameArgs;
@@ -72,14 +72,14 @@ export class GameResolver {
     return this.gameToDtoMapper.transform(game);
   }
 
-  @Roles(Role.AUTHOR, Role.TEACHER, Role.STUDENT)
+  @Roles(Role.TEACHER, Role.STUDENT)
   @Query(() => [GameDto])
   async games(): Promise<GameDto[]> {
     const games: Game[] = await this.gameService.findAll();
     return Promise.all(games.map(async game => this.gameToDtoMapper.transform(game)));
   }
 
-  @Roles(Role.AUTHOR, Role.TEACHER, Role.STUDENT)
+  @Roles(Role.TEACHER, Role.STUDENT)
   @GameKeyExtractor(context => (context as GqlExecutionContext).getArgs()['id'])
   @UseGuards(GqlInstructorAssignedGuard, GqlPlayerOfGuard)
   @Query(() => GameDto)
@@ -91,7 +91,7 @@ export class GameResolver {
     return this.gameToDtoMapper.transform(game);
   }
 
-  @Roles(Role.AUTHOR)
+  @Roles(Role.TEACHER)
   @Mutation(() => GameDto)
   async assignInstructor(@Args('gameId') gameId: string, @Args('userId') userId: string): Promise<GameDto> {
     const game: Game = await this.gameService.assignInstructor(gameId, userId);
@@ -132,7 +132,7 @@ export class GameResolver {
     return Promise.all(validations.map(async validation => this.validationToDtoMapper.transform(validation)));
   }
 
-  @Roles(Role.AUTHOR)
+  @Roles(Role.TEACHER)
   @Subscription(() => GameDto)
   gameModified(): AsyncIterator<GameDto> {
     return this.pubSub.asyncIterator(NotificationEnum.GAME_MODIFIED);

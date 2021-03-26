@@ -16,7 +16,7 @@ import { PlayerReward } from '../player-reward/models/player-reward.model';
 
 @Resolver(() => RevealDto)
 export class RevealResolver extends RewardResolver {
-  @Roles(Role.AUTHOR, Role.TEACHER, Role.STUDENT)
+  @Roles(Role.TEACHER, Role.STUDENT)
   @UseGuards(GqlInstructorAssignedGuard, GqlPlayerOfGuard)
   @Query(() => [RevealDto])
   async reveals(@Args('gameId') gameId: string): Promise<RevealDto[]> {

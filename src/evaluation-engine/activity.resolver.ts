@@ -14,7 +14,7 @@ import { GameService } from '../game/game.service';
 export class ActivityResolver {
   constructor(protected readonly gameService: GameService, protected readonly activityService: ActivityService) {}
 
-  @Roles(Role.AUTHOR, Role.TEACHER, Role.STUDENT)
+  @Roles(Role.TEACHER, Role.STUDENT)
   @UseGuards(GqlInstructorAssignedGuard, GqlPlayerOfGuard)
   @Query(() => [ActivityDto])
   async activities(@Args('gameId') gameId: string, @Args('challengeId') challengeId: string): Promise<ActivityDto[]> {
@@ -22,7 +22,7 @@ export class ActivityResolver {
     return this.activityService.getActivities(game.courseId, challengeId);
   }
 
-  @Roles(Role.AUTHOR, Role.TEACHER, Role.STUDENT)
+  @Roles(Role.TEACHER, Role.STUDENT)
   @UseGuards(GqlInstructorAssignedGuard, GqlPlayerOfGuard)
   @Query(() => ActivityDto)
   async activity(@Args('gameId') gameId: string, @Args('activityId') activityId: string): Promise<ActivityDto> {

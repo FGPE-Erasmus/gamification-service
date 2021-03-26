@@ -9,19 +9,19 @@ import { UserService } from './user.service';
 export class UserResolver {
   constructor(protected readonly userService: UserService) {}
 
-  @Roles(Role.AUTHOR, Role.TEACHER)
+  @Roles(Role.TEACHER)
   @Query(() => [UserDto])
   async users(): Promise<UserDto[]> {
     return this.userService.getUsers();
   }
 
-  @Roles(Role.AUTHOR, Role.TEACHER)
+  @Roles(Role.TEACHER)
   @Query(() => [UserDto])
   async usersByRole(@Args('role') role: Role): Promise<UserDto[]> {
     return this.userService.getUsersByRole(role);
   }
 
-  @Roles(Role.AUTHOR, Role.TEACHER)
+  @Roles(Role.TEACHER)
   @Query(() => UserDto)
   async user(@Args('id') userId: string): Promise<UserDto> {
     return this.userService.getUser(userId);

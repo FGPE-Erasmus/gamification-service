@@ -13,8 +13,6 @@ import { RewardDto } from './dto/reward.dto';
 import { RewardToDtoMapper } from './mappers/reward-to-dto.mapper';
 import { ChallengeToDtoMapper } from '../challenge/mappers/challenge-to-dto.mapper';
 import { Reward } from './models/reward.model';
-import { PlayerDto } from '../player/dto/player.dto';
-import { Player } from '../player/models/player.model';
 import { PlayerService } from '../player/player.service';
 import { PlayerToDtoMapper } from '../player/mappers/player-to-dto.mapper';
 import { Roles } from '../keycloak/decorators/roles.decorator';
@@ -43,7 +41,7 @@ export class RewardResolver {
     protected readonly playerRewardToDtoMapper: PlayerRewardToDtoMapper,
   ) {}
 
-  @Roles(Role.AUTHOR, Role.TEACHER, Role.STUDENT)
+  @Roles(Role.TEACHER, Role.STUDENT)
   @UseGuards(GqlInstructorAssignedGuard, GqlPlayerOfGuard)
   @Query(() => [RewardDto])
   async rewards(@Args('gameId') gameId: string): Promise<RewardDto[]> {
@@ -143,7 +141,7 @@ export class RewardResolver {
     return this.pubSub.asyncIterator(NotificationEnum.REWARD_SUBSTRACTED + '_TEACHER');
   }
 
-  @Roles(Role.AUTHOR)
+  @Roles(Role.TEACHER)
   @Subscription(() => RewardDto)
   rewardModified(): AsyncIterator<RewardDto> {
     return this.pubSub.asyncIterator(NotificationEnum.REWARD_MODIFIED);

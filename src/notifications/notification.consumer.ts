@@ -22,7 +22,7 @@ export class NotificationConsumer {
   constructor(@Inject('PUB_SUB') protected readonly pubSub: PubSub) {}
 
   @Process(NotificationEnum.NOTIFICATION_SENT)
-  async onSentNotificationStudent(job: Job<unknown>): Promise<void> {
+  async onSentNotification(job: Job<unknown>): Promise<void> {
     const { type, payload, gameId } = job.data as { type: string; payload; gameId: string };
 
     switch (type) {

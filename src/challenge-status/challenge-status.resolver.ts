@@ -41,7 +41,7 @@ export class ChallengeStatusResolver {
     protected readonly activityService: ActivityService,
   ) {}
 
-  @Roles(Role.AUTHOR, Role.TEACHER)
+  @Roles(Role.TEACHER)
   @UseGuards(GqlInstructorAssignedGuard)
   @Query(() => ChallengeStatusDto)
   async challengeStatus(

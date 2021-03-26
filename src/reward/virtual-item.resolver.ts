@@ -13,7 +13,7 @@ import { GqlPlayer } from '../common/decorators/gql-player.decorator';
 
 @Resolver(() => VirtualItemDto)
 export class VirtualItemResolver extends RewardResolver {
-  @Roles(Role.AUTHOR, Role.TEACHER, Role.STUDENT)
+  @Roles(Role.TEACHER, Role.STUDENT)
   @UseGuards(GqlInstructorAssignedGuard, GqlPlayerOfGuard)
   @Query(() => [VirtualItemDto])
   async virtualItems(@Args('gameId') gameId: string): Promise<VirtualItemDto[]> {
