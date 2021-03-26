@@ -8,7 +8,7 @@ import { AuthGuard } from '../../src/keycloak/guards/auth.guard';
 import { KeycloakRequest } from '../../src/keycloak/types/keycloak-request.type';
 import { getReq } from '../../src/common/utils/request.utils';
 import { Role } from '../../src/common/enums/role.enum';
-import { LOGGED_IN_AUTHOR, LOGGED_IN_STUDENT, USERS } from '../utils/test-data';
+import { LOGGED_IN_STUDENT, LOGGED_IN_TEACHER, USERS } from '../utils/test-data';
 import { KeycloakService } from '../../src/keycloak/keycloak.service';
 import { UserDto } from '../../src/keycloak/dto/user.dto';
 import { testGrantForRole } from '../utils/test-grant';
@@ -17,7 +17,7 @@ import { Result } from '../../src/submission/models/result.enum';
 import { JSONPath } from 'jsonpath-plus';
 import { EvaluationDto } from '../../src/evaluation-engine/dto/evaluation.dto';
 import { EvaluationEngine } from '../../src/submission/models/evaluation-engine.enum';
-import { Player } from 'src/player/models/player.model';
+import { Player } from '../../src/player/models/player.model';
 
 describe('Modes test (e2e)', () => {
   let app: INestApplication;
@@ -208,8 +208,8 @@ describe('Modes test (e2e)', () => {
   async function importGEdIL(mode: string): Promise<string> {
     jest.spyOn(AuthGuard.prototype, 'canActivate').mockImplementation(async (context: ExecutionContext) => {
       const req: KeycloakRequest = getReq(context);
-      req.grant = testGrantForRole(Role.AUTHOR);
-      req.userInfo = LOGGED_IN_AUTHOR;
+      req.grant = testGrantForRole(Role.TEACHER);
+      req.userInfo = LOGGED_IN_TEACHER;
       return true;
     });
 

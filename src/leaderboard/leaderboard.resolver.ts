@@ -30,7 +30,7 @@ export class LeaderboardResolver {
     protected readonly challengeToDtoMapper: ChallengeToDtoMapper,
   ) {}
 
-  @Roles(Role.AUTHOR, Role.TEACHER, Role.STUDENT)
+  @Roles(Role.TEACHER, Role.STUDENT)
   @UseGuards(GqlInstructorAssignedGuard, GqlPlayerOfGuard)
   @Query(() => [LeaderboardDto])
   async leaderboards(@Args('gameId') gameId: string): Promise<LeaderboardDto[]> {
@@ -38,7 +38,7 @@ export class LeaderboardResolver {
     return Promise.all(leaderboards.map(async leaderboard => this.leaderboardToDtoMapper.transform(leaderboard)));
   }
 
-  @Roles(Role.AUTHOR, Role.TEACHER, Role.STUDENT)
+  @Roles(Role.TEACHER, Role.STUDENT)
   @UseGuards(GqlInstructorAssignedGuard, GqlPlayerOfGuard)
   @Query(() => LeaderboardDto)
   async leaderboard(@Args('gameId') gameId: string, @Args('id') id: string): Promise<LeaderboardDto> {
@@ -66,7 +66,7 @@ export class LeaderboardResolver {
     return this.challengeToDtoMapper.transform(parentChallenge);
   }
 
-  @Roles(Role.AUTHOR)
+  @Roles(Role.TEACHER)
   @Subscription(() => LeaderboardDto)
   leaderboardModified(): AsyncIterator<LeaderboardDto> {
     return this.pubSub.asyncIterator(NotificationEnum.LEADERBOARD_MODIFIED);

@@ -29,7 +29,7 @@ export class ChallengeResolver {
     protected readonly activityService: ActivityService,
   ) {}
 
-  @Roles(Role.AUTHOR, Role.TEACHER, Role.STUDENT)
+  @Roles(Role.TEACHER, Role.STUDENT)
   @UseGuards(GqlInstructorAssignedGuard, GqlPlayerOfGuard)
   @Query(() => [ChallengeDto])
   async challenges(@Args('gameId') gameId: string): Promise<ChallengeDto[]> {
@@ -37,7 +37,7 @@ export class ChallengeResolver {
     return Promise.all(challenges.map(async challenge => this.challengeToDtoMapper.transform(challenge)));
   }
 
-  @Roles(Role.AUTHOR, Role.TEACHER, Role.STUDENT)
+  @Roles(Role.TEACHER, Role.STUDENT)
   @UseGuards(GqlInstructorAssignedGuard, GqlPlayerOfGuard)
   @Query(() => ChallengeDto)
   async challenge(@Args('gameId') gameId: string, @Args('id') id: string): Promise<ChallengeDto> {
@@ -77,7 +77,7 @@ export class ChallengeResolver {
     return activities;
   }
 
-  @Roles(Role.AUTHOR)
+  @Roles(Role.TEACHER)
   @Subscription(() => ChallengeDto)
   challengeModified(): AsyncIterator<ChallengeDto> {
     return this.pubSub.asyncIterator(NotificationEnum.CHALLENGE_MODIFIED);

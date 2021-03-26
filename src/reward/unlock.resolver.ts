@@ -15,7 +15,7 @@ import { GqlPlayer } from '../common/decorators/gql-player.decorator';
 
 @Resolver(() => UnlockDto)
 export class UnlockResolver extends RewardResolver {
-  @Roles(Role.AUTHOR, Role.TEACHER, Role.STUDENT)
+  @Roles(Role.TEACHER, Role.STUDENT)
   @UseGuards(GqlInstructorAssignedGuard, GqlPlayerOfGuard)
   @Query(() => [UnlockDto])
   async unlocks(@Args('gameId') gameId: string): Promise<UnlockDto[]> {

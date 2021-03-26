@@ -75,7 +75,7 @@ export class PlayerResolver {
     return this.playerToDtoMapper.transform(player);
   }
 
-  @Roles(Role.AUTHOR, Role.TEACHER)
+  @Roles(Role.TEACHER)
   @UseGuards(GqlInstructorAssignedGuard)
   @Mutation(() => PlayerDto)
   async addToGame(@Args('userId') userId: string, @Args('gameId') gameId: string): Promise<PlayerDto> {
@@ -87,7 +87,7 @@ export class PlayerResolver {
     return this.playerToDtoMapper.transform(player);
   }
 
-  @Roles(Role.AUTHOR, Role.TEACHER)
+  @Roles(Role.TEACHER)
   @UseGuards(GqlInstructorAssignedGuard)
   @Mutation(() => PlayerDto)
   async removeFromGame(@Args('userId') userId: string, @Args('gameId') gameId: string): Promise<PlayerDto> {

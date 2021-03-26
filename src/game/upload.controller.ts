@@ -14,7 +14,7 @@ import { GameToDtoMapper } from './mappers/game-to-dto.mapper';
 export class GameUploadController {
   constructor(private readonly gameService: GameService, protected readonly gameToDtoMapper: GameToDtoMapper) {}
 
-  @Roles(Role.AUTHOR)
+  @Roles(Role.TEACHER)
   @Post()
   @UseInterceptors(FileInterceptor('file'))
   async importGEdILArchive(@Body() gameDto: GameInput, @UploadedFile() file: Express.Multer.File): Promise<GameDto> {

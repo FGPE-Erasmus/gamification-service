@@ -24,7 +24,7 @@ export class ScheduledHookResolver {
     protected readonly challengeToDtoMapper: ChallengeToDtoMapper,
   ) {}
 
-  @Roles(Role.AUTHOR)
+  @Roles(Role.TEACHER)
   @Query(() => [ScheduledHookDto])
   async scheduledHooks(@Args('gameId') gameId: string): Promise<ScheduledHookDto[]> {
     const hooks: ScheduledHook[] = await this.scheduledHookService.findByGameId(gameId);

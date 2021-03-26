@@ -12,14 +12,14 @@ import { EvaluationEngineService } from './evaluation-engine.service';
 export class ProgrammingLanguageResolver {
   constructor(protected readonly evaluationEngineService: EvaluationEngineService) {}
 
-  @Roles(Role.AUTHOR, Role.TEACHER, Role.STUDENT)
+  @Roles(Role.TEACHER, Role.STUDENT)
   @UseGuards(GqlInstructorAssignedGuard, GqlPlayerOfGuard)
   @Query(() => [ProgrammingLanguageDto])
   async programmingLanguages(@Args('gameId') gameId: string): Promise<ProgrammingLanguageDto[]> {
     return this.evaluationEngineService.getProgrammingLanguages(gameId);
   }
 
-  @Roles(Role.AUTHOR, Role.TEACHER, Role.STUDENT)
+  @Roles(Role.TEACHER, Role.STUDENT)
   @UseGuards(GqlInstructorAssignedGuard, GqlPlayerOfGuard)
   @Query(() => ProgrammingLanguageDto)
   async programmingLanguage(

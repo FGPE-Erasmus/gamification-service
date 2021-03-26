@@ -13,7 +13,6 @@ import { GqlUserInfo } from '../common/decorators/gql-user-info.decorator';
 import { UserDto } from './dto/user.dto';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from './guards/auth.guard';
-import { Role } from '../common/enums/role.enum';
 import { UserService } from './user.service';
 
 @Resolver('Keycloak')
@@ -34,7 +33,6 @@ export class KeycloakResolver {
   @UseGuards(AuthGuard)
   @Query(() => ProfileDto)
   async me(@GqlUserInfo() userInfo: Record<string, any>): Promise<ProfileDto> {
-    console.log(this.keycloakService.grant?.access_token.hasRealmRole(Role.AUTHOR));
     return {
       id: userInfo.sub,
       username: userInfo.preferredUsername,

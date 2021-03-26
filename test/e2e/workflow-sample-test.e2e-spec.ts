@@ -10,7 +10,6 @@ import { getReq } from '../../src/common/utils/request.utils';
 import { Role } from '../../src/common/enums/role.enum';
 import {
   GAMES_WORKFLOW,
-  LOGGED_IN_AUTHOR,
   LOGGED_IN_STUDENT,
   LOGGED_IN_STUDENT_ALT,
   LOGGED_IN_TEACHER,
@@ -60,8 +59,8 @@ describe('WorkflowSampleTest (e2e)', () => {
   it('Import GEdIL Archive', async () => {
     jest.spyOn(AuthGuard.prototype, 'canActivate').mockImplementation(async (context: ExecutionContext) => {
       const req: KeycloakRequest = getReq(context);
-      req.grant = testGrantForRole(Role.AUTHOR);
-      req.userInfo = LOGGED_IN_AUTHOR;
+      req.grant = testGrantForRole(Role.TEACHER);
+      req.userInfo = LOGGED_IN_TEACHER;
       return true;
     });
 
@@ -102,8 +101,8 @@ describe('WorkflowSampleTest (e2e)', () => {
   it('Assign Instructor', async () => {
     jest.spyOn(AuthGuard.prototype, 'canActivate').mockImplementation(async (context: ExecutionContext) => {
       const req: KeycloakRequest = getReq(context);
-      req.grant = testGrantForRole(Role.AUTHOR);
-      req.userInfo = LOGGED_IN_AUTHOR;
+      req.grant = testGrantForRole(Role.TEACHER);
+      req.userInfo = LOGGED_IN_TEACHER;
       return true;
     });
 

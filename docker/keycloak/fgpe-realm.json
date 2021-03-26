@@ -62,15 +62,6 @@
         "attributes": {}
       },
       {
-        "id": "0ae7e23f-dd07-41a3-883e-4e59553d762b",
-        "name": "author",
-        "description": "Create/modify/delete educational resources, courses, and gamification layers.",
-        "composite": false,
-        "clientRole": false,
-        "containerId": "fgpe",
-        "attributes": {}
-      },
-      {
         "id": "9ad14184-b348-4677-b047-05052b7cd83d",
         "name": "teacher",
         "description": "Define student groups, attach/detach students to/from student groups, assign courses/single challenges to students/student groups, view profile of students from defined groups",
@@ -500,41 +491,6 @@
       "groups": [
         "/Admin"
       ]
-    },
-    {
-      "id": "1c49e089-67fe-45be-b9df-c848f58acc34",
-      "createdTimestamp": 1606848335444,
-      "username": "author_fgpe",
-      "enabled": true,
-      "totp": false,
-      "emailVerified": true,
-      "firstName": "Author",
-      "lastName": "FGPE",
-      "email": "author@fgpe.usz.edu.pl",
-      "credentials": [
-        {
-          "id": "107c59d4-e470-4b4f-b5a1-1e87d029a4fd",
-          "type": "password",
-          "createdDate": 1606848335498,
-          "secretData": "{\"value\":\"kTMjBa25E80taxlKzTmrJP1BgHX99FZkfbCt3X+XuNtbw3yOOaXaCLLh97+41H4GvnKz3Wsmdc1FKDJbrMe14Q==\",\"salt\":\"T9RRIKoGWvqnx1pV9ZUwiA==\"}",
-          "credentialData": "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\"}"
-        }
-      ],
-      "disableableCredentialTypes": [],
-      "requiredActions": [],
-      "realmRoles": [
-        "offline_access",
-        "uma_authorization",
-        "author"
-      ],
-      "clientRoles": {
-        "account": [
-          "view-profile",
-          "manage-account"
-        ]
-      },
-      "notBefore": 0,
-      "groups": []
     },
     {
       "id": "1b335cd6-b6fb-44c9-bddd-4acf549587b2",

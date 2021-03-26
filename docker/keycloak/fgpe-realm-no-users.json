@@ -62,15 +62,6 @@
         "attributes": {}
       },
       {
-        "id": "0ae7e23f-dd07-41a3-883e-4e59553d762b",
-        "name": "author",
-        "description": "Create/modify/delete educational resources, courses, and gamification layers.",
-        "composite": false,
-        "clientRole": false,
-        "containerId": "fgpe",
-        "attributes": {}
-      },
-      {
         "id": "9ad14184-b348-4677-b047-05052b7cd83d",
         "name": "teacher",
         "description": "Define student groups, attach/detach students to/from student groups, assign courses/single challenges to students/student groups, view profile of students from defined groups",
