@@ -39,17 +39,16 @@ import { GameToDtoMapper } from '../game/mappers/game-to-dto.mapper';
 export class HookService {
   constructor(
     @Inject('PUB_SUB') protected readonly pubSub: PubSub,
-    @Inject(forwardRef(() => ChallengeService))
-    protected readonly challengeService: ChallengeService,
+    @Inject(forwardRef(() => ChallengeService)) protected readonly challengeService: ChallengeService,
+    @Inject(forwardRef(() => PlayerService)) protected readonly playerService: PlayerService,
+    @Inject(forwardRef(() => RewardService)) protected readonly rewardService: RewardService,
+    @Inject(forwardRef(() => GameService)) protected readonly gameService: GameService,
     protected readonly actionHookService: ActionHookService,
     protected readonly scheduledHookService: ScheduledHookService,
     protected readonly challengeStatusService: ChallengeStatusService,
-    protected readonly playerService: PlayerService,
-    protected readonly rewardService: RewardService,
     protected readonly playerRewardService: PlayerRewardService,
     protected readonly submissionService: SubmissionService,
     protected readonly eventService: EventService,
-    protected readonly gameService: GameService,
     protected readonly notificationService: NotificationService,
     protected readonly rewardToDtoMapper: RewardToDtoMapper,
     protected readonly playerRewardToDtoMapper: PlayerRewardToDtoMapper,

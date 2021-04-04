@@ -187,6 +187,7 @@ type Player {
 type Game {
   id: ID!
   name: String!
+  private: Boolean!
   state: GameStateEnum!
   evaluationEngine: EvaluationEngine!
   description: String
@@ -602,6 +603,7 @@ input GroupInput {
 
 input GameInput {
   name: String!
+  private: Boolean
   description: String
   courseId: String!
   gedilLayerId: String

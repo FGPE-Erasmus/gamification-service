@@ -18,9 +18,8 @@ import { ChallengeDto } from 'src/challenge/dto/challenge.dto';
 export class ScheduledHookService extends BaseService<ScheduledHook, ScheduledHookDocument> implements OnModuleInit {
   constructor(
     protected readonly repository: ScheduledHookRepository,
-    @Inject(forwardRef(() => HookService))
-    protected readonly hookService: HookService,
-    protected readonly gameService: GameService,
+    @Inject(forwardRef(() => HookService)) protected readonly hookService: HookService,
+    @Inject(forwardRef(() => GameService)) protected readonly gameService: GameService,
     private schedulerRegistry: SchedulerRegistry,
   ) {
     super(new Logger(ScheduledHookService.name), repository);

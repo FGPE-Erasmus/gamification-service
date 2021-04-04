@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { FilterQuery, UpdateQuery } from 'mongoose';
 
 import { BaseService } from '../common/services/base.service';
@@ -29,9 +29,9 @@ import { ChallengeToDtoMapper } from './mappers/challenge-to-dto.mapper';
 @Injectable()
 export class ChallengeService extends BaseService<Challenge, ChallengeDocument> {
   constructor(
+    @Inject(forwardRef(() => RewardService)) protected readonly rewardService: RewardService,
     protected readonly repository: ChallengeRepository,
     protected readonly leaderboardService: LeaderboardService,
-    protected readonly rewardService: RewardService,
     protected readonly hookService: HookService,
     protected readonly actionHookService: ActionHookService,
     protected readonly scheduledHookService: ScheduledHookService,

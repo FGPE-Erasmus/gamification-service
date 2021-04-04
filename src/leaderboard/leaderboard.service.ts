@@ -28,7 +28,7 @@ export class LeaderboardService extends BaseService<Leaderboard, LeaderboardDocu
     protected readonly repository: LeaderboardRepository,
     protected readonly toDtoMapper: LeaderboardToDtoMapper,
     @Inject(forwardRef(() => ChallengeService)) protected readonly challengeService: ChallengeService,
-    protected readonly playerService: PlayerService,
+    @Inject(forwardRef(() => PlayerService)) protected readonly playerService: PlayerService,
     protected readonly notificationService: NotificationService,
     protected readonly submissionService: SubmissionService,
     protected readonly playerToDtoMapper: PlayerToDtoMapper,
