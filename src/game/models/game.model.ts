@@ -6,6 +6,7 @@ import { EvaluationEngine } from '../../submission/models/evaluation-engine.enum
 
 export interface Game extends IBaseEntity {
   name: string;
+  private?: boolean;
   description?: string;
   state: GameStateEnum;
   evaluationEngine?: string;
@@ -24,6 +25,9 @@ export interface Game extends IBaseEntity {
 export class GameDocument extends Document implements Game {
   @Prop()
   name: string;
+
+  @Prop({ default: true })
+  private?: boolean;
 
   @Prop({ nullable: true })
   description?: string;

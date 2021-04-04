@@ -55,12 +55,16 @@ export class GameResolver {
 
   @Roles(Role.TEACHER)
   @Mutation(() => GameDto)
-  async importGEdILArchive(@Args() importGameArgs: ImportGameArgs): Promise<GameDto> {
+  async importGEdILArchive(
+    @Args() importGameArgs: ImportGameArgs,
+    @GqlUserInfo('sub') teacherId: string,
+  ): Promise<GameDto> {
     const { file, gameInput } = importGameArgs;
     const { filename, mimetype, encoding, createReadStream } = await file;
     const game = await this.gameService.importGEdILArchive(
       {
         name: gameInput.name,
+        private: gameInput.private,
         description: gameInput.description,
         startDate: gameInput.startDate,
         endDate: gameInput.endDate,
@@ -68,6 +72,7 @@ export class GameResolver {
         courseId: gameInput.courseId,
       },
       { filename, mimetype, encoding: encoding as BufferEncoding, content: createReadStream() },
+      teacherId,
     );
     return this.gameToDtoMapper.transform(game);
   }

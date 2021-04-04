@@ -15,6 +15,7 @@ export class GameToDtoMapper implements IMapper<Game, GameDto> {
       [
         'id',
         'name',
+        'private',
         'state',
         'evaluationEngine',
         'description',

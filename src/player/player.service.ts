@@ -7,12 +7,14 @@ import { TriggerEventEnum as TriggerEvent } from '../hook/enums/trigger-event.en
 import { EventService } from '../event/event.service';
 import { Group } from '../group/models/group.model';
 import { GroupService } from '../group/group.service';
+import { GameService } from '../game/game.service';
 
 @Injectable()
 export class PlayerService extends BaseService<Player, PlayerDocument> {
   constructor(
     protected readonly repository: PlayerRepository,
     protected readonly eventService: EventService,
+    protected readonly gameService: GameService,
     @Inject(forwardRef(() => GroupService)) protected readonly groupService: GroupService,
   ) {
     super(new Logger(PlayerService.name), repository);
@@ -37,9 +39,11 @@ export class PlayerService extends BaseService<Player, PlayerDocument> {
   async enroll(gameId: string, userId: string): Promise<Player> {
     // is the player already enrolled?
     let player: Player = await this.findByGameAndUser(gameId, userId);
-    if (player) {
-      return player;
-    }
+    if (player) return player;
+
+    // is the game private?
+    const game = await this.gameService.findById(gameId);
+    if (game.private) throw new Error('The private game cannot be accessed.');
 
     // enroll
     player = await this.create({ game: gameId, user: userId });

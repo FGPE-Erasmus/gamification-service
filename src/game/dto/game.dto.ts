@@ -14,6 +14,9 @@ export class GameDto {
   @Field()
   name?: string;
 
+  @Field()
+  private?: boolean;
+
   @Field(() => GameStateEnum)
   state?: GameStateEnum;
 

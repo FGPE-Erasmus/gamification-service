@@ -18,7 +18,7 @@ export class ValidationService extends BaseService<Validation, ValidationDocumen
     protected readonly eventService: EventService,
     @Inject(forwardRef(() => EvaluationEngineService))
     protected readonly evaluationEngineService: EvaluationEngineService,
-    protected readonly playerService: PlayerService,
+    @Inject(forwardRef(() => PlayerService)) protected readonly playerService: PlayerService,
     @Inject(forwardRef(() => ChallengeStatusService)) protected readonly challengeStatusService: ChallengeStatusService,
   ) {
     super(new Logger(ValidationService.name), repository);

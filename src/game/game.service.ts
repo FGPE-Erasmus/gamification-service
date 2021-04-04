@@ -26,10 +26,10 @@ export class GameService extends BaseService<Game, GameDocument> {
   constructor(
     protected readonly repository: GameRepository,
     protected readonly userService: UserService,
-    protected readonly rewardService: RewardService,
     protected readonly leaderboardService: LeaderboardService,
     protected readonly notificationService: NotificationService,
     protected readonly gameToDtoMapper: GameToDtoMapper,
+    @Inject(forwardRef(() => RewardService)) protected readonly rewardService: RewardService,
     @Inject(forwardRef(() => ChallengeService)) protected readonly challengeService: ChallengeService,
     @Inject(forwardRef(() => ScheduledHookService)) protected readonly scheduledHookService: ScheduledHookService,
     @Inject(forwardRef(() => HookService)) protected readonly hookService: HookService,
@@ -101,7 +101,7 @@ export class GameService extends BaseService<Game, GameDocument> {
    * @param {GameInput} input the game attributes
    * @param {IFile} gedilFile the GEdIL specification package.
    */
-  async importGEdILArchive(input: GameInput, gedilFile: IFile): Promise<Game | undefined> {
+  async importGEdILArchive(input: GameInput, gedilFile: IFile, teacherId: string): Promise<Game | undefined> {
     let game: Game;
 
     const entries = { challenges: {}, leaderboards: {}, rewards: {}, rules: {} };
@@ -119,6 +119,8 @@ export class GameService extends BaseService<Game, GameDocument> {
           gedilLayerId: gedilLayer.id,
           gedilLayerDescription: `[${gedilLayer.name}] ${gedilLayer.description}`,
         });
+        //assign importing teacher
+        await this.findOneAndUpdate({ _id: { $eq: game.id } }, { $addToSet: { instructors: teacherId } });
       } else {
         if (!fileName.includes('metadata.json')) continue;
         const result = /^(challenges|leaderboards|rewards|rules)\/([^/]+)\//.exec(fileName);

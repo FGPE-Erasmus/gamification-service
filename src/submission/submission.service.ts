@@ -22,7 +22,7 @@ export class SubmissionService extends BaseService<Submission, SubmissionDocumen
   constructor(
     protected readonly repository: SubmissionRepository,
     protected readonly eventService: EventService,
-    protected readonly playerService: PlayerService,
+    @Inject(forwardRef(() => PlayerService)) protected readonly playerService: PlayerService,
     @Inject(forwardRef(() => GameService)) protected readonly gameService: GameService,
     @Inject(forwardRef(() => EvaluationEngineService))
     protected readonly evaluationEngineService: EvaluationEngineService,
