@@ -89,7 +89,7 @@ import { ResourceGuard } from './keycloak/guards/resource.guard';
 
     KeycloakModule.registerAsync({
       useFactory: () => ({
-        authServerUrl: `http://${appConfig.auth.keycloak.host}:${appConfig.auth.keycloak.port}${appConfig.auth.keycloak.prefix}/auth`,
+        authServerUrl: `${appConfig.auth.keycloak.url}/auth`,
         realm: appConfig.auth.keycloak.realm,
         clientId: appConfig.auth.keycloak.clientId,
         secret: appConfig.auth.keycloak.clientSecret,

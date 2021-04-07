@@ -55,7 +55,7 @@ services:
       - fgpe-gs-nw
 
   keycloak:
-    container_name: ${AUTH_KEYCLOAK_HOST}
+    container_name: keycloak
     image: fgpe/keycloak:latest
     restart: unless-stopped
     volumes:
@@ -82,7 +82,7 @@ services:
     restart: unless-stopped
     volumes:
       # - ./docker/keycloak/postgres:/var/lib/postgresql ##workaround for windows
-       - ./docker/keycloak/postgres:/var/lib/postgresql/data 
+       - ./docker/keycloak/postgres:/var/lib/postgresql/data
 
     environment:
       - POSTGRES_USER=admin

@@ -1,6 +1,6 @@
 import { isISO8601 } from 'class-validator';
 import { CustomScalar, Scalar } from '@nestjs/graphql';
-import { Kind, ValueNode, GraphQLError } from 'graphql';
+import { GraphQLError, Kind, ValueNode } from 'graphql';
 
 @Scalar('Date', () => Date)
 export class DateScalar implements CustomScalar<string | Date, Date> {
@@ -19,7 +19,7 @@ export class DateScalar implements CustomScalar<string | Date, Date> {
   }
 
   parseLiteral(ast: ValueNode): Date {
-    if ((ast.kind === Kind.INT || ast.kind === Kind.STRING) && isISO8601(ast.value)) {
+    if ((ast.kind === Kind.INT || ast.kind === Kind.STRING) && ast.value && isISO8601(ast.value)) {
       return new Date(ast.value);
     }
     throw new GraphQLError('Date cannot represent an invalid ISO-8601 Date string');

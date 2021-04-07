@@ -100,6 +100,7 @@ export class GameService extends BaseService<Game, GameDocument> {
    *
    * @param {GameInput} input the game attributes
    * @param {IFile} gedilFile the GEdIL specification package.
+   * @param {String} teacherId ID of the teacher
    */
   async importGEdILArchive(input: GameInput, gedilFile: IFile, teacherId: string): Promise<Game | undefined> {
     let game: Game;
@@ -169,21 +170,23 @@ export class GameService extends BaseService<Game, GameDocument> {
     }
 
     //add scheduled hooks for start and end of the game
-    if (game.startDate.getTime() < new Date().getTime() || !game.startDate) {
-      await this.patch(game.id, { state: GameStateEnum.OPEN });
-    } else {
-      await this.scheduledHookService.create({
-        game: game.id?.toString(),
-        cron: game.startDate,
-        actions: [
-          {
-            type: CategoryEnum.UPDATE,
-            parameters: ['GAME', 'STATE', GameStateEnum.OPEN],
-          },
-        ],
-        recurrent: false,
-        active: true,
-      });
+    if (game.startDate) {
+      if (game.startDate.getTime() < new Date().getTime()) {
+        await this.patch(game.id, { state: GameStateEnum.OPEN });
+      } else {
+        await this.scheduledHookService.create({
+          game: game.id?.toString(),
+          cron: game.startDate,
+          actions: [
+            {
+              type: CategoryEnum.UPDATE,
+              parameters: ['GAME', 'STATE', GameStateEnum.OPEN],
+            },
+          ],
+          recurrent: false,
+          active: true,
+        });
+      }
     }
 
     if (game.endDate) {
