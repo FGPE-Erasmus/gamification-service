@@ -37,6 +37,7 @@ import { ValidationDto } from '../submission/dto/validation.dto';
 import { Validation } from '../submission/models/validation.model';
 import { UserService } from '../keycloak/user.service';
 import { NotificationEnum } from '../common/enums/notifications.enum';
+import { GqlPlayer } from '../common/decorators/gql-player.decorator';
 
 @Resolver(() => GameDto)
 export class GameResolver {
@@ -79,8 +80,26 @@ export class GameResolver {
 
   @Roles(Role.TEACHER, Role.STUDENT)
   @Query(() => [GameDto])
-  async games(): Promise<GameDto[]> {
-    const games: Game[] = await this.gameService.findAll();
+  async games(@GqlUserInfo('sub') userId: string, @GqlPlayer('id') playerId: string, @GqlUserInfo('role') role: string): Promise<GameDto[]> {
+    
+    
+    // private games enrolled and all public
+    let games: Game[] = [];
+    if (role == 'teacher') {
+      games = await this.gameService.findAll({
+        $or: [
+          { $and: [{instructors: userId}, {private: true}]},
+          { private: false }
+        ]
+      });
+    } else if (role == 'student') {
+      games = await this.gameService.findAll({
+        $or: [
+          { $and: [{players: playerId}, {private: true}]},
+          { private: false }
+        ]
+      });
+    }
     return Promise.all(games.map(async game => this.gameToDtoMapper.transform(game)));
   }
 
