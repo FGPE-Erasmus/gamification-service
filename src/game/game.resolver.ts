@@ -80,26 +80,20 @@ export class GameResolver {
 
   @Roles(Role.TEACHER, Role.STUDENT)
   @Query(() => [GameDto])
-  async games(@GqlUserInfo('sub') userId: string, @GqlPlayer('id') playerId: string, @GqlUserInfo('role') role: string): Promise<GameDto[]> {
-    
-    
-    // private games enrolled and all public
-    let games: Game[] = [];
-    if (role == 'teacher') {
-      games = await this.gameService.findAll({
-        $or: [
-          { $and: [{instructors: userId}, {private: true}]},
-          { private: false }
-        ]
+  async games(@GqlUserInfo('sub') userId: string, @GqlUserInfo('ROLE') userRole: string): Promise<GameDto[]> {
+    const query: { $or: any[] } = {
+      $or: [{ private: false }],
+    };
+
+    if (userRole === Role.STUDENT) {
+      const playerIds = await this.playerService.findByUser(userId);
+      playerIds.forEach(id => {
+        query.$or.push({ $and: [{ players: id }, { private: true }] });
       });
-    } else if (role == 'student') {
-      games = await this.gameService.findAll({
-        $or: [
-          { $and: [{players: playerId}, {private: true}]},
-          { private: false }
-        ]
-      });
+    } else if (userRole === Role.TEACHER) {
+      query.$or.push({ $and: [{ instructors: userId }, { private: true }] });
     }
+    const games = await this.gameService.findAll(query);
     return Promise.all(games.map(async game => this.gameToDtoMapper.transform(game)));
   }
 
