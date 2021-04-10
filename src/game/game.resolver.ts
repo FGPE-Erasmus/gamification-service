@@ -37,7 +37,6 @@ import { ValidationDto } from '../submission/dto/validation.dto';
 import { Validation } from '../submission/models/validation.model';
 import { UserService } from '../keycloak/user.service';
 import { NotificationEnum } from '../common/enums/notifications.enum';
-import { GqlPlayer } from '../common/decorators/gql-player.decorator';
 
 @Resolver(() => GameDto)
 export class GameResolver {
