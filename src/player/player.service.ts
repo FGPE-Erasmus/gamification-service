@@ -36,14 +36,15 @@ export class PlayerService extends BaseService<Player, PlayerDocument> {
     });
   }
 
-  async enroll(gameId: string, userId: string): Promise<Player> {
+  async enroll(gameId: string, userId: string, enrolledByTeacher?: boolean): Promise<Player> {
     // is the player already enrolled?
     let player: Player = await this.findByGameAndUser(gameId, userId);
     if (player) return player;
 
-    // is the game private?
+    // is the game private? If so - has the enrollment been issued by a teacher?
     const game = await this.gameService.findById(gameId);
-    if (game.private) throw new Error('The private game cannot be accessed.');
+    if (game.private && (!enrolledByTeacher || typeof enrolledByTeacher == undefined))
+      throw new Error('The private game cannot be accessed.');
 
     // enroll
     player = await this.create({ game: gameId, user: userId });

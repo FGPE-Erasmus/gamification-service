@@ -79,8 +79,20 @@ export class GameResolver {
 
   @Roles(Role.TEACHER, Role.STUDENT)
   @Query(() => [GameDto])
-  async games(): Promise<GameDto[]> {
-    const games: Game[] = await this.gameService.findAll();
+  async games(@GqlUserInfo('sub') userId: string, @GqlUserInfo('ROLE') userRole: string): Promise<GameDto[]> {
+    const query: { $or: any[] } = {
+      $or: [{ private: false }],
+    };
+
+    if (userRole === Role.STUDENT) {
+      const playerIds = await this.playerService.findByUser(userId);
+      playerIds.forEach(id => {
+        query.$or.push({ $and: [{ players: id }, { private: true }] });
+      });
+    } else if (userRole === Role.TEACHER) {
+      query.$or.push({ $and: [{ instructors: userId }, { private: true }] });
+    }
+    const games = await this.gameService.findAll(query);
     return Promise.all(games.map(async game => this.gameToDtoMapper.transform(game)));
   }
 

@@ -79,7 +79,7 @@ export class PlayerResolver {
   @UseGuards(GqlInstructorAssignedGuard)
   @Mutation(() => PlayerDto)
   async addToGame(@Args('userId') userId: string, @Args('gameId') gameId: string): Promise<PlayerDto> {
-    const player: Player = await this.playerService.enroll(gameId, userId);
+    const player: Player = await this.playerService.enroll(gameId, userId, true);
     this.notificationService.sendNotification(
       NotificationEnum.PLAYER_ENROLLED,
       await this.playerToDtoMapper.transform(player),
