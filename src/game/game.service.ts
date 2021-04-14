@@ -119,9 +119,8 @@ export class GameService extends BaseService<Game, GameDocument> {
           state: GameStateEnum.LOCKED,
           gedilLayerId: gedilLayer.id,
           gedilLayerDescription: `[${gedilLayer.name}] ${gedilLayer.description}`,
+          instructors: [teacherId],
         });
-        //assign importing teacher
-        await this.findOneAndUpdate({ _id: { $eq: game.id } }, { $addToSet: { instructors: teacherId } });
       } else {
         if (!fileName.includes('metadata.json')) continue;
         const result = /^(challenges|leaderboards|rewards|rules)\/([^/]+)\//.exec(fileName);
