@@ -14,6 +14,8 @@ import { PlayerRepository } from './repositories/player.repository';
 import { PlayerToDtoMapper } from './mappers/player-to-dto.mapper';
 import { PlayerResolver } from './player.resolver';
 import { NotificationModule } from '../notifications/notification.module';
+import { PlayerStatsResolver } from './player-stats.resolver';
+import { StatsResolver } from './stats.resolver';
 
 @Module({
   imports: [
@@ -32,7 +34,7 @@ import { NotificationModule } from '../notifications/notification.module';
     forwardRef(() => SubscriptionsModule),
     forwardRef(() => NotificationModule),
   ],
-  providers: [PlayerToDtoMapper, PlayerRepository, PlayerService, PlayerResolver],
+  providers: [PlayerToDtoMapper, PlayerRepository, PlayerService, PlayerResolver, PlayerStatsResolver, StatsResolver],
   exports: [PlayerToDtoMapper, PlayerRepository, PlayerService],
 })
 export class PlayerModule {}

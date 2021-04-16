@@ -8,6 +8,13 @@ import { EventService } from '../event/event.service';
 import { Group } from '../group/models/group.model';
 import { GroupService } from '../group/group.service';
 import { GameService } from '../game/game.service';
+import { PlayerStatsDto } from './dto/player-stats.dto';
+import { Submission } from '../submission/models/submission.model';
+import { SubmissionService } from '../submission/submission.service';
+import { groupBy } from '../common/utils/array.utils';
+import { Result } from '../submission/models/result.enum';
+import { Validation } from '../submission/models/validation.model';
+import { StatsDto } from './dto/stats.dto';
 
 @Injectable()
 export class PlayerService extends BaseService<Player, PlayerDocument> {
@@ -15,6 +22,7 @@ export class PlayerService extends BaseService<Player, PlayerDocument> {
     protected readonly repository: PlayerRepository,
     protected readonly eventService: EventService,
     protected readonly gameService: GameService,
+    protected readonly submissionService: SubmissionService,
     @Inject(forwardRef(() => GroupService)) protected readonly groupService: GroupService,
   ) {
     super(new Logger(PlayerService.name), repository);
@@ -97,5 +105,154 @@ export class PlayerService extends BaseService<Player, PlayerDocument> {
     }
 
     return await this.patch(playerId, { group: groupId });
+  }
+
+  async statistics(gameId: string, groupId?: string): Promise<StatsDto> {
+    const players: Player[] = await this.findByGame(gameId);
+    const playersStatistics: PlayerStatsDto[] = await Promise.all(
+      players
+        .filter(player => !groupId || player.group === groupId)
+        .map(async player => await this.playerStatistics(gameId, player.user)),
+    );
+    let statistics: StatsDto = {
+      game: gameId,
+      nrOfSubmissions: 0,
+      nrOfValidations: 0,
+      nrOfSubmissionsByActivity: {},
+      nrOfValidationsByActivity: {},
+      nrOfSubmissionsByActivityAndResult: {},
+      nrOfValidationsByActivityAndResult: {},
+    };
+    for (const playerStatistics of playersStatistics) {
+      statistics = await this.mergePlayerStatistics(statistics, playerStatistics);
+    }
+    return statistics;
+  }
+
+  async playerStatistics(gameId: string, userId: string): Promise<PlayerStatsDto> {
+    // is the user enrolled?
+    const player: Player = await this.findOne(
+      {
+        user: { $eq: userId },
+        game: { $eq: gameId },
+      },
+      null,
+      { populate: 'submissions validations learningPath rewards' },
+    );
+    if (!player) {
+      throw new NotFoundException();
+    }
+
+    // build stats
+    const submissionsByActivity: Record<string, Submission[]> = groupBy(
+      player.submissions,
+      (submission: Submission) => submission.exerciseId,
+    );
+    const submissionsByActivityAndResult: Record<string, Record<Result, Submission[]>> = {};
+    Object.keys(submissionsByActivity).forEach(activity => {
+      submissionsByActivityAndResult[activity] = groupBy(
+        submissionsByActivity[activity],
+        (submission: Submission) => submission.result,
+      );
+    });
+
+    const validationsByActivity: Record<string, Validation[]> = groupBy(
+      player.validations,
+      (submission: Submission) => submission.exerciseId,
+    );
+    const validationsByActivityAndResult: Record<string, Record<Result, Validation[]>> = {};
+    Object.keys(validationsByActivity).forEach(activity => {
+      validationsByActivityAndResult[activity] = groupBy(
+        validationsByActivity[activity],
+        (submission: Submission) => submission.result,
+      );
+    });
+
+    return {
+      player: player.id,
+      nrOfSubmissions: player.submissions.length,
+      nrOfValidations: player.validations.length,
+      nrOfSubmissionsByActivity: Object.entries(submissionsByActivity).reduce(
+        (p, [k, v]) => ({ ...p, [k]: v.length }),
+        {},
+      ),
+      nrOfValidationsByActivity: Object.entries(validationsByActivity).reduce(
+        (p, [k, v]) => ({ ...p, [k]: v.length }),
+        {},
+      ),
+      nrOfSubmissionsByActivityAndResult: Object.entries(submissionsByActivityAndResult).reduce((p, [k, v]) => {
+        return {
+          ...p,
+          [k]: Object.entries(v).reduce((p2, [k2, v2]) => ({ ...p2, [k2]: v2.length }), {}),
+        };
+      }, {}),
+      nrOfValidationsByActivityAndResult: Object.entries(validationsByActivityAndResult).reduce((p, [k, v]) => {
+        return {
+          ...p,
+          [k]: Object.entries(v).reduce((p2, [k2, v2]) => ({ ...p2, [k2]: v2.length }), {}),
+        };
+      }, {}),
+    };
+  }
+
+  async mergePlayerStatistics(stats: StatsDto, playerStats: PlayerStatsDto): Promise<StatsDto> {
+    const nrOfSubmissionsByActivity = {};
+    new Set([
+      ...Object.keys(stats.nrOfSubmissionsByActivity || {}),
+      ...Object.keys(playerStats.nrOfSubmissionsByActivity || {}),
+    ]).forEach(activity => {
+      nrOfSubmissionsByActivity[activity] =
+        (stats.nrOfSubmissionsByActivity[activity] || 0) + (playerStats.nrOfSubmissionsByActivity[activity] || 0);
+    });
+
+    const nrOfValidationsByActivity = {};
+    new Set([
+      ...Object.keys(stats.nrOfValidationsByActivity || {}),
+      ...Object.keys(playerStats.nrOfValidationsByActivity || {}),
+    ]).forEach(activity => {
+      nrOfValidationsByActivity[activity] =
+        (stats.nrOfValidationsByActivity[activity] || 0) + (playerStats.nrOfValidationsByActivity[activity] || 0);
+    });
+
+    const nrOfSubmissionsByActivityAndResult = {};
+    new Set([
+      ...Object.keys(stats.nrOfSubmissionsByActivityAndResult || {}),
+      ...Object.keys(playerStats.nrOfSubmissionsByActivityAndResult || {}),
+    ]).forEach(activity => {
+      new Set([
+        ...Object.keys(stats.nrOfSubmissionsByActivityAndResult[activity] || {}),
+        ...Object.keys(playerStats.nrOfSubmissionsByActivityAndResult[activity] || {}),
+      ]).forEach(result => {
+        nrOfSubmissionsByActivityAndResult[activity] = {};
+        nrOfSubmissionsByActivityAndResult[activity][result] =
+          (stats.nrOfSubmissionsByActivityAndResult[activity]?.[result] || 0) +
+          (playerStats.nrOfSubmissionsByActivityAndResult[activity]?.[result] || 0);
+      });
+    });
+
+    const nrOfValidationsByActivityAndResult = {};
+    new Set([
+      ...Object.keys(stats.nrOfValidationsByActivityAndResult || {}),
+      ...Object.keys(playerStats.nrOfValidationsByActivityAndResult || {}),
+    ]).forEach(activity => {
+      new Set([
+        ...Object.keys(stats.nrOfValidationsByActivityAndResult[activity] || {}),
+        ...Object.keys(playerStats.nrOfValidationsByActivityAndResult[activity] || {}),
+      ]).forEach(result => {
+        nrOfValidationsByActivityAndResult[activity] = {};
+        nrOfValidationsByActivityAndResult[activity][result] =
+          (stats.nrOfValidationsByActivityAndResult[activity]?.[result] || 0) +
+          (playerStats.nrOfValidationsByActivityAndResult[activity]?.[result] || 0);
+      });
+    });
+
+    return {
+      nrOfSubmissions: stats.nrOfSubmissions + playerStats.nrOfSubmissions,
+      nrOfValidations: stats.nrOfValidations + playerStats.nrOfValidations,
+      nrOfSubmissionsByActivity,
+      nrOfValidationsByActivity,
+      nrOfSubmissionsByActivityAndResult,
+      nrOfValidationsByActivityAndResult,
+    };
   }
 }

@@ -9,6 +9,7 @@ import { GroupSchema } from './models/group.model';
 import { GroupRepository } from './repositories/group.repository';
 import { GroupService } from './group.service';
 import { GroupResolver } from './group.resolver';
+import { GroupTokenResolver } from './group-token.resolver';
 
 @Module({
   imports: [
@@ -22,7 +23,7 @@ import { GroupResolver } from './group.resolver';
     forwardRef(() => GameModule),
     forwardRef(() => PlayerModule),
   ],
-  providers: [GroupToDtoMapper, GroupRepository, GroupService, GroupResolver],
+  providers: [GroupToDtoMapper, GroupRepository, GroupService, GroupResolver, GroupTokenResolver],
   exports: [GroupToDtoMapper, GroupRepository, GroupService],
 })
 export class GroupModule {}

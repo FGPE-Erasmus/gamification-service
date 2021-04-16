@@ -109,6 +109,18 @@ export class GameResolver {
   }
 
   @Roles(Role.TEACHER)
+  @GameKeyExtractor(context => (context as GqlExecutionContext).getArgs()['id'])
+  @UseGuards(GqlInstructorAssignedGuard)
+  @Query(() => GameDto)
+  async generateEnrollToken(@Args('id') id: string): Promise<GameDto> {
+    const game: Game = await this.gameService.findById(id);
+    if (!game) {
+      throw new NotFoundException();
+    }
+    return this.gameToDtoMapper.transform(game);
+  }
+
+  @Roles(Role.TEACHER)
   @Mutation(() => GameDto)
   async assignInstructor(@Args('gameId') gameId: string, @Args('userId') userId: string): Promise<GameDto> {
     const game: Game = await this.gameService.assignInstructor(gameId, userId);

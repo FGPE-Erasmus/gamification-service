@@ -371,6 +371,31 @@ type ProgrammingLanguage {
   execute: String
 }
 
+type TokenDto {
+  token: String!
+  expiresIn: Float!
+}
+
+type PlayerStats {
+  player: Player!
+  nrOfSubmissions: Float!
+  nrOfValidations: Float!
+  nrOfSubmissionsByActivity: JSON
+  nrOfValidationsByActivity: JSON
+  nrOfSubmissionsByActivityAndResult: JSON
+  nrOfValidationsByActivityAndResult: JSON
+}
+
+type Stats {
+  game: Game!
+  nrOfSubmissions: Float!
+  nrOfValidations: Float!
+  nrOfSubmissionsByActivity: JSON
+  nrOfValidationsByActivity: JSON
+  nrOfSubmissionsByActivityAndResult: JSON
+  nrOfValidationsByActivityAndResult: JSON
+}
+
 type Condition {
   order: Float!
   leftEntity: String!
@@ -528,11 +553,14 @@ type Query {
   challenge(id: String!, gameId: String!): Challenge!
   games: [Game!]!
   game(id: String!): Game!
+  generateEnrollToken(id: String!): Game!
   myGames: [Game!]!
   players(gameId: String!): [Player!]!
   profileInGame(gameId: String!): Player!
   player(userId: String!, gameId: String!): Player!
   myGameProfiles: [Player!]!
+  playerStats(userId: String!, gameId: String!): PlayerStats!
+  stats(groupId: String, gameId: String!): Stats!
   challengeStatus(challengeId: String!, playerId: String!): ChallengeStatus!
   myChallengeStatus(gameId: String!, challengeId: String!): ChallengeStatus!
   activities(challengeId: String!, gameId: String!): [Activity!]!
@@ -582,12 +610,16 @@ type Mutation {
   logout(redirectUri: String): LogoutResponse!
   importGEdILArchive(gameInput: GameInput!, file: Upload!): Game!
   assignInstructor(userId: String!, gameId: String!): Game!
+  generateGameToken(id: String!): TokenDto!
   enroll(gameId: String!): Player!
+  enrollWithToken(token: String!): Player!
   addToGame(gameId: String!, userId: String!): Player!
   removeFromGame(gameId: String!, userId: String!): Player!
   setGroup(groupId: String!, playerId: String!, gameId: String!): Player!
+  addToGroupWithToken(token: String!, gameId: String!): Player!
   saveGroup(id: ID, groupInput: GroupInput!, gameId: String!): Group!
   autoAssignGroups(gameId: String!): [Group!]!
+  generateGroupToken(groupId: String!, gameId: String!): TokenDto!
   evaluate(gameId: String!, exerciseId: String!, file: Upload!): Submission
   validate(gameId: String!, exerciseId: String!, file: Upload!, inputs: [String!] = []): Validation
 }

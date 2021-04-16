@@ -1,5 +1,5 @@
-import { Resolver, Args, Query, ResolveField, Parent, Mutation, Subscription } from '@nestjs/graphql';
-import { NotFoundException, UseGuards, Inject } from '@nestjs/common';
+import { Args, Mutation, Parent, Query, ResolveField, Resolver, Subscription } from '@nestjs/graphql';
+import { Inject, NotFoundException, UseGuards } from '@nestjs/common';
 import { PubSub } from 'graphql-subscriptions';
 
 import { ChallengeStatusService } from '../challenge-status/challenge-status.service';
@@ -67,11 +67,14 @@ export class PlayerResolver {
   @Mutation(() => PlayerDto)
   async enroll(@GqlUserInfo('sub') userId: string, @Args('gameId') gameId: string): Promise<PlayerDto> {
     const player: Player = await this.playerService.enroll(gameId, userId);
-    this.notificationService.sendNotification(
-      NotificationEnum.PLAYER_ENROLLED,
-      await this.playerToDtoMapper.transform(player),
-    );
+    return this.playerToDtoMapper.transform(player);
+  }
 
+  @Roles(Role.STUDENT)
+  @Mutation(() => PlayerDto)
+  async enrollWithToken(@GqlUserInfo('sub') userId: string, @Args('token') token: string): Promise<PlayerDto> {
+    const payload = await this.gameService.verifyEnrollToken(token);
+    const player: Player = await this.playerService.enroll(payload.gameId, userId);
     return this.playerToDtoMapper.transform(player);
   }
 
@@ -153,6 +156,19 @@ export class PlayerResolver {
   ): Promise<PlayerDto> {
     const player: Player = await this.playerService.setGroup(gameId, playerId, groupId);
     return this.playerToDtoMapper.transform(player);
+  }
+
+  @Roles(Role.STUDENT)
+  @UseGuards(GqlPlayerOfGuard)
+  @Mutation(() => PlayerDto)
+  async addToGroupWithToken(
+    @GqlPlayer() player: Player,
+    @Args('gameId') gameId: string,
+    @Args('token') token: string,
+  ): Promise<PlayerDto> {
+    const payload = await this.groupService.verifyGroupToken(token);
+    const updated: Player = await this.playerService.setGroup(gameId, player.id, payload.groupId);
+    return this.playerToDtoMapper.transform(updated);
   }
 
   @ResolveField()

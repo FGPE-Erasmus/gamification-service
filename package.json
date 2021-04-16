@@ -60,6 +60,7 @@
     "graphql-upload": "^11.0.0",
     "helmet": "^3.23.3",
     "jsonpath-plus": "^4.0.0",
+    "jsonwebtoken": "^8.5.1",
     "keycloak-admin": "^1.14.3",
     "keycloak-connect": "^11.0.3",
     "mongodb": "^3.5.9",

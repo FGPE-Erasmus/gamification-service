@@ -70,6 +70,10 @@ interface IAppConfig {
       jobOptions: JobOptions;
     };
   };
+  generatedTokens: {
+    timeout: number;
+    secret: string;
+  };
   logger: LoggerService | LogLevel[] | boolean;
 }
 
@@ -149,6 +153,10 @@ export const appConfig: IAppConfig = {
         backoff: 2000,
       },
     },
+  },
+  generatedTokens: {
+    timeout: +process.env.APP_TOKENS_TIMEOUT || 30 * 24 * 3600, // 30 days
+    secret: process.env.APP_TOKENS_SECRET || 'FGPE',
   },
   logger: (process.env.APP_LOGGER_LEVELS?.split(',') as LogLevel[]) || ['error', 'warn'],
 };

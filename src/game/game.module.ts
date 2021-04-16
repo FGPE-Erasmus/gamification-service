@@ -16,6 +16,7 @@ import { GameRepository } from './repositories/game.repository';
 import { GameUploadController } from './upload.controller';
 import { NotificationModule } from '../notifications/notification.module';
 import { SubscriptionsModule } from '../common/subscriptions/subscriptions.module';
+import { GameTokenResolver } from './game-token.resolver';
 
 @Module({
   imports: [
@@ -36,7 +37,7 @@ import { SubscriptionsModule } from '../common/subscriptions/subscriptions.modul
     forwardRef(() => SubscriptionsModule),
   ],
   controllers: [GameUploadController],
-  providers: [GameToDtoMapper, GameRepository, GameService, GameResolver],
+  providers: [GameToDtoMapper, GameRepository, GameService, GameResolver, GameTokenResolver],
   exports: [GameToDtoMapper, GameRepository, GameService],
 })
 export class GameModule {}
