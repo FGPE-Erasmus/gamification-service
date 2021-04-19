@@ -1,4 +1,4 @@
-import { ObjectType, Field, ID } from '@nestjs/graphql';
+import { Field, ID, ObjectType } from '@nestjs/graphql';
 
 import { GameDto } from '../../game/dto/game.dto';
 import { PlayerRewardDto } from '../../player-reward/dto/player-reward.dto';
@@ -7,6 +7,7 @@ import { ChallengeStatusDto } from '../../challenge-status/dto/challenge-status.
 import { GroupDto } from '../../group/dto/group.dto';
 import { UserDto } from '../../keycloak/dto/user.dto';
 import { ValidationDto } from '../../submission/dto/validation.dto';
+import { PlayerStatsDto } from './player-stats.dto';
 
 @ObjectType('Player')
 export class PlayerDto {
@@ -36,6 +37,9 @@ export class PlayerDto {
 
   @Field(() => [PlayerRewardDto])
   rewards?: string[];
+
+  @Field(() => PlayerStatsDto)
+  stats?: PlayerStatsDto;
 
   @Field(() => Date)
   createdAt?: Date;

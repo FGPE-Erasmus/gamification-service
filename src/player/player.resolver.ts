@@ -40,6 +40,7 @@ import { ValidationService } from '../submission/validation.service';
 import { ValidationToDtoMapper } from '../submission/mappers/validation-to-dto.mapper';
 import { UserService } from '../keycloak/user.service';
 import { NotificationService } from '../notifications/notification.service';
+import { PlayerStatsDto } from './dto/player-stats.dto';
 
 @Resolver(() => PlayerDto)
 export class PlayerResolver {
@@ -234,6 +235,12 @@ export class PlayerResolver {
     const { id: playerId } = root;
     const rewards: PlayerReward[] = await this.playerRewardService.findAll({ player: { $eq: playerId } });
     return Promise.all(rewards.map(async reward => this.playerRewardToDtoMapper.transform(reward)));
+  }
+
+  @ResolveField()
+  async stats(@Parent() root: PlayerDto): Promise<PlayerStatsDto> {
+    const { user, game } = root;
+    return await this.playerService.playerStatistics(game, user);
   }
 
   //Subscriptions for both students and teachers
