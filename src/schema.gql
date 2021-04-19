@@ -544,37 +544,7 @@ type Profile {
 }
 
 type Query {
-  me: Profile!
-  user(id: String!): User!
-  users: [User!]!
-  usersByRole(role: String!): [User!]!
   alive: String!
-  challenges(gameId: String!): [Challenge!]!
-  challenge(id: String!, gameId: String!): Challenge!
-  games: [Game!]!
-  game(id: String!): Game!
-  generateEnrollToken(id: String!): Game!
-  myGames: [Game!]!
-  players(gameId: String!): [Player!]!
-  profileInGame(gameId: String!): Player!
-  player(userId: String!, gameId: String!): Player!
-  myGameProfiles: [Player!]!
-  playerStats(userId: String!, gameId: String!): PlayerStats!
-  stats(groupId: String, gameId: String!): Stats!
-  challengeStatus(challengeId: String!, playerId: String!): ChallengeStatus!
-  myChallengeStatus(gameId: String!, challengeId: String!): ChallengeStatus!
-  activities(challengeId: String!, gameId: String!): [Activity!]!
-  activity(activityId: String!, gameId: String!): Activity!
-  activityStatus(playerId: String!, activityId: String!, gameId: String!): ActivityStatus!
-  myActivityStatus(activityId: String!, gameId: String!): ActivityStatus!
-  programmingLanguages(gameId: String!): [ProgrammingLanguage!]!
-  programmingLanguage(languageId: String!, gameId: String!): ProgrammingLanguage!
-  actionHooks(gameId: String!): [ActionHook!]!
-  scheduledHooks(gameId: String!): [ScheduledHook!]!
-  leaderboards(gameId: String!): [Leaderboard!]!
-  leaderboard(id: String!, gameId: String!): Leaderboard!
-  rankings(leaderboardId: String!, gameId: String!): [Ranking!]!
-  groupRankings(leaderboardId: String!, gameId: String!): [Ranking!]!
   rewards(gameId: String!): [Reward!]!
   badges(gameId: String!): [Badge!]!
   playerBadges(gameId: String!): [Badge!]!
@@ -586,15 +556,18 @@ type Query {
   playerMessages(gameId: String!): [Message!]!
   points(gameId: String!): [Point!]!
   playerPoints(gameId: String!): [Point!]!
-  reveals(gameId: String!): [Reveal!]!
-  playerReveals(gameId: String!): [Reveal!]!
   virtualItems(gameId: String!): [VirtualItem!]!
   playerVirtualItems(gameId: String!): [VirtualItem!]!
   unlocks(gameId: String!): [Unlock!]!
   playerUnlocks(gameId: String!): [Unlock!]!
-  groups(gameId: String!): [Group!]!
-  group(id: String!, gameId: String!): Group!
-  groupInGame(gameId: String!): Group!
+  reveals(gameId: String!): [Reveal!]!
+  playerReveals(gameId: String!): [Reveal!]!
+  programmingLanguages(gameId: String!): [ProgrammingLanguage!]!
+  programmingLanguage(languageId: String!, gameId: String!): ProgrammingLanguage!
+  activities(challengeId: String!, gameId: String!): [Activity!]!
+  activity(activityId: String!, gameId: String!): Activity!
+  activityStatus(playerId: String!, activityId: String!, gameId: String!): ActivityStatus!
+  myActivityStatus(activityId: String!, gameId: String!): ActivityStatus!
   submission(id: String!, gameId: String!): Submission!
   submissions(exerciseId: String, gameId: String!, userId: String!): [Submission!]!
   mySubmissions(exerciseId: String, gameId: String!): [Submission!]!
@@ -603,25 +576,64 @@ type Query {
   validations(exerciseId: String, gameId: String!, userId: String!): [Validation!]!
   latestValidation(exerciseId: String!, gameId: String!): Validation!
   myValidations(exerciseId: String, gameId: String!): [Validation!]!
+  groups(gameId: String!): [Group!]!
+  group(id: String!, gameId: String!): Group!
+  groupInGame(gameId: String!): Group!
+  players(gameId: String!): [Player!]!
+  profileInGame(gameId: String!): Player!
+  player(userId: String!, gameId: String!): Player!
+  myGameProfiles: [Player!]!
+  playerStats(userId: String!, gameId: String!): PlayerStats!
+  stats(groupId: String, gameId: String!): Stats!
+  challengeStatus(challengeId: String!, playerId: String!): ChallengeStatus!
+  myChallengeStatus(gameId: String!, challengeId: String!): ChallengeStatus!
+  actionHooks(gameId: String!): [ActionHook!]!
+  scheduledHooks(gameId: String!): [ScheduledHook!]!
+  leaderboards(gameId: String!): [Leaderboard!]!
+  leaderboard(id: String!, gameId: String!): Leaderboard!
+  rankings(leaderboardId: String!, gameId: String!): [Ranking!]!
+  groupRankings(leaderboardId: String!, gameId: String!): [Ranking!]!
+  challenges(gameId: String!): [Challenge!]!
+  challenge(id: String!, gameId: String!): Challenge!
+  games: [Game!]!
+  game(id: String!): Game!
+  generateEnrollToken(id: String!): Game!
+  myGames: [Game!]!
+  me: Profile!
+  user(id: String!): User!
+  users: [User!]!
+  usersByRole(role: String!): [User!]!
 }
 
 type Mutation {
-  login(username: String, password: String, scope: String, refreshToken: String, redirectUri: String): Auth!
-  logout(redirectUri: String): LogoutResponse!
-  importGEdILArchive(gameInput: GameInput!, file: Upload!): Game!
-  assignInstructor(userId: String!, gameId: String!): Game!
-  generateGameToken(id: String!): TokenDto!
+  evaluate(gameId: String!, exerciseId: String!, file: Upload!): Submission
+  validate(gameId: String!, exerciseId: String!, file: Upload!, inputs: [String!] = []): Validation
+  saveGroup(id: ID, groupInput: GroupInput!, gameId: String!): Group!
+  autoAssignGroups(gameId: String!): [Group!]!
+  generateGroupToken(groupId: String!, gameId: String!): TokenDto!
   enroll(gameId: String!): Player!
   enrollWithToken(token: String!): Player!
   addToGame(gameId: String!, userId: String!): Player!
   removeFromGame(gameId: String!, userId: String!): Player!
   setGroup(groupId: String!, playerId: String!, gameId: String!): Player!
   addToGroupWithToken(token: String!, gameId: String!): Player!
-  saveGroup(id: ID, groupInput: GroupInput!, gameId: String!): Group!
-  autoAssignGroups(gameId: String!): [Group!]!
-  generateGroupToken(groupId: String!, gameId: String!): TokenDto!
-  evaluate(gameId: String!, exerciseId: String!, file: Upload!): Submission
-  validate(gameId: String!, exerciseId: String!, file: Upload!, inputs: [String!] = []): Validation
+  removeFromGroup(gameId: String!, groupId: String!, playerId: String!): Player!
+  importGEdILArchive(gameInput: GameInput!, file: Upload!): Game!
+  assignInstructor(userId: String!, gameId: String!): Game!
+  removeGame(gameId: String!): Game!
+  setAvailability(isPrivate: Boolean!, gameId: String!): Game!
+  generateGameToken(id: String!): TokenDto!
+  login(username: String, password: String, scope: String, refreshToken: String, redirectUri: String): Auth!
+  logout(redirectUri: String): LogoutResponse!
+}
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
+
+input GroupInput {
+  name: String!
+  displayName: String
+  imageUrl: String
 }
 
 input GameInput {
@@ -636,27 +648,7 @@ input GameInput {
   evaluationEngine: EvaluationEngine
 }
 
-"""The `Upload` scalar type represents a file upload."""
-scalar Upload
-
-input GroupInput {
-  name: String!
-  displayName: String
-  imageUrl: String
-}
-
 type Subscription {
-  challengeModified: Challenge!
-  gameModified: Game!
-  gameStarted(gameId: String!): Game!
-  gameFinished(gameId: String!): Game!
-  playerEnrolled(gameId: String!): Player!
-  playerLeft(gameId: String!): Player!
-  pointsUpdatedStudent(gameId: String!): Player!
-  pointsUpdatedTeacher(gameId: String!): Player!
-  challengeStatusUpdatedStudent(gameId: String!): ChallengeStatus!
-  challengeStatusUpdatedTeacher(gameId: String!): ChallengeStatus!
-  leaderboardModified: Leaderboard!
   rewardReceivedStudent(gameId: String!): PlayerReward!
   rewardRemovedStudent(gameId: String!): PlayerReward!
   rewardSubtractedStudent(gameId: String!): PlayerReward!
@@ -670,4 +662,15 @@ type Subscription {
   submissionSentTeacher(gameId: String!): Submission!
   validationProcessedStudent(gameId: String!): Validation!
   validationProcessedTeacher(gameId: String!): Validation!
+  playerEnrolled(gameId: String!): Player!
+  playerLeft(gameId: String!): Player!
+  pointsUpdatedStudent(gameId: String!): Player!
+  pointsUpdatedTeacher(gameId: String!): Player!
+  challengeStatusUpdatedStudent(gameId: String!): ChallengeStatus!
+  challengeStatusUpdatedTeacher(gameId: String!): ChallengeStatus!
+  leaderboardModified: Leaderboard!
+  challengeModified: Challenge!
+  gameModified: Game!
+  gameStarted(gameId: String!): Game!
+  gameFinished(gameId: String!): Game!
 }

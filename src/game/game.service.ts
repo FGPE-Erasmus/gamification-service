@@ -292,4 +292,14 @@ export class GameService extends BaseService<Game, GameDocument> {
     }
     return payload;
   }
+
+  async removeGame(gameId: string): Promise<Game> {
+    const game: Game = await this.findOne({ _id: gameId });
+    if (game) {
+      if (game.players.length > 0) throw new Error('Cannot delete a game with players still enrolled.');
+      else return await this.deleteOne({ _id: gameId });
+    } else {
+      throw new Error('Game not found.');
+    }
+  }
 }
