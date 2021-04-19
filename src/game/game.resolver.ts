@@ -37,6 +37,10 @@ import { ValidationDto } from '../submission/dto/validation.dto';
 import { Validation } from '../submission/models/validation.model';
 import { UserService } from '../keycloak/user.service';
 import { NotificationEnum } from '../common/enums/notifications.enum';
+import { ChallengeDto } from '../challenge/dto/challenge.dto';
+import { Challenge } from '../challenge/models/challenge.model';
+import { ChallengeService } from '../challenge/challenge.service';
+import { ChallengeToDtoMapper } from '../challenge/mappers/challenge-to-dto.mapper';
 
 @Resolver(() => GameDto)
 export class GameResolver {
@@ -45,6 +49,8 @@ export class GameResolver {
     protected readonly gameService: GameService,
     protected readonly gameToDtoMapper: GameToDtoMapper,
     protected readonly userService: UserService,
+    protected readonly challengeService: ChallengeService,
+    protected readonly challengeToDtoMapper: ChallengeToDtoMapper,
     protected readonly playerService: PlayerService,
     protected readonly playerToDtoMapper: PlayerToDtoMapper,
     protected readonly submissionService: SubmissionService,
@@ -161,6 +167,12 @@ export class GameResolver {
   async players(@Parent() root: GameDto): Promise<PlayerDto[]> {
     const players: Player[] = await this.playerService.findAll({ _id: { $in: root.players } });
     return Promise.all(players.map(async player => this.playerToDtoMapper.transform(player)));
+  }
+
+  @ResolveField()
+  async challenges(@Parent() root: GameDto): Promise<ChallengeDto[]> {
+    const challenges: Challenge[] = await this.challengeService.findAll({ game: root.id });
+    return Promise.all(challenges.map(async challenge => this.challengeToDtoMapper.transform(challenge)));
   }
 
   @ResolveField()

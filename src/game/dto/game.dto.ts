@@ -5,6 +5,7 @@ import { UserDto } from '../../keycloak/dto/user.dto';
 import { ValidationDto } from '../../submission/dto/validation.dto';
 import { GameStateEnum } from '../enum/game-state.enum';
 import { EvaluationEngine } from '../../submission/models/evaluation-engine.enum';
+import { ChallengeDto } from '../../challenge/dto/challenge.dto';
 
 @ObjectType('Game')
 export class GameDto {
@@ -43,6 +44,9 @@ export class GameDto {
 
   @Field(() => [UserDto])
   instructors?: string[];
+
+  @Field(() => [ChallengeDto])
+  challenges?: string[];
 
   @Field(() => [PlayerDto])
   players?: string[];
