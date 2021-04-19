@@ -110,7 +110,7 @@ export class PlayerService extends BaseService<Player, PlayerDocument> {
       throw new NotFoundException();
     }
 
-    return await this.findOneAndUpdate({ _id: playerId }, { group: groupId });
+    return await this.patch(playerId, { group: groupId });
   }
 
   async statistics(gameId: string, groupId?: string): Promise<StatsDto> {
