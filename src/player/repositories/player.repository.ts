@@ -31,12 +31,12 @@ export class PlayerRepository extends BaseRepository<Player, PlayerDocument> {
       const old = await this.getById(doc.id);
 
       // if game changed, remove from previous game's collection
-      if (doc.game != old.game) {
+      if (doc.game && doc.game != old.game) {
         await this.gameRepository.removePlayer(old.game, { id: doc.id });
       }
 
       // if group changed, remove from previous group's collection
-      if (doc.group != old.group) {
+      if (doc.group && doc.group != old.group) {
         await this.groupRepository.removePlayer(old.group, { id: doc.id });
       }
     }

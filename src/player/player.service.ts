@@ -85,6 +85,12 @@ export class PlayerService extends BaseService<Player, PlayerDocument> {
     return player;
   }
 
+  async removeFromGroup(groupId: string, playerId: string): Promise<Player> {
+    const player: Player = await this.findOneAndUpdate({ _id: playerId }, { $unset: { group: '' } });
+    await this.groupService.findOneAndUpdate({ _id: groupId }, { $pullAll: { players: [playerId] } });
+    return player;
+  }
+
   async setGroup(gameId: string, playerId: string, groupId: string): Promise<Player> {
     // is the player enrolled?
     const player: Player = await this.findOne({

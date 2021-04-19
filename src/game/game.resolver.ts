@@ -134,6 +134,20 @@ export class GameResolver {
     return Promise.all(games.map(async game => this.gameToDtoMapper.transform(game)));
   }
 
+  @Roles(Role.TEACHER)
+  @Mutation(() => GameDto)
+  async removeGame(@Args('gameId') gameId: string): Promise<GameDto> {
+    const game: Game = await this.gameService.removeGame(gameId);
+    return this.gameToDtoMapper.transform(game);
+  }
+
+  @Roles(Role.TEACHER)
+  @Mutation(() => GameDto)
+  async setAvailability(@Args('gameId') gameId: string, @Args('isPrivate') isPrivate: boolean): Promise<GameDto> {
+    const game: Game = await this.gameService.findOneAndUpdate({ _id: gameId }, { private: isPrivate });
+    return this.gameToDtoMapper.transform(game);
+  }
+
   @ResolveField()
   async instructors(@Parent() root: GameDto): Promise<UserDto[]> {
     const dtos: UserDto[] = [];

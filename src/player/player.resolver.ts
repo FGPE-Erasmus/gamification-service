@@ -171,6 +171,18 @@ export class PlayerResolver {
     return this.playerToDtoMapper.transform(updated);
   }
 
+  @Roles(Role.TEACHER)
+  @UseGuards(GqlInstructorAssignedGuard)
+  @Mutation(() => PlayerDto)
+  async removeFromGroup(
+    @Args('playerId') playerId: string,
+    @Args('groupId') groupId: string,
+    @Args('gameId') gameId: string,
+  ): Promise<PlayerDto> {
+    const player: Player = await this.playerService.removeFromGroup(groupId, playerId);
+    return this.playerToDtoMapper.transform(player);
+  }
+
   @ResolveField()
   async game(@Parent() root: PlayerDto): Promise<GameDto> {
     const { game: gameId } = root;
