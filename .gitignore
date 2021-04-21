@@ -8,7 +8,6 @@
 .env.correct
 *.log
 yarn.lock
-package-lock.json
 
 # Logs
 logs

@@ -208,6 +208,7 @@ type Game {
   startDate: Date
   endDate: Date
   instructors: [User!]!
+  challenges: [Challenge!]!
   players: [Player!]!
   submissions: [Submission!]!
   validations: [Validation!]!
