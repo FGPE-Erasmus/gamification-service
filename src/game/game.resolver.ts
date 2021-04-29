@@ -41,6 +41,10 @@ import { ChallengeDto } from '../challenge/dto/challenge.dto';
 import { Challenge } from '../challenge/models/challenge.model';
 import { ChallengeService } from '../challenge/challenge.service';
 import { ChallengeToDtoMapper } from '../challenge/mappers/challenge-to-dto.mapper';
+import { GroupDto } from '../group/dto/group.dto';
+import { Group } from '../group/models/group.model';
+import { GroupService } from '../group/group.service';
+import { GroupToDtoMapper } from '../group/mappers/group-to-dto.mapper';
 
 @Resolver(() => GameDto)
 export class GameResolver {
@@ -51,6 +55,8 @@ export class GameResolver {
     protected readonly userService: UserService,
     protected readonly challengeService: ChallengeService,
     protected readonly challengeToDtoMapper: ChallengeToDtoMapper,
+    protected readonly groupService: GroupService,
+    protected readonly groupToDtoMapper: GroupToDtoMapper,
     protected readonly playerService: PlayerService,
     protected readonly playerToDtoMapper: PlayerToDtoMapper,
     protected readonly submissionService: SubmissionService,
@@ -167,6 +173,12 @@ export class GameResolver {
   async players(@Parent() root: GameDto): Promise<PlayerDto[]> {
     const players: Player[] = await this.playerService.findAll({ _id: { $in: root.players } });
     return Promise.all(players.map(async player => this.playerToDtoMapper.transform(player)));
+  }
+
+  @ResolveField()
+  async groups(@Parent() root: GameDto): Promise<GroupDto[]> {
+    const groups: Group[] = await this.groupService.findAll({ game: root.id });
+    return Promise.all(groups.map(async group => this.groupToDtoMapper.transform(group)));
   }
 
   @ResolveField()

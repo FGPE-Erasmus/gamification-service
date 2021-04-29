@@ -6,6 +6,7 @@ import { ValidationDto } from '../../submission/dto/validation.dto';
 import { GameStateEnum } from '../enum/game-state.enum';
 import { EvaluationEngine } from '../../submission/models/evaluation-engine.enum';
 import { ChallengeDto } from '../../challenge/dto/challenge.dto';
+import { GroupDto } from '../../group/dto/group.dto';
 
 @ObjectType('Game')
 export class GameDto {
@@ -47,6 +48,9 @@ export class GameDto {
 
   @Field(() => [ChallengeDto])
   challenges?: string[];
+
+  @Field(() => [GroupDto])
+  groups?: string[];
 
   @Field(() => [PlayerDto])
   players?: string[];

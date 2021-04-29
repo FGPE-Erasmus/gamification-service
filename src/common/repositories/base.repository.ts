@@ -31,7 +31,7 @@ export class BaseRepository<I extends IBaseEntity, E extends I & Document> imple
       .exec();
   }
 
-  async getAll(projection: string | Record<string, unknown> = {}, options: Record<string, unknown> = {}): Promise<I[]> {
+  async getAll(projection: string | Record<string, unknown> = {}, options: Record<string, unknown> = {}): Promise<E[]> {
     return this.model
       .find({}, projection, options)
       .lean<E>({ virtuals: true })

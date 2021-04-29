@@ -89,21 +89,21 @@ export class MooshakService implements IEngineService {
 
     activity.codeSkeletons = codeSkeletons ? codeSkeletons : [];
 
-    const viewer: { statement: string; PDFviewable: boolean } = await this.httpService
-      .get<{ statement: string; PDFviewable: boolean }>(
+    const viewer: { statement: string; pdfviewable: boolean } = await this.httpService
+      .get<{ statement: string; pdfviewable: boolean }>(
         `/data/contests/${courseId}/problems/${activityId}/view`,
         options,
       )
       .pipe(
         first(),
-        map<any, { statement: string; PDFviewable: boolean }>(res => res.data),
+        map<any, { statement: string; pdfviewable: boolean }>(res => res.data),
         MooshakService.catchMooshakError(),
       )
       .toPromise();
 
-    if (viewer.PDFviewable) {
+    if (viewer.pdfviewable) {
       const pdf: ArrayBuffer = await this.httpService
-        .get<ArrayBuffer>(`/data/contests/${courseId}/problems/${activityId}/view`, {
+        .get<ArrayBuffer>(`/data/contests/${courseId}/problems/${activityId}/pdf-statement`, {
           ...options,
           responseType: 'arraybuffer',
         })
