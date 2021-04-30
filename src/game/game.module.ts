@@ -17,6 +17,7 @@ import { GameUploadController } from './upload.controller';
 import { NotificationModule } from '../notifications/notification.module';
 import { SubscriptionsModule } from '../common/subscriptions/subscriptions.module';
 import { GameTokenResolver } from './game-token.resolver';
+import { GroupModule } from '../group/group.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { GameTokenResolver } from './game-token.resolver';
     ]),
     MulterModule,
     forwardRef(() => PlayerModule),
+    forwardRef(() => GroupModule),
     forwardRef(() => ChallengeModule),
     forwardRef(() => LeaderboardModule),
     forwardRef(() => HookModule),

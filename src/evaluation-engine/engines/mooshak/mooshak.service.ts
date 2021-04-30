@@ -113,7 +113,7 @@ export class MooshakService implements IEngineService {
           MooshakService.catchMooshakError(),
         )
         .toPromise();
-      activity.statement = String.fromCharCode.apply(null, new Uint16Array(pdf));
+      activity.statement = Buffer.from(new Uint8Array(pdf)).toString('base64');
       activity.pdf = true;
     } else {
       activity.statement = viewer.statement;

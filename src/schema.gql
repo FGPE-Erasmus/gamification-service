@@ -209,6 +209,7 @@ type Game {
   endDate: Date
   instructors: [User!]!
   challenges: [Challenge!]!
+  groups: [Group!]!
   players: [Player!]!
   submissions: [Submission!]!
   validations: [Validation!]!
@@ -565,14 +566,17 @@ type Query {
   stats(groupId: String, gameId: String!): Stats!
   challengeStatus(challengeId: String!, playerId: String!): ChallengeStatus!
   myChallengeStatus(gameId: String!, challengeId: String!): ChallengeStatus!
+  groups(gameId: String!): [Group!]!
+  group(id: String!, gameId: String!): Group!
+  groupInGame(gameId: String!): Group!
+  actionHooks(gameId: String!): [ActionHook!]!
+  scheduledHooks(gameId: String!): [ScheduledHook!]!
   activities(challengeId: String!, gameId: String!): [Activity!]!
   activity(activityId: String!, gameId: String!): Activity!
   activityStatus(playerId: String!, activityId: String!, gameId: String!): ActivityStatus!
   myActivityStatus(activityId: String!, gameId: String!): ActivityStatus!
   programmingLanguages(gameId: String!): [ProgrammingLanguage!]!
   programmingLanguage(languageId: String!, gameId: String!): ProgrammingLanguage!
-  actionHooks(gameId: String!): [ActionHook!]!
-  scheduledHooks(gameId: String!): [ScheduledHook!]!
   leaderboards(gameId: String!): [Leaderboard!]!
   leaderboard(id: String!, gameId: String!): Leaderboard!
   rankings(leaderboardId: String!, gameId: String!): [Ranking!]!
@@ -594,9 +598,6 @@ type Query {
   playerVirtualItems(gameId: String!): [VirtualItem!]!
   unlocks(gameId: String!): [Unlock!]!
   playerUnlocks(gameId: String!): [Unlock!]!
-  groups(gameId: String!): [Group!]!
-  group(id: String!, gameId: String!): Group!
-  groupInGame(gameId: String!): Group!
   submission(id: String!, gameId: String!): Submission!
   submissions(exerciseId: String, gameId: String!, userId: String!): [Submission!]!
   mySubmissions(exerciseId: String, gameId: String!): [Submission!]!
