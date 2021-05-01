@@ -560,6 +560,7 @@ type Query {
   players(gameId: String!): [Player!]!
   profileInGame(gameId: String!): Player!
   player(userId: String!, gameId: String!): Player!
+  allGameProfiles(userId: String!): [Player!]!
   myGameProfiles: [Player!]!
   playerStats(userId: String!, gameId: String!): PlayerStats!
   stats(groupId: String, gameId: String!): Stats!
@@ -614,14 +615,20 @@ type Mutation {
   assignInstructor(userId: String!, gameId: String!): Game!
   removeGame(gameId: String!): Game!
   setAvailability(isPrivate: Boolean!, gameId: String!): Game!
+  changeStartDate(startDate: Date!, gameId: String!): Game!
+  changeEndDate(endDate: Date!, gameId: String!): Game!
   generateGameToken(id: String!): TokenDto!
   enroll(gameId: String!): Player!
   enrollWithToken(token: String!): Player!
   addToGame(gameId: String!, userId: String!): Player!
+  addMultipleToGame(gameId: String!, usersIds: [String!]!): [Player!]!
+  removeMultipleFromGame(gameId: String!, usersIds: [String!]!): [Player!]!
   removeFromGame(gameId: String!, userId: String!): Player!
   setGroup(groupId: String!, playerId: String!, gameId: String!): Player!
+  setGroupForMultiple(playersIds: [String!]!, groupId: String!, gameId: String!): [Player!]!
   addToGroupWithToken(token: String!, gameId: String!): Player!
   removeFromGroup(gameId: String!, groupId: String!, playerId: String!): Player!
+  removeMultipleFromGroup(playersIds: [String!]!, groupId: String!, gameId: String!): [Player!]!
   saveGroup(id: ID, groupInput: GroupInput!, gameId: String!): Group!
   autoAssignGroups(gameId: String!): [Group!]!
   generateGroupToken(groupId: String!, gameId: String!): TokenDto!

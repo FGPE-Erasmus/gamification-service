@@ -93,6 +93,40 @@ export class PlayerResolver {
 
   @Roles(Role.TEACHER)
   @UseGuards(GqlInstructorAssignedGuard)
+  @Mutation(() => [PlayerDto])
+  async addMultipleToGame(
+    @Args({ name: 'usersIds', type: () => [String] }) usersIds: string[],
+    @Args('gameId') gameId: string,
+  ): Promise<PlayerDto[]> {
+    return await Promise.all(
+      usersIds.map(async userId => {
+        const player: Player = await this.playerService.enroll(gameId, userId, true);
+        const playerDto: PlayerDto = await this.playerToDtoMapper.transform(player);
+        this.notificationService.sendNotification(NotificationEnum.PLAYER_ENROLLED, playerDto);
+        return playerDto;
+      }),
+    );
+  }
+
+  @Roles(Role.TEACHER)
+  @UseGuards(GqlInstructorAssignedGuard)
+  @Mutation(() => [PlayerDto])
+  async removeMultipleFromGame(
+    @Args({ name: 'usersIds', type: () => [String] }) usersIds: string[],
+    @Args('gameId') gameId: string,
+  ): Promise<PlayerDto[]> {
+    return await Promise.all(
+      usersIds.map(async userId => {
+        const player: Player = await this.playerService.removeFromGame(gameId, userId);
+        const playerDto: PlayerDto = await this.playerToDtoMapper.transform(player);
+        this.notificationService.sendNotification(NotificationEnum.PLAYER_LEFT, playerDto);
+        return playerDto;
+      }),
+    );
+  }
+
+  @Roles(Role.TEACHER)
+  @UseGuards(GqlInstructorAssignedGuard)
   @Mutation(() => PlayerDto)
   async removeFromGame(@Args('userId') userId: string, @Args('gameId') gameId: string): Promise<PlayerDto> {
     const player: Player = await this.playerService.removeFromGame(gameId, userId);
@@ -140,6 +174,13 @@ export class PlayerResolver {
     return this.playerToDtoMapper.transform(player);
   }
 
+  @Roles(Role.TEACHER)
+  @Query(() => [PlayerDto])
+  async allGameProfiles(@Args('userId') userId: string): Promise<PlayerDto[]> {
+    const players: Player[] = await this.playerService.findByUser(userId);
+    return Promise.all(players.map(async player => this.playerToDtoMapper.transform(player)));
+  }
+
   @Roles(Role.STUDENT)
   @Query(() => [PlayerDto])
   async myGameProfiles(@GqlUserInfo('sub') userId: string): Promise<PlayerDto[]> {
@@ -157,6 +198,18 @@ export class PlayerResolver {
   ): Promise<PlayerDto> {
     const player: Player = await this.playerService.setGroup(gameId, playerId, groupId);
     return this.playerToDtoMapper.transform(player);
+  }
+
+  @Roles(Role.TEACHER)
+  @UseGuards(GqlInstructorAssignedGuard)
+  @Mutation(() => [PlayerDto])
+  async setGroupForMultiple(
+    @Args('gameId') gameId: string,
+    @Args('groupId') groupId: string,
+    @Args({ name: 'playersIds', type: () => [String] }) playersIds: string[],
+  ): Promise<PlayerDto[]> {
+    const players: Player[] = await this.playerService.bulkGroupPlayersAction(gameId, playersIds, groupId, false);
+    return Promise.all(players.map(async player => this.playerToDtoMapper.transform(player)));
   }
 
   @Roles(Role.STUDENT)
@@ -182,6 +235,18 @@ export class PlayerResolver {
   ): Promise<PlayerDto> {
     const player: Player = await this.playerService.removeFromGroup(groupId, playerId);
     return this.playerToDtoMapper.transform(player);
+  }
+
+  @Roles(Role.TEACHER)
+  @UseGuards(GqlInstructorAssignedGuard)
+  @Mutation(() => [PlayerDto])
+  async removeMultipleFromGroup(
+    @Args('gameId') gameId: string,
+    @Args('groupId') groupId: string,
+    @Args({ name: 'playersIds', type: () => [String] }) playersIds: string[],
+  ): Promise<PlayerDto[]> {
+    const players: Player[] = await this.playerService.bulkGroupPlayersAction(gameId, playersIds, groupId, true);
+    return Promise.all(players.map(async player => this.playerToDtoMapper.transform(player)));
   }
 
   @ResolveField()
