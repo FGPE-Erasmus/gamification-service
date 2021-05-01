@@ -160,6 +160,20 @@ export class GameResolver {
     return this.gameToDtoMapper.transform(game);
   }
 
+  @Roles(Role.TEACHER)
+  @Mutation(() => GameDto)
+  async changeStartDate(@Args('gameId') gameId: string, @Args('startDate') newStartDate: Date): Promise<GameDto> {
+    const game: Game = await this.gameService.changeStartDate(gameId, newStartDate);
+    return this.gameToDtoMapper.transform(game);
+  }
+
+  @Roles(Role.TEACHER)
+  @Mutation(() => GameDto)
+  async changeEndDate(@Args('gameId') gameId: string, @Args('endDate') newEndDate: Date): Promise<GameDto> {
+    const game: Game = await this.gameService.changeEndDate(gameId, newEndDate);
+    return this.gameToDtoMapper.transform(game);
+  }
+
   @ResolveField()
   async instructors(@Parent() root: GameDto): Promise<UserDto[]> {
     const dtos: UserDto[] = [];

@@ -113,6 +113,22 @@ export class PlayerService extends BaseService<Player, PlayerDocument> {
     return await this.patch(playerId, { group: groupId });
   }
 
+  async bulkGroupPlayersAction(
+    gameId: string,
+    playersIds: string[],
+    groupId: string,
+    ifPlayersRemoval: boolean,
+  ): Promise<Player[]> {
+    return await Promise.all(
+      playersIds.map(async playerId => {
+        const player: Player = ifPlayersRemoval
+          ? await this.removeFromGroup(groupId, playerId)
+          : await this.setGroup(gameId, playerId, groupId);
+        return player;
+      }),
+    );
+  }
+
   async statistics(gameId: string, groupId?: string): Promise<StatsDto> {
     const players: Player[] = await this.findByGame(gameId);
     const playersStatistics: PlayerStatsDto[] = await Promise.all(

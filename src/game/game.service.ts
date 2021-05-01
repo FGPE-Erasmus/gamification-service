@@ -23,6 +23,7 @@ import { GameToDtoMapper } from './mappers/game-to-dto.mapper';
 import { TokenDto } from '../common/dto/token.dto';
 import { createToken, verifyToken } from '../common/services/jwt.service';
 import { appConfig } from '../app.config';
+import { ScheduledHook } from '../hook/models/scheduled-hook.model';
 
 @Injectable()
 export class GameService extends BaseService<Game, GameDocument> {
@@ -301,5 +302,59 @@ export class GameService extends BaseService<Game, GameDocument> {
     } else {
       throw new Error('Game not found.');
     }
+  }
+
+  /**
+   * Change the starting date of the game.
+   * @param gameId the ID of the game.
+   * @param newStartDate new value of the starting date.
+   */
+  async changeStartDate(gameId: string, newStartDate: Date): Promise<Game> {
+    const game: Game = await this.findOneAndUpdate({ _id: gameId }, { startDate: newStartDate });
+    this._updateDateScheduledHooks(gameId, newStartDate, true);
+    return game;
+  }
+
+  /**
+   * Change the ending date of the game.
+   * @param gameId the ID of the game.
+   * @param newEndDate new value of the ending date.
+   */
+  async changeEndDate(gameId: string, newEndDate: Date): Promise<Game> {
+    const game: Game = await this.findOneAndUpdate({ _id: gameId }, { endDate: newEndDate });
+    this._updateDateScheduledHooks(gameId, newEndDate, false);
+    return game;
+  }
+
+  /**
+   * Delete the old scheduled hook for the start/end of the game and create a new one.
+   * @param gameId ID of the game.
+   * @param newDate new value for of the.
+   * @param isStartDate is the date an opening or ending date.
+   */
+  async _updateDateScheduledHooks(gameId: string, newDate: Date, isStartDate: boolean): Promise<ScheduledHook> {
+    const isActive = newDate.getTime() > new Date().getTime();
+    if (!isActive) throw new Error('Requested date is in the past');
+    const oldScheduledHook: ScheduledHook = await this.scheduledHookService.deleteOne({
+      $and: [
+        { game: gameId },
+        {
+          actions: {
+            type: CategoryEnum.UPDATE,
+            parameters: ['GAME', 'STATE', isStartDate ? GameStateEnum.OPEN : GameStateEnum.CLOSED],
+          },
+        },
+      ],
+    });
+    this.scheduledHookService.stopCronJob(oldScheduledHook.id);
+    const newScheduledHook: ScheduledHook = await this.scheduledHookService.create({
+      game: gameId,
+      cron: newDate,
+      actions: oldScheduledHook.actions,
+      recurrent: false,
+      active: isActive,
+    });
+    this.scheduledHookService.addCronJob(newScheduledHook, {});
+    return await newScheduledHook;
   }
 }
