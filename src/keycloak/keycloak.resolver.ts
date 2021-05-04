@@ -1,4 +1,4 @@
-import { Args, Resolver, Mutation, Query } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { Response } from 'express';
 
 import { appConfig } from '../app.config';

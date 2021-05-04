@@ -1,4 +1,4 @@
-import { Logger, Inject } from '@nestjs/common';
+import { Inject, Logger } from '@nestjs/common';
 import { InjectQueue, Process, Processor } from '@nestjs/bull';
 import { Job, Queue } from 'bull';
 import { PubSub } from 'graphql-subscriptions';

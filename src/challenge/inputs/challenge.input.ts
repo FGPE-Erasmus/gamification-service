@@ -1,5 +1,5 @@
 import { Field, InputType } from '@nestjs/graphql';
-import { MinLength, MaxLength, IsArray, IsEnum, IsBoolean, IsMongoId, IsUUID, IsOptional } from 'class-validator';
+import { IsArray, IsBoolean, IsEnum, IsMongoId, IsOptional, IsUUID, MaxLength, MinLength } from 'class-validator';
 
 import { Difficulty } from '../models/difficulty.enum';
 import { Mode } from '../models/mode.enum';

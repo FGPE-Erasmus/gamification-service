@@ -1,5 +1,5 @@
-import { Resolver, Args, Query, ResolveField, Parent, Subscription } from '@nestjs/graphql';
-import { NotFoundException, UseGuards, Inject } from '@nestjs/common';
+import { Args, Parent, Query, ResolveField, Resolver, Subscription } from '@nestjs/graphql';
+import { Inject, NotFoundException, UseGuards } from '@nestjs/common';
 import { PubSub } from 'graphql-subscriptions';
 
 import { NotificationEnum } from '../common/enums/notifications.enum';

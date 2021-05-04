@@ -100,7 +100,8 @@ export class ChallengeService extends BaseService<Challenge, ChallengeDocument> 
   }
 
   async importGEdIL(
-    imported: { [t in 'challenges' | 'leaderboards' | 'rewards' | 'rules']: { [k: string]: string } },
+    importTracker: { [t in 'challenges' | 'leaderboards' | 'rewards']: { [k: string]: string } },
+    rules: any[],
     game: Game,
     gedilId: string,
     entries: { [path: string]: Buffer },
@@ -112,6 +113,7 @@ export class ChallengeService extends BaseService<Challenge, ChallengeDocument> 
     for (const path of Object.keys(entries)) {
       if (path === 'metadata.json') {
         const encodedContent = extractToJson(entries[path]);
+        const gedilId = encodedContent.id;
         delete encodedContent.id;
         challenge = await this.create({
           ...encodedContent,
@@ -119,6 +121,7 @@ export class ChallengeService extends BaseService<Challenge, ChallengeDocument> 
           game: game.id,
           parentChallenge: parentChallenge?.id,
         });
+        importTracker.challenges[gedilId] = challenge.id;
       } else {
         const result = /^(challenges|leaderboards|rewards|rules)\/([^/]+)\//.exec(path);
         if (result) {
@@ -133,47 +136,46 @@ export class ChallengeService extends BaseService<Challenge, ChallengeDocument> 
       }
     }
 
-    const subObjects = { challenges: {}, leaderboards: {}, rewards: {}, rules: {} };
-
     // inner challenges
     for (const gedilId of Object.keys(subEntries.challenges)) {
-      subObjects.challenges[gedilId] = await this.importGEdIL(
-        imported,
+      const newChallenge = await this.importGEdIL(
+        importTracker,
+        rules,
         game,
         gedilId,
         subEntries.challenges[gedilId],
         challenge,
       );
+      importTracker.challenges[gedilId] = newChallenge.id;
     }
 
     // inner leaderboards
     for (const gedilId of Object.keys(subEntries.leaderboards)) {
-      subObjects.leaderboards[gedilId] = await this.leaderboardService.importGEdIL(
-        imported,
+      const newLeaderboard = await this.leaderboardService.importGEdIL(
+        importTracker,
+        rules,
         game,
         subEntries.leaderboards[gedilId],
         challenge,
       );
+      importTracker.leaderboards[gedilId] = newLeaderboard.id;
     }
 
     // inner rewards
     for (const gedilId of Object.keys(subEntries.rewards)) {
-      subObjects.rewards[gedilId] = await this.rewardService.importGEdIL(
-        imported,
+      const newReward = await this.rewardService.importGEdIL(
+        importTracker,
+        rules,
         game,
         subEntries.rewards[gedilId],
         challenge,
       );
+      importTracker.rewards[gedilId] = newReward.id;
     }
 
     // inner rules
     for (const gedilId of Object.keys(subEntries.rules)) {
-      subObjects.rules[gedilId] = await this.hookService.importGEdIL(
-        imported,
-        game,
-        subEntries.rules[gedilId],
-        challenge,
-      );
+      await this.hookService.importGEdIL(importTracker, rules, game, subEntries.rules[gedilId], challenge);
     }
 
     // add logic hooks of the challenge
@@ -189,7 +191,9 @@ export class ChallengeService extends BaseService<Challenge, ChallengeDocument> 
       {
         order: 1,
         leftEntity: EntityEnum.FIXED,
-        leftProperty: Object.values(subObjects.challenges).join(', '),
+        leftProperty: Object.keys(subEntries.challenges)
+          .map(gedilId => importTracker.challenges[gedilId])
+          .join(', '),
         comparingFunction: ComparingFunction.IN,
         rightEntity: EntityEnum.PLAYER,
         rightProperty: `$.learningPath[?(@.state==\'${State.COMPLETED}\')].challenge`,

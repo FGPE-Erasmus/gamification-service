@@ -1,4 +1,4 @@
-import { Resolver, Args, Query, ResolveField, Parent } from '@nestjs/graphql';
+import { Args, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 
 import { GqlPlayer } from '../common/decorators/gql-player.decorator';

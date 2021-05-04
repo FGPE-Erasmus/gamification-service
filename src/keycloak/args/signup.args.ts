@@ -1,5 +1,5 @@
-import { IsEmail, MinLength, MaxLength, IsDefined, Matches, IsString } from 'class-validator';
-import { Field, ArgsType } from '@nestjs/graphql';
+import { IsDefined, IsEmail, IsString, Matches, MaxLength, MinLength } from 'class-validator';
+import { ArgsType, Field } from '@nestjs/graphql';
 
 import { EmailScalar as Email } from '../../common/scalars/email.scalar';
 

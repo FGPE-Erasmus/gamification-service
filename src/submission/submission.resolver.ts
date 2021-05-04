@@ -1,5 +1,5 @@
-import { UseGuards, NotFoundException, ForbiddenException, Inject } from '@nestjs/common';
-import { Resolver, Args, Mutation, Query, ResolveField, Parent, Subscription } from '@nestjs/graphql';
+import { ForbiddenException, Inject, NotFoundException, UseGuards } from '@nestjs/common';
+import { Args, Mutation, Parent, Query, ResolveField, Resolver, Subscription } from '@nestjs/graphql';
 import { PubSub } from 'graphql-subscriptions';
 
 import { NotificationEnum } from '../common/enums/notifications.enum';

@@ -1,6 +1,5 @@
 import { Document, FilterQuery, UpdateQuery } from 'mongoose';
 import { IBaseEntity } from './base-entity.interface';
-import { Submission } from '../../submission/models/submission.model';
 
 export interface IRepository<I extends IBaseEntity, E extends I & Document> {
   /**

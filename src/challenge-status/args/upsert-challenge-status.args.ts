@@ -1,5 +1,5 @@
-import { ID, Field, ArgsType } from '@nestjs/graphql';
-import { IsOptional, IsMongoId, Allow, ValidateNested } from 'class-validator';
+import { ArgsType, Field, ID } from '@nestjs/graphql';
+import { Allow, IsMongoId, IsOptional, ValidateNested } from 'class-validator';
 
 import { ChallengeStatusInput } from '../inputs/challenge-status.input';
 

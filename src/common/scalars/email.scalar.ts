@@ -1,5 +1,5 @@
-import { Scalar, CustomScalar } from '@nestjs/graphql';
-import { Kind, ValueNode, GraphQLError } from 'graphql';
+import { CustomScalar, Scalar } from '@nestjs/graphql';
+import { GraphQLError, Kind, ValueNode } from 'graphql';
 
 @Scalar('Email')
 export class EmailScalar implements CustomScalar<string, string> {

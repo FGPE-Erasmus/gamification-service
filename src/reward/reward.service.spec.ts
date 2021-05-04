@@ -1,6 +1,6 @@
 import { forwardRef } from '@nestjs/common';
-import { MongooseModule, getConnectionToken } from '@nestjs/mongoose';
-import { TestingModule, Test } from '@nestjs/testing';
+import { getConnectionToken, MongooseModule } from '@nestjs/mongoose';
+import { Test, TestingModule } from '@nestjs/testing';
 import { Connection } from 'mongoose';
 
 import { ChallengeModule } from '../challenge/challenge.module';

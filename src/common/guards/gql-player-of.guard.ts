@@ -1,4 +1,4 @@
-import { Injectable, CanActivate, ExecutionContext, Logger, Scope } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable, Logger, Scope } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 
 import { ROLES } from '../../keycloak/decorators/roles.decorator';

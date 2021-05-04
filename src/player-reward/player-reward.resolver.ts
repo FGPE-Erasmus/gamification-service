@@ -1,4 +1,4 @@
-import { Resolver, ResolveField, Parent } from '@nestjs/graphql';
+import { Parent, ResolveField, Resolver } from '@nestjs/graphql';
 
 import { GameService } from '../game/game.service';
 import { GameToDtoMapper } from '../game/mappers/game-to-dto.mapper';

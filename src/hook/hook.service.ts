@@ -1,4 +1,4 @@
-import { Injectable, Inject, forwardRef } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { PubSub } from 'graphql-subscriptions';
 
 import { checkCriteria } from '../common/helpers/criteria.helper';
@@ -57,35 +57,36 @@ export class HookService {
   ) {}
 
   async importGEdIL(
-    imported: { [t in 'challenges' | 'leaderboards' | 'rewards' | 'rules']: { [k: string]: string } },
+    importTracker: { [t in 'challenges' | 'leaderboards' | 'rewards']: { [k: string]: string } },
+    rules: any[],
     game: Game,
     entries: { [path: string]: Buffer },
     parentChallenge?: Challenge,
-  ): Promise<(ScheduledHook | ActionHook)[] | undefined> {
-    const hooks: (ScheduledHook | ActionHook)[] = [];
-
+  ): Promise<void> {
     for (const path of Object.keys(entries)) {
       const encodedContent = extractToJson(entries[path]);
-      delete encodedContent.id;
-
       const triggers = encodedContent.triggers;
       for (const trigger of triggers) {
-        let hook: ScheduledHook | ActionHook;
+        let hook: any;
         let sourceIds;
         if (trigger.event.startsWith('CHALLENGE_')) {
-          sourceIds = trigger.parameters.map(gedilId => imported.challenges[gedilId]['_id'].toString());
+          sourceIds = trigger.parameters.map(gedilId => importTracker.challenges[gedilId].toString());
           trigger.parameters = sourceIds;
         } else if (trigger.event.startsWith('REWARD_')) {
-          sourceIds = trigger.parameters.map(gedilId => imported.rewards[gedilId]['_id'].toString());
+          sourceIds = trigger.parameters.map(gedilId => importTracker.rewards[gedilId].toString());
           trigger.parameters = sourceIds;
         }
-        if (encodedContent.actions[0].parameters && encodedContent.actions[0].parameters !== null) {
-          encodedContent.actions[0].parameters = encodedContent.actions[0].parameters.map(param => {
-            if (imported.rewards[param]) {
-              return imported.rewards[param]['id'];
-            }
-            return param;
-          });
+        for (const action of encodedContent.actions) {
+          if (action.parameters) {
+            action.parameters = action.parameters.map(param => {
+              if (importTracker.rewards[param]) {
+                return importTracker.rewards[param];
+              } else if (importTracker.challenges[param]) {
+                return importTracker.challenges[param];
+              }
+              return param;
+            });
+          }
         }
 
         const data: { [key: string]: any } = {
@@ -100,26 +101,24 @@ export class HookService {
           active: true,
         };
         if (trigger.kind === TriggerKind.ACTION) {
-          hook = await this.actionHookService.create({
+          hook = {
             ...data,
             trigger: trigger.event,
             sourceId: trigger.parameters[0],
-          } as ActionHook);
+          };
         } else if (trigger.kind === TriggerKind.SCHEDULED) {
           if (trigger.event === 'INTERVAL') {
             data.interval = parseInt(trigger.parameters[0]);
           } else {
             data.cron = trigger.parameters[0];
           }
-          hook = await this.scheduledHookService.create({
+          hook = {
             ...data,
-          } as ScheduledHook);
+          };
         }
-        hooks.push(hook);
+        rules.push(hook);
       }
     }
-
-    return hooks;
   }
 
   /**

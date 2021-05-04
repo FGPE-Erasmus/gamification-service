@@ -1,4 +1,4 @@
-import { ObjectType, ID, Field } from '@nestjs/graphql';
+import { Field, ID, ObjectType } from '@nestjs/graphql';
 
 import { ChallengeDto } from '../../challenge/dto/challenge.dto';
 import { GameDto } from '../../game/dto/game.dto';

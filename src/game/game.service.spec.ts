@@ -22,7 +22,6 @@ import { toMongoId } from '../common/utils/mongo.utils';
 import KeycloakMockService from '../../test/__mocks__/keycloak.service';
 import { KeycloakService } from '../keycloak/keycloak.service';
 import { KeycloakModule } from '../keycloak/keycloak.module';
-import { AppModule } from '../app.module';
 
 const GEDIL_FILE = 'test/resources/gedil/the-a-run-gedil.zip';
 

@@ -1,4 +1,4 @@
-import { Args, Resolver, Query } from '@nestjs/graphql';
+import { Args, Query, Resolver } from '@nestjs/graphql';
 
 import { UserDto } from './dto/user.dto';
 import { Role } from '../common/enums/role.enum';

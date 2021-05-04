@@ -1,5 +1,5 @@
-import { ArgsType, Field, Int, ID } from '@nestjs/graphql';
-import { Max, Min, MinLength, IsArray, IsMongoId, Allow } from 'class-validator';
+import { ArgsType, Field, ID, Int } from '@nestjs/graphql';
+import { Allow, IsArray, IsMongoId, Max, Min, MinLength } from 'class-validator';
 
 import { order } from '../types/order.type';
 

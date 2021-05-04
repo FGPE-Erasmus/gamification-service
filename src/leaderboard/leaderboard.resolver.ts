@@ -1,4 +1,4 @@
-import { Resolver, Query, ResolveField, Parent, Args, Subscription, Mutation } from '@nestjs/graphql';
+import { Args, Parent, Query, ResolveField, Resolver, Subscription } from '@nestjs/graphql';
 import { Inject, NotFoundException, UseGuards } from '@nestjs/common';
 import { PubSub } from 'graphql-subscriptions/dist/pubsub';
 

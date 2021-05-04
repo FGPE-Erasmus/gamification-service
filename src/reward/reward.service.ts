@@ -95,6 +95,7 @@ export class RewardService extends BaseService<Reward, RewardDocument> {
    * Import GEdIL entries from a reward.
    *
    * @param {any} importTracker the objects already imported from the same archive.
+   * @param {any[]} rules the rules to add
    * @param {Game} game the game which is being imported.
    * @param {[path: string]: Buffer} entries the archive entries to import.
    * @param {Challenge} challenge the challenge to which this reward is
@@ -102,7 +103,8 @@ export class RewardService extends BaseService<Reward, RewardDocument> {
    * @returns {Promise<Reward | undefined>} the imported reward.
    */
   async importGEdIL(
-    importTracker: { [t in 'challenges' | 'leaderboards' | 'rewards' | 'rules']: { [k: string]: string } },
+    importTracker: { [t in 'challenges' | 'leaderboards' | 'rewards']: { [k: string]: string } },
+    rules: any[],
     game: Game,
     entries: { [path: string]: Buffer },
     challenge?: Challenge,
@@ -112,6 +114,7 @@ export class RewardService extends BaseService<Reward, RewardDocument> {
     }
 
     const encodedContent = extractToJson(entries['metadata.json']);
+    const gedilId = encodedContent.id;
     delete encodedContent.id;
 
     // create reward
@@ -122,9 +125,11 @@ export class RewardService extends BaseService<Reward, RewardDocument> {
       challenges: encodedContent.challenges?.map(gedilId => importTracker.challenges[gedilId]),
     });
 
+    importTracker.rewards[gedilId] = reward.id;
+
     // when appended to a challenge, assign on complete it
     if (challenge) {
-      await this.actionHookService.create({
+      rules.push({
         game: game.id,
         parentChallenge: challenge.id,
         sourceId: challenge.id,

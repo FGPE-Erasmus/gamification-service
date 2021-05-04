@@ -1,5 +1,5 @@
-import { ID, Field, ArgsType } from '@nestjs/graphql';
-import { IsOptional, IsMongoId } from 'class-validator';
+import { ArgsType, Field, ID } from '@nestjs/graphql';
+import { IsMongoId, IsOptional } from 'class-validator';
 
 @ArgsType()
 export class AddPlayersArgs {

@@ -102,6 +102,7 @@ export class LeaderboardService extends BaseService<Leaderboard, LeaderboardDocu
    * Import GEdIL entries from a leaderboard.
    *
    * @param {any} importTracker the objects already imported from the same archive.
+   * @param {any[]} rules the rules to add
    * @param {Game} game the game which is being imported.
    * @param {[path: string]: Buffer} entries the archive entries to import.
    * @param {Challenge} challenge the challenge to which this leaderboard is
@@ -109,7 +110,8 @@ export class LeaderboardService extends BaseService<Leaderboard, LeaderboardDocu
    * @returns {Promise<Leaderboard | undefined>} the imported leaderboard.
    */
   async importGEdIL(
-    importTracker: { [t in 'challenges' | 'leaderboards' | 'rewards' | 'rules']: { [k: string]: string } },
+    importTracker: { [t in 'challenges' | 'leaderboards' | 'rewards']: { [k: string]: string | string[] } },
+    rules: any[],
     game: Game,
     entries: { [path: string]: Buffer },
     challenge?: Challenge,
@@ -119,15 +121,20 @@ export class LeaderboardService extends BaseService<Leaderboard, LeaderboardDocu
     }
 
     const encodedContent = extractToJson(entries['metadata.json']);
+    const gedilId = encodedContent.id;
     delete encodedContent.id;
 
     // create leaderboard
-    return await this.create({
+    const leaderboard = await this.create({
       ...encodedContent,
       sortingOrders: encodedContent.sorting_orders,
       game: game.id,
       parentChallenge: challenge?.id,
     });
+
+    importTracker.leaderboards[gedilId] = leaderboard.id;
+
+    return leaderboard;
   }
 
   /**

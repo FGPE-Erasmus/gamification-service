@@ -24,6 +24,7 @@ import { TokenDto } from '../common/dto/token.dto';
 import { createToken, verifyToken } from '../common/services/jwt.service';
 import { appConfig } from '../app.config';
 import { ScheduledHook } from '../hook/models/scheduled-hook.model';
+import { ActionHookService } from '../hook/action-hook.service';
 
 @Injectable()
 export class GameService extends BaseService<Game, GameDocument> {
@@ -35,6 +36,7 @@ export class GameService extends BaseService<Game, GameDocument> {
     protected readonly gameToDtoMapper: GameToDtoMapper,
     @Inject(forwardRef(() => RewardService)) protected readonly rewardService: RewardService,
     @Inject(forwardRef(() => ChallengeService)) protected readonly challengeService: ChallengeService,
+    @Inject(forwardRef(() => ActionHookService)) protected readonly actionHookService: ActionHookService,
     @Inject(forwardRef(() => ScheduledHookService)) protected readonly scheduledHookService: ScheduledHookService,
     @Inject(forwardRef(() => HookService)) protected readonly hookService: HookService,
   ) {
@@ -141,35 +143,49 @@ export class GameService extends BaseService<Game, GameDocument> {
       }
     }
 
-    const subObjects = { challenges: {}, leaderboards: {}, rewards: {}, rules: {} };
+    const subObjects = { challenges: {}, leaderboards: {}, rewards: {} };
+    const rules = [];
 
     // challenges
     for (const gedilId of Object.keys(entries.challenges)) {
-      subObjects.challenges[gedilId] = await this.challengeService.importGEdIL(
+      const newChallenge = await this.challengeService.importGEdIL(
         subObjects,
+        rules,
         game,
         gedilId,
         entries.challenges[gedilId],
       );
+      subObjects.challenges[gedilId] = newChallenge.id;
     }
 
     // leaderboards
     for (const gedilId of Object.keys(entries.leaderboards)) {
-      subObjects.leaderboards[gedilId] = await this.leaderboardService.importGEdIL(
+      const newLeaderboard = await this.leaderboardService.importGEdIL(
         subObjects,
+        rules,
         game,
         entries.leaderboards[gedilId],
       );
+      subObjects.leaderboards[gedilId] = newLeaderboard.id;
     }
 
     // rewards
     for (const gedilId of Object.keys(entries.rewards)) {
-      subObjects.rewards[gedilId] = await this.rewardService.importGEdIL(subObjects, game, entries.rewards[gedilId]);
+      const newReward = await this.rewardService.importGEdIL(subObjects, rules, game, entries.rewards[gedilId]);
+      subObjects.rewards[gedilId] = newReward.id;
     }
 
     // rules
     for (const gedilId of Object.keys(entries.rules)) {
-      subObjects.rules[gedilId] = await this.hookService.importGEdIL(subObjects, game, entries.rules[gedilId]);
+      await this.hookService.importGEdIL(subObjects, rules, game, entries.rules[gedilId]);
+    }
+
+    for (const rule of rules) {
+      if (rule.cron || rule.interval) {
+        await this.scheduledHookService.create(rule);
+      } else {
+        await this.actionHookService.create(rule);
+      }
     }
 
     const now = new Date().getTime();

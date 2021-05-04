@@ -1,15 +1,15 @@
 import { Field, InputType } from '@nestjs/graphql';
 import { Type } from 'class-transformer';
 import {
-  MinLength,
-  MaxLength,
-  IsString,
-  IsOptional,
-  IsDate,
-  IsUUID,
-  IsEnum,
-  Matches,
   IsBoolean,
+  IsDate,
+  IsEnum,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Matches,
+  MaxLength,
+  MinLength,
 } from 'class-validator';
 import { EvaluationEngine } from '../../submission/models/evaluation-engine.enum';
 
