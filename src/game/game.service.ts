@@ -260,6 +260,18 @@ export class GameService extends BaseService<Game, GameDocument> {
   }
 
   /**
+   * Unassigns a user as instructor in a game.
+   *
+   * @param {string} gameId ID of the game.
+   * @param {string} userId ID of the user.
+   * @return {Game} game w/ new instructor.
+   */
+  async unassignInstructor(gameId: string, userId: string): Promise<Game> {
+    const user: UserDto = await this.userService.getUser(userId);
+    return this.findOneAndUpdate({ _id: { $eq: gameId } }, { $pullAll: { instructors: [user.id] } });
+  }
+
+  /**
    * Check if a user is assigned as instructor in a game.
    *
    * @param {string} gameId ID of the game.

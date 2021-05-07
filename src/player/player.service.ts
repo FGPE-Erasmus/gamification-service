@@ -85,10 +85,8 @@ export class PlayerService extends BaseService<Player, PlayerDocument> {
     return player;
   }
 
-  async removeFromGroup(groupId: string, playerId: string): Promise<Player> {
-    const player: Player = await this.findOneAndUpdate({ _id: playerId }, { $unset: { group: '' } });
-    await this.groupService.findOneAndUpdate({ _id: groupId }, { $pullAll: { players: [playerId] } });
-    return player;
+  async removeFromGroup(playerId: string): Promise<Player> {
+    return await this.patch(playerId, { group: null });
   }
 
   async setGroup(gameId: string, playerId: string, groupId: string): Promise<Player> {
@@ -113,18 +111,18 @@ export class PlayerService extends BaseService<Player, PlayerDocument> {
     return await this.patch(playerId, { group: groupId });
   }
 
-  async bulkGroupPlayersAction(
-    gameId: string,
-    playersIds: string[],
-    groupId: string,
-    ifPlayersRemoval: boolean,
-  ): Promise<Player[]> {
+  async bulkRemoveFromGroup(gameId: string, playersIds: string[]): Promise<Player[]> {
     return await Promise.all(
       playersIds.map(async playerId => {
-        const player: Player = ifPlayersRemoval
-          ? await this.removeFromGroup(groupId, playerId)
-          : await this.setGroup(gameId, playerId, groupId);
-        return player;
+        return await this.removeFromGroup(playerId);
+      }),
+    );
+  }
+
+  async bulkSetGroup(gameId: string, playersIds: string[], groupId: string): Promise<Player[]> {
+    return await Promise.all(
+      playersIds.map(async playerId => {
+        return await this.setGroup(gameId, playerId, groupId);
       }),
     );
   }

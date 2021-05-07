@@ -8,7 +8,7 @@ import {
   Resolver,
   Subscription,
 } from '@nestjs/graphql';
-import { Inject, NotFoundException, UseGuards } from '@nestjs/common';
+import { ForbiddenException, Inject, NotFoundException, UseGuards } from '@nestjs/common';
 import { PubSub } from 'graphql-subscriptions';
 
 import { ImportGameArgs } from './args/import-game.args';
@@ -134,8 +134,27 @@ export class GameResolver {
 
   @Roles(Role.TEACHER)
   @Mutation(() => GameDto)
-  async assignInstructor(@Args('gameId') gameId: string, @Args('userId') userId: string): Promise<GameDto> {
-    const game: Game = await this.gameService.assignInstructor(gameId, userId);
+  async assignInstructor(
+    @GqlUserInfo('sub') senderId: string,
+    @Args('gameId') gameId: string,
+    @Args('userId') userId: string,
+  ): Promise<GameDto> {
+    let game: Game = await this.gameService.findById(gameId);
+    if (!game) {
+      throw new NotFoundException();
+    }
+    if (game.private && !game.instructors.includes(senderId)) {
+      throw new ForbiddenException();
+    }
+    game = await this.gameService.assignInstructor(gameId, userId);
+    return this.gameToDtoMapper.transform(game);
+  }
+
+  @Roles(Role.TEACHER)
+  @UseGuards(GqlInstructorAssignedGuard)
+  @Mutation(() => GameDto)
+  async unassignInstructor(@Args('gameId') gameId: string, @Args('userId') userId: string): Promise<GameDto> {
+    const game: Game = await this.gameService.unassignInstructor(gameId, userId);
     return this.gameToDtoMapper.transform(game);
   }
 
@@ -147,6 +166,7 @@ export class GameResolver {
   }
 
   @Roles(Role.TEACHER)
+  @UseGuards(GqlInstructorAssignedGuard)
   @Mutation(() => GameDto)
   async removeGame(@Args('gameId') gameId: string): Promise<GameDto> {
     const game: Game = await this.gameService.removeGame(gameId);
@@ -154,6 +174,7 @@ export class GameResolver {
   }
 
   @Roles(Role.TEACHER)
+  @UseGuards(GqlInstructorAssignedGuard)
   @Mutation(() => GameDto)
   async setAvailability(@Args('gameId') gameId: string, @Args('isPrivate') isPrivate: boolean): Promise<GameDto> {
     const game: Game = await this.gameService.findOneAndUpdate({ _id: gameId }, { private: isPrivate });
@@ -161,6 +182,7 @@ export class GameResolver {
   }
 
   @Roles(Role.TEACHER)
+  @UseGuards(GqlInstructorAssignedGuard)
   @Mutation(() => GameDto)
   async changeStartDate(@Args('gameId') gameId: string, @Args('startDate') newStartDate: Date): Promise<GameDto> {
     const game: Game = await this.gameService.changeStartDate(gameId, newStartDate);
@@ -168,6 +190,7 @@ export class GameResolver {
   }
 
   @Roles(Role.TEACHER)
+  @UseGuards(GqlInstructorAssignedGuard)
   @Mutation(() => GameDto)
   async changeEndDate(@Args('gameId') gameId: string, @Args('endDate') newEndDate: Date): Promise<GameDto> {
     const game: Game = await this.gameService.changeEndDate(gameId, newEndDate);

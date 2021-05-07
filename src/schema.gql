@@ -614,6 +614,7 @@ type Mutation {
   logout(redirectUri: String): LogoutResponse!
   importGEdILArchive(gameInput: GameInput!, file: Upload!): Game!
   assignInstructor(userId: String!, gameId: String!): Game!
+  unassignInstructor(userId: String!, gameId: String!): Game!
   removeGame(gameId: String!): Game!
   setAvailability(isPrivate: Boolean!, gameId: String!): Game!
   changeStartDate(startDate: Date!, gameId: String!): Game!
@@ -628,8 +629,8 @@ type Mutation {
   setGroup(groupId: String!, playerId: String!, gameId: String!): Player!
   setGroupForMultiple(playersIds: [String!]!, groupId: String!, gameId: String!): [Player!]!
   addToGroupWithToken(token: String!, gameId: String!): Player!
-  removeFromGroup(gameId: String!, groupId: String!, playerId: String!): Player!
-  removeMultipleFromGroup(playersIds: [String!]!, groupId: String!, gameId: String!): [Player!]!
+  removeFromGroup(gameId: String!, playerId: String!): Player!
+  removeMultipleFromGroup(playersIds: [String!]!, gameId: String!): [Player!]!
   saveGroup(id: ID, groupInput: GroupInput!, gameId: String!): Group!
   autoAssignGroups(gameId: String!): [Group!]!
   generateGroupToken(groupId: String!, gameId: String!): TokenDto!

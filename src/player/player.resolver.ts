@@ -208,7 +208,7 @@ export class PlayerResolver {
     @Args('groupId') groupId: string,
     @Args({ name: 'playersIds', type: () => [String] }) playersIds: string[],
   ): Promise<PlayerDto[]> {
-    const players: Player[] = await this.playerService.bulkGroupPlayersAction(gameId, playersIds, groupId, false);
+    const players: Player[] = await this.playerService.bulkSetGroup(gameId, playersIds, groupId);
     return Promise.all(players.map(async player => this.playerToDtoMapper.transform(player)));
   }
 
@@ -228,12 +228,8 @@ export class PlayerResolver {
   @Roles(Role.TEACHER)
   @UseGuards(GqlInstructorAssignedGuard)
   @Mutation(() => PlayerDto)
-  async removeFromGroup(
-    @Args('playerId') playerId: string,
-    @Args('groupId') groupId: string,
-    @Args('gameId') gameId: string,
-  ): Promise<PlayerDto> {
-    const player: Player = await this.playerService.removeFromGroup(groupId, playerId);
+  async removeFromGroup(@Args('playerId') playerId: string, @Args('gameId') gameId: string): Promise<PlayerDto> {
+    const player: Player = await this.playerService.removeFromGroup(playerId);
     return this.playerToDtoMapper.transform(player);
   }
 
@@ -242,10 +238,9 @@ export class PlayerResolver {
   @Mutation(() => [PlayerDto])
   async removeMultipleFromGroup(
     @Args('gameId') gameId: string,
-    @Args('groupId') groupId: string,
     @Args({ name: 'playersIds', type: () => [String] }) playersIds: string[],
   ): Promise<PlayerDto[]> {
-    const players: Player[] = await this.playerService.bulkGroupPlayersAction(gameId, playersIds, groupId, true);
+    const players: Player[] = await this.playerService.bulkRemoveFromGroup(gameId, playersIds);
     return Promise.all(players.map(async player => this.playerToDtoMapper.transform(player)));
   }
 
