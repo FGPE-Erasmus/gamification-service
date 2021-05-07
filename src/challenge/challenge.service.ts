@@ -175,7 +175,10 @@ export class ChallengeService extends BaseService<Challenge, ChallengeDocument> 
 
     // inner rules
     for (const gedilId of Object.keys(subEntries.rules)) {
-      await this.hookService.importGEdIL(importTracker, rules, game, subEntries.rules[gedilId], challenge);
+      rules.push(
+        async importTracker =>
+          await this.hookService.importGEdIL(importTracker, game, subEntries.rules[gedilId], challenge),
+      );
     }
 
     // add logic hooks of the challenge

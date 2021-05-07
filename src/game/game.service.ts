@@ -177,15 +177,11 @@ export class GameService extends BaseService<Game, GameDocument> {
 
     // rules
     for (const gedilId of Object.keys(entries.rules)) {
-      await this.hookService.importGEdIL(subObjects, rules, game, entries.rules[gedilId]);
+      await this.hookService.importGEdIL(subObjects, game, entries.rules[gedilId]);
     }
 
     for (const rule of rules) {
-      if (rule.cron || rule.interval) {
-        await this.scheduledHookService.create(rule);
-      } else {
-        await this.actionHookService.create(rule);
-      }
+      await rule(subObjects);
     }
 
     const now = new Date().getTime();

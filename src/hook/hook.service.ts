@@ -58,7 +58,6 @@ export class HookService {
 
   async importGEdIL(
     importTracker: { [t in 'challenges' | 'leaderboards' | 'rewards']: { [k: string]: string } },
-    rules: any[],
     game: Game,
     entries: { [path: string]: Buffer },
     parentChallenge?: Challenge,
@@ -67,7 +66,6 @@ export class HookService {
       const encodedContent = extractToJson(entries[path]);
       const triggers = encodedContent.triggers;
       for (const trigger of triggers) {
-        let hook: any;
         let sourceIds;
         if (trigger.event.startsWith('CHALLENGE_')) {
           sourceIds = trigger.parameters.map(gedilId => importTracker.challenges[gedilId].toString());
@@ -101,22 +99,21 @@ export class HookService {
           active: true,
         };
         if (trigger.kind === TriggerKind.ACTION) {
-          hook = {
+          await this.actionHookService.create({
             ...data,
             trigger: trigger.event,
             sourceId: trigger.parameters[0],
-          };
+          } as ActionHook);
         } else if (trigger.kind === TriggerKind.SCHEDULED) {
           if (trigger.event === 'INTERVAL') {
             data.interval = parseInt(trigger.parameters[0]);
           } else {
             data.cron = trigger.parameters[0];
           }
-          hook = {
+          await this.scheduledHookService.create({
             ...data,
-          };
+          } as ScheduledHook);
         }
-        rules.push(hook);
       }
     }
   }

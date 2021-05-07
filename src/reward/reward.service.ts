@@ -129,24 +129,27 @@ export class RewardService extends BaseService<Reward, RewardDocument> {
 
     // when appended to a challenge, assign on complete it
     if (challenge) {
-      rules.push({
-        game: game.id,
-        parentChallenge: challenge.id,
-        sourceId: challenge.id,
-        trigger: TriggerEvent.CHALLENGE_COMPLETED,
-        criteria: {
-          conditions: [],
-          junctors: [],
-        },
-        actions: [
-          {
-            type: CategoryEnum.GIVE,
-            parameters: [reward.id as string],
-          },
-        ],
-        recurrent: false,
-        active: true,
-      });
+      rules.push(
+        async () =>
+          await this.actionHookService.create({
+            game: game.id,
+            parentChallenge: challenge.id,
+            sourceId: challenge.id,
+            trigger: TriggerEvent.CHALLENGE_COMPLETED,
+            criteria: {
+              conditions: [],
+              junctors: [],
+            },
+            actions: [
+              {
+                type: CategoryEnum.GIVE,
+                parameters: [reward.id as string],
+              },
+            ],
+            recurrent: false,
+            active: true,
+          }),
+      );
     }
 
     return reward;
