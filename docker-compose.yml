@@ -60,6 +60,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./docker/keycloak/fgpe-realm.json:/tmp/fgpe-realm.json
+      - ./docker/keycloak/profile.properties:/opt/jboss/keycloak/standalone/configuration/profile.properties
     ports:
       - 8080:8080
     environment:
