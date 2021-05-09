@@ -27,6 +27,7 @@
   "sslRequired": "external",
   "registrationAllowed": true,
   "registrationEmailAsUsername": false,
+  "enable-cors" : true,
   "rememberMe": true,
   "verifyEmail": true,
   "loginWithEmailAllowed": true,
