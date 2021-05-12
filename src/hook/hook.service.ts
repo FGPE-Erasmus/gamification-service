@@ -91,7 +91,7 @@ export class HookService {
           game: game.id?.toString(),
           parentChallenge: parentChallenge?.id?.toString(),
           criteria: {
-            conditions: HookService.transformConditions(encodedContent.criteria.conditions),
+            conditions: HookService.transformConditions(encodedContent.criteria.conditions, importTracker),
             junctors: encodedContent.criteria.junctors || [],
           },
           actions: encodedContent.actions,
@@ -480,17 +480,43 @@ export class HookService {
     });
   }
 
-  private static transformConditions(data: [{ [key: string]: any }]): ConditionInput[] {
+  private static transformConditions(
+    data: [{ [key: string]: any }],
+    importTracker: { [t in 'challenges' | 'leaderboards' | 'rewards']: { [k: string]: string } },
+  ): ConditionInput[] {
     if (!data) {
       return [];
     }
     return data.map(condition => ({
       order: condition.order,
       leftEntity: condition.left_entity,
-      leftProperty: condition.left_property,
+      leftProperty: this.replaceGedilIds(importTracker, condition.left_property),
       comparingFunction: condition.comparing_function,
       rightEntity: condition.right_entity,
-      rightProperty: condition.right_property,
+      rightProperty: this.replaceGedilIds(importTracker, condition.right_property),
     }));
+  }
+
+  private static replaceGedilIds(
+    importTracker: { [t in 'challenges' | 'leaderboards' | 'rewards']: { [k: string]: string } },
+    target: string,
+  ): string {
+    if (!target) {
+      return target;
+    }
+    const uuidv4 = new RegExp(/([0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12})/gi);
+    let result;
+    while ((result = uuidv4.exec(target)) !== null) {
+      if (importTracker.challenges[result[0]]) {
+        target = target.replace(new RegExp(result[0], 'g'), importTracker.challenges[result[0]]);
+      } else if (importTracker.leaderboards[result[0]]) {
+        target = target.replace(new RegExp(result[0], 'g'), importTracker.leaderboards[result[0]]);
+      } else if (importTracker.rewards[result[0]]) {
+        target = target.replace(new RegExp(result[0], 'g'), importTracker.rewards[result[0]]);
+      } else {
+        break;
+      }
+    }
+    return target;
   }
 }

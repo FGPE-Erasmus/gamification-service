@@ -296,7 +296,7 @@ type Hint {
   recurrent: Boolean!
   cost: Float
   message: String
-  challenges: [Challenge!]
+  challenges: [Challenge!]!
   players: [PlayerReward!]!
   createdAt: Date!
   updatedAt: Date
@@ -312,7 +312,7 @@ type Message {
   recurrent: Boolean!
   cost: Float
   message: String
-  challenges: [Challenge!]
+  challenges: [Challenge!]!
   players: [PlayerReward!]!
   createdAt: Date!
   updatedAt: Date
@@ -590,7 +590,7 @@ type Query {
   hints(gameId: String!): [Hint!]!
   playerHints(challengeId: String!, gameId: String!): [Hint!]!
   messages(gameId: String!): [Message!]!
-  playerMessages(gameId: String!): [Message!]!
+  playerMessages(challengeId: String!, gameId: String!): [Message!]!
   points(gameId: String!): [Point!]!
   playerPoints(gameId: String!): [Point!]!
   reveals(gameId: String!): [Reveal!]!
