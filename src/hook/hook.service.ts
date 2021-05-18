@@ -1,4 +1,4 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { PubSub } from 'graphql-subscriptions';
 
 import { checkCriteria } from '../common/helpers/criteria.helper';
@@ -37,6 +37,8 @@ import { GameToDtoMapper } from '../game/mappers/game-to-dto.mapper';
 
 @Injectable()
 export class HookService {
+  protected readonly logger = new Logger(HookService.name);
+
   constructor(
     @Inject('PUB_SUB') protected readonly pubSub: PubSub,
     @Inject(forwardRef(() => ChallengeService)) protected readonly challengeService: ChallengeService,
@@ -186,13 +188,29 @@ export class HookService {
     for (const action of actions) {
       switch (action.type) {
         case Category.GIVE:
-          await this.runGiveActions(gameId, eventParams.playerId?.toString(), action.parameters);
+          try {
+            await this.runGiveActions(gameId, eventParams.playerId?.toString(), action.parameters);
+          } catch (err) {
+            this.logger.error(
+              `Ecountered an error while granting an object of type/id ${action.parameters[0]}: ${err}`,
+            );
+          }
           break;
         case Category.TAKE:
-          await this.runTakeActions(gameId, eventParams.playerId?.toString(), action.parameters);
+          try {
+            await this.runTakeActions(gameId, eventParams.playerId?.toString(), action.parameters);
+          } catch (err) {
+            this.logger.error(
+              `Ecountered an error while withdrawing an object of type ${action.parameters[0]}: ${err}`,
+            );
+          }
           break;
         case Category.UPDATE:
-          await this.runUpdateActions(gameId, eventParams.playerId?.toString(), action.parameters);
+          try {
+            await this.runUpdateActions(gameId, eventParams.playerId?.toString(), action.parameters);
+          } catch (err) {
+            this.logger.error(`Ecountered an error while updating an object of type ${action.parameters[0]}: ${err}`);
+          }
           break;
       }
     }
@@ -220,12 +238,12 @@ export class HookService {
       } else if (playerReward) {
         // player already has the reward and it is accumulative
         const quantity: number = playerReward.count + (parameters[1] ? +parameters[1] : 1);
+        await this.playerRewardService.patch(playerReward.id, { count: quantity });
         this.notificationService.sendNotification(
           NotificationEnum.REWARD_RECEIVED,
           await this.playerRewardToDtoMapper.transform(playerReward),
           gameId,
         );
-        await this.playerRewardService.patch(playerReward.id, { count: quantity });
       } else {
         // player does not have the reward
         const createdPlayerReward: PlayerReward = await this.playerRewardService.create({
@@ -275,7 +293,7 @@ export class HookService {
    * @param {string[]} parameters Parameters of the event
    */
   private async runTakeActions(gameId: string, playerId: string, parameters: { [key: string]: any } | string) {
-    if (parameters[0] !== 'points') {
+    if (parameters[0].toUpperCase() !== 'POINTS') {
       const quantity: number = parameters[1] ? +parameters[1] : 1;
       const playerReward: PlayerReward = await this.playerRewardService.findOneAndUpdate(
         { player: playerId, reward: parameters[0] },
@@ -434,7 +452,6 @@ export class HookService {
    */
   private async updatePlayer(gameId: string, playerId: string, property: string, value: string) {
     switch (property.toUpperCase()) {
-      // more cases can be later added if needed
       case 'POINTS':
         await this.updatePlayerPoints(gameId, playerId, value);
         break;
