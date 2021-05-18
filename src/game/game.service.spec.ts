@@ -97,6 +97,7 @@ describe('GameService', () => {
 
       const game = await service.importGEdILArchive(
         {
+          courseId: 'proto_fgpe',
           name: 'Some name',
           description: 'Some description.',
           startDate: new Date(Date.parse('2020-07-01')),
@@ -105,6 +106,7 @@ describe('GameService', () => {
         {
           content: Readable.from(buff),
         },
+        '',
       );
 
       expect(game).toHaveProperty('name', data.name);

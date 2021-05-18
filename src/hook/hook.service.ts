@@ -504,7 +504,7 @@ export class HookService {
     if (!target) {
       return target;
     }
-    const uuidv4 = new RegExp(/([0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12})/gi);
+    const uuidv4 = /([0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12})/i;
     let result;
     while ((result = uuidv4.exec(target)) !== null) {
       if (importTracker.challenges[result[0]]) {
