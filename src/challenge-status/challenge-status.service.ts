@@ -85,13 +85,8 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
    * @returns {ChallengeStatus} the challenge status
    */
   async markAsFailed(gameId: string, challengeId: string, playerId: string, date: Date): Promise<ChallengeStatus> {
-    const challenge: Challenge = await this.challengeService.findById(challengeId);
     const temp: ChallengeStatus = await this.findByChallengeIdAndPlayerId(challengeId, playerId);
     const result: ChallengeStatus = await this.patch(temp.id, { state: StateEnum.FAILED, endedAt: date });
-
-    if (challenge.mode == Mode.TIME_BOMB && result.endedAt.getTime() > date.getTime()) {
-      return;
-    }
 
     // send CHALLENGE_FAILED message to execute attached hooks
     await this.eventService.fireEvent(TriggerEvent.CHALLENGE_FAILED, {
