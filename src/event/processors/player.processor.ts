@@ -99,16 +99,21 @@ export class PlayerProcessor {
     }
 
     // create state of player in challenge
-    const challengeStatus = await this.challengeStatusService.create({
+    const referenceDate: Date = new Date();
+    let challengeStatus: ChallengeStatus = {
       player: player.id,
       challenge: challenge.id,
-      startedAt: new Date(),
+      startedAt: referenceDate,
       state: challengeState,
-    });
-
+    };
     if (challengeStatus.state === StateEnum.AVAILABLE && challenge.mode === Mode.TIME_BOMB) {
-      await this.scheduledHookService.createTimebombHook(challenge.game, player.id);
+      challengeStatus = {
+        ...challengeStatus,
+        endedAt: new Date(referenceDate.getTime() + Number.parseInt(challenge.modeParameters[0])),
+      };
+      await this.scheduledHookService.createTimebombHook(challenge, player.id);
     }
+    await this.challengeStatusService.create(challengeStatus);
 
     // prepare sub-tree
     for (const child of challenge.children) {
