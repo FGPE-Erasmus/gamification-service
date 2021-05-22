@@ -27,4 +27,4 @@ RUN npm install --only=production
 
 COPY --from=builder /usr/src/app/dist ./dist
 
-CMD ["node", "dist/src/main"]
+CMD ["node", "--max-old-space-size=2048", "dist/src/main"]
