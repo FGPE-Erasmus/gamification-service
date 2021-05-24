@@ -59,16 +59,12 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
   async markAsOpen(gameId: string, challengeId: string, playerId: string, date: Date): Promise<ChallengeStatus> {
     const temp: ChallengeStatus = await this.findByChallengeIdAndPlayerId(challengeId, playerId);
     const challenge: Challenge = await this.challengeService.findById(challengeId);
-    const query: { state: any; openedAt: any; endedAt?: any } = {
+    let query: { state: any; openedAt: any; endedAt?: any } = {
       state: StateEnum.OPENED,
       openedAt: date,
     };
 
-    if (challenge.mode == Mode.TIME_BOMB) {
-      query.endedAt = new Date(date.getTime() + Number.parseInt(challenge.modeParameters[0]));
-      await this.scheduledHookService.createTimebombHook(challenge, playerId);
-    }
-
+    if (challenge.mode == Mode.TIME_BOMB) query = await this._timebombOpeningQuery(query, challenge, playerId, date);
     const result: ChallengeStatus = await this.patch(temp.id, query);
 
     // send CHALLENGE_OPENED message to execute attached hooks
@@ -320,5 +316,16 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
       progress += sliceValue * (await this.challengeProgress(child, playerId));
     }
     return progress;
+  }
+
+  async _timebombOpeningQuery(
+    query: { state: any; openedAt: any; endedAt?: any },
+    challenge: Challenge,
+    playerId: string,
+    date: Date,
+  ): Promise<{ state: any; openedAt: any; endedAt?: any }> {
+    query.endedAt = new Date(date.getTime() + Number.parseInt(challenge.modeParameters[0]));
+    await this.scheduledHookService.createTimebombHook(challenge, playerId);
+    return query;
   }
 }
