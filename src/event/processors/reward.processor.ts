@@ -49,15 +49,15 @@ export class RewardProcessor {
   }
 
   async _changeRevealingStatus(gameId, challengeId, playerId) {
-    if (await this._checkForLockedChallenge(challengeId)) {
+    if (await this._ifLocked(challengeId)) {
       await this.challengeStatusService.markAsLocked(gameId, toString(challengeId), playerId);
     } else {
       await this.challengeStatusService.markAsAvailable(gameId, toString(challengeId), playerId);
     }
   }
 
-  async _checkForLockedChallenge(challengeId): Promise<boolean> {
+  async _ifLocked(challengeId): Promise<boolean> {
     const challenge = await this.challengeService.findById(challengeId);
-    return challenge.hidden && challenge.locked ? true : false;
+    return challenge.locked ? true : false;
   }
 }
