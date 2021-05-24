@@ -58,7 +58,21 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
    */
   async markAsOpen(gameId: string, challengeId: string, playerId: string, date: Date): Promise<ChallengeStatus> {
     const temp: ChallengeStatus = await this.findByChallengeIdAndPlayerId(challengeId, playerId);
-    const result: ChallengeStatus = await this.patch(temp.id, { state: StateEnum.OPENED, openedAt: date });
+    const challenge: Challenge = await this.challengeService.findById(challengeId);
+    const query: { state: any; openedAt: any; endedAt?: any } = {
+      state: StateEnum.OPENED,
+      openedAt: date,
+    };
+
+    if (challenge.mode == Mode.TIME_BOMB) {
+      query.endedAt = new Date(date.getTime() + challenge.modeParameters[0]);
+      await this.scheduledHookService.createTimebombHook(challenge, playerId);
+    }
+
+    const result: ChallengeStatus = await this.patch(temp.id, query);
+    console.log(date);
+    console.log(query.endedAt);
+    console.log(result);
 
     // send CHALLENGE_OPENED message to execute attached hooks
     await this.eventService.fireEvent(TriggerEvent.CHALLENGE_OPENED, {

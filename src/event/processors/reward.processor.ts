@@ -9,12 +9,14 @@ import { TriggerEventEnum as TriggerEvent } from '../../hook/enums/trigger-event
 import { RewardType } from '../../reward/models/reward-type.enum';
 import { ChallengeStatusService } from '../../challenge-status/challenge-status.service';
 import { toString } from '../../common/utils/mongo.utils';
+import { ChallengeService } from '../../challenge/challenge.service';
 
 @Processor(appConfig.queue.event.name)
 export class RewardProcessor {
   constructor(
     protected readonly rewardService: RewardService,
     protected readonly challengeStatusService: ChallengeStatusService,
+    protected readonly challengeService: ChallengeService,
     protected readonly hookService: HookService,
     protected readonly actionHookService: ActionHookService,
   ) {}
@@ -27,11 +29,11 @@ export class RewardProcessor {
 
     if (reward.kind === RewardType.REVEAL) {
       for (const challengeId of reward.challenges) {
-        await this.challengeStatusService.markAsAvailable(gameId, toString(challengeId), playerId);
+        await this._changeRevealingStatus(gameId, challengeId, playerId);
       }
     } else if (reward.kind === RewardType.UNLOCK) {
       for (const challengeId of reward.challenges) {
-        await this.challengeStatusService.markAsAvailable(gameId, toString(challengeId), playerId);
+        await this.challengeStatusService.markAsOpen(gameId, toString(challengeId), playerId, new Date());
       }
     }
 
@@ -44,5 +46,18 @@ export class RewardProcessor {
     for (const actionHook of actionHooks) {
       await this.hookService.executeHook(actionHook, job.data, { ...reward });
     }
+  }
+
+  async _changeRevealingStatus(gameId, challengeId, playerId) {
+    if (await this._checkForLockedChallenge(challengeId)) {
+      await this.challengeStatusService.markAsLocked(gameId, toString(challengeId), playerId);
+    } else {
+      await this.challengeStatusService.markAsAvailable(gameId, toString(challengeId), playerId);
+    }
+  }
+
+  async _checkForLockedChallenge(challengeId): Promise<boolean> {
+    const challenge = await this.challengeService.findById(challengeId);
+    return challenge.hidden && challenge.locked ? true : false;
   }
 }
