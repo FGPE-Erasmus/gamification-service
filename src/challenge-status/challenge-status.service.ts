@@ -65,14 +65,11 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
     };
 
     if (challenge.mode == Mode.TIME_BOMB) {
-      query.endedAt = new Date(date.getTime() + challenge.modeParameters[0]);
+      query.endedAt = new Date(date.getTime() + Number.parseInt(challenge.modeParameters[0]));
       await this.scheduledHookService.createTimebombHook(challenge, playerId);
     }
 
     const result: ChallengeStatus = await this.patch(temp.id, query);
-    console.log(date);
-    console.log(query.endedAt);
-    console.log(result);
 
     // send CHALLENGE_OPENED message to execute attached hooks
     await this.eventService.fireEvent(TriggerEvent.CHALLENGE_OPENED, {
