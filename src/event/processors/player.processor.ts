@@ -90,23 +90,30 @@ export class PlayerProcessor {
   ): Promise<ChallengeStatus> {
     // infer state for current challenge
     let challengeState: StateEnum;
+    let openingDate: Date = null;
+    const referenceDate: Date = new Date();
+
     if (challenge.hidden) {
       challengeState = StateEnum.HIDDEN;
     } else if (challenge.locked && state === StateEnum.AVAILABLE) {
       challengeState = StateEnum.LOCKED;
-    } else {
+    } else if (challenge.mode == Mode.NORMAL) {
       challengeState = StateEnum.AVAILABLE;
+    } else {
+      challengeState = StateEnum.OPENED;
+      openingDate = referenceDate;
     }
 
     // create state of player in challenge
-    const referenceDate: Date = new Date();
     let challengeStatus: ChallengeStatus = {
       player: player.id,
       challenge: challenge.id,
       startedAt: referenceDate,
+      openedAt: openingDate,
       state: challengeState,
     };
-    if (challengeStatus.state === StateEnum.AVAILABLE && challenge.mode === Mode.TIME_BOMB) {
+
+    if (challengeStatus.state === StateEnum.OPENED && challenge.mode === Mode.TIME_BOMB) {
       challengeStatus = {
         ...challengeStatus,
         endedAt: new Date(referenceDate.getTime() + Number.parseInt(challenge.modeParameters[0])),
