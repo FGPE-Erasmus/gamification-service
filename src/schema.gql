@@ -96,6 +96,7 @@ type Activity {
   color: String
   type: String
   difficulty: String
+  editorKind: String
   statement: String
   pdf: Boolean
   codeSkeletons: [CodeSkeleton!]

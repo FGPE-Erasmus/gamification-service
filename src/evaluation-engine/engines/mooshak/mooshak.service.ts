@@ -23,12 +23,21 @@ import { CodeSkeletonDto } from '../../dto/code-skeleton.dto';
 @Injectable()
 export class MooshakService implements IEngineService {
   protected readonly logger: Logger = new Logger(MooshakService.name);
-  protected readonly token: string;
+
+  protected static tokenCache: { [_: string]: { token: string; expiryTime: number } } = {};
 
   constructor(protected readonly httpService: HttpService) {}
 
   async login(courseId: string, username: string, password: string): Promise<{ token: string }> {
-    return await this.httpService
+    const now = new Date().getTime();
+
+    if (MooshakService.tokenCache[courseId]) {
+      if (MooshakService.tokenCache[courseId].expiryTime > now) {
+        return { ...MooshakService.tokenCache[courseId] };
+      }
+    }
+
+    const { token } = await this.httpService
       .post<{ token: string }>(`/auth/login`, {
         contest: courseId,
         username,
@@ -37,9 +46,16 @@ export class MooshakService implements IEngineService {
       .pipe(
         first(),
         map(res => res.data),
-        MooshakService.catchMooshakError(),
+        this.catchMooshakError(courseId),
       )
       .toPromise();
+
+    MooshakService.tokenCache[courseId] = {
+      token,
+      expiryTime: now + 60 * 60 * 1000, // 1 hour
+    };
+
+    return { token };
   }
 
   async getLanguages(courseId: string, options?: AxiosRequestConfig): Promise<ProgrammingLanguageDto[]> {
@@ -48,7 +64,7 @@ export class MooshakService implements IEngineService {
       .pipe(
         first(),
         map<any, ProgrammingLanguageDto[]>(res => res.data),
-        MooshakService.catchMooshakError(),
+        this.catchMooshakError(courseId),
       )
       .toPromise();
   }
@@ -63,7 +79,7 @@ export class MooshakService implements IEngineService {
       .pipe(
         first(),
         map<any, ProgrammingLanguageDto>(res => res.data),
-        MooshakService.catchMooshakError(),
+        this.catchMooshakError(courseId),
       )
       .toPromise();
   }
@@ -74,7 +90,7 @@ export class MooshakService implements IEngineService {
       .pipe(
         first(),
         map<any, ActivityDto>(res => res.data),
-        MooshakService.catchMooshakError(),
+        this.catchMooshakError(courseId),
       )
       .toPromise();
 
@@ -83,7 +99,7 @@ export class MooshakService implements IEngineService {
       .pipe(
         first(),
         map<any, ActivityDto>(res => res.data),
-        MooshakService.catchMooshakError(),
+        this.catchMooshakError(courseId),
       )
       .toPromise();
 
@@ -97,7 +113,7 @@ export class MooshakService implements IEngineService {
       .pipe(
         first(),
         map<any, { statement: string; pdfviewable: boolean }>(res => res.data),
-        MooshakService.catchMooshakError(),
+        this.catchMooshakError(courseId),
       )
       .toPromise();
 
@@ -110,7 +126,7 @@ export class MooshakService implements IEngineService {
         .pipe(
           first(),
           map(res => res.data),
-          MooshakService.catchMooshakError(),
+          this.catchMooshakError(courseId),
         )
         .toPromise();
       activity.statement = Buffer.from(new Uint8Array(pdf)).toString('base64');
@@ -148,7 +164,7 @@ export class MooshakService implements IEngineService {
       .pipe(
         first(),
         map<any, MooshakSubmissionDto>(res => res.data),
-        MooshakService.catchMooshakError(),
+        this.catchMooshakError(courseId),
       )
       .toPromise();
 
@@ -182,7 +198,7 @@ export class MooshakService implements IEngineService {
       .pipe(
         first(),
         map<any, MooshakSubmissionDto>(res => res.data),
-        MooshakService.catchMooshakError(),
+        this.catchMooshakError(courseId),
       )
       .toPromise();
 
@@ -202,7 +218,7 @@ export class MooshakService implements IEngineService {
       .pipe(
         first(),
         map<any, MooshakValidationDto>(res => res.data),
-        MooshakService.catchMooshakError(),
+        this.catchMooshakError(courseId),
       )
       .toPromise();
 
@@ -222,7 +238,7 @@ export class MooshakService implements IEngineService {
       .pipe(
         first(),
         map<any, MooshakEvaluationDto>(res => res.data),
-        MooshakService.catchMooshakError(),
+        this.catchMooshakError(courseId),
       )
       .toPromise();
 
@@ -235,7 +251,7 @@ export class MooshakService implements IEngineService {
       .pipe(
         first(),
         map<any, string>(res => base64Decode(res.data)),
-        MooshakService.catchMooshakError(),
+        this.catchMooshakError(courseId),
       )
       .toPromise();
   }
@@ -246,13 +262,16 @@ export class MooshakService implements IEngineService {
       .pipe(
         first(),
         map<any, string>(res => base64Decode(res.data)),
-        MooshakService.catchMooshakError(),
+        this.catchMooshakError(courseId),
       )
       .toPromise();
   }
 
-  private static catchMooshakError = <T>() =>
+  private catchMooshakError = <T>(courseId?: string) =>
     catchError<T, ObservableInput<any>>((error: AxiosError) => {
+      if (error.response.status === 401 || error.response.status === 403) {
+        delete MooshakService.tokenCache[courseId];
+      }
       if (error.response) {
         const ex: MooshakExceptionDto = error.response.data as MooshakExceptionDto;
         return throwError(new Error(`${ex.status} ${ex.title} -  ${ex.message}`));

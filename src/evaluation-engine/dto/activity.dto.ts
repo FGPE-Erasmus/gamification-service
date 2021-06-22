@@ -25,6 +25,9 @@ export class ActivityDto {
   difficulty?: string;
 
   @Field({ nullable: true })
+  editorKind?: string;
+
+  @Field({ nullable: true })
   statement?: string;
 
   @Field({ nullable: true, defaultValue: false })
