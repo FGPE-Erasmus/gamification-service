@@ -15,6 +15,7 @@ import { PlayerProcessor } from './processors/player.processor';
 import { ChallengeModule } from '../challenge/challenge.module';
 import { ChallengeProcessor } from './processors/challenge.processor';
 import { RewardProcessor } from './processors/reward.processor';
+import { LeaderboardModule } from '../leaderboard/leaderboard.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { RewardProcessor } from './processors/reward.processor';
     forwardRef(() => RewardModule),
     forwardRef(() => PlayerRewardModule),
     forwardRef(() => SubmissionModule),
+    forwardRef(() => LeaderboardModule),
   ],
   providers: [
     EventListener,

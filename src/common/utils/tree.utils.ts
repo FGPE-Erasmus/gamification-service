@@ -29,15 +29,14 @@ export function findSubtree(tree: any[], lookup: any, key = 'id', childrenProp =
   return undefined;
 }
 
-export function collectFromTree(tree: any, lookupProp: string, childrenProp = 'children', depthFirst = true): any[] {
+export function collectFromTree(tree: any[], lookupProp: string, childrenProp = 'children', depthFirst = true): any[] {
   if (!tree || tree.length === 0) {
     return [];
   }
-  const collected = [...tree.refs];
-  for (const node of tree[childrenProp]) {
-    collected.push(node[lookupProp]);
-
-    const result = collectFromTree(node, lookupProp, childrenProp, depthFirst);
+  const collected = [];
+  for (const node of tree) {
+    collected.push(...node[lookupProp]);
+    const result = collectFromTree(node[childrenProp], lookupProp, childrenProp, depthFirst);
     collected.push(...result);
   }
   return collected;

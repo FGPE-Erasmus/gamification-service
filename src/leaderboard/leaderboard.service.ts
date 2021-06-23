@@ -21,12 +21,14 @@ import { SortingOrder } from './models/sorting.enum';
 import { LeaderboardRepository } from './repositories/leaderboard.repository';
 import { NotificationEnum } from '../common/enums/notifications.enum';
 import { NotificationService } from '../notifications/notification.service';
+import { CacheService } from '../cache/cache.service';
 
 @Injectable()
 export class LeaderboardService extends BaseService<Leaderboard, LeaderboardDocument> {
   constructor(
     protected readonly repository: LeaderboardRepository,
     protected readonly toDtoMapper: LeaderboardToDtoMapper,
+    protected readonly cacheService: CacheService,
     @Inject(forwardRef(() => ChallengeService)) protected readonly challengeService: ChallengeService,
     @Inject(forwardRef(() => PlayerService)) protected readonly playerService: PlayerService,
     protected readonly notificationService: NotificationService,
@@ -150,6 +152,12 @@ export class LeaderboardService extends BaseService<Leaderboard, LeaderboardDocu
   }
 
   async getRankings(leaderboardId: string, groupId?: string): Promise<PlayerRankingDto[]> {
+    const cacheKey = `l${leaderboardId}:g${groupId ? groupId : '-'}`;
+    const cached = await this.cacheService.get(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
     const leaderboard: Leaderboard = await this.findById(leaderboardId);
 
     const exerciseIds: string[] = await this.challengeService.getExercises(
@@ -230,7 +238,11 @@ export class LeaderboardService extends BaseService<Leaderboard, LeaderboardDocu
       rankingPlayers.push(rankedPlayer);
     }
 
-    return LeaderboardService.sortPlayers(rankingPlayers, metrics);
+    const result = LeaderboardService.sortPlayers(rankingPlayers, metrics);
+
+    await this.cacheService.set(cacheKey, result);
+
+    return result;
   }
 
   private static sortPlayers(
@@ -293,5 +305,15 @@ export class LeaderboardService extends BaseService<Leaderboard, LeaderboardDocu
       }
     }
     return aw === bw ? 0 : aw > bw ? 1 : -1;
+  }
+
+  async invalidateCaches(gameId: string, playerId: string): Promise<void> {
+    const leaderboards: Leaderboard[] = await this.findByGameId(gameId);
+    const player: Player = await this.playerService.findById(playerId);
+
+    for (const leaderboard of leaderboards) {
+      const cacheKey = `l${leaderboard.id}:g${player.group ? player.group : '-'}`;
+      await this.cacheService.invalidate(cacheKey);
+    }
   }
 }

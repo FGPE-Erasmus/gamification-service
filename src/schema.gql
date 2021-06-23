@@ -385,6 +385,28 @@ type ProgrammingLanguage {
   execute: String
 }
 
+type Leaderboard {
+  id: ID
+  game: Game
+  parentChallenge: Challenge
+  name: String
+  groups: Boolean
+  metrics: [String!]
+  sortingOrders: [SortingOrder!]
+  createdAt: Date!
+  updatedAt: Date
+}
+
+enum SortingOrder {
+  ASC
+  DESC
+}
+
+type Ranking {
+  player: Player
+  score: JSON!
+}
+
 type TokenDto {
   token: String!
   expiresIn: Float!
@@ -500,28 +522,6 @@ type ScheduledHook {
   lastRun: Date
   createdAt: Date!
   updatedAt: Date
-}
-
-type Leaderboard {
-  id: ID
-  game: Game
-  parentChallenge: Challenge
-  name: String
-  groups: Boolean
-  metrics: [String!]
-  sortingOrders: [SortingOrder!]
-  createdAt: Date!
-  updatedAt: Date
-}
-
-enum SortingOrder {
-  ASC
-  DESC
-}
-
-type Ranking {
-  player: Player
-  score: JSON!
 }
 
 type Auth {

@@ -42,6 +42,11 @@ interface IAppConfig {
     host: string;
     port: number;
   };
+  cacheManager: {
+    host: string;
+    port: number;
+    ttl: number;
+  };
   evaluationEngine: {
     protocol: string;
     host: string;
@@ -113,6 +118,11 @@ export const appConfig: IAppConfig = {
   messageBroker: {
     host: process.env.REDIS_HOST,
     port: +process.env.REDIS_PORT,
+  },
+  cacheManager: {
+    host: process.env.REDIS_HOST,
+    port: +process.env.REDIS_PORT,
+    ttl: 15 * 60, // 15 minutes
   },
   evaluationEngine: {
     protocol: process.env.EE_PROTOCOL,

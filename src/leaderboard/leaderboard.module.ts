@@ -13,10 +13,12 @@ import { LeaderboardToDtoMapper } from './mappers/leaderboard-to-dto.mapper';
 import { RankingResolver } from './ranking.resolver';
 import { NotificationModule } from '../notifications/notification.module';
 import { SubscriptionsModule } from 'src/common/subscriptions/subscriptions.module';
+import { CacheModule } from '../cache/cache.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: 'Leaderboard', schema: LeaderboardSchema }]),
+    CacheModule,
     forwardRef(() => GameModule),
     forwardRef(() => ChallengeModule),
     forwardRef(() => PlayerModule),
