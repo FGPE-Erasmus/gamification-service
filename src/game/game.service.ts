@@ -372,7 +372,7 @@ export class GameService extends BaseService<Game, GameDocument> {
         },
       ],
     });
-    this.scheduledHookService.stopCronJob(oldScheduledHook.id);
+    await this.scheduledHookService.stopCronJob(oldScheduledHook.id);
     const newScheduledHook: ScheduledHook = await this.scheduledHookService.create({
       game: gameId,
       cron: newDate,
@@ -381,6 +381,6 @@ export class GameService extends BaseService<Game, GameDocument> {
       active: isActive,
     });
     this.scheduledHookService.addCronJob(newScheduledHook, {});
-    return await newScheduledHook;
+    return newScheduledHook;
   }
 }
