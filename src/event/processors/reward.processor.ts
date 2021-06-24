@@ -10,6 +10,7 @@ import { RewardType } from '../../reward/models/reward-type.enum';
 import { ChallengeStatusService } from '../../challenge-status/challenge-status.service';
 import { toString } from '../../common/utils/mongo.utils';
 import { ChallengeService } from '../../challenge/challenge.service';
+import { PlayerService } from '../../player/player.service';
 
 @Processor(appConfig.queue.event.name)
 export class RewardProcessor {
@@ -18,6 +19,7 @@ export class RewardProcessor {
     protected readonly challengeStatusService: ChallengeStatusService,
     protected readonly challengeService: ChallengeService,
     protected readonly hookService: HookService,
+    protected readonly playerService: PlayerService,
     protected readonly actionHookService: ActionHookService,
   ) {}
 
@@ -46,6 +48,9 @@ export class RewardProcessor {
     for (const actionHook of actionHooks) {
       await this.hookService.executeHook(actionHook, job.data, { ...reward });
     }
+
+    // invalidate caches
+    await this.playerService.invalidateCaches(playerId);
   }
 
   async _changeRevealingStatus(gameId, challengeId, playerId) {

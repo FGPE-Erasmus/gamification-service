@@ -16,6 +16,7 @@ import { PlayerResolver } from './player.resolver';
 import { NotificationModule } from '../notifications/notification.module';
 import { PlayerStatsResolver } from './player-stats.resolver';
 import { StatsResolver } from './stats.resolver';
+import { CacheModule } from '../cache/cache.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { StatsResolver } from './stats.resolver';
         schema: PlayerSchema,
       },
     ]),
+    CacheModule,
     forwardRef(() => EventModule),
     forwardRef(() => GameModule),
     forwardRef(() => GroupModule),

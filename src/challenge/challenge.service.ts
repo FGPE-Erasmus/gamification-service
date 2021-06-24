@@ -286,7 +286,7 @@ export class ChallengeService extends BaseService<Challenge, ChallengeDocument> 
     const challenges = await this.findByGameId(gameId);
     const tree: (Challenge & { children: any })[] = createTree(challenges, 'id', 'parentChallenge', 'children');
     if (challengeId) {
-      return findSubtree(tree, challengeId, 'id', 'children');
+      return [findSubtree(tree, challengeId, 'id', 'children')];
     }
     return tree;
   }

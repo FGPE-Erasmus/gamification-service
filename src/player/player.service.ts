@@ -15,6 +15,7 @@ import { groupBy } from '../common/utils/array.utils';
 import { Result } from '../submission/models/result.enum';
 import { Validation } from '../submission/models/validation.model';
 import { StatsDto } from './dto/stats.dto';
+import { CacheService } from '../cache/cache.service';
 
 @Injectable()
 export class PlayerService extends BaseService<Player, PlayerDocument> {
@@ -24,6 +25,7 @@ export class PlayerService extends BaseService<Player, PlayerDocument> {
     protected readonly gameService: GameService,
     protected readonly submissionService: SubmissionService,
     @Inject(forwardRef(() => GroupService)) protected readonly groupService: GroupService,
+    protected readonly cacheService: CacheService,
   ) {
     super(new Logger(PlayerService.name), repository);
   }
@@ -150,6 +152,14 @@ export class PlayerService extends BaseService<Player, PlayerDocument> {
   }
 
   async playerStatistics(gameId: string, userId: string): Promise<PlayerStatsDto> {
+    // check cache
+    const cacheKey = `player-stats:g${gameId}-u${userId}`;
+    const cached = await this.cacheService.get(cacheKey);
+    if (cached) {
+      console.log(`Using cached ${cacheKey}`);
+      return cached;
+    }
+
     // is the user enrolled?
     const player: Player = await this.findOne(
       {
@@ -188,7 +198,7 @@ export class PlayerService extends BaseService<Player, PlayerDocument> {
       );
     });
 
-    return {
+    const result = {
       player: player.id,
       nrOfSubmissions: player.submissions.length,
       nrOfValidations: player.validations.length,
@@ -213,6 +223,10 @@ export class PlayerService extends BaseService<Player, PlayerDocument> {
         };
       }, {}),
     };
+
+    await this.cacheService.set(cacheKey, result);
+
+    return result;
   }
 
   async mergePlayerStatistics(stats: StatsDto, playerStats: PlayerStatsDto): Promise<StatsDto> {
@@ -274,5 +288,10 @@ export class PlayerService extends BaseService<Player, PlayerDocument> {
       nrOfSubmissionsByActivityAndResult,
       nrOfValidationsByActivityAndResult,
     };
+  }
+
+  async invalidateCaches(playerId: string): Promise<void> {
+    const player: Player = await this.findById(playerId);
+    await this.cacheService.invalidate(`player-stats:g${player.game}-u${player.user}`);
   }
 }

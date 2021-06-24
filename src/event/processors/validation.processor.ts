@@ -7,6 +7,7 @@ import { TriggerEventEnum as TriggerEvent } from '../../hook/enums/trigger-event
 import { HookService } from '../../hook/hook.service';
 import { EventService } from '../event.service';
 import { ValidationService } from '../../submission/validation.service';
+import { PlayerService } from '../../player/player.service';
 
 @Processor(appConfig.queue.event.name)
 export class ValidationProcessor {
@@ -15,6 +16,7 @@ export class ValidationProcessor {
     protected readonly eventService: EventService,
     protected readonly hookService: HookService,
     protected readonly actionHookService: ActionHookService,
+    protected readonly playerService: PlayerService,
   ) {}
 
   @Process(`${TriggerEvent.VALIDATION_RECEIVED}_JOB`)
@@ -58,5 +60,8 @@ export class ValidationProcessor {
       playerId,
       exerciseId,
     });
+
+    // invalidate caches
+    await this.playerService.invalidateCaches(playerId);
   }
 }

@@ -10,6 +10,7 @@ import { SubmissionService } from '../../submission/submission.service';
 import { HookService } from '../../hook/hook.service';
 import { EventService } from '../event.service';
 import { LeaderboardService } from '../../leaderboard/leaderboard.service';
+import { PlayerService } from '../../player/player.service';
 
 @Processor(appConfig.queue.event.name)
 export class SubmissionProcessor {
@@ -18,6 +19,7 @@ export class SubmissionProcessor {
     protected readonly eventService: EventService,
     protected readonly hookService: HookService,
     protected readonly actionHookService: ActionHookService,
+    protected readonly playerService: PlayerService,
     protected readonly leaderboardService: LeaderboardService,
   ) {}
 
@@ -55,9 +57,6 @@ export class SubmissionProcessor {
       await this.hookService.executeHook(actionHook, job.data, { exerciseId: exerciseId });
     }
 
-    // invalidate leaderboard cache
-    await this.leaderboardService.invalidateCaches(gameId, playerId);
-
     // send notification to trigger further processing
     const submission: Submission = await this.submissionService.findById(submissionId);
     await this.eventService.fireEvent(
@@ -69,6 +68,10 @@ export class SubmissionProcessor {
         exerciseId,
       },
     );
+
+    // invalidate caches
+    await this.playerService.invalidateCaches(playerId);
+    await this.leaderboardService.invalidateCaches(gameId, playerId);
   }
 
   @Process(`${TriggerEvent.SUBMISSION_ACCEPTED}_JOB`)

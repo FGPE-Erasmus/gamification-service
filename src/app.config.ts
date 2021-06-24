@@ -122,7 +122,7 @@ export const appConfig: IAppConfig = {
   cacheManager: {
     host: process.env.REDIS_HOST,
     port: +process.env.REDIS_PORT,
-    ttl: 15 * 60, // 15 minutes
+    ttl: 60 * 60, // 60 minutes
   },
   evaluationEngine: {
     protocol: process.env.EE_PROTOCOL,

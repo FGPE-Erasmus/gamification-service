@@ -185,7 +185,9 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
     const result: ChallengeStatus = await this.patch(temp.id, { state: StateEnum.AVAILABLE });
     const challenge: Challenge = await this.challengeService.findById(challengeId);
 
-    if (challenge.mode === Mode.TIME_BOMB) await this.scheduledHookService.createTimebombHook(challenge, playerId);
+    if (challenge.mode === Mode.TIME_BOMB) {
+      await this.scheduledHookService.createTimebombHook(challenge, playerId);
+    }
 
     // send CHALLENGE_AVAILABLE message to execute attached hooks
     await this.eventService.fireEvent(TriggerEvent.CHALLENGE_AVAILABLE, {

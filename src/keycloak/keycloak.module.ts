@@ -9,13 +9,14 @@ import { KeycloakOptions } from './interfaces/keycloak-options.interface';
 import { KeycloakAsyncOptions } from './interfaces/keycloak-async-options.interface';
 import { UserResolver } from './user.resolver';
 import { UserService } from './user.service';
+import { CacheModule } from '../cache/cache.module';
 
 @Module({
   providers: [KeycloakResolver, KeycloakService, UserService, UserResolver],
   exports: [KeycloakService, UserService],
 })
 export class KeycloakModule {
-  public static imports = [HttpModule];
+  public static imports = [HttpModule, CacheModule];
 
   public static register(options: KeycloakOptions): DynamicModule {
     return {
