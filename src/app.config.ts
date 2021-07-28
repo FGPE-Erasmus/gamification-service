@@ -135,7 +135,7 @@ export const appConfig: IAppConfig = {
   port: 3000,
   host: '0.0.0.0',
   http: {
-    timeout: +process.env.HTTP_TIMEOUT || 5000,
+    timeout: +process.env.HTTP_TIMEOUT || 30000,
     maxRedirects: +process.env.HTTP_MAX_REDIRECTS || 5,
   },
   queue: {

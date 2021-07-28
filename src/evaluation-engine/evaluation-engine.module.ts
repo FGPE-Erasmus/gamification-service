@@ -1,4 +1,4 @@
-import { forwardRef, HttpModule, Module } from '@nestjs/common';
+import { forwardRef, HttpModule, HttpService, Logger, Module, OnModuleInit } from '@nestjs/common';
 import { BullModule } from '@nestjs/bull';
 
 import { appConfig } from '../app.config';
@@ -63,4 +63,15 @@ import { BaseService } from './engines/base/base-engine.service';
   ],
   exports: [EvaluationEngineService, ActivityService],
 })
-export class EvaluationEngineModule {}
+export class EvaluationEngineModule implements OnModuleInit {
+  protected readonly logger: Logger = new Logger(EvaluationEngineModule.name);
+
+  constructor(private httpService: HttpService) {}
+
+  public onModuleInit() {
+    this.logger.warn('Initializing evaluation engine module');
+    this.httpService.axiosRef.interceptors.request.use(req => {
+      return new Promise(resolve => setTimeout(() => resolve(req), 250));
+    });
+  }
+}

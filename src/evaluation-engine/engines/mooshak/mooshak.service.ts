@@ -269,10 +269,10 @@ export class MooshakService implements IEngineService {
 
   private catchMooshakError = <T>(courseId?: string) =>
     catchError<T, ObservableInput<any>>((error: AxiosError) => {
-      if (error.response.status === 401 || error.response.status === 403) {
-        delete MooshakService.tokenCache[courseId];
-      }
       if (error.response) {
+        if (error.response.status === 401 || error.response.status === 403) {
+          delete MooshakService.tokenCache[courseId];
+        }
         const ex: MooshakExceptionDto = error.response.data as MooshakExceptionDto;
         return throwError(new Error(`${ex.status} ${ex.title} -  ${ex.message}`));
       }
