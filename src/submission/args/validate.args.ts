@@ -1,7 +1,6 @@
 import { ArgsType, Field } from '@nestjs/graphql';
-import { GraphQLUpload } from 'apollo-server-express';
 import { IsDefined } from 'class-validator';
-import { FileUpload } from 'graphql-upload';
+import { FileUpload, GraphQLUpload } from 'graphql-upload';
 
 @ArgsType()
 export class ValidateArgs {

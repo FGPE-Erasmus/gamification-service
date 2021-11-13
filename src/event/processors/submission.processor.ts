@@ -50,7 +50,7 @@ export class SubmissionProcessor {
     const actionHooks = await this.actionHookService.findAll({
       game: { $eq: gameId },
       trigger: TriggerEvent.SUBMISSION_EVALUATED,
-      $or: [{ sourceId: { $exists: false } }, { sourceId: { $eq: exerciseId } }],
+      $or: [{ sourceId: { $eq: null } }, { sourceId: { $eq: exerciseId } }],
     });
 
     for (const actionHook of actionHooks) {
@@ -84,7 +84,7 @@ export class SubmissionProcessor {
     const actionHooks = await this.actionHookService.findAll({
       game: { $eq: gameId },
       trigger: TriggerEvent.SUBMISSION_ACCEPTED,
-      sourceId: exerciseId,
+      $or: [{ sourceId: { $eq: null } }, { sourceId: { $eq: exerciseId } }],
     });
 
     for (const actionHook of actionHooks) {
@@ -102,7 +102,7 @@ export class SubmissionProcessor {
     const actionHooks = await this.actionHookService.findAll({
       game: { $eq: gameId },
       trigger: TriggerEvent.SUBMISSION_REJECTED,
-      sourceId: exerciseId,
+      $or: [{ sourceId: { $eq: null } }, { sourceId: { $eq: exerciseId } }],
     });
 
     for (const actionHook of actionHooks) {

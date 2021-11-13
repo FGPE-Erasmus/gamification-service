@@ -267,11 +267,18 @@ export class MooshakService implements IEngineService {
       .toPromise();
   }
 
+  // TODO import course
+
+  // TODO import problem
+
   private catchMooshakError = <T>(courseId?: string) =>
     catchError<T, ObservableInput<any>>((error: AxiosError) => {
+      console.log(error);
       if (error.response) {
         if (error.response.status === 401 || error.response.status === 403) {
+          console.log(MooshakService.tokenCache);
           delete MooshakService.tokenCache[courseId];
+          console.log(MooshakService.tokenCache);
         }
         const ex: MooshakExceptionDto = error.response.data as MooshakExceptionDto;
         return throwError(new Error(`${ex.status} ${ex.title} -  ${ex.message}`));
@@ -280,6 +287,7 @@ export class MooshakService implements IEngineService {
     });
 
   private static mapMooshakSubmissionToEvaluation(mooshakSubmission: MooshakSubmissionDto): EvaluationDto {
+    console.log(mooshakSubmission);
     return {
       result: MooshakService.mapMooshakResultToResult(mooshakSubmission.classify),
       evaluationEngine: EvaluationEngine.MOOSHAK,

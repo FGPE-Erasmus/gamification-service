@@ -25,7 +25,7 @@ export function base64Encode(input: string): string {
  * @returns {string} the decoded string
  */
 export function base64Decode(input: string): string {
-  return Buffer.from(input, 'base64').toString('ascii');
+  return Buffer.from(input, 'base64').toString('utf8');
 }
 
 /**

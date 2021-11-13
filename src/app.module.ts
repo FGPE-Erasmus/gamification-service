@@ -1,5 +1,5 @@
 import { join } from 'path';
-import { Global, HttpModule, Module } from '@nestjs/common';
+import { Global, HttpModule, MiddlewareConsumer, Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { GraphQLModule } from '@nestjs/graphql';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -23,6 +23,7 @@ import { SubscriptionsModule } from './common/subscriptions/subscriptions.module
 import { KeycloakModule } from './keycloak/keycloak.module';
 import { AuthGuard } from './keycloak/guards/auth.guard';
 import { ResourceGuard } from './keycloak/guards/resource.guard';
+import { graphqlUploadExpress } from 'graphql-upload';
 
 @Global()
 @Module({
@@ -85,6 +86,7 @@ import { ResourceGuard } from './keycloak/guards/resource.guard';
       introspection: true,
       installSubscriptionHandlers: true,
       resolvers: { JSON: GraphQLJSON },
+      uploads: false,
     }),
 
     KeycloakModule.registerAsync({
@@ -127,4 +129,8 @@ import { ResourceGuard } from './keycloak/guards/resource.guard';
   ],
   exports: [HttpModule, KeycloakModule],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(graphqlUploadExpress()).forRoutes('graphql');
+  }
+}
