@@ -49,7 +49,27 @@ export class PlayerProcessor {
     });
 
     for (const actionHook of actionHooks) {
+      // if not recurrent, do not execute a second time
+      if (!actionHook.recurrent) {
+        const executed = await this.eventService.hasEventLogsMatching({
+          game: gameId,
+          player: playerId,
+          actionHook: actionHook.id,
+        });
+
+        if (executed) continue;
+      }
+
+      // execute hook
       await this.hookService.executeHook(actionHook, job.data, {});
+
+      // add event log
+      await this.eventService.createEventLog({
+        game: gameId,
+        player: playerId,
+        actionHook: actionHook.id,
+        timestamp: new Date(),
+      });
     }
   }
 
@@ -64,13 +84,33 @@ export class PlayerProcessor {
     });
 
     for (const actionHook of actionHooks) {
+      // if not recurrent, do not execute a second time
+      if (!actionHook.recurrent) {
+        const executed = await this.eventService.hasEventLogsMatching({
+          game: gameId,
+          player: playerId,
+          actionHook: actionHook.id,
+        });
+
+        if (executed) continue;
+      }
+
+      // execute hook
       await this.hookService.executeHook(actionHook, job.data, {});
+
+      // add event log
+      await this.eventService.createEventLog({
+        game: gameId,
+        player: playerId,
+        actionHook: actionHook.id,
+        timestamp: new Date(),
+      });
     }
   }
 
   @Process(`${TriggerEvent.PLAYER_UPDATED}_JOB`)
   async onPlayerUpdated(job: Job<{ gameId: string; playerId: string }>): Promise<void> {
-    const { gameId } = job.data;
+    const { gameId, playerId } = job.data;
 
     // process hooks
     const actionHooks = await this.actionHookService.findAll({
@@ -79,7 +119,27 @@ export class PlayerProcessor {
     });
 
     for (const actionHook of actionHooks) {
+      // if not recurrent, do not execute a second time
+      if (!actionHook.recurrent) {
+        const executed = await this.eventService.hasEventLogsMatching({
+          game: gameId,
+          player: playerId,
+          actionHook: actionHook.id,
+        });
+
+        if (executed) continue;
+      }
+
+      // execute hook
       await this.hookService.executeHook(actionHook, job.data, {});
+
+      // add event log
+      await this.eventService.createEventLog({
+        game: gameId,
+        player: playerId,
+        actionHook: actionHook.id,
+        timestamp: new Date(),
+      });
     }
   }
 

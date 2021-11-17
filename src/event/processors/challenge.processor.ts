@@ -8,6 +8,7 @@ import { Challenge } from '../../challenge/models/challenge.model';
 import { ActionHookService } from '../../hook/action-hook.service';
 import { TriggerEventEnum as TriggerEvent } from '../../hook/enums/trigger-event.enum';
 import { HookService } from '../../hook/hook.service';
+import { EventService } from '../event.service';
 
 @Processor(appConfig.queue.event.name)
 export class ChallengeProcessor {
@@ -16,11 +17,13 @@ export class ChallengeProcessor {
     protected readonly hookService: HookService,
     protected readonly challengeService: ChallengeService,
     protected readonly challengeStatusService: ChallengeStatusService,
+    protected readonly eventService: EventService,
   ) {}
 
   @Process(`${TriggerEvent.CHALLENGE_COMPLETED}_JOB`)
   async onChallengeCompleted(job: Job<{ gameId: string; challengeId: string; playerId: string }>): Promise<void> {
     const { gameId, challengeId, playerId } = job.data;
+
     const challenge: Challenge = await this.challengeService.findById(challengeId);
     //process hooks
     const actionHooks = await this.actionHookService.findAll({
@@ -30,7 +33,29 @@ export class ChallengeProcessor {
     });
 
     for (const actionHook of actionHooks) {
+      // if not recurrent, do not execute a second time
+      if (!actionHook.recurrent) {
+        const executed = await this.eventService.hasEventLogsMatching({
+          game: gameId,
+          challenge: challengeId,
+          player: playerId,
+          actionHook: actionHook.id,
+        });
+
+        if (executed) continue;
+      }
+
+      // execute hook
       await this.hookService.executeHook(actionHook, job.data, { ...challenge });
+
+      // add event log
+      await this.eventService.createEventLog({
+        game: gameId,
+        challenge: challengeId,
+        player: playerId,
+        actionHook: actionHook.id,
+        timestamp: new Date(),
+      });
     }
   }
 
@@ -47,7 +72,29 @@ export class ChallengeProcessor {
     });
 
     for (const actionHook of actionHooks) {
+      // if not recurrent, do not execute a second time
+      if (!actionHook.recurrent) {
+        const executed = await this.eventService.hasEventLogsMatching({
+          game: gameId,
+          challenge: challengeId,
+          player: playerId,
+          actionHook: actionHook.id,
+        });
+
+        if (executed) continue;
+      }
+
+      // execute hook
       await this.hookService.executeHook(actionHook, job.data, { ...challenge });
+
+      // add event log
+      await this.eventService.createEventLog({
+        game: gameId,
+        challenge: challengeId,
+        player: playerId,
+        actionHook: actionHook.id,
+        timestamp: new Date(),
+      });
     }
   }
 
@@ -64,7 +111,29 @@ export class ChallengeProcessor {
     });
 
     for (const actionHook of actionHooks) {
+      // if not recurrent, do not execute a second time
+      if (!actionHook.recurrent) {
+        const executed = await this.eventService.hasEventLogsMatching({
+          game: gameId,
+          challenge: challengeId,
+          player: playerId,
+          actionHook: actionHook.id,
+        });
+
+        if (executed) continue;
+      }
+
+      // execute hook
       await this.hookService.executeHook(actionHook, job.data, { ...challenge });
+
+      // add event log
+      await this.eventService.createEventLog({
+        game: gameId,
+        challenge: challengeId,
+        player: playerId,
+        actionHook: actionHook.id,
+        timestamp: new Date(),
+      });
     }
   }
 
@@ -81,7 +150,29 @@ export class ChallengeProcessor {
     });
 
     for (const actionHook of actionHooks) {
+      // if not recurrent, do not execute a second time
+      if (!actionHook.recurrent) {
+        const executed = await this.eventService.hasEventLogsMatching({
+          game: gameId,
+          challenge: challengeId,
+          player: playerId,
+          actionHook: actionHook.id,
+        });
+
+        if (executed) continue;
+      }
+
+      // execute hook
       await this.hookService.executeHook(actionHook, job.data, { ...challenge });
+
+      // add event log
+      await this.eventService.createEventLog({
+        game: gameId,
+        challenge: challengeId,
+        player: playerId,
+        actionHook: actionHook.id,
+        timestamp: new Date(),
+      });
     }
   }
 
@@ -98,7 +189,29 @@ export class ChallengeProcessor {
     });
 
     for (const actionHook of actionHooks) {
+      // if not recurrent, do not execute a second time
+      if (!actionHook.recurrent) {
+        const executed = await this.eventService.hasEventLogsMatching({
+          game: gameId,
+          challenge: challengeId,
+          player: playerId,
+          actionHook: actionHook.id,
+        });
+
+        if (executed) continue;
+      }
+
+      // execute hook
       await this.hookService.executeHook(actionHook, job.data, { ...challenge });
+
+      // add event log
+      await this.eventService.createEventLog({
+        game: gameId,
+        challenge: challengeId,
+        player: playerId,
+        actionHook: actionHook.id,
+        timestamp: new Date(),
+      });
     }
   }
 
@@ -115,7 +228,29 @@ export class ChallengeProcessor {
     });
 
     for (const actionHook of actionHooks) {
+      // if not recurrent, do not execute a second time
+      if (!actionHook.recurrent) {
+        const executed = await this.eventService.hasEventLogsMatching({
+          game: gameId,
+          challenge: challengeId,
+          player: playerId,
+          actionHook: actionHook.id,
+        });
+
+        if (executed) continue;
+      }
+
+      // execute hook
       await this.hookService.executeHook(actionHook, job.data, { ...challenge });
+
+      // add event log
+      await this.eventService.createEventLog({
+        game: gameId,
+        challenge: challengeId,
+        player: playerId,
+        actionHook: actionHook.id,
+        timestamp: new Date(),
+      });
     }
   }
 }

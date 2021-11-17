@@ -337,7 +337,7 @@ export class GameService extends BaseService<Game, GameDocument> {
    */
   async changeStartDate(gameId: string, newStartDate: Date): Promise<Game> {
     const game: Game = await this.findOneAndUpdate({ _id: gameId }, { startDate: newStartDate });
-    this._updateDateScheduledHooks(gameId, newStartDate, true);
+    await this._updateDateScheduledHooks(gameId, newStartDate, true);
     return game;
   }
 
@@ -348,7 +348,7 @@ export class GameService extends BaseService<Game, GameDocument> {
    */
   async changeEndDate(gameId: string, newEndDate: Date): Promise<Game> {
     const game: Game = await this.findOneAndUpdate({ _id: gameId }, { endDate: newEndDate });
-    this._updateDateScheduledHooks(gameId, newEndDate, false);
+    await this._updateDateScheduledHooks(gameId, newEndDate, false);
     return game;
   }
 

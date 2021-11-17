@@ -11,6 +11,7 @@ import { ChallengeStatusService } from '../../challenge-status/challenge-status.
 import { toString } from '../../common/utils/mongo.utils';
 import { ChallengeService } from '../../challenge/challenge.service';
 import { PlayerService } from '../../player/player.service';
+import { EventService } from '../event.service';
 
 @Processor(appConfig.queue.event.name)
 export class RewardProcessor {
@@ -21,6 +22,7 @@ export class RewardProcessor {
     protected readonly hookService: HookService,
     protected readonly playerService: PlayerService,
     protected readonly actionHookService: ActionHookService,
+    protected readonly eventService: EventService,
   ) {}
 
   @Process(`${TriggerEvent.REWARD_GRANTED}_JOB`)
@@ -46,7 +48,28 @@ export class RewardProcessor {
     });
 
     for (const actionHook of actionHooks) {
+      // if not recurrent, do not execute a second time
+      if (!actionHook.recurrent) {
+        const executed = await this.eventService.hasEventLogsMatching({
+          game: gameId,
+          player: playerId,
+          reward: rewardId,
+          actionHook: actionHook.id,
+        });
+
+        if (executed) continue;
+      }
+
       await this.hookService.executeHook(actionHook, job.data, { ...reward });
+
+      // add event log
+      await this.eventService.createEventLog({
+        game: gameId,
+        player: playerId,
+        reward: rewardId,
+        actionHook: actionHook.id,
+        timestamp: new Date(),
+      });
     }
 
     // invalidate caches

@@ -36,7 +36,29 @@ export class SubmissionProcessor {
     });
 
     for (const actionHook of actionHooks) {
+      // if not recurrent, do not execute a second time
+      if (!actionHook.recurrent) {
+        const executed = await this.eventService.hasEventLogsMatching({
+          game: gameId,
+          player: playerId,
+          activityId: exerciseId,
+          actionHook: actionHook.id,
+        });
+
+        if (executed) continue;
+      }
+
+      // execute hook
       await this.hookService.executeHook(actionHook, job.data, { exerciseId: exerciseId });
+
+      // add event log
+      await this.eventService.createEventLog({
+        game: gameId,
+        player: playerId,
+        activityId: exerciseId,
+        actionHook: actionHook.id,
+        timestamp: new Date(),
+      });
     }
   }
 
@@ -54,7 +76,28 @@ export class SubmissionProcessor {
     });
 
     for (const actionHook of actionHooks) {
+      // if not recurrent, do not execute a second time
+      if (!actionHook.recurrent) {
+        const executed = await this.eventService.hasEventLogsMatching({
+          game: gameId,
+          player: playerId,
+          activityId: exerciseId,
+          actionHook: actionHook.id,
+        });
+
+        if (executed) continue;
+      }
+
       await this.hookService.executeHook(actionHook, job.data, { exerciseId: exerciseId });
+
+      // add event log
+      await this.eventService.createEventLog({
+        game: gameId,
+        player: playerId,
+        activityId: exerciseId,
+        actionHook: actionHook.id,
+        timestamp: new Date(),
+      });
     }
 
     // send notification to trigger further processing
@@ -88,7 +131,28 @@ export class SubmissionProcessor {
     });
 
     for (const actionHook of actionHooks) {
+      // if not recurrent, do not execute a second time
+      if (!actionHook.recurrent) {
+        const executed = await this.eventService.hasEventLogsMatching({
+          game: gameId,
+          player: playerId,
+          activityId: exerciseId,
+          actionHook: actionHook.id,
+        });
+
+        if (executed) continue;
+      }
+
       await this.hookService.executeHook(actionHook, job.data, { exerciseId: exerciseId });
+
+      // add event log
+      await this.eventService.createEventLog({
+        game: gameId,
+        player: playerId,
+        activityId: exerciseId,
+        actionHook: actionHook.id,
+        timestamp: new Date(),
+      });
     }
   }
 
@@ -106,7 +170,28 @@ export class SubmissionProcessor {
     });
 
     for (const actionHook of actionHooks) {
+      // if not recurrent, do not execute a second time
+      if (!actionHook.recurrent) {
+        const executed = await this.eventService.hasEventLogsMatching({
+          game: gameId,
+          player: playerId,
+          activityId: exerciseId,
+          actionHook: actionHook.id,
+        });
+
+        if (executed) continue;
+      }
+
       await this.hookService.executeHook(actionHook, job.data, { exerciseId: exerciseId });
+
+      // add event log
+      await this.eventService.createEventLog({
+        game: gameId,
+        player: playerId,
+        activityId: exerciseId,
+        actionHook: actionHook.id,
+        timestamp: new Date(),
+      });
     }
   }
 }

@@ -1,5 +1,6 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { BullModule } from '@nestjs/bull';
+import { MongooseModule } from '@nestjs/mongoose';
 
 import { appConfig } from '../app.config';
 import { ChallengeStatusModule } from '../challenge-status/challenge-status.module';
@@ -16,9 +17,17 @@ import { ChallengeModule } from '../challenge/challenge.module';
 import { ChallengeProcessor } from './processors/challenge.processor';
 import { RewardProcessor } from './processors/reward.processor';
 import { LeaderboardModule } from '../leaderboard/leaderboard.module';
+import { EventLogRepository } from './repositories/event-log.repository';
+import { EventLogSchema } from './models/event-log.model';
 
 @Module({
   imports: [
+    MongooseModule.forFeature([
+      {
+        name: 'EventLog',
+        schema: EventLogSchema,
+      },
+    ]),
     BullModule.registerQueueAsync({
       name: appConfig.queue.event.name,
       useFactory: () => ({
@@ -41,6 +50,7 @@ import { LeaderboardModule } from '../leaderboard/leaderboard.module';
   providers: [
     EventListener,
     EventService,
+    EventLogRepository,
 
     // domain processors
     ChallengeProcessor,
@@ -48,6 +58,6 @@ import { LeaderboardModule } from '../leaderboard/leaderboard.module';
     SubmissionProcessor,
     RewardProcessor,
   ],
-  exports: [EventService],
+  exports: [EventService, EventLogRepository],
 })
 export class EventModule {}
