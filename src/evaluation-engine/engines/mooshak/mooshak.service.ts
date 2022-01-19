@@ -19,6 +19,7 @@ import { Validation } from '../../../submission/models/validation.model';
 import { ValidationDto } from '../../dto/validation.dto';
 import { MooshakValidationDto } from './mooshak-validation.dto';
 import { CodeSkeletonDto } from '../../dto/code-skeleton.dto';
+import { CacheService } from '../../../cache/cache.service';
 
 @Injectable()
 export class MooshakService implements IEngineService {
@@ -26,7 +27,7 @@ export class MooshakService implements IEngineService {
 
   protected static tokenCache: { [_: string]: { token: string; expiryTime: number } } = {};
 
-  constructor(protected readonly httpService: HttpService) {}
+  constructor(protected readonly cacheService: CacheService, protected readonly httpService: HttpService) {}
 
   async login(courseId: string, username: string, password: string): Promise<{ token: string }> {
     const now = new Date().getTime();
@@ -85,6 +86,13 @@ export class MooshakService implements IEngineService {
   }
 
   async getActivity(courseId: string, activityId: string, options?: AxiosRequestConfig): Promise<ActivityDto> {
+    const cacheKey = `activity:${courseId}:${activityId}`;
+
+    const cached = await this.cacheService.get(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
     const activity: ActivityDto = await this.httpService
       .get<ActivityDto>(`/data/contests/${courseId}/problems/${activityId}`, options)
       .pipe(
@@ -134,6 +142,8 @@ export class MooshakService implements IEngineService {
     } else {
       activity.statement = viewer.statement;
     }
+
+    await this.cacheService.set(cacheKey, activity);
 
     return activity;
   }

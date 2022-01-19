@@ -20,6 +20,7 @@ import { ActivityStatusResolver } from './activity-status.resolver';
 import { NotificationModule } from '../notifications/notification.module';
 import { BaseConsumer } from './engines/base/base.consumer';
 import { BaseService } from './engines/base/base-engine.service';
+import { CacheModule } from '../cache/cache.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { BaseService } from './engines/base/base-engine.service';
         defaultJobOptions: { ...appConfig.queue.evaluation.jobOptions },
       }),
     }),
+    CacheModule,
     forwardRef(() => EventModule),
     forwardRef(() => HookModule),
     forwardRef(() => GameModule),

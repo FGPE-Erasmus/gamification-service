@@ -139,7 +139,7 @@ export class ScheduledHookService extends BaseService<ScheduledHook, ScheduledHo
             order: 0,
             leftEntity: EntityEnum.PLAYER,
             leftProperty: `$.learningPath[?(@.challenge==\'${challenge.id}\')].state`,
-            comparingFunction: ComparingFunction.NOT_EQUAL,
+            comparingFunction: ComparingFunction.NOT_EQUALS,
             rightEntity: EntityEnum.FIXED,
             rightProperty: StateEnum.COMPLETED,
           },

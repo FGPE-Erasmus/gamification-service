@@ -211,15 +211,19 @@ export class PlayerService extends BaseService<Player, PlayerDocument> {
         {},
       ),
       nrOfSubmissionsByActivityAndResult: Object.entries(submissionsByActivityAndResult).reduce((p, [k, v]) => {
+        const byResult = {};
+        Object.keys(v).forEach(res => (byResult[res] = v[res].length));
         return {
           ...p,
-          [k]: Object.entries(v).reduce((p2, [k2, v2]) => ({ ...p2, [k2]: v2.length }), {}),
+          [k]: byResult,
         };
       }, {}),
       nrOfValidationsByActivityAndResult: Object.entries(validationsByActivityAndResult).reduce((p, [k, v]) => {
+        const byResult = {};
+        Object.keys(v).forEach(res => (byResult[res] = v[res].length));
         return {
           ...p,
-          [k]: Object.entries(v).reduce((p2, [k2, v2]) => ({ ...p2, [k2]: v2.length }), {}),
+          [k]: byResult,
         };
       }, {}),
     };
@@ -253,14 +257,18 @@ export class PlayerService extends BaseService<Player, PlayerDocument> {
       ...Object.keys(stats.nrOfSubmissionsByActivityAndResult || {}),
       ...Object.keys(playerStats.nrOfSubmissionsByActivityAndResult || {}),
     ]).forEach(activity => {
+      nrOfSubmissionsByActivityAndResult[activity] = {};
       new Set([
         ...Object.keys(stats.nrOfSubmissionsByActivityAndResult[activity] || {}),
         ...Object.keys(playerStats.nrOfSubmissionsByActivityAndResult[activity] || {}),
       ]).forEach(result => {
-        nrOfSubmissionsByActivityAndResult[activity] = {};
         nrOfSubmissionsByActivityAndResult[activity][result] =
-          (stats.nrOfSubmissionsByActivityAndResult[activity]?.[result] || 0) +
-          (playerStats.nrOfSubmissionsByActivityAndResult[activity]?.[result] || 0);
+          ((stats.nrOfSubmissionsByActivityAndResult[activity] &&
+            stats.nrOfSubmissionsByActivityAndResult[activity][result]) ||
+            0) +
+          ((playerStats.nrOfSubmissionsByActivityAndResult[activity] &&
+            playerStats.nrOfSubmissionsByActivityAndResult[activity][result]) ||
+            0);
       });
     });
 
@@ -269,14 +277,18 @@ export class PlayerService extends BaseService<Player, PlayerDocument> {
       ...Object.keys(stats.nrOfValidationsByActivityAndResult || {}),
       ...Object.keys(playerStats.nrOfValidationsByActivityAndResult || {}),
     ]).forEach(activity => {
+      nrOfValidationsByActivityAndResult[activity] = {};
       new Set([
         ...Object.keys(stats.nrOfValidationsByActivityAndResult[activity] || {}),
         ...Object.keys(playerStats.nrOfValidationsByActivityAndResult[activity] || {}),
       ]).forEach(result => {
-        nrOfValidationsByActivityAndResult[activity] = {};
         nrOfValidationsByActivityAndResult[activity][result] =
-          (stats.nrOfValidationsByActivityAndResult[activity]?.[result] || 0) +
-          (playerStats.nrOfValidationsByActivityAndResult[activity]?.[result] || 0);
+          ((stats.nrOfValidationsByActivityAndResult[activity] &&
+            stats.nrOfValidationsByActivityAndResult[activity][result]) ||
+            0) +
+          ((playerStats.nrOfValidationsByActivityAndResult[activity] &&
+            playerStats.nrOfValidationsByActivityAndResult[activity][result]) ||
+            0);
       });
     });
 

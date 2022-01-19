@@ -128,9 +128,9 @@ export function evaluateCondition(left: any | any[], right: any | any[], compari
       return left <= right;
     case ComparingFunction.GREAT_OR_EQUAL:
       return left >= right;
-    case ComparingFunction.EQUAL:
+    case ComparingFunction.EQUALS:
       return left === right;
-    case ComparingFunction.NOT_EQUAL:
+    case ComparingFunction.NOT_EQUALS:
       return left !== right;
     case ComparingFunction.STARTS_WITH:
       return left.startsWith(right);
