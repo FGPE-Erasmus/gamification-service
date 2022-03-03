@@ -16,6 +16,7 @@ import { Mode } from '../challenge/models/mode.enum';
 import { GameService } from '../game/game.service';
 import { GameStateEnum } from '../game/enum/game-state.enum';
 import { Game } from '../game/models/game.model';
+import { streamToString } from 'src/common/utils/stream.utils';
 
 @Injectable()
 export class SubmissionService extends BaseService<Submission, SubmissionDocument> {
@@ -56,10 +57,12 @@ export class SubmissionService extends BaseService<Submission, SubmissionDocumen
     if (challenge.mode === Mode.SHAPESHIFTER)
       exerciseId = await this.challengeStatusService.getCurrentShape(challenge, playerId);
 
+    const content: string = await streamToString(file.content);
     const submission: Submission = await super.create({
       game: gameId,
       player: playerId,
       exerciseId: exerciseId,
+      program: content,
     } as Submission);
 
     // send SUBMISSION_RECEIVED event
@@ -69,7 +72,7 @@ export class SubmissionService extends BaseService<Submission, SubmissionDocumen
       exerciseId: exerciseId,
     });
 
-    await this.evaluationEngineService.evaluate(gameId, submission.id, file);
+    await this.evaluationEngineService.evaluate(gameId, submission.id, file.filename, submission.program);
 
     return submission;
   }

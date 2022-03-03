@@ -10,6 +10,7 @@ import { PlayerService } from '../player/player.service';
 import { Validation, ValidationDocument } from './models/validation.model';
 import { TriggerEventEnum as TriggerEvent } from '../hook/enums/trigger-event.enum';
 import { ValidationRepository } from './repositories/validation.repository';
+import { streamToString } from 'src/common/utils/stream.utils';
 
 @Injectable()
 export class ValidationService extends BaseService<Validation, ValidationDocument> {
@@ -42,10 +43,13 @@ export class ValidationService extends BaseService<Validation, ValidationDocumen
     file: IFile,
     inputs: string[],
   ): Promise<Validation> {
+    const content: string = await streamToString(file.content);
+
     const validation: Validation = await super.create({
       game: gameId,
       player: playerId,
       exerciseId: exerciseId,
+      program: content,
     } as Validation);
 
     // send VALIDATION_RECEIVED event
@@ -55,7 +59,7 @@ export class ValidationService extends BaseService<Validation, ValidationDocumen
       exerciseId: exerciseId,
     });
 
-    await this.evaluationEngineService.validate(gameId, validation.id, file, inputs);
+    await this.evaluationEngineService.validate(gameId, validation.id, file.filename, validation.program, inputs);
 
     return validation;
   }

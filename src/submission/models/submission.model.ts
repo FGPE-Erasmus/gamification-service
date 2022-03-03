@@ -9,6 +9,7 @@ export interface Submission extends IBaseEntity {
   game: any;
   player: any;
   exerciseId: string;
+  program: string;
   evaluationEngine?: EvaluationEngine;
   evaluationEngineId?: string;
   language?: string;
@@ -30,6 +31,9 @@ export class SubmissionDocument extends Document implements Submission {
 
   @Prop()
   exerciseId: string;
+
+  @Prop()
+  program: string;
 
   @Prop({ type: () => String, enum: EvaluationEngine })
   evaluationEngine?: EvaluationEngine;

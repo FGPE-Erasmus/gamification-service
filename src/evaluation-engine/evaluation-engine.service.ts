@@ -92,31 +92,35 @@ export class EvaluationEngineService {
     return (await this.getActivities(courseId, [activityId]))[0];
   }
 
-  async validate(gameId: string, validationId: string, file: IFile, inputs: string[]): Promise<void> {
+  async validate(
+    gameId: string,
+    validationId: string,
+    filename: string,
+    content: string,
+    inputs: string[],
+  ): Promise<void> {
     // get the game
     const game = await this.gameService.findById(gameId);
 
     // validate
-    const content: string = await streamToString(file.content);
     await this.evaluationQueue.add(`${(game.evaluationEngine || 'BASE').toUpperCase()}_${REQUEST_VALIDATION_JOB}`, {
       courseId: game.courseId,
       validationId,
-      filename: file.filename,
+      filename,
       content,
       inputs,
     });
   }
 
-  async evaluate(gameId: string, submissionId: string, file: IFile): Promise<void> {
+  async evaluate(gameId: string, submissionId: string, filename: string, content: string): Promise<void> {
     // get the game
     const game = await this.gameService.findById(gameId);
 
     // evaluate
-    const content: string = await streamToString(file.content);
     await this.evaluationQueue.add(`${(game.evaluationEngine || 'BASE').toUpperCase()}_${REQUEST_EVALUATION_JOB}`, {
       courseId: game.courseId,
       submissionId,
-      filename: file.filename,
+      filename,
       content,
     });
   }
@@ -127,19 +131,7 @@ export class EvaluationEngineService {
       populate: 'game',
     });
 
-    // get a token
-    const { token } = await this.mooshakService.login(
-      validation.game.courseId,
-      appConfig.evaluationEngine.username,
-      appConfig.evaluationEngine.password,
-    );
-
-    // get the program
-    return await this.mooshakService.getValidationProgram(validation.game.courseId, validation, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    return validation.program;
   }
 
   async getSubmissionProgram(submissionId: string): Promise<string> {
@@ -148,18 +140,6 @@ export class EvaluationEngineService {
       populate: 'game',
     });
 
-    // get a token
-    const { token } = await this.mooshakService.login(
-      submission.game.courseId,
-      appConfig.evaluationEngine.username,
-      appConfig.evaluationEngine.password,
-    );
-
-    // get the program
-    return await this.mooshakService.getEvaluationProgram(submission.game.courseId, submission, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    return submission.program;
   }
 }
