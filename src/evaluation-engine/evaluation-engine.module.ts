@@ -63,7 +63,7 @@ import { CacheModule } from '../cache/cache.module';
     ActivityStatusResolver,
     ProgrammingLanguageResolver,
   ],
-  exports: [EvaluationEngineService, ActivityService],
+  exports: [EvaluationEngineService, ActivityService, MooshakService],
 })
 export class EvaluationEngineModule implements OnModuleInit {
   protected readonly logger: Logger = new Logger(EvaluationEngineModule.name);

@@ -255,6 +255,36 @@ export class MooshakService implements IEngineService {
     return MooshakService.mapMooshakEvaluationToEvaluation(response as MooshakEvaluationDto);
   }
 
+  async importContest(fileName: string, buffer: Buffer, options?: AxiosRequestConfig): Promise<{ id: string }> {
+    const form: FormData = new FormData();
+    form.append('file', buffer, { filename: fileName });
+    return await this.httpService
+      .post<{ id: string }>(`/data/contests`, form, options)
+      .pipe(
+        first(),
+        map<any, { id: string }>(res => res.data),
+      )
+      .toPromise();
+  }
+
+  async importProblem(
+    courseId: string,
+    fileName: string,
+    buffer: Buffer,
+    options?: AxiosRequestConfig,
+  ): Promise<ActivityDto> {
+    const form: FormData = new FormData();
+    form.append('file', buffer, { filename: fileName });
+    return await this.httpService
+      .post<string>(`/data/contests/${courseId}/problems`, form, options)
+      .pipe(
+        first(),
+        map<any, ActivityDto>(res => res.data),
+        this.catchMooshakError(courseId),
+      )
+      .toPromise();
+  }
+
   async getValidationProgram(courseId: string, validation: Validation, options?: AxiosRequestConfig): Promise<string> {
     return await this.httpService
       .get<string>(`/data/contests/${courseId}/validations/${validation.evaluationEngineId}/program`, options)
@@ -276,10 +306,6 @@ export class MooshakService implements IEngineService {
       )
       .toPromise();
   }
-
-  // TODO import course
-
-  // TODO import problem
 
   private catchMooshakError = <T>(courseId?: string) =>
     catchError<T, ObservableInput<any>>((error: AxiosError) => {
