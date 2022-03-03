@@ -46,15 +46,18 @@ export class PlayerService extends BaseService<Player, PlayerDocument> {
     });
   }
 
-  async enroll(gameId: string, userId: string, enrolledByTeacher?: boolean): Promise<Player> {
+  async enroll(gameId: string, userId: string, enrolledByTeacher?: boolean, token?: string): Promise<Player> {
     // is the player already enrolled?
     let player: Player = await this.findByGameAndUser(gameId, userId);
     if (player) return player;
 
-    // is the game private? If so - has the enrollment been issued by a teacher?
-    const game = await this.gameService.findById(gameId);
-    if (game.private && (!enrolledByTeacher || typeof enrolledByTeacher == undefined))
-      throw new Error('The private game cannot be accessed.');
+    // If the student has a token it's clear that he is invited to join a specific game regardless whether it's private or not.
+    if (!token) {
+      // is the game private? If so - has the enrollment been issued by a teacher?
+      const game = await this.gameService.findById(gameId);
+      if (game.private && (!enrolledByTeacher || typeof enrolledByTeacher == undefined))
+        throw new Error('The private game cannot be accessed.');
+    }
 
     // enroll
     player = await this.create({ game: gameId, user: userId });
