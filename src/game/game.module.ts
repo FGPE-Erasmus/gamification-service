@@ -8,6 +8,7 @@ import { LeaderboardModule } from '../leaderboard/leaderboard.module';
 import { RewardModule } from '../reward/reward.module';
 import { SubmissionModule } from '../submission/submission.module';
 import { PlayerModule } from '../player/player.module';
+import { EvaluationEngineModule } from '../evaluation-engine/evaluation-engine.module';
 import { GameResolver } from './game.resolver';
 import { GameService } from './game.service';
 import { GameToDtoMapper } from './mappers/game-to-dto.mapper';
@@ -37,6 +38,7 @@ import { GroupModule } from '../group/group.module';
     forwardRef(() => SubmissionModule),
     forwardRef(() => NotificationModule),
     forwardRef(() => SubscriptionsModule),
+    forwardRef(() => EvaluationEngineModule),
   ],
   controllers: [GameUploadController],
   providers: [GameToDtoMapper, GameRepository, GameService, GameResolver, GameTokenResolver],

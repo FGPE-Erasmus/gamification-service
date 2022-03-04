@@ -31,13 +31,6 @@ export class GameInput {
   @MaxLength(1000)
   description?: string;
 
-  @Field()
-  @IsString()
-  @MinLength(1)
-  @MaxLength(50)
-  @Matches(/[a-zA-Z0-9_-]+/)
-  courseId: string;
-
   @Field({ nullable: true })
   @IsOptional()
   @IsUUID(4)

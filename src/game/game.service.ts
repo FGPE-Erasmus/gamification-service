@@ -25,6 +25,8 @@ import { createToken, verifyToken } from '../common/services/jwt.service';
 import { appConfig } from '../app.config';
 import { ScheduledHook } from '../hook/models/scheduled-hook.model';
 import { ActionHookService } from '../hook/action-hook.service';
+import { MooshakService } from 'src/evaluation-engine/engines/mooshak/mooshak.service';
+import { readFile } from 'fs/promises';
 
 @Injectable()
 export class GameService extends BaseService<Game, GameDocument> {
@@ -34,6 +36,7 @@ export class GameService extends BaseService<Game, GameDocument> {
     protected readonly leaderboardService: LeaderboardService,
     protected readonly notificationService: NotificationService,
     protected readonly gameToDtoMapper: GameToDtoMapper,
+    protected readonly mooshakService: MooshakService,
     @Inject(forwardRef(() => RewardService)) protected readonly rewardService: RewardService,
     @Inject(forwardRef(() => ChallengeService)) protected readonly challengeService: ChallengeService,
     @Inject(forwardRef(() => ActionHookService)) protected readonly actionHookService: ActionHookService,
@@ -110,21 +113,57 @@ export class GameService extends BaseService<Game, GameDocument> {
    */
   async importGEdILArchive(input: GameInput, gedilFile: IFile, teacherId: string): Promise<Game | undefined> {
     let game: Game;
+    let courseId: string;
 
-    const entries = { challenges: {}, leaderboards: {}, rewards: {}, rules: {} };
+    // get a token
+    const { token } = await this.mooshakService.login(
+      null,
+      appConfig.evaluationEngine.adminUsername,
+      appConfig.evaluationEngine.adminPassword,
+    );
 
-    const zip = gedilFile.content.pipe(Parse({ forceStream: true }));
+    const entries = {
+      challenges: {},
+      leaderboards: {},
+      rewards: {},
+      rules: {},
+    };
+
+    const zip = gedilFile.content.pipe(
+      Parse({
+        forceStream: true,
+      }),
+    );
     for await (const entry of zip) {
       const fileName = entry.path;
-
       if (fileName === 'metadata.json') {
         const gedilLayer = extractToJson(await entry.buffer());
+
+        const buffer = await readFile(`${__dirname}/../assets/proto_fgpe_template.zip`);
+        courseId = (
+          await this.mooshakService.importContest(`${gedilLayer.id}.zip`, buffer, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          })
+        ).id;
+
         game = await this.create({
           ...input,
+          courseId,
           state: GameStateEnum.LOCKED,
           gedilLayerId: gedilLayer.id,
           gedilLayerDescription: `[${gedilLayer.name}] ${gedilLayer.description}`,
           instructors: [teacherId],
+        });
+      } else if (fileName.startsWith('exercises')) {
+        const buffer = await entry.buffer();
+        const splittedFileName: string[] = fileName.split('/');
+        const fn: string = splittedFileName[splittedFileName.length - 1];
+        await this.mooshakService.importProblem(courseId, fn, buffer, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         });
       } else {
         const result = /^(challenges|leaderboards|rewards|rules)\/([^/]+)\//.exec(fileName);
@@ -145,7 +184,11 @@ export class GameService extends BaseService<Game, GameDocument> {
       }
     }
 
-    const subObjects = { challenges: {}, leaderboards: {}, rewards: {} };
+    const subObjects = {
+      challenges: {},
+      leaderboards: {},
+      rewards: {},
+    };
     const rules = [];
 
     // challenges
@@ -188,26 +231,42 @@ export class GameService extends BaseService<Game, GameDocument> {
 
     const now = new Date().getTime();
     if (!game.startDate && !game.endDate) {
-      game = await this.patch(game.id, { state: GameStateEnum.OPEN });
+      game = await this.patch(game.id, {
+        state: GameStateEnum.OPEN,
+      });
     } else {
       if (!game.startDate && game.endDate.getTime() <= now) {
-        game = await this.patch(game.id, { state: GameStateEnum.CLOSED });
+        game = await this.patch(game.id, {
+          state: GameStateEnum.CLOSED,
+        });
       } else if (!game.startDate && game.endDate.getTime() > now) {
-        game = await this.patch(game.id, { state: GameStateEnum.OPEN });
+        game = await this.patch(game.id, {
+          state: GameStateEnum.OPEN,
+        });
       } else if (!game.endDate && game.startDate.getTime() > now) {
-        game = await this.patch(game.id, { state: GameStateEnum.LOCKED });
+        game = await this.patch(game.id, {
+          state: GameStateEnum.LOCKED,
+        });
       } else if (!game.endDate && game.startDate.getTime() <= now) {
-        game = await this.patch(game.id, { state: GameStateEnum.OPEN });
+        game = await this.patch(game.id, {
+          state: GameStateEnum.OPEN,
+        });
       } else {
         if (game.startDate.getTime() > game.endDate.getTime()) {
           throw new BadRequestException('Start date after end date');
         }
         if (now >= game.startDate.getTime() && now < game.endDate.getTime()) {
-          game = await this.patch(game.id, { state: GameStateEnum.OPEN });
+          game = await this.patch(game.id, {
+            state: GameStateEnum.OPEN,
+          });
         } else if (now < game.startDate.getTime()) {
-          game = await this.patch(game.id, { state: GameStateEnum.LOCKED });
+          game = await this.patch(game.id, {
+            state: GameStateEnum.LOCKED,
+          });
         } else if (now >= game.endDate.getTime()) {
-          game = await this.patch(game.id, { state: GameStateEnum.CLOSED });
+          game = await this.patch(game.id, {
+            state: GameStateEnum.CLOSED,
+          });
         }
       }
 
