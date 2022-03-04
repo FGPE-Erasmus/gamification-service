@@ -133,12 +133,6 @@ export class ValidationResolver {
     return this.playerToDtoMapper.transform(player);
   }
 
-  @ResolveField('program', () => String)
-  async program(@Parent() root: ValidationDto): Promise<string> {
-    const { id: validationId } = root;
-    return this.evaluationEngineService.getValidationProgram(validationId);
-  }
-
   //Subscription for students
   @Roles(Role.STUDENT)
   @UseGuards(GqlPlayerOfGuard)

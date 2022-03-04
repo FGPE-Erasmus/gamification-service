@@ -9,6 +9,7 @@ export interface Validation extends IBaseEntity {
   game: any;
   player: any;
   exerciseId: string;
+  program: string;
   evaluationEngine?: EvaluationEngine;
   evaluationEngineId?: string;
   language?: string;
@@ -31,6 +32,9 @@ export class ValidationDocument extends Document implements Validation {
 
   @Prop()
   exerciseId: string;
+
+  @Prop()
+  program: string;
 
   @Prop({ type: () => String, enum: EvaluationEngine })
   evaluationEngine?: EvaluationEngine;

@@ -20,6 +20,7 @@ export class ValidationToDtoMapper implements IMapper<Validation, ValidationDto>
         'evaluationEngine',
         'evaluationEngineId',
         'language',
+        'program',
         'feedback',
         'metrics',
         'outputs',

@@ -133,12 +133,6 @@ export class SubmissionResolver {
     return this.playerToDtoMapper.transform(player);
   }
 
-  @ResolveField('program', () => String)
-  async program(@Parent() root: SubmissionDto): Promise<string> {
-    const { id: submissionId } = root;
-    return this.evaluationEngineService.getSubmissionProgram(submissionId);
-  }
-
   //Subscriptions for students
   @Roles(Role.STUDENT)
   @UseGuards(GqlPlayerOfGuard)
