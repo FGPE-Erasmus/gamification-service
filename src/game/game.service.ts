@@ -118,9 +118,9 @@ export class GameService extends BaseService<Game, GameDocument> {
 
     // get a token
     const { token } = await this.mooshakService.login(
-      undefined,
-      appConfig.evaluationEngine.username,
-      appConfig.evaluationEngine.password,
+      '',
+      appConfig.evaluationEngine.adminUsername,
+      appConfig.evaluationEngine.adminPassword,
     );
 
     const entries = {

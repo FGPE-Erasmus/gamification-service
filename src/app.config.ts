@@ -54,6 +54,8 @@ interface IAppConfig {
     urlPrefix: string;
     username: string;
     password: string;
+    adminUsername: string;
+    adminPassword: string;
   };
   port: number;
   host: string;
@@ -131,6 +133,8 @@ export const appConfig: IAppConfig = {
     urlPrefix: process.env.EE_URL_PREFIX,
     username: process.env.EE_USERNAME,
     password: process.env.EE_PASSWORD,
+    adminUsername: process.env.EE_ADMIN_USERNAME,
+    adminPassword: process.env.EE_ADMIN_PASSWORD,
   },
   port: 3000,
   host: '0.0.0.0',
