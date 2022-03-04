@@ -26,7 +26,6 @@ import { appConfig } from '../app.config';
 import { ScheduledHook } from '../hook/models/scheduled-hook.model';
 import { ActionHookService } from '../hook/action-hook.service';
 import { MooshakService } from 'src/evaluation-engine/engines/mooshak/mooshak.service';
-import * as FormData from 'form-data';
 import { readFile } from 'fs/promises';
 
 @Injectable()
@@ -118,7 +117,7 @@ export class GameService extends BaseService<Game, GameDocument> {
 
     // get a token
     const { token } = await this.mooshakService.login(
-      '',
+      null,
       appConfig.evaluationEngine.adminUsername,
       appConfig.evaluationEngine.adminPassword,
     );
@@ -140,7 +139,7 @@ export class GameService extends BaseService<Game, GameDocument> {
       if (fileName === 'metadata.json') {
         const gedilLayer = extractToJson(await entry.buffer());
 
-        const buffer = await readFile(`${__dirname}/assets/proto_fgpe_template.zip`);
+        const buffer = await readFile(`${__dirname}/../assets/proto_fgpe_template.zip`);
         courseId = (
           await this.mooshakService.importContest(`${gedilLayer.id}.zip`, buffer, {
             headers: {

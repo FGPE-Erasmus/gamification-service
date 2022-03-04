@@ -436,8 +436,8 @@ enum ComparingFunction {
   GREATER_THAN
   LESS_OR_EQUAL
   GREAT_OR_EQUAL
-  EQUAL
-  NOT_EQUAL
+  EQUALS
+  NOT_EQUALS
   STARTS_WITH
   MATCHES
   NOT_MATCHES
@@ -643,7 +643,6 @@ input GameInput {
   name: String!
   private: Boolean
   description: String
-  courseId: String!
   gedilLayerId: String
   gedilLayerDescription: String
   startDate: Date

@@ -29,7 +29,7 @@ export class MooshakService implements IEngineService {
 
   constructor(protected readonly cacheService: CacheService, protected readonly httpService: HttpService) {}
 
-  async login(courseId: string, username: string, password: string): Promise<{ token: string }> {
+  async login(courseId: string | null, username: string, password: string): Promise<{ token: string }> {
     const now = new Date().getTime();
 
     if (MooshakService.tokenCache[courseId]) {
@@ -259,7 +259,13 @@ export class MooshakService implements IEngineService {
     const form: FormData = new FormData();
     form.append('file', buffer, { filename: fileName });
     return await this.httpService
-      .post<{ id: string }>(`/data/contests`, form, options)
+      .post<{ id: string }>(`/data/contests`, form, {
+        ...options,
+        headers: {
+          ...options.headers,
+          ...form.getHeaders(),
+        },
+      })
       .pipe(
         first(),
         map<any, { id: string }>(res => res.data),
@@ -276,7 +282,14 @@ export class MooshakService implements IEngineService {
     const form: FormData = new FormData();
     form.append('file', buffer, { filename: fileName });
     return await this.httpService
-      .post<string>(`/data/contests/${courseId}/problems`, form, options)
+      .post<ActivityDto>(`/data/contests/${courseId}/problems`, form, {
+          ...options,
+          headers: {
+            ...options.headers,
+            ...form.getHeaders(),
+          },
+        }
+      )
       .pipe(
         first(),
         map<any, ActivityDto>(res => res.data),
