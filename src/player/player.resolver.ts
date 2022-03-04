@@ -75,7 +75,7 @@ export class PlayerResolver {
   @Mutation(() => PlayerDto)
   async enrollWithToken(@GqlUserInfo('sub') userId: string, @Args('token') token: string): Promise<PlayerDto> {
     const payload = await this.gameService.verifyEnrollToken(token);
-    const player: Player = await this.playerService.enroll(payload.gameId, userId);
+    const player: Player = await this.playerService.enroll(payload.gameId, userId, true);
     return this.playerToDtoMapper.transform(player);
   }
 
