@@ -74,16 +74,17 @@ export class ValidationResolver {
     @Args('gameId') gameId: string,
     @Args('exerciseId') exerciseId: string,
   ): Promise<ValidationDto> {
-    const validation: Validation = await this.validationService.findOne(
+    const validations: Validation[] = await this.validationService.findAll(
       {
         game: gameId,
         player: playerId,
         exerciseId: exerciseId,
       },
       {},
-      { sort: { createdAt: -1 } },
+      { sort: { createdAt: -1 }, limit: 1 },
     );
-    return await this.validationToDtoMapper.transform(validation);
+    if ( validations.length === 0 ) throw new NotFoundException();
+    return await this.validationToDtoMapper.transform(validations[0]);
   }
 
   @Roles(Role.STUDENT)

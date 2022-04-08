@@ -9,10 +9,9 @@ services:
     user: node
     working_dir: /home/node/app
     volumes:
-      - ./assets:/home/node/app/assets
       - ./src:/home/node/app/src
     ports:
-      - 3000:3000
+      - "3000:3000"
     depends_on:
       - mongodb
       - redis

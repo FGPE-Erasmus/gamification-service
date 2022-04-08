@@ -4,8 +4,8 @@
   "compilerOptions": {
     "assets": [
       {
-        "include": "../assets",
-        "outDir": "dist/assets",
+        "include": "./assets",
+        "outDir": "dist",
         "watchAssets": true
       }
     ]

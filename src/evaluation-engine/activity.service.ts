@@ -40,7 +40,7 @@ export class ActivityService {
   }
 
   public async isActivitySolved(gameId: string, exerciseId: string, playerId: string): Promise<boolean> {
-    const acceptedSubmissions: Submission[] = await this.submissionService.findAll(
+    const acceptedSubmission: Submission = await this.submissionService.findOne(
       {
         $and: [
           { game: { $eq: gameId } },
@@ -49,8 +49,8 @@ export class ActivityService {
           { result: { $eq: Result.ACCEPT } },
         ],
       },
-      'id',
+      'id'
     );
-    return acceptedSubmissions.length !== 0;
+    return !!acceptedSubmission;
   }
 }

@@ -88,16 +88,17 @@ export class SubmissionResolver {
     @Args('gameId') gameId: string,
     @Args('exerciseId') exerciseId: string,
   ): Promise<SubmissionDto> {
-    const submission: Submission = await this.submissionService.findOne(
+    const submissions: Submission[] = await this.submissionService.findAll(
       {
         game: gameId,
         player: playerId,
         exerciseId: exerciseId,
       },
       {},
-      { sort: { createdAt: -1 } },
+      { sort: { createdAt: -1 }, limit: 1 },
     );
-    return await this.submissionToDtoMapper.transform(submission);
+    if ( submissions.length === 0 ) throw new NotFoundException();
+    return await this.submissionToDtoMapper.transform(submissions[0]);
   }
 
   @Roles(Role.STUDENT)

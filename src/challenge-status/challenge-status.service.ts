@@ -278,12 +278,11 @@ export class ChallengeStatusService extends BaseService<ChallengeStatus, Challen
   /**
    * Estimate the progress of the player in the challenge.
    *
-   * @param {string} gameId the ID of the game
    * @param {string} challengeId the ID of the challenge
    * @param {string} playerId the ID of the player
    * @returns {number} the progress of the player in the challenge.
    */
-  async progress(gameId: string, challengeId: string, playerId: string): Promise<number> {
+  async progress(challengeId: string, playerId: string): Promise<number> {
     const challenge: Challenge = await this.challengeService.findById(challengeId);
     return this.challengeProgress(challenge, playerId);
   }

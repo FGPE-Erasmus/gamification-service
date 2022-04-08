@@ -112,8 +112,7 @@ export class ChallengeStatusResolver {
   @ResolveField('progress', () => Number)
   async progress(@Parent() root: ChallengeStatusDto): Promise<number> {
     const { challenge: challengeId, player } = root;
-    const challenge: Challenge = await this.challengeService.findById(challengeId);
-    return this.challengeStatusService.progress(challenge.game, challengeId, player);
+    return this.challengeStatusService.progress(challengeId, player);
   }
 
   //Subscription for students
