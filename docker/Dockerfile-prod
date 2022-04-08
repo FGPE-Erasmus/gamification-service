@@ -25,6 +25,7 @@ COPY package*.json ./
 RUN npm set unsafe-perm true
 RUN npm install --only=production
 
-COPY --from=builder /usr/src/app/dist ./dist
+COPY --from=builder /usr/src/app/dist/src ./dist
+COPY --from=builder /usr/src/app/dist/assets ./dist/assets
 
-CMD ["node", "--max-old-space-size=2048", "dist/src/main"]
+CMD ["node", "--max-old-space-size=2048", "dist/main"]

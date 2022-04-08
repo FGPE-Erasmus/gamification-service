@@ -3,11 +3,9 @@ version: "3.7"
 services:
   app:
     container_name: app
-    build:
-      context: .
-      dockerfile: ./docker/Dockerfile
-    user: node
-    working_dir: /home/node/app
+    image: fgpe/gamification-service
+    env_file:
+      - .env.production
     volumes:
       - ./src:/home/node/app/src
     ports:
@@ -18,7 +16,6 @@ services:
       - mooshak-mock
     networks:
       - fgpe-gs-nw
-    command: "npm run start:dev"
 
   mongodb:
     container_name: ${DB_HOST}
