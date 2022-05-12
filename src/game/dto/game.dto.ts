@@ -17,6 +17,9 @@ export class GameDto {
   name?: string;
 
   @Field()
+  archival?: boolean;
+
+  @Field()
   private?: boolean;
 
   @Field(() => GameStateEnum)

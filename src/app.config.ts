@@ -4,6 +4,7 @@ import * as path from 'path';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('dotenv').config({ path: path.resolve(__dirname, `../.env.${process.env.NODE_ENV || 'dev'}`) });
+console.log('started', path.resolve(__dirname, `../.env.${process.env.NODE_ENV || 'dev'}`));
 
 interface IAppConfig {
   version: string;

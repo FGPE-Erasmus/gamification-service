@@ -19,12 +19,16 @@ export interface Game extends IBaseEntity {
   players?: any[];
   submissions?: any[];
   validations?: any[];
+  archival?: boolean;
 }
 
 @Schema({ collection: 'Game' })
 export class GameDocument extends Document implements Game {
   @Prop()
   name: string;
+
+  @Prop({ default: false })
+  archival?: boolean;
 
   @Prop({ default: true })
   private?: boolean;
