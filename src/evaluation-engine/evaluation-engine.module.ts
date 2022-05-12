@@ -39,6 +39,10 @@ import { CacheModule } from '../cache/cache.module';
           port: appConfig.messageBroker.port,
         },
         defaultJobOptions: { ...appConfig.queue.evaluation.jobOptions },
+        limiter: {
+          max: 1,
+          duration: 500,
+        },
       }),
     }),
     CacheModule,

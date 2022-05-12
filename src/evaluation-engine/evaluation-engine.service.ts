@@ -3,8 +3,6 @@ import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 
 import { appConfig } from '../app.config';
-import { IFile } from '../common/interfaces/file.interface';
-import { streamToString } from '../common/utils/stream.utils';
 import { REQUEST_EVALUATION_JOB, REQUEST_VALIDATION_JOB } from './evaluation-engine.constants';
 import { ActivityDto } from './dto/activity.dto';
 import { MooshakService } from './engines/mooshak/mooshak.service';
