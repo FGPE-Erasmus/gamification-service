@@ -11,7 +11,7 @@ export class GameInput {
   @MaxLength(200)
   name: string;
 
-  @Field({ nullable: true })
+  @Field({ defaultValue: false })
   @IsBoolean()
   @IsOptional()
   archival?: boolean;
