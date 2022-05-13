@@ -175,6 +175,14 @@ export class GameResolver {
   @Roles(Role.TEACHER)
   @UseGuards(GqlInstructorAssignedGuard)
   @Mutation(() => GameDto)
+  async setArchival(@Args('gameId') gameId: string, @Args('isArchival') isArchival: boolean): Promise<GameDto> {
+    const game: Game = await this.gameService.findOneAndUpdate({ _id: gameId }, { archival: isArchival });
+    return this.gameToDtoMapper.transform(game);
+  }
+
+  @Roles(Role.TEACHER)
+  @UseGuards(GqlInstructorAssignedGuard)
+  @Mutation(() => GameDto)
   async setAvailability(@Args('gameId') gameId: string, @Args('isPrivate') isPrivate: boolean): Promise<GameDto> {
     const game: Game = await this.gameService.findOneAndUpdate({ _id: gameId }, { private: isPrivate });
     return this.gameToDtoMapper.transform(game);
