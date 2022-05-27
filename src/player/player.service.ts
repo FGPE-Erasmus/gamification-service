@@ -56,6 +56,8 @@ export class PlayerService extends BaseService<Player, PlayerDocument> {
     if (game.private && (!enrolledByTeacher || typeof enrolledByTeacher == undefined))
       throw new Error('The private game cannot be accessed.');
 
+    if (game.archival) throw new Error('The archival game cannot be accessed.');
+
     // enroll
     player = await this.create({ game: gameId, user: userId });
 

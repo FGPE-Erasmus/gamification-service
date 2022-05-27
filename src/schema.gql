@@ -199,6 +199,7 @@ type Player {
 type Game {
   id: ID!
   name: String!
+  archival: Boolean!
   private: Boolean!
   state: GameStateEnum!
   evaluationEngine: EvaluationEngine!
@@ -617,6 +618,7 @@ type Mutation {
   assignInstructor(userId: String!, gameId: String!): Game!
   unassignInstructor(userId: String!, gameId: String!): Game!
   removeGame(gameId: String!): Game!
+  setArchival(isArchival: Boolean!, gameId: String!): Game!
   setAvailability(isPrivate: Boolean!, gameId: String!): Game!
   changeStartDate(startDate: Date!, gameId: String!): Game!
   changeEndDate(endDate: Date!, gameId: String!): Game!
@@ -641,6 +643,7 @@ type Mutation {
 
 input GameInput {
   name: String!
+  archival: Boolean = false
   private: Boolean
   description: String
   gedilLayerId: String

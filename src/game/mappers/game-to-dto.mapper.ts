@@ -11,10 +11,12 @@ export class GameToDtoMapper implements IMapper<Game, GameDto> {
     if (!obj) {
       return undefined;
     }
-    return pick(
+
+    const dto = pick(
       [
         'id',
         'name',
+        'archival',
         'private',
         'state',
         'evaluationEngine',
@@ -33,5 +35,9 @@ export class GameToDtoMapper implements IMapper<Game, GameDto> {
       ],
       obj,
     ) as GameDto;
+
+    dto.archival = !!dto.archival;
+
+    return dto;
   }
 }
