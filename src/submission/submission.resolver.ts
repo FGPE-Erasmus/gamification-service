@@ -97,7 +97,7 @@ export class SubmissionResolver {
       {},
       { sort: { createdAt: -1 }, limit: 1 },
     );
-    if ( submissions.length === 0 ) throw new NotFoundException();
+    if (submissions.length === 0) throw new NotFoundException();
     return await this.submissionToDtoMapper.transform(submissions[0]);
   }
 

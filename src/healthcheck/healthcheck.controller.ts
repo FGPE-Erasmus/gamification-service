@@ -2,10 +2,12 @@ import { Controller, Get, Res } from '@nestjs/common';
 import { Response } from 'express';
 
 import { appConfig } from '../app.config';
+import { Public } from '../keycloak/decorators/public.decorator';
 
 @Controller('healthcheck')
 export class HealthcheckController {
   @Get()
+  @Public()
   async checkStatus(@Res() res: Response): Promise<void> {
     try {
       res

@@ -7,6 +7,7 @@ require('dotenv').config({ path: path.resolve(__dirname, `../.env.${process.env.
 
 interface IAppConfig {
   version: string;
+  key: string;
   name: string;
   uuid: string;
   isProduction: boolean;
@@ -82,9 +83,25 @@ interface IAppConfig {
     secret: string;
   };
   logger: LoggerService | LogLevel[] | boolean;
+  lti: {
+    baseUrl: string;
+    database: {
+      host: string;
+      port: number;
+      username: string;
+      password: string;
+      database: string;
+    };
+    tool: {
+      name: string;
+      clientId: string;
+    };
+    redirectUrl: string;
+  };
 }
 
 export const appConfig: IAppConfig = {
+  key: process.env.APP_KEY,
   name: process.env.APP_NAME,
   version: process.env.APP_VERSION,
   uuid: process.env.APP_UUID,
@@ -173,4 +190,19 @@ export const appConfig: IAppConfig = {
     secret: process.env.APP_TOKENS_SECRET || 'FGPE',
   },
   logger: (process.env.APP_LOGGER_LEVELS?.split(',') as LogLevel[]) || ['error', 'warn'],
+  lti: {
+    baseUrl: process.env.LTI_BASE_URL,
+    database: {
+      host: process.env.LTI_DB_HOST,
+      port: +process.env.LTI_DB_PORT,
+      username: process.env.LTI_DB_USERNAME,
+      password: process.env.LTI_DB_PASSWORD,
+      database: process.env.LTI_DB_NAME,
+    },
+    tool: {
+      name: process.env.LTI_TOOL_NAME,
+      clientId: process.env.LTI_TOOL_CLIENT_ID,
+    },
+    redirectUrl: process.env.LTI_REDIRECT_URL,
+  },
 };

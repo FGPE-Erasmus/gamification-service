@@ -21,6 +21,8 @@ import { MooshakValidationDto } from './mooshak-validation.dto';
 import { CodeSkeletonDto } from '../../dto/code-skeleton.dto';
 import { CacheService } from '../../../cache/cache.service';
 
+const ACCESS_TOKEN_KEY = 'mooshak_access_token';
+
 @Injectable()
 export class MooshakService implements IEngineService {
   protected readonly logger: Logger = new Logger(MooshakService.name);
@@ -32,9 +34,13 @@ export class MooshakService implements IEngineService {
   async login(courseId: string | null, username: string, password: string): Promise<{ token: string }> {
     const now = new Date().getTime();
 
-    if (MooshakService.tokenCache[courseId]) {
-      if (MooshakService.tokenCache[courseId].expiryTime > now) {
-        return { ...MooshakService.tokenCache[courseId] };
+    const cached = await this.cacheService.get(`${ACCESS_TOKEN_KEY}-${courseId}`);
+    if (cached) {
+      const token = JSON.parse(cached);
+      if (token.expiryTime > now) {
+        return { ...token };
+      } else {
+        await this.cacheService.invalidate(`${ACCESS_TOKEN_KEY}-${courseId}`);
       }
     }
 
@@ -51,10 +57,7 @@ export class MooshakService implements IEngineService {
       )
       .toPromise();
 
-    MooshakService.tokenCache[courseId] = {
-      token,
-      expiryTime: now + 60 * 60 * 1000, // 1 hour
-    };
+    await this.cacheService.set(`${ACCESS_TOKEN_KEY}-${courseId}`, JSON.stringify(token));
 
     return { token };
   }
@@ -283,13 +286,12 @@ export class MooshakService implements IEngineService {
     form.append('file', buffer, { filename: fileName });
     return await this.httpService
       .post<ActivityDto>(`/data/contests/${courseId}/problems`, form, {
-          ...options,
-          headers: {
-            ...options.headers,
-            ...form.getHeaders(),
-          },
-        }
-      )
+        ...options,
+        headers: {
+          ...options.headers,
+          ...form.getHeaders(),
+        },
+      })
       .pipe(
         first(),
         map<any, ActivityDto>(res => res.data),

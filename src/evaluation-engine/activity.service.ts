@@ -49,7 +49,7 @@ export class ActivityService {
           { result: { $eq: Result.ACCEPT } },
         ],
       },
-      'id'
+      'id',
     );
     return !!acceptedSubmission;
   }

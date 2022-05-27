@@ -101,10 +101,63 @@ services:
     networks:
       - fgpe-gs-nw
 
+  moodle:
+    image: fgpe/moodle
+    restart: unless-stopped
+    environment:
+      SITE_URL: ${MOODLE_URL}
+      MOODLE_SITE_NAME: ${MOODLE_SITE_NAME}
+      MOODLE_EMAIL: ${MOODLE_EMAIL}
+      MOODLE_USERNAME: ${MOODLE_USERNAME}
+      MOODLE_PASSWORD: ${MOODLE_PASSWORD}
+      DB_TYPE: pgsql
+      DB_HOST: moodle-db
+      DB_PORT: 5432
+      DB_NAME: ${MOODLE_DB_NAME}
+      DB_USER: ${MOODLE_DB_USER}
+      DB_PASS: ${MOODLE_DB_PASSWORD}
+      ALLOW_EMPTY_PASSWORD: "no"
+      SSLPROXY: ${MOODLE_SSLPROXY}
+    ports:
+      - '80:8080'
+      - '8444:8443'
+    volumes:
+      - fgpe-moodle-data:/var/www/moodledata
+    depends_on:
+      - moodle-db
+    networks:
+      - fgpe-gs-nw
+
+  moodle-db:
+    image: postgres:alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${MOODLE_DB_NAME}
+      POSTGRES_USER: ${MOODLE_DB_USER}
+      POSTGRES_PASSWORD: ${MOODLE_DB_PASSWORD}
+    volumes:
+      - fgpe-moodle-db-data:/var/lib/postgresql/data
+    networks:
+      - fgpe-gs-nw
+
+  lti-db:
+    image: mongo:latest
+    environment:
+      - MONGO_INITDB_DATABASE=${LTI_DB_NAME}
+      - MONGO_INITDB_ROOT_USERNAME=${LTI_DB_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${LTI_DB_PASSWORD}
+    volumes:
+      - fgpe-lti-db:/data/db
+    networks:
+      - fgpe-gs-nw
+
 volumes:
   fgpe-gs-db: {}
   fgpe-gs-redis: {}
   fgpe-gs-mooshak-mock: {}
+  fgpe-moodle-data: {}
+  fgpe-moodle-db-data: {}
+  fgpe-lti-db: {}
 
 networks:
   fgpe-gs-nw:

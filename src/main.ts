@@ -11,7 +11,7 @@ async function bootstrap() {
   EventEmitter.defaultMaxListeners = 30;
   const app = await NestFactory.create(AppModule, { logger: appConfig.logger });
   app.use(helmet());
-  app.use(cookieParser());
+  app.use(cookieParser(appConfig.key));
   app.enableCors({
     origin: true,
     methods: 'GET, HEAD, OPTIONS, PUT, PATCH, POST, DELETE',

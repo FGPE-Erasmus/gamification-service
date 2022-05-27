@@ -65,6 +65,8 @@
     "jsonwebtoken": "^8.5.1",
     "keycloak-admin": "^1.14.3",
     "keycloak-connect": "^11.0.3",
+    "ltijs": "^5.8.8",
+    "ltijs-sequelize": "^2.4.4",
     "mongodb": "^3.5.9",
     "mongoose": "^5.10.7",
     "mongoose-autopopulate": "^0.12.2",

@@ -10,8 +10,10 @@ import { KeycloakAsyncOptions } from './interfaces/keycloak-async-options.interf
 import { UserResolver } from './user.resolver';
 import { UserService } from './user.service';
 import { CacheModule } from '../cache/cache.module';
+import { KeycloakController } from './keycloak.controller';
 
 @Module({
+  controllers: [KeycloakController],
   providers: [KeycloakResolver, KeycloakService, UserService, UserResolver],
   exports: [KeycloakService, UserService],
 })

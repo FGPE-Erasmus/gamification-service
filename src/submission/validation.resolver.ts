@@ -83,7 +83,7 @@ export class ValidationResolver {
       {},
       { sort: { createdAt: -1 }, limit: 1 },
     );
-    if ( validations.length === 0 ) throw new NotFoundException();
+    if (validations.length === 0) throw new NotFoundException();
     return await this.validationToDtoMapper.transform(validations[0]);
   }
 

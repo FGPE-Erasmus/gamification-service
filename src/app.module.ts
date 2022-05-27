@@ -24,6 +24,7 @@ import { KeycloakModule } from './keycloak/keycloak.module';
 import { AuthGuard } from './keycloak/guards/auth.guard';
 import { ResourceGuard } from './keycloak/guards/resource.guard';
 import { graphqlUploadExpress } from 'graphql-upload';
+import { LtiModule } from './lti/lti.module';
 
 @Global()
 @Module({
@@ -114,6 +115,7 @@ import { graphqlUploadExpress } from 'graphql-upload';
     LeaderboardModule,
     RewardModule,
     SubscriptionsModule,
+    LtiModule,
   ],
   providers: [
     DateScalar,

@@ -1,4 +1,4 @@
-import { HttpService, Inject, Injectable, Scope } from '@nestjs/common';
+import { HttpService, Inject, Injectable, Logger, LoggerService, Scope } from '@nestjs/common';
 import { REQUEST } from '@nestjs/core';
 import { Grant } from 'keycloak-connect';
 
@@ -12,6 +12,7 @@ import authenticate from './utils/authenticate.utils';
 
 @Injectable({ scope: Scope.REQUEST })
 export class KeycloakService {
+  protected readonly logger: LoggerService;
   protected readonly realmUrl: string;
 
   constructor(
@@ -19,11 +20,21 @@ export class KeycloakService {
     @Inject(REQUEST) private readonly req: KeycloakRequest,
     private readonly httpService: HttpService,
   ) {
+    this.logger = new Logger(KeycloakService.name);
     this.realmUrl = `${this.options.authServerUrl}/admin/realms/${this.options.realm}`;
   }
 
   async authenticate(loginArgs: LoginArgs): Promise<AuthDto> {
     return authenticate(this.req, this.options, this.httpService, loginArgs);
+  }
+
+  async ltiLogin(token: any, body: any): Promise<any> {
+    //const role = token.platformContext.roles;
+    this.logger.log(JSON.stringify(token));
+    this.logger.log(JSON.stringify(body));
+    return {
+      status: 'ok',
+    };
   }
 
   async logout(): Promise<null> {
