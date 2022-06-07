@@ -16,6 +16,7 @@ import { KeycloakController } from './keycloak.controller';
   controllers: [KeycloakController],
   providers: [KeycloakResolver, KeycloakService, UserService, UserResolver],
   exports: [KeycloakService, UserService],
+  imports: [CacheModule]
 })
 export class KeycloakModule {
   public static imports = [HttpModule, CacheModule];

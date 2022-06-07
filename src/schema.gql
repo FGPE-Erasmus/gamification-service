@@ -548,6 +548,10 @@ type Profile {
   lastName: String
 }
 
+type Platform {
+  publicKey: String!
+}
+
 type Query {
   me: Profile!
   user(id: String!): User!
@@ -639,6 +643,7 @@ type Mutation {
   generateGroupToken(groupId: String!, gameId: String!): TokenDto!
   evaluate(gameId: String!, exerciseId: String!, file: Upload!): Submission
   validate(gameId: String!, exerciseId: String!, file: Upload!, inputs: [String!] = []): Validation
+  registerPlatform(url: String!, name: String!, clientId: String!): Platform!
 }
 
 input GameInput {

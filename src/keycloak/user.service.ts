@@ -99,7 +99,7 @@ export class UserService {
     }));
   }
 
-  async getUserByUsername(username: string, forceFresh = false): Promise<UserDto | null> {
+  async getUserByUsername(username: string, forceFresh = false, accessToken = null): Promise<UserDto | null> {
     const cacheKey = `user_by_username:${username}`;
     if (!forceFresh) {
       const cached = await this.cacheService.get(cacheKey);
@@ -110,7 +110,7 @@ export class UserService {
     const response: AxiosResponse<User[]> = await this.httpService
       .get<User[]>(`${this.realmUrl}/users?username=${username}`, {
         headers: {
-          Authorization: `Bearer ${(await this.getAccessToken()).data.access_token}`,
+          Authorization: `Bearer ${accessToken || (await this.getAccessToken()).data.access_token}`,
         },
       })
       .toPromise();
@@ -129,35 +129,74 @@ export class UserService {
     return result;
   }
 
-  async createUser(user: UserDto): Promise<UserDto> {
-    const response: AxiosResponse<User> = await this.httpService
-      .post<User>(`${this.realmUrl}/users`, user, {
+  async createUser(user: UserDto, role: 'teacher' | 'student' = 'student'): Promise<UserDto> {
+    this.logger.log('---------------------------------------------------------------')
+    const token = (await this.getAccessToken()).data;
+    this.logger.log(JSON.stringify(token))
+
+    const createUserResponse: AxiosResponse<void> = await this.httpService
+      .post<void>(`${this.realmUrl}/users`, { ...user, enabled: true }, {
         headers: {
-          Authorization: `Bearer ${(await this.getAccessToken()).data.access_token}`,
+          Authorization: `Bearer ${token.access_token}`,
         },
       })
       .toPromise();
-    if (response.status > 299) {
-      throw new HttpException(response.data, response.status);
+    if (createUserResponse.status > 299) {
+      throw new HttpException('', createUserResponse.status);
     }
-    return {
-      firstName: response.data.given_name,
-      lastName: response.data.family_name,
-      ...response.data,
-    };
+
+    const savedUser = await this.getUserByUsername(user.username, true, token.access_token);
+    this.logger.log(JSON.stringify(savedUser))
+
+    const roleResponse: AxiosResponse = await this.httpService
+      .get<{ id: string; name: string; containerId: string }>(
+        `${this.realmUrl}/roles/${role}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token.access_token}`,
+          },
+        }
+      )
+      .toPromise()
+    if (roleResponse.status > 299) {
+      throw new HttpException(roleResponse.data, roleResponse.status);
+    }
+    this.logger.log(JSON.stringify(roleResponse.data))
+
+    const addRoleResponse = await this.httpService
+      .post<any>(
+        `${this.realmUrl}/users/${savedUser.id}/role-mappings/realm`,
+        [roleResponse.data],
+        {
+          headers: {
+            Authorization: `Bearer ${token.access_token}`,
+          },
+        }
+      )
+      .toPromise();
+    if (addRoleResponse.status > 299) {
+      throw new HttpException(addRoleResponse.data, addRoleResponse.status);
+    }
+    this.logger.log(JSON.stringify(addRoleResponse.data))
+
+    return savedUser;
   }
 
   async exchangeAdminTokenForUserToken(targetUserId: string): Promise<any> {
-    const response: AxiosResponse<any> = await this.httpService
+    const token = (await this.getAccessToken()).data;
+    this.logger.log(token.refresh_token)
+    const response: AxiosResponse = await this.httpService
       .post<any>(
         `${this.options.authServerUrl}/realms/${this.options.realm}/protocol/openid-connect/token`,
         qs.stringify({
-          client_id: 'admin-cli',
+          client_id: 'fgpe-learning-platform',
           grant_type: 'urn:ietf:params:oauth:grant-type:token-exchange',
-          subject_token: (await this.getAccessToken()).data.access_token,
+          subject_token_type: 'urn:ietf:params:oauth:token-type:access_token',
+          subject_token: token.access_token,
           requested_token_type: 'urn:ietf:params:oauth:token-type:refresh_token',
-          audience: this.options.clientId,
           requested_subject: targetUserId,
+          scope: 'openid profile email',
+          audience: 'fgpe-learning-platform',
         }),
         {
           headers: {
@@ -169,7 +208,6 @@ export class UserService {
     if (response.status > 299) {
       throw new HttpException(response.data, response.status);
     }
-    this.logger.log(JSON.stringify(response.data));
     return response.data;
   }
 

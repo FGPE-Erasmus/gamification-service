@@ -28,15 +28,6 @@ export class KeycloakService {
     return authenticate(this.req, this.options, this.httpService, loginArgs);
   }
 
-  async ltiLogin(token: any, body: any): Promise<any> {
-    //const role = token.platformContext.roles;
-    this.logger.log(JSON.stringify(token));
-    this.logger.log(JSON.stringify(body));
-    return {
-      status: 'ok',
-    };
-  }
-
   async logout(): Promise<null> {
     if (!this.req.session) return null;
     await new Promise<void>((resolve, reject) => {
