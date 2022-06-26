@@ -13,6 +13,7 @@ interface IAppConfig {
   isProduction: boolean;
   isDevelopment: boolean;
   isTesting: boolean;
+  basePath: string;
   assetsPath: string;
   auth: {
     keycloak: {
@@ -108,6 +109,7 @@ export const appConfig: IAppConfig = {
   isProduction: process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'prod',
   isDevelopment: process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'dev',
   isTesting: process.env.NODE_ENV === 'test',
+  basePath: process.env.APP_BASE_PATH || '/',
   assetsPath: `${__dirname}/../assets`,
   auth: {
     keycloak: {
