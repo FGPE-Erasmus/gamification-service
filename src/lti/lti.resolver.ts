@@ -8,15 +8,11 @@ import { PlatformDto } from './dto/platform.dto';
 
 @Resolver(() => PlatformDto)
 export class LtiResolver {
-  constructor(
-    protected readonly ltiService: LtiService,
-  ) {}
+  constructor(protected readonly ltiService: LtiService) {}
 
   @Roles(Role.TEACHER)
   @Mutation(() => PlatformDto)
-  async registerPlatform(
-    @Args() platformDto: CreatePlatformArgs,
-  ): Promise<any> {
+  async registerPlatform(@Args() platformDto: CreatePlatformArgs): Promise<any> {
     return this.ltiService.registerPlatform(platformDto);
   }
 }

@@ -30,11 +30,7 @@ export class LtiController {
 
   @Post('auth')
   @Public()
-  async ltiAuth(
-    @Req() req: Request,
-    @Res() res: Response,
-    @Body() dto: LtiAuthDto
-  ): Promise<void> {
+  async ltiAuth(@Req() req: Request, @Res() res: Response, @Body() dto: LtiAuthDto): Promise<void> {
     const result = await this.ltiService.auth(req.res.locals.token, dto);
     res
       /*.cookie(LTI_CONTEXT_COOKIE_KEY, jwt.sign({
@@ -60,16 +56,8 @@ export class LtiController {
 
   @Post('grade')
   @Public()
-  async send(
-    @Req() req: Request,
-    @Body() dto: LtiGradeDto,
-  ): Promise<any> {
-    this.logger.log(JSON.stringify(dto))
-    return await this.ltiService.sendLastGrade(
-      req.res.locals.token,
-      dto.game,
-      dto.challenge,
-      dto.activity
-    );
+  async send(@Req() req: Request, @Body() dto: LtiGradeDto): Promise<any> {
+    this.logger.log(JSON.stringify(dto));
+    return await this.ltiService.sendLastGrade(req.res.locals.token, dto.game, dto.challenge, dto.activity);
   }
 }

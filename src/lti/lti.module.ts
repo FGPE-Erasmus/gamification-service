@@ -15,7 +15,7 @@ import { LtiResolver } from './lti.resolver';
   providers: [LtiService, LtiResolver],
   controllers: [LtiController],
   exports: [LtiService],
-  imports: [KeycloakModule, GameModule, PlayerModule, EvaluationEngineModule, ChallengeModule, ChallengeStatusModule]
+  imports: [KeycloakModule, GameModule, PlayerModule, EvaluationEngineModule, ChallengeModule, ChallengeStatusModule],
 })
 export class LtiModule implements NestModule {
   configure(consumer: MiddlewareConsumer): void {

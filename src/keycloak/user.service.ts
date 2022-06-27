@@ -130,61 +130,58 @@ export class UserService {
   }
 
   async createUser(user: UserDto, role: 'teacher' | 'student' = 'student'): Promise<UserDto> {
-    this.logger.log('---------------------------------------------------------------')
+    this.logger.log('---------------------------------------------------------------');
     const token = (await this.getAccessToken()).data;
-    this.logger.log(JSON.stringify(token))
+    this.logger.log(JSON.stringify(token));
 
     const createUserResponse: AxiosResponse<void> = await this.httpService
-      .post<void>(`${this.realmUrl}/users`, { ...user, enabled: true }, {
-        headers: {
-          Authorization: `Bearer ${token.access_token}`,
+      .post<void>(
+        `${this.realmUrl}/users`,
+        { ...user, enabled: true },
+        {
+          headers: {
+            Authorization: `Bearer ${token.access_token}`,
+          },
         },
-      })
+      )
       .toPromise();
     if (createUserResponse.status > 299) {
       throw new HttpException('', createUserResponse.status);
     }
 
     const savedUser = await this.getUserByUsername(user.username, true, token.access_token);
-    this.logger.log(JSON.stringify(savedUser))
+    this.logger.log(JSON.stringify(savedUser));
 
     const roleResponse: AxiosResponse = await this.httpService
-      .get<{ id: string; name: string; containerId: string }>(
-        `${this.realmUrl}/roles/${role}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token.access_token}`,
-          },
-        }
-      )
-      .toPromise()
+      .get<{ id: string; name: string; containerId: string }>(`${this.realmUrl}/roles/${role}`, {
+        headers: {
+          Authorization: `Bearer ${token.access_token}`,
+        },
+      })
+      .toPromise();
     if (roleResponse.status > 299) {
       throw new HttpException(roleResponse.data, roleResponse.status);
     }
-    this.logger.log(JSON.stringify(roleResponse.data))
+    this.logger.log(JSON.stringify(roleResponse.data));
 
     const addRoleResponse = await this.httpService
-      .post<any>(
-        `${this.realmUrl}/users/${savedUser.id}/role-mappings/realm`,
-        [roleResponse.data],
-        {
-          headers: {
-            Authorization: `Bearer ${token.access_token}`,
-          },
-        }
-      )
+      .post<any>(`${this.realmUrl}/users/${savedUser.id}/role-mappings/realm`, [roleResponse.data], {
+        headers: {
+          Authorization: `Bearer ${token.access_token}`,
+        },
+      })
       .toPromise();
     if (addRoleResponse.status > 299) {
       throw new HttpException(addRoleResponse.data, addRoleResponse.status);
     }
-    this.logger.log(JSON.stringify(addRoleResponse.data))
+    this.logger.log(JSON.stringify(addRoleResponse.data));
 
     return savedUser;
   }
 
   async exchangeAdminTokenForUserToken(targetUserId: string): Promise<any> {
     const token = (await this.getAccessToken()).data;
-    this.logger.log(token.refresh_token)
+    this.logger.log(token.refresh_token);
     const response: AxiosResponse = await this.httpService
       .post<any>(
         `${this.options.authServerUrl}/realms/${this.options.realm}/protocol/openid-connect/token`,
