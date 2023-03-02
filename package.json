@@ -64,7 +64,7 @@
     "jsonpath-plus": "^4.0.0",
     "jsonwebtoken": "^8.5.1",
     "keycloak-admin": "^1.14.3",
-    "keycloak-connect": "^11.0.3",
+    "keycloak-connect": "^21.0.1",
     "mongodb": "^3.5.9",
     "mongoose": "^5.10.7",
     "mongoose-autopopulate": "^0.12.2",
