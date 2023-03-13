@@ -20,27 +20,66 @@ import { ValidationDto } from '../../dto/validation.dto';
 import { MooshakValidationDto } from './mooshak-validation.dto';
 import { CodeSkeletonDto } from '../../dto/code-skeleton.dto';
 import { CacheService } from '../../../cache/cache.service';
+import { appConfig } from '../../../app.config';
+import { sleep } from '../../../common/utils/time.utils';
 
+const MAX_REQUESTS_COUNT = 1;
+const INTERVAL_MS = 10;
+let PENDING_REQUESTS = 0;
 const ACCESS_TOKEN_KEY = 'mooshak_access_token';
 
 @Injectable()
 export class MooshakService implements IEngineService {
   protected readonly logger: Logger = new Logger(MooshakService.name);
 
-  protected static tokenCache: { [_: string]: { token: string; expiryTime: number } } = {};
+  constructor(
+    protected readonly cacheService: CacheService,
+    protected readonly httpService: HttpService
+  ) {
+    httpService.axiosRef.interceptors.request.use(async (config) => {
+      if ( config.url.endsWith('/auth/login') ) {
+        while ( true ) {
+          if ( PENDING_REQUESTS < MAX_REQUESTS_COUNT ) {
+            PENDING_REQUESTS++
+            const cached = await this.cacheService.get(`${ ACCESS_TOKEN_KEY }-${ config.data.contest }-${ config.data.username }`);
+            if ( cached ) {
+              const token = JSON.parse(cached);
+              if ( token.expiryTime > new Date().getTime() ) {
+                this.logger.error('recently cached token EXISTS')
+                throw { local: true, data: { ...token } };
+              }
+            }
+            return config
+          }
+          await sleep(INTERVAL_MS);
+        }
+      }
+      return config
+    })
+    httpService.axiosRef.interceptors.response.use((response) => {
+        if ( response.config.url.endsWith('/auth/login') ) {
+          PENDING_REQUESTS = Math.max(0, PENDING_REQUESTS - 1)
+        }
+        return Promise.resolve(response)
+      }, (error) => {
+      if ( error.local ) {
+        PENDING_REQUESTS = Math.max(0, PENDING_REQUESTS - 1)
+        return Promise.resolve({ data: { ...error.data } })
+      }
+      return Promise.reject(error)
+    })
+  }
 
-  constructor(protected readonly cacheService: CacheService, protected readonly httpService: HttpService) {}
-
-  async login(courseId: string | null, username: string, password: string): Promise<{ token: string }> {
+  async login(courseId: string | null, username: string, password: string): Promise<{ token: string;}> {
     const now = new Date().getTime();
 
-    const cached = await this.cacheService.get(`${ACCESS_TOKEN_KEY}-${courseId}`);
+    this.logger.error(`${ACCESS_TOKEN_KEY}-${courseId}-${username}`)
+    const cached = await this.cacheService.get(`${ACCESS_TOKEN_KEY}-${courseId}-${username}`);
     if (cached) {
       const token = JSON.parse(cached);
+      this.logger.error('cached token EXISTS')
       if (token.expiryTime > now) {
         return { ...token };
-      } else {
-        await this.cacheService.invalidate(`${ACCESS_TOKEN_KEY}-${courseId}`);
       }
     }
 
@@ -53,11 +92,16 @@ export class MooshakService implements IEngineService {
       .pipe(
         first(),
         map(res => res.data),
-        this.catchMooshakError(courseId),
+        this.catchMooshakError(courseId, username),
       )
       .toPromise();
 
-    await this.cacheService.set(`${ACCESS_TOKEN_KEY}-${courseId}`, JSON.stringify(token));
+    if ( token ) {
+      this.logger.error(`caching ${token}`)
+      await this.cacheService.set(`${ACCESS_TOKEN_KEY}-${courseId}-${username}`, JSON.stringify({ token, expiryTime: now + 5 * 60 * 1000 }));
+    } else {
+      throw new Error('No token generated')
+    }
 
     return { token };
   }
@@ -322,19 +366,25 @@ export class MooshakService implements IEngineService {
       .toPromise();
   }
 
-  private catchMooshakError = <T>(courseId?: string) =>
-    catchError<T, ObservableInput<any>>((error: AxiosError) => {
-      console.log(error);
-      if (error.response) {
-        if (error.response.status === 401 || error.response.status === 403) {
-          console.log(MooshakService.tokenCache);
-          delete MooshakService.tokenCache[courseId];
-          console.log(MooshakService.tokenCache);
+  private catchMooshakError = <T>(courseId?: string, username?: string) =>
+    catchError<T, ObservableInput<any>>(async (error: AxiosError) =>{
+      if ( error.response ) {
+        if ( error.response.config.url.endsWith('/auth/login') ) {
+          PENDING_REQUESTS = Math.max(0, PENDING_REQUESTS - 1)
+        }
+        if ( error.response.status === 401 || error.response.status === 403 ) {
+          this.logger.error(`removing ${ACCESS_TOKEN_KEY}-${courseId}`)
+          if ( username ) {
+            await this.cacheService.invalidate(`${ACCESS_TOKEN_KEY}-${courseId}-${username}`);
+          } else {
+            await this.cacheService.invalidate(`${ACCESS_TOKEN_KEY}-${courseId}-${appConfig.evaluationEngine.username}`);
+            await this.cacheService.invalidate(`${ACCESS_TOKEN_KEY}-${courseId}-${appConfig.evaluationEngine.adminUsername}`);
+          }
         }
         const ex: MooshakExceptionDto = error.response.data as MooshakExceptionDto;
-        return throwError(new Error(`${ex.status} ${ex.title} -  ${ex.message}`));
+        return throwError(new Error(`${ ex.status } ${ ex.title } - ${ ex.message }`));
       }
-      return throwError(new Error(`${error.code} ${error.name} -  ${error.message}`));
+      return throwError(new Error(`${ error.code } ${ error.name } - ${ error.message }`));
     });
 
   private static mapMooshakSubmissionToEvaluation(mooshakSubmission: MooshakSubmissionDto): EvaluationDto {

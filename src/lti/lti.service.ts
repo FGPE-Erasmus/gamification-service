@@ -28,50 +28,52 @@ export class LtiService {
     this.logger.log(JSON.stringify(appConfig.basePath));
     this.logger.log(JSON.stringify(appConfig.lti));
 
-    lti.setup(
-      appConfig.key,
-      {
-        url: `mongodb://${appConfig.lti.database.host}:${appConfig.lti.database.port}/${appConfig.lti.database.database}?authSource=admin`,
-        connection: {
-          user: appConfig.lti.database.username ?? '',
-          pass: appConfig.lti.database.password ?? '',
+    if ( appConfig.lti ) {
+      lti.setup(
+        appConfig.key,
+        {
+          url: `mongodb://${appConfig.lti.database.host}:${appConfig.lti.database.port}/${appConfig.lti.database.database}?authSource=admin`,
+          connection: {
+            user: appConfig.lti.database.username ?? '',
+            pass: appConfig.lti.database.password ?? '',
+          },
         },
-      },
-      {
-        cookies: {
-          // Set secure to true if the testing platform is in a different domain and https is being used
-          secure: appConfig.isProduction,
-          // Set sameSite to 'None' if the testing platform is in a different domain and https is being used
-          sameSite: '',
+        {
+          cookies: {
+            // Set secure to true if the testing platform is in a different domain and https is being used
+            secure: appConfig.isProduction,
+            // Set sameSite to 'None' if the testing platform is in a different domain and https is being used
+            sameSite: '',
+          },
+          devMode: appConfig.isDevelopment,
+          tokenMaxAge: 60,
+          cors: true,
         },
-        devMode: appConfig.isDevelopment,
-        tokenMaxAge: 60,
-        cors: true,
-      },
-    );
+      );
 
-    lti.onConnect(async (token: IdToken, req: Request, res: Response) => {
-      const query = {};
-      if (token.platformContext.custom?.game) {
-        query['gameId'] = token.platformContext.custom.game;
-      }
-      if (token.platformContext.custom?.challenge) {
-        query['challengeId'] = token.platformContext.custom.challenge;
-      }
-      if (token.platformContext.custom?.exercise) {
-        query['exerciseId'] = token.platformContext.custom.exercise;
-      }
-      this.logger.log(JSON.stringify(query));
-      this.logger.log(JSON.stringify(appConfig.lti));
-      return lti.redirect(res, appConfig.lti.redirectUrl, { query });
-    });
+      lti.onConnect(async (token: IdToken, req: Request, res: Response) => {
+        const query = {};
+        if (token.platformContext.custom?.game) {
+          query['gameId'] = token.platformContext.custom.game;
+        }
+        if (token.platformContext.custom?.challenge) {
+          query['challengeId'] = token.platformContext.custom.challenge;
+        }
+        if (token.platformContext.custom?.exercise) {
+          query['exerciseId'] = token.platformContext.custom.exercise;
+        }
+        this.logger.log(JSON.stringify(query));
+        this.logger.log(JSON.stringify(appConfig.lti));
+        return lti.redirect(res, appConfig.lti.redirectUrl, { query });
+      });
 
-    const router = Router();
-    router.all(/.*/, (req, res, next) => {
-      next();
-    });
-    lti.app.use(router);
-    lti.deploy({ serverless: true });
+      const router = Router();
+      router.all(/.*/, (req, res, next) => {
+        next();
+      });
+      lti.app.use(router);
+      lti.deploy({ serverless: true });
+    }
   }
 
   async auth(token: IdToken, body: LtiAuthDto): Promise<any> {

@@ -192,7 +192,7 @@ export const appConfig: IAppConfig = {
     secret: process.env.APP_TOKENS_SECRET || 'FGPE',
   },
   logger: (process.env.APP_LOGGER_LEVELS?.split(',') as LogLevel[]) || ['error', 'warn'],
-  lti: {
+  lti: (process.env.LTI_BASE_URL && {
     baseUrl: process.env.LTI_BASE_URL,
     database: {
       host: process.env.LTI_DB_HOST,
@@ -206,5 +206,5 @@ export const appConfig: IAppConfig = {
       clientId: process.env.LTI_TOOL_CLIENT_ID,
     },
     redirectUrl: process.env.LTI_REDIRECT_URL,
-  },
+  }),
 };

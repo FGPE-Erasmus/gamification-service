@@ -26,6 +26,7 @@ import { CacheModule } from '../cache/cache.module';
   imports: [
     HttpModule.registerAsync({
       useFactory: () => ({
+
         timeout: appConfig.http.timeout,
         maxRedirects: appConfig.http.maxRedirects,
         baseURL: `${appConfig.evaluationEngine.protocol}://${appConfig.evaluationEngine.host}:${appConfig.evaluationEngine.port}${appConfig.evaluationEngine.urlPrefix}`,

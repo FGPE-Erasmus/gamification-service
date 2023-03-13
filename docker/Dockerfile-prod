@@ -1,11 +1,11 @@
 # build stage
-FROM node:lts-alpine as builder
+FROM node:14-alpine as builder
 
 WORKDIR /usr/src/app
 
 COPY package*.json ./
+COPY .npmrc ./
 
-RUN npm set unsafe-perm true
 RUN npm install
 
 COPY . .
@@ -13,7 +13,7 @@ COPY . .
 RUN npm run build
 
 # production stage
-FROM node:lts-alpine as production
+FROM node:14-alpine as production
 
 ARG NODE_ENV=production
 ENV NODE_ENV=$NODE_ENV

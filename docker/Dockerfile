@@ -1,4 +1,4 @@
-FROM node:lts-alpine
+FROM node:14-alpine
 
 RUN apk update && apk add bash
 
@@ -15,8 +15,8 @@ ENV PATH=$PATH:/home/node/.npm-global/bin
 WORKDIR /home/node/app
 
 COPY package*.json ./
+COPY .npmrc ./
 
-RUN npm set unsafe-perm true
 RUN npm install
 
 RUN chown -R node:node /home/node/.npm-global
