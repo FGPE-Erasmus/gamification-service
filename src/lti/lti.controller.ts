@@ -5,6 +5,7 @@ import { Public } from '../keycloak/decorators/public.decorator';
 import { LtiService } from './lti.service';
 import { LtiAuthDto } from './dto/auth.dto';
 import { LtiGradeDto } from './dto/grade.dto';
+import { appConfig } from '../app.config';
 
 const LTI_CONTEXT_COOKIE_KEY = 'FGPE_LTI_CONTEXT';
 
@@ -32,6 +33,7 @@ export class LtiController {
   @Public()
   async ltiAuth(@Req() req: Request, @Res() res: Response, @Body() dto: LtiAuthDto): Promise<void> {
     const result = await this.ltiService.auth(req.res.locals.token, dto);
+    res.cookie(appConfig.auth.keycloak.cookieKey, result.access_token, { httpOnly: true });
     res
       /*.cookie(LTI_CONTEXT_COOKIE_KEY, jwt.sign({
         ltik: dto.ltik,
