@@ -115,7 +115,7 @@ $ npm run test:cov
 <tr border=0>
 <td border=0>
 
-This software has been developed as a part of the Framework for Gamified Programming Education project ([https://fgpe.usz.edu.pl/](https://fgpe.usz.edu.pl/)), co-funded by the Erasmus+ Programme of the European Union.
+This software has been developed as a part of the Framework for Gamified Programming Education ([https://fgpe.usz.edu.pl/](https://fgpe.usz.edu.pl/)) and FGPE Plus: Learning tools interoperability for gamified programming education ([https://fgpeplus.usz.edu.pl/](https://fgpeplus.usz.edu.pl/)) projects which were co-funded by the Erasmus+ Programme of the European Union.
 
 </td>
 <td border=0>
